@@ -646,8 +646,14 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .gdc { display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:center; width:100%; text-align:left; border:0; background:#fff; border-radius:18px; padding:18px 18px; font:inherit; color:var(--txt); cursor:pointer; }
 .gdc b { font-size:17px; font-weight:700; letter-spacing:-0.02em; }
 .gdc span { grid-column:1; font-size:13.5px; color:var(--sub); line-height:1.5; }
+.gdg + .gdg { margin-top:22px; }
+.gdg h4 { margin:0 4px 10px; font-size:13px; font-weight:700; color:var(--sub); letter-spacing:0.02em; }
+.gdc .gds { display:flex; flex-wrap:wrap; gap:6px; grid-column:1 / span 2; margin-top:6px; }
+.gds button { font:inherit; font-size:12.5px; font-weight:600; color:var(--sub); background:#f1f3f6; border:0; border-radius:999px; padding:5px 11px; cursor:pointer; }
+.gds button:hover { color:var(--txt); background:#e6e9ee; }
+.gdl .gdc i { grid-row:1; }
 .gdc i { grid-row:1 / span 2; grid-column:2; font-style:normal; font-size:18px; font-weight:700; color:var(--acc); }
-.gdbs { max-width:900px; display:flex; flex-direction:column; overflow:hidden !important; padding-bottom:0; }
+.gdbs { max-width:1180px; display:flex; flex-direction:column; overflow:hidden !important; padding-bottom:0; }
 .gdbs h3 { display:none; } /* 제목은 문서 안에 있으니 창 위에는 안 보임 */
 .gdbs iframe { flex:1; min-height:0; width:100%; border:0; border-radius:12px; background:#fff; }
 .qkh { display:block; width:100%; padding:0 0 8px; position:relative; cursor:pointer; }
@@ -1064,7 +1070,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261117gd4';
+var APP_VER = '20261118gd5';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1471,16 +1477,21 @@ function render() {
   $$('.dpk').forEach(function (i) { i.addEventListener('click', function () { try { if (i.showPicker) i.showPicker(); } catch (e) {} }); });
 }
 // GUIDE 메뉴 (2026-11-10): 목록은 화면에, 문서는 아래에서 올라오는 창으로
-var GUIDES = [{ f: 'folder-file.html', t: '폴더및파일가이드라인', s: 'NAS 프로젝트 폴더 구조, 폴더·파일명 규칙, 일러스트 저장·전달 기준' }, { f: 'packshot.html', t: '팩샷·상세페이지 작업 가이드', s: '일러스트 스트럭처 → 포토샵 목업 → 상세페이지 → 최종 검수, 단계별 컨펌 기준' }];
+// 2026-11-18: 업무 및 행정 / 디자인 작업 2그룹, 아래 항목은 해당 섹션 바로가기
+var GUIDE_GROUPS = [{"g":"업무 및 행정","i":[{"f":"g.html?id=office","t":"사무실 이용 가이드","s":[["사무실 출입","door"],["나스(NAS)","nas"],["와이파이","wifi"],["복합기 사용","printer"]]},{"f":"g.html?id=admin","t":"행정업무 가이드","s":[["퀵","quick"],["법인택시","taxi"],["법인카드 사용","corpcard"],["개인 지출결의 작성","expense"],["명함 제작","namecard"]]},{"f":"g.html?id=system","t":"업무 시스템 가이드","s":[["위하고 접속","wehago"],["메일플러그 접속","mailplug"],["메일 서명 수정","signature"]]}]},{"g":"디자인 작업","i":[{"f":"folder-file.html","t":"폴더 및 파일 가이드","s":[]},{"f":"g.html?id=illustrator","t":"일러스트 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["새 문서·저장","save"]]},{"f":"g.html?id=photoshop","t":"포토샵 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["문서 기준","doc"]]},{"f":"g.html?id=indesign","t":"인디자인 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["저장·전달","save"]]},{"f":"g.html?id=bridge","t":"브릿지 셋팅","s":[["색상 설정 동기화","color"],["작업 영역","workspace"],["환경설정","prefs"],["일괄 이름 바꾸기","rename"],["레이블·별점","label"]]},{"f":"g.html?id=acrobat","t":"아크로뱃 셋팅","s":[["작업 영역 (도구·탭)","workspace"],["환경설정","prefs"],["인쇄 PDF 검수","check"],["피드백·비교","feedback"]]},{"f":"g.html?id=label","t":"상품 라벨 스티커 데이터 (와우프레스)","s":[["주문 옵션","option"],["데이터 만들기","data"],["체크 포인트","check"]]},{"f":"packshot.html","t":"시즌그리팅 팩샷 작업가이드","s":[]},{"f":"g.html?id=photocard","t":"포토카드 제작 유의사항","s":[["기본 규격","spec"],["사진 작업","image"],["앞·뒷면","back"],["발주·검수","order"]]}]}];
+var GUIDES = [];
+GUIDE_GROUPS.forEach(function (gr) { gr.i.forEach(function (g) { GUIDES.push(g); }); });
 function renderGuide() {
-  $('#main').innerHTML = '<div class="gdl">' + GUIDES.map(function (g, i) { return '<button class="gdc" type="button" data-i="' + i + '"><b>' + esc(g.t) + '</b><span>' + esc(g.s) + '</span><i>→</i></button>'; }).join('') + '</div>';
-  $$('.gdc').forEach(function (b) { b.onclick = function () { openGd(GUIDES[+b.dataset.i]); }; });
+  var n = 0;
+  $('#main').innerHTML = GUIDE_GROUPS.map(function (gr) { return '<div class="gdg"><h4>' + esc(gr.g) + '</h4><div class="gdl">' + gr.i.map(function (g) { var i = n++; return '<div class="gdc" role="button" tabindex="0" data-i="' + i + '"><b>' + esc(g.t) + '</b><i>→</i>' + (g.s.length ? '<span class="gds">' + g.s.map(function (x) { return '<button type="button" data-i="' + i + '" data-a="' + esc(x[1]) + '">' + esc(x[0]) + '</button>'; }).join('') + '</span>' : '') + '</div>'; }).join('') + '</div></div>'; }).join('');
+  $$('.gdc').forEach(function (b) { b.onclick = function () { openGd(GUIDES[+b.dataset.i]); }; b.onkeydown = function (e) { if (e.key === 'Enter') b.onclick(); }; });
+  $$('.gds button').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); openGd(GUIDES[+b.dataset.i], b.dataset.a); }; });
 }
-function openGd(g) {
+function openGd(g, anchor) {
   $('#gdT').textContent = g.t;
   var f = $('#gdF');
   f.onload = function () { try { var d = f.contentDocument; d.documentElement.setAttribute('data-theme', 'light'); var bk = d.querySelector('.back'); if (bk) bk.style.display = 'none'; var w = d.querySelector('.wrap'); if (w) w.style.paddingTop = '8px'; } catch (e) {} };
-  f.setAttribute('src', 'guide/' + g.f + '?t=' + Date.now()); // 매번 최신 문서로
+  f.setAttribute('src', 'guide/' + g.f + (g.f.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now() + (anchor ? '#' + anchor : '')); // 매번 최신 문서로
   var was = !!$('.bs.open'); closeBs();
   setTimeout(function () { openBs('#gd'); $('#gd').style.height = $('#gd').style.maxHeight; }, was ? 230 : 0);
 }
