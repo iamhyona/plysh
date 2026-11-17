@@ -1064,7 +1064,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261117gd3';
+var APP_VER = '20261117gd4';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1471,7 +1471,7 @@ function render() {
   $$('.dpk').forEach(function (i) { i.addEventListener('click', function () { try { if (i.showPicker) i.showPicker(); } catch (e) {} }); });
 }
 // GUIDE 메뉴 (2026-11-10): 목록은 화면에, 문서는 아래에서 올라오는 창으로
-var GUIDES = [{ f: 'folder-file.html', t: '폴더및파일가이드라인', s: 'NAS 프로젝트 폴더 구조, 폴더·파일명 규칙, 일러스트 저장·전달 기준' }];
+var GUIDES = [{ f: 'folder-file.html', t: '폴더및파일가이드라인', s: 'NAS 프로젝트 폴더 구조, 폴더·파일명 규칙, 일러스트 저장·전달 기준' }, { f: 'packshot.html', t: '팩샷·상세페이지 작업 가이드', s: '일러스트 스트럭처 → 포토샵 목업 → 상세페이지 → 최종 검수, 단계별 컨펌 기준' }];
 function renderGuide() {
   $('#main').innerHTML = '<div class="gdl">' + GUIDES.map(function (g, i) { return '<button class="gdc" type="button" data-i="' + i + '"><b>' + esc(g.t) + '</b><span>' + esc(g.s) + '</span><i>→</i></button>'; }).join('') + '</div>';
   $$('.gdc').forEach(function (b) { b.onclick = function () { openGd(GUIDES[+b.dataset.i]); }; });
