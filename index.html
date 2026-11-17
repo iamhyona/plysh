@@ -1098,7 +1098,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261118gd5';
+var APP_VER = '20261118qp1';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3295,8 +3295,8 @@ $('#qpGo').onclick = function () {
   var mp = qpMap(QP.r);
   $('#qkLabel').innerHTML = mp ? '<div class="lbp"><div class="lbh lbfull">' + qpHtml(QP.r) + '<img class="lbmap" src="' + mp + '" alt=""></div></div>' : '<div class="lbp"><div class="lbh">' + qpHtml(QP.r) + '</div><div class="lbcut"></div><div class="lbh lbh2">' + qpHtml(QP.r) + '</div></div>';
   closeBs();
-  var im = $('#qkLabel img'), go = function () { setTimeout(function () { window.print(); }, 260); };
-  if (im && !im.complete) { im.onload = im.onerror = go; } else go();
+  // 2026-11-18: 지도 이미지는 미리보기에서 이미 불러와 있어서 기다리지 않고 바로 인쇄 (기다리면 인쇄 창이 안 뜨는 문제)
+  setTimeout(function () { window.print(); }, 260);
 };
 
 /* ───── WORK LOG 빠른 입력 (2026-10-19): 대충 쓴 글 · 카톡 캡처를 읽어서 기록으로 ───── */
