@@ -1,4 +1,3 @@
-await new Promise(r=>setTimeout(r,2500));
 window.__C=(async()=>{const key=window.__KEY;const out={key,url:location.href,items:[]};const seen=new Set();
 const els=[...document.querySelectorAll('img,svg,a,div,span,h1,h2,header *,footer *')].filter(e=>{const t=((e.className&&e.className.baseVal!==undefined?e.className.baseVal:e.className)||'')+' '+(e.id||'')+' '+(e.getAttribute('alt')||'')+' '+(e.getAttribute('aria-label')||'')+' '+(e.getAttribute('src')||'')+' '+(e.getAttribute('href')||'');return /logo|brand|^\/$|home/i.test(t)});
 for(const e of els.slice(0,60)){let svg=e.tagName.toLowerCase()==='svg'?e:e.querySelector&&e.querySelector('svg');if(svg&&!seen.has(svg)){seen.add(svg);const c=svg.cloneNode(true);c.setAttribute('data-color',getComputedStyle(svg).color);out.items.push({type:'svg',data:c.outerHTML})}
