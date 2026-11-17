@@ -252,6 +252,24 @@ ul.rules li::before{margin-top:11.5px}
 .box{margin-top:5px}
 /* 단계 카드 마우스오버 테두리 = 단계 색 */
 .flow .st:hover,.flow .st:focus-visible{border-color:var(--c)}
+/* 모바일: 폴더·파일 가이드 수준으로 */
+@media (max-width:640px){
+body,p,ul.rules li,.check li,.lede{font-size:15.5px;line-height:1.6}
+h1{font-size:26px}h2{font-size:22px}h2 .n{font-size:15px}h3{font-size:18px;margin-top:22px}
+ul.rules,.check{gap:12px}
+ul.rules li::before{margin-top:10px}
+.warn,.gate{font-size:14.5px;padding:12px 14px}
+.fig{padding:14px}.fig .cap{font-size:13.5px}
+td{font-size:14.5px;padding:10px 12px}th{font-size:12.5px}
+.cmp .tag,.chip small,.steps>div::before{font-size:12.5px}
+.cmp .ex,.steps>div b,.flow b{font-size:16px}
+.cmp .why,.chip span,.nest div,.flow span.s,.steps .muted,.steps>div{font-size:14px}
+.cmp>div,.steps>div,.chip{padding:12px 14px}
+.chip b{font-size:22px}
+.flow .st{padding:14px 56px 12px 16px;gap:6px}
+.flow .st .go{width:30px;height:30px;font-size:15px;right:14px}
+.meta{font-size:12.5px}
+}
 </style>
 </head>
 <body>
