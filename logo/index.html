@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PLYSH · LOGO 검수</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --faint:#b0b8c1;
+  --acc:#3182f6; --red:#ef4444; --chip:#f2f4f6; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; background:var(--bg); color:var(--txt); font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif; font-size:15px; letter-spacing:-0.01em; }
+button,input,select,textarea { font:inherit; color:inherit; letter-spacing:inherit; }
+button { cursor:pointer; }
+.mute { color:var(--mute); }
+.hide { display:none !important; }
+
+/* 상단 */
+header { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(10px + env(safe-area-inset-top)) 16px 0; }
+.hd { display:flex; align-items:center; justify-content:space-between; height:44px; max-width:560px; margin:0 auto; }
+.brand { border:0; background:none; padding:0; font-size:17px; font-weight:800; letter-spacing:.06em; }
+.mode { display:flex; max-width:560px; margin:8px auto 0; background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; }
+.mode button { flex:1; border:0; background:none; border-radius:10px; padding:8px 0; font-size:12px; font-weight:800; letter-spacing:.06em; color:var(--mute); }
+.hd .mode { margin:0; flex:none; border-radius:11px; padding:3px; }
+.hd .mode button { flex:none; padding:7px 7px; font-size:11px; letter-spacing:.03em; border-radius:9px; }
+.mode button.on { background:#fff; color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.mode.off button.on { background:none; box-shadow:none; color:var(--mute); }
+
+#nav { display:flex; gap:4px; max-width:560px; margin:8px auto 10px; overflow-x:auto; }
+#nav span { flex:none; padding:7px 9px; font-size:11px; font-weight:800; letter-spacing:.03em; color:var(--mute); border-radius:9px; }
+#nav span.on { background:#fff; color:var(--txt); }
+main { max-width:960px; margin:0 auto; padding:6px 16px 60px; }
+.ld { text-align:center; color:var(--mute); padding:40px 0; }
+.rv { max-width:960px; margin:0 auto 8px; padding:10px 14px; background:#fff3cd; border-radius:12px; font-size:13px; }
+.tabs2 { display:flex; gap:6px; overflow-x:auto; margin:0 -16px 12px; padding:0 16px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.tabs2::-webkit-scrollbar { display:none; }
+.tabs2 button { flex:none; border:0; background:#fff; border-radius:999px; padding:8px 13px; font-size:13px; font-weight:600; color:var(--sub); display:flex; align-items:center; gap:6px; }
+.tabs2 button.on { background:var(--txt); color:#fff; }
+.tabs2 button i { width:8px; height:8px; border-radius:50%; display:block; }
+.qkq { display:flex; align-items:center; gap:8px; background:#fff; border-radius:14px; padding:0 14px; height:46px; margin-bottom:10px; }
+.qkq input { flex:1; min-width:0; border:0; outline:0; font-size:16px; background:none; color:var(--txt); }
+.qkq svg { width:18px; height:18px; color:var(--mute); flex:none; }
+/* LOGO (2026-11-18): 로고 미리보기·검색·.ai 다운로드 */
+.lgtop { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.lgtop .qkq { flex:1; margin:0; }
+.lgvw { display:flex; background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; flex:none; }
+.lgvw button { border:0; background:none; border-radius:9px; width:38px; height:40px; display:grid; place-items:center; color:var(--mute); }
+.lgvw button.on { background:#fff; color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.lgvw svg { width:18px; height:18px; }
+.lgn { font-size:12.5px; color:var(--mute); margin:2px 4px 10px; }
+.lgg { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+.lgc { background:#fff; border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
+.lgp { height:120px; display:grid; place-items:center; padding:16px; background:#fff; border-bottom:1px solid var(--line); }
+.lgp.dk { background:#191f28; }
+.lgp img { max-width:100%; max-height:88px; object-fit:contain; display:block; }
+.lgm { padding:10px 12px 12px; display:flex; align-items:flex-end; gap:8px; }
+.lgm div { flex:1; min-width:0; }
+.lgm b { display:block; font-size:12.5px; font-weight:700; overflow-wrap:anywhere; line-height:1.35; }
+.lgm small { display:block; font-size:11.5px; color:var(--mute); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lgd { flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--chip); color:var(--txt); text-decoration:none; font-size:11px; font-weight:800; letter-spacing:.02em; }
+.lgd:hover { background:var(--txt); color:#fff; }
+.lgl { background:#fff; border-radius:18px; overflow:hidden; }
+.lgr { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line); }
+.lgr:last-child { border-bottom:0; }
+.lgr .lgp { width:64px; height:48px; padding:6px; border:1px solid var(--line); border-radius:10px; flex:none; }
+.lgr .lgp img { max-height:34px; }
+.lgr .lgm { padding:0; flex:1; align-items:center; }
+.lgh { margin:18px 4px 8px; font-size:13px; font-weight:700; color:var(--sub); }
+.lgh:first-child { margin-top:4px; }
+.lgnote { font-size:12px; color:var(--mute); line-height:1.6; margin:16px 4px 4px; }
+</style></head><body>
+<header><div class="hd"><b class="brand">PLYSH</b></div><div id="nav"><span>PROJECT</span><span>CALENDAR</span><span>QUICK</span><span>TO DO LIST</span><span>EXPENSE</span><span>WORK LOG</span><span class="on">LOGO</span><span>GUIDE</span></div></header>
+<div class="rv">검수용 화면이에요. 확인 후 PLYSH 메뉴에 그대로 반영돼요.</div>
+<main id="main"></main>
+<script>
+var $=function(q){return document.querySelector(q)}, $$=function(q){return Array.prototype.slice.call(document.querySelectorAll(q))};
+var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var S={view:'logo'};
+// LOGO 메뉴 (2026-11-18): 소속사·아티스트·인쇄·세탁·분리배출 로고 미리보기 + 한글/영어 검색 + .ai 다운로드
+var LG = { list: null, tab: ls.get('d4:lgtab') || 'all', vw: ls.get('d4:lgvw') || 'grid', q: '' };
+var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
+var LG_SUB = { Laundry: { Wash: '물세탁', Bleach: '표백', TumbleDry: '텀블건조', Dry: '자연건조', Iron: '다림질', DryClean: '드라이클리닝', WetClean: '웻클리닝' } };
+function lgNorm(t) { return String(t || '').toLowerCase().replace(/[\s_\-().·]/g, ''); }
+function renderLogo() {
+  if (!LG.list) {
+    $('#main').innerHTML = '<div class="ld">로고 불러오는 중…</div>';
+    fetch('logos.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (d) { LG.list = d; if (S.view === 'logo') renderLogo(); }, function () { $('#main').innerHTML = '<div class="ld">로고 목록을 불러오지 못했어요</div>'; });
+    return;
+  }
+  var ic = { grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>', list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>' };
+  $('#main').innerHTML = '<div class="lgtop"><label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="lgQ" type="search" placeholder="로고 검색 (한글·영어)" value="' + esc(LG.q) + '" autocomplete="off"></label>' +
+    '<div class="lgvw">' + ['grid', 'list'].map(function (v) { return '<button data-lv="' + v + '" class="' + (LG.vw === v ? 'on' : '') + '" aria-label="' + (v === 'grid' ? '미리보기로 보기' : '리스트로 보기') + '">' + ic[v] + '</button>'; }).join('') + '</div></div>' +
+    '<div class="tabs2" id="lgT">' + LG_TABS.map(function (t) { return '<button data-lt="' + t[0] + '" class="' + (LG.tab === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div><div id="lgB"></div>';
+  $$('#lgT button').forEach(function (b) { b.onclick = function () { LG.tab = b.dataset.lt; ls.set('d4:lgtab', LG.tab); $$('#lgT button').forEach(function (x) { x.classList.toggle('on', x === b); }); lgBody(); }; });
+  $$('.lgvw button').forEach(function (b) { b.onclick = function () { LG.vw = b.dataset.lv; ls.set('d4:lgvw', LG.vw); $$('.lgvw button').forEach(function (x) { x.classList.toggle('on', x === b); }); lgBody(); }; });
+  var q = $('#lgQ'); q.oninput = function () { LG.q = q.value; lgBody(); };
+  lgBody();
+}
+function lgBody() {
+  var qs = LG.q.trim().split(/\s+/).filter(Boolean).map(lgNorm);
+  var L = LG.list.filter(function (x) {
+    if (!qs.length && LG.tab !== 'all' && x.c !== LG.tab) return false;
+    if (!qs.length) return true;
+    var h = lgNorm(x.n + ' ' + x.b + ' ' + x.k);
+    return qs.every(function (w) { return h.indexOf(w) > -1; });
+  });
+  var cat = {}; LG_TABS.forEach(function (t) { cat[t[0]] = t[1]; });
+  function grp(x) {
+    if (x.c === 'laundry') return '세탁기호 · ' + (LG_SUB.Laundry[x.n.split('_')[1]] || '');
+    if (x.c === 'recycle' || x.c === 'print') return x.b;
+    return '';
+  }
+  function card(x) {
+    var nm = x.n.replace(/^Laundry_/, '').replace(/_/g, ' ');
+    var p = '<div class="lgp' + (x.d ? ' dk' : '') + '"><img loading="lazy" src="' + esc(x.s.replace('logo/','')) + '" alt="' + esc(x.n) + '"></div>';
+    var m = '<div class="lgm"><div><b>' + esc(nm) + '</b><small>' + esc(x.k || x.b) + '</small></div><a class="lgd" href="' + esc(x.f.replace('logo/','')) + '" download="' + esc(x.n) + '.ai" title=".ai 다운로드">AI</a></div>';
+    return LG.vw === 'grid' ? '<div class="lgc">' + p + m + '</div>' : '<div class="lgr">' + p + m + '</div>';
+  }
+  var h = '<div class="lgn">' + (qs.length ? '검색 결과 ' : (cat[LG.tab] + ' ')) + L.length + '개</div>', last = null, buf = [];
+  function flush() { if (buf.length) h += LG.vw === 'grid' ? '<div class="lgg">' + buf.join('') + '</div>' : '<div class="lgl">' + buf.join('') + '</div>'; buf = []; }
+  L.forEach(function (x) {
+    var gg = grp(x), g = (qs.length || LG.tab === 'all' || !gg ? cat[x.c] + (gg ? ' · ' : '') : '') + gg;
+    if (g !== last) { flush(); h += '<div class="lgh">' + esc(g) + '</div>'; last = g; }
+    buf.push(card(x));
+  });
+  flush();
+  if (!L.length) h += '<div class="ld">찾는 로고가 없어요</div>';
+  h += '<div class="lgnote">원본 보관: 구글 드라이브 PLASH / 05_LOGO · 다운로드는 일러스트 .ai (글자 아웃라인)<br>웹 수집 로고는 위키미디어 공용 자료라 실제 사용 전 소속사 공식 파일과 대조해 주세요.</div>';
+  $('#lgB').innerHTML = h;
+}
+
+renderLogo();
+</script></body></html>

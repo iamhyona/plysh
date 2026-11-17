@@ -59,7 +59,7 @@ header { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(
 .ym button .yl b { font-size:15px; } .ym button .yl small { font-size:12px; opacity:.9; }
 .ym button.fu { opacity:.4; }
 .dyv .dh { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.dyv p { margin:0; font-size:16px; line-height:1.75; white-space:pre-wrap; word-break:break-all; }
+.dyv p { margin:0; font-size:16px; line-height:1.75; white-space:pre-wrap; overflow-wrap:anywhere; }
 .dyv .ph { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:16px; }
 .dyv .ph button { border:0; padding:0; aspect-ratio:1; border-radius:10px; overflow:hidden; background:var(--chip); }
 .dyv .ph img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -641,6 +641,34 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .qkq input { flex:1; min-width:0; border:0; outline:0; font-size:16px; background:none; color:var(--txt); }
 .qkq svg { width:18px; height:18px; color:var(--mute); flex:none; }
 .qkc { background:#fff; border-radius:18px; padding:16px 16px 8px; margin-bottom:10px; }
+/* LOGO (2026-11-18): 로고 미리보기·검색·.ai 다운로드 */
+.lgtop { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.lgtop .qkq { flex:1; margin:0; }
+.lgvw { display:flex; background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; flex:none; }
+.lgvw button { border:0; background:none; border-radius:9px; width:38px; height:40px; display:grid; place-items:center; color:var(--mute); }
+.lgvw button.on { background:#fff; color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.lgvw svg { width:18px; height:18px; }
+.lgn { font-size:12.5px; color:var(--mute); margin:2px 4px 10px; }
+.lgg { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+.lgc { background:#fff; border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
+.lgp { height:120px; display:grid; place-items:center; padding:16px; background:#fff; border-bottom:1px solid var(--line); }
+.lgp.dk { background:#191f28; }
+.lgp img { max-width:100%; max-height:88px; object-fit:contain; display:block; }
+.lgm { padding:10px 12px 12px; display:flex; align-items:flex-end; gap:8px; }
+.lgm div { flex:1; min-width:0; }
+.lgm b { display:block; font-size:12.5px; font-weight:700; overflow-wrap:anywhere; line-height:1.35; }
+.lgm small { display:block; font-size:11.5px; color:var(--mute); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lgd { flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--chip); color:var(--txt); text-decoration:none; font-size:11px; font-weight:800; letter-spacing:.02em; }
+.lgd:hover { background:var(--txt); color:#fff; }
+.lgl { background:#fff; border-radius:18px; overflow:hidden; }
+.lgr { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line); }
+.lgr:last-child { border-bottom:0; }
+.lgr .lgp { width:64px; height:48px; padding:6px; border:1px solid var(--line); border-radius:10px; flex:none; }
+.lgr .lgp img { max-height:34px; }
+.lgr .lgm { padding:0; flex:1; align-items:center; }
+.lgh { margin:18px 4px 8px; font-size:13px; font-weight:700; color:var(--sub); }
+.lgh:first-child { margin-top:4px; }
+.lgnote { font-size:12px; color:var(--mute); line-height:1.6; margin:16px 4px 4px; }
 /* GUIDE (2026-11-10) */
 .gdl { display:grid; gap:10px; }
 .gdc { display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:center; width:100%; text-align:left; border:0; background:#fff; border-radius:18px; padding:18px 18px; font:inherit; color:var(--txt); cursor:pointer; }
@@ -843,7 +871,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="pj">PROJECT</button><button data-v="month">CALENDAR</button><button data-v="qk">QUICK</button><button data-v="todo">TO DO LIST</button><button data-v="exp">EXPENSE</button><button data-v="wl">WORK LOG</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
+    <button data-v="pj">PROJECT</button><button data-v="month">CALENDAR</button><button data-v="qk">QUICK</button><button data-v="todo">TO DO LIST</button><button data-v="exp">EXPENSE</button><button data-v="wl">WORK LOG</button><button data-v="logo" type="button">LOGO</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
   </nav>
 </header>
 <main id="main"><div class="ld">불러오는 중…</div></main>
@@ -1476,6 +1504,58 @@ function render() {
   // 날짜 글자를 누르면 날짜 고르기 창이 바로 열림 (2026.10.06)
   $$('.dpk').forEach(function (i) { i.addEventListener('click', function () { try { if (i.showPicker) i.showPicker(); } catch (e) {} }); });
 }
+// LOGO 메뉴 (2026-11-18): 소속사·아티스트·인쇄·세탁·분리배출 로고 미리보기 + 한글/영어 검색 + .ai 다운로드
+var LG = { list: null, tab: ls.get('d4:lgtab') || 'all', vw: ls.get('d4:lgvw') || 'grid', q: '' };
+var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
+var LG_SUB = { Laundry: { Wash: '물세탁', Bleach: '표백', TumbleDry: '텀블건조', Dry: '자연건조', Iron: '다림질', DryClean: '드라이클리닝', WetClean: '웻클리닝' } };
+function lgNorm(t) { return String(t || '').toLowerCase().replace(/[\s_\-().·]/g, ''); }
+function renderLogo() {
+  if (!LG.list) {
+    $('#main').innerHTML = '<div class="ld">로고 불러오는 중…</div>';
+    fetch('logo/logos.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (d) { LG.list = d; if (S.view === 'logo') renderLogo(); }, function () { $('#main').innerHTML = '<div class="ld">로고 목록을 불러오지 못했어요</div>'; });
+    return;
+  }
+  var ic = { grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>', list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>' };
+  $('#main').innerHTML = '<div class="lgtop"><label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="lgQ" type="search" placeholder="로고 검색 (한글·영어)" value="' + esc(LG.q) + '" autocomplete="off"></label>' +
+    '<div class="lgvw">' + ['grid', 'list'].map(function (v) { return '<button data-lv="' + v + '" class="' + (LG.vw === v ? 'on' : '') + '" aria-label="' + (v === 'grid' ? '미리보기로 보기' : '리스트로 보기') + '">' + ic[v] + '</button>'; }).join('') + '</div></div>' +
+    '<div class="tabs2" id="lgT">' + LG_TABS.map(function (t) { return '<button data-lt="' + t[0] + '" class="' + (LG.tab === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div><div id="lgB"></div>';
+  $$('#lgT button').forEach(function (b) { b.onclick = function () { LG.tab = b.dataset.lt; ls.set('d4:lgtab', LG.tab); $$('#lgT button').forEach(function (x) { x.classList.toggle('on', x === b); }); lgBody(); }; });
+  $$('.lgvw button').forEach(function (b) { b.onclick = function () { LG.vw = b.dataset.lv; ls.set('d4:lgvw', LG.vw); $$('.lgvw button').forEach(function (x) { x.classList.toggle('on', x === b); }); lgBody(); }; });
+  var q = $('#lgQ'); q.oninput = function () { LG.q = q.value; lgBody(); };
+  lgBody();
+}
+function lgBody() {
+  var qs = LG.q.trim().split(/\s+/).filter(Boolean).map(lgNorm);
+  var L = LG.list.filter(function (x) {
+    if (!qs.length && LG.tab !== 'all' && x.c !== LG.tab) return false;
+    if (!qs.length) return true;
+    var h = lgNorm(x.n + ' ' + x.b + ' ' + x.k);
+    return qs.every(function (w) { return h.indexOf(w) > -1; });
+  });
+  var cat = {}; LG_TABS.forEach(function (t) { cat[t[0]] = t[1]; });
+  function grp(x) {
+    if (x.c === 'laundry') return '세탁기호 · ' + (LG_SUB.Laundry[x.n.split('_')[1]] || '');
+    if (x.c === 'recycle' || x.c === 'print') return x.b;
+    return '';
+  }
+  function card(x) {
+    var nm = x.n.replace(/^Laundry_/, '').replace(/_/g, ' ');
+    var p = '<div class="lgp' + (x.d ? ' dk' : '') + '"><img loading="lazy" src="' + esc(x.s) + '" alt="' + esc(x.n) + '"></div>';
+    var m = '<div class="lgm"><div><b>' + esc(nm) + '</b><small>' + esc(x.k || x.b) + '</small></div><a class="lgd" href="' + esc(x.f) + '" download="' + esc(x.n) + '.ai" title=".ai 다운로드">AI</a></div>';
+    return LG.vw === 'grid' ? '<div class="lgc">' + p + m + '</div>' : '<div class="lgr">' + p + m + '</div>';
+  }
+  var h = '<div class="lgn">' + (qs.length ? '검색 결과 ' : (cat[LG.tab] + ' ')) + L.length + '개</div>', last = null, buf = [];
+  function flush() { if (buf.length) h += LG.vw === 'grid' ? '<div class="lgg">' + buf.join('') + '</div>' : '<div class="lgl">' + buf.join('') + '</div>'; buf = []; }
+  L.forEach(function (x) {
+    var gg = grp(x), g = (qs.length || LG.tab === 'all' || !gg ? cat[x.c] + (gg ? ' · ' : '') : '') + gg;
+    if (g !== last) { flush(); h += '<div class="lgh">' + esc(g) + '</div>'; last = g; }
+    buf.push(card(x));
+  });
+  flush();
+  if (!L.length) h += '<div class="ld">찾는 로고가 없어요</div>';
+  h += '<div class="lgnote">원본 보관: 구글 드라이브 PLASH / 05_LOGO · 다운로드는 일러스트 .ai (글자 아웃라인)<br>웹 수집 로고는 위키미디어 공용 자료라 실제 사용 전 소속사 공식 파일과 대조해 주세요.</div>';
+  $('#lgB').innerHTML = h;
+}
 // GUIDE 메뉴 (2026-11-10): 목록은 화면에, 문서는 아래에서 올라오는 창으로
 // 2026-11-18: 업무 및 행정 / 디자인 작업 2그룹, 아래 항목은 해당 섹션 바로가기
 var GUIDE_GROUPS = [{"g":"업무 및 행정","i":[{"f":"g.html?id=office","t":"사무실 이용 가이드","s":[["사무실 출입","door"],["나스(NAS)","nas"],["와이파이","wifi"],["복합기 사용","printer"]]},{"f":"g.html?id=admin","t":"행정업무 가이드","s":[["퀵","quick"],["법인택시","taxi"],["법인카드 사용","corpcard"],["개인 지출결의 작성","expense"],["명함 제작","namecard"]]},{"f":"g.html?id=system","t":"업무 시스템 가이드","s":[["위하고 접속","wehago"],["메일플러그 접속","mailplug"],["메일 서명 수정","signature"]]}]},{"g":"디자인 작업","i":[{"f":"folder-file.html","t":"폴더 및 파일 가이드","s":[]},{"f":"g.html?id=illustrator","t":"일러스트 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["새 문서·저장","save"]]},{"f":"g.html?id=photoshop","t":"포토샵 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["문서 기준","doc"]]},{"f":"g.html?id=indesign","t":"인디자인 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["저장·전달","save"]]},{"f":"g.html?id=bridge","t":"브릿지 셋팅","s":[["색상 설정 동기화","color"],["작업 영역","workspace"],["환경설정","prefs"],["일괄 이름 바꾸기","rename"],["레이블·별점","label"]]},{"f":"g.html?id=acrobat","t":"아크로뱃 셋팅","s":[["작업 영역 (도구·탭)","workspace"],["환경설정","prefs"],["인쇄 PDF 검수","check"],["피드백·비교","feedback"]]},{"f":"g.html?id=label","t":"상품 라벨 스티커 데이터 (와우프레스)","s":[["주문 옵션","option"],["데이터 만들기","data"],["체크 포인트","check"]]},{"f":"packshot.html","t":"시즌그리팅 팩샷 작업가이드","s":[]},{"f":"g.html?id=photocard","t":"포토카드 제작 유의사항","s":[["기본 규격","spec"],["사진 작업","image"],["앞·뒷면","back"],["발주·검수","order"]]}]}];
@@ -1498,9 +1578,9 @@ function openGd(g, anchor) {
 function renderView() {
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' ? 'pj' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'guide' || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
