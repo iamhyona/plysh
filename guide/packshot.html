@@ -220,6 +220,31 @@ th,td{padding:12px 14px}
 ul.rules li::before{margin-top:11px}
 .box{margin-top:6px}
 .steps>div::before{font-size:13.5px}
+/* 박스 글자 키우기: 박스 제목 > 박스 본문 */
+.steps>div b{font-size:20px}
+.steps>div .muted,.steps>div{font-size:17px}
+.steps>div::before{font-size:14px}
+.flow b{font-size:20px}
+.flow span.s{font-size:16.5px}
+.chip small{font-size:14.5px}
+.chip b{font-size:28px}
+.chip span{font-size:17px}
+.nest div{font-size:16px}
+.cmp .tag{font-size:14px}.cmp .ex{font-size:17px}.cmp .why{font-size:15px}
+/* 행간·문단 간격 통일: 행간 1.45, 항목 간격은 행간보다 크게 */
+body,p,td,.warn,.gate,.steps .muted,.flow span.s,.chip span,.cmp .why,.fig .cap,.nest div{line-height:1.45}
+.flow b,.steps>div b,.cmp .ex{line-height:1.3}
+ul.rules,.check{gap:14px}
+ul.rules li::before{margin-top:10px}
+.box{margin-top:4px}
+/* 박스 글자 3단계 통일: 박스 라벨 15 · 박스 제목 20 · 박스 본문 17 */
+.cmp .tag,.chip small,.steps>div::before{font-size:15px}
+.cmp .ex{font-size:20px}
+.cmp .why,.chip span,.nest div,.warn,.gate,.flow span.s,.steps .muted,.steps>div{font-size:17px}
+.cmp>div{gap:8px;padding:18px 20px}
+td{font-size:17px}th{font-size:14px}
+.fig .cap{font-size:16px}
+.meta{font-size:14px}
 </style>
 </head>
 <body>
@@ -229,14 +254,14 @@ ul.rules li::before{margin-top:11px}
   <div class="eyebrow">SOUND CONTENTS 디자인본부 · 디자인4팀</div>
   <h1>팩샷·상세페이지 작업 가이드</h1>
   <p class="lede">일러스트 스트럭처부터 소속사 전달까지, 팩샷과 상세페이지를 만드는 순서와 기준. 단계마다 컨펌을 받은 뒤 다음 단계 진행.</p>
-  <div class="meta"><span>아트보드 <b>3:4 · 3000×4000px</b></span><span>컬러 <b>RGB · sRGB IEC61966-2.1</b></span><span>적용 <b>2026.11~</b></span></div>
+  <div class="meta"><span>아트보드 <b>3:4 · 3000×4000px</b></span><span>컬러 <b>RGB · sRGB IEC61966-2.1</b></span><span>수정 작성일 <b>2026.11.17. 23:41:30</b></span></div>
 </header>
 
 <div class="flow" aria-label="전체 작업 순서">
-  <a class="st" href="#step1"><span class="cf">1단계</span><b>일러스트 스트럭처</b><span class="s">실제 사이즈·수량으로 배치, 구조만 확인</span><span class="go" aria-hidden="true">↓</span></a>
-  <a class="st s2" href="#step2"><span class="cf">2단계</span><b>포토샵 팩샷 목업</b><span class="s">최종 JPG 적용, 정보 표기·정렬·여백 정리</span><span class="go" aria-hidden="true">↓</span></a>
+  <a class="st" href="#step1"><span class="cf">1단계</span><b>일러스트 스트럭처</b><span class="s">실제 사이즈로 배치, 구조만 확인</span><span class="go" aria-hidden="true">↓</span></a>
+  <a class="st s2" href="#step2"><span class="cf">2단계</span><b>포토샵 팩샷 목업</b><span class="s">JPG 적용, 정보·정렬·여백 정리</span><span class="go" aria-hidden="true">↓</span></a>
   <a class="st s3" href="#step3"><span class="cf">3단계</span><b>상세페이지</b><span class="s">구성품 요약, 이미지·정보 반복 배치</span><span class="go" aria-hidden="true">↓</span></a>
-  <a class="st last" href="#step4"><span class="cf">최종</span><b>검수·전달</b><span class="s">누락·오탈자·표기·리갈·컬러 확인 후 전달</span><span class="go" aria-hidden="true">↓</span></a>
+  <a class="st last" href="#step4"><span class="cf">최종</span><b>검수·전달</b><span class="s">누락·표기·리갈·컬러 확인 후 전달</span><span class="go" aria-hidden="true">↓</span></a>
 </div>
 
 <section id="step1" class="k1">
@@ -327,7 +352,7 @@ ul.rules li::before{margin-top:11px}
   <div class="steps">
     <div><b>인디자인 확인</b><span class="muted">최종 디자인 파일 확인</span></div>
     <div><b>JPG 내보내기</b><span class="muted">페이지별 JPG 300ppi, 펼침면은 스프레드</span></div>
-    <div><b>스트럭처 가져오기</b><span class="muted">일러스트에서 확정한 스트럭처를 포토샵으로</span></div>
+    <div><b>스트럭처 가져오기</b><span class="muted">확정한 스트럭처를 포토샵으로</span></div>
     <div><b>같은 배율로 배치</b><span class="muted">모든 JPG를 같은 배율(%)로 축소·배치</span></div>
   </div>
 
