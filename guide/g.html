@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PLYSH GUIDE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#ffffff;
+  --surface:#f4f6f9;
+  --ink:#141820;
+  --muted:#5d6675;
+  --line:#e2e6ec;
+  --accent:#2f5bd6;
+  --ok:#1f8a5b;
+  --ng:#c8412f;
+  --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --track:-0.025em;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);letter-spacing:var(--track);font-size:15.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.back{display:inline-block;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:20px}
+.back:hover{color:var(--ink)}
+header{display:grid;gap:10px;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:12.5px;font-weight:600;color:var(--accent);letter-spacing:0.02em}
+h1{font-size:32px;line-height:1.25;font-weight:700;margin:0;text-wrap:balance;letter-spacing:-0.035em}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+section{padding-block:36px;border-bottom:1px solid var(--line);display:grid;gap:16px}
+section:last-of-type{border-bottom:0}
+h2{font-size:21px;font-weight:700;margin:0;letter-spacing:-0.03em;display:flex;gap:10px;align-items:baseline}
+h2 .n{font-size:13px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+p{margin:0;max-width:65ch}
+.muted{color:var(--muted)}
+code{font-family:var(--font);font-weight:600;font-size:0.94em;background:var(--surface);padding:1px 6px;border-radius:4px;white-space:nowrap}
+.tree{background:var(--surface);border-radius:10px;padding:20px 22px;overflow-x:auto}
+.tree ul{list-style:none;margin:0;padding:0}
+.tree ul ul{padding-left:20px;border-left:1px solid var(--line);margin:4px 0 8px 7px}
+.tree li{padding:2px 0;white-space:nowrap}
+.tree .root{font-weight:700}
+.tree .f{font-weight:600}
+.tree .d{color:var(--muted);font-weight:400;margin-left:10px;font-size:13.5px}
+.tree .sub{font-weight:500}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--ink)}
+td:first-child{white-space:nowrap;font-weight:600}
+.formula{background:var(--surface);border-radius:10px;padding:18px 20px;display:grid;gap:12px;overflow-x:auto}
+.formula .line{font-size:19px;font-weight:700;letter-spacing:-0.02em;white-space:nowrap}
+.formula .line span{color:var(--accent)}
+.parts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:var(--muted)}
+.parts b{color:var(--ink);font-weight:600}
+ul.rules{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+ul.rules li{display:grid;grid-template-columns:20px 1fr;gap:8px}
+ul.rules li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:10px;margin-left:4px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp>div{min-width:0;border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.cmp .tag{font-size:12.5px;font-weight:700}
+.cmp .ok .tag{color:var(--ok)}
+.cmp .ng .tag{color:var(--ng)}
+.cmp .ex{font-weight:600;font-size:14px;word-break:break-all}
+.cmp .why{font-size:13px;color:var(--muted)}
+.files{display:grid;gap:8px}
+.file{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline;padding:12px 16px;border:1px solid var(--line);border-radius:10px}
+.file .ext{font-size:12px;font-weight:700;color:var(--accent);min-width:58px}
+.file .name{font-weight:600;font-size:14.5px;word-break:break-all;min-width:0}
+.file .desc{grid-column:2;font-size:13px;color:var(--muted)}
+.check{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.check li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+.box{width:16px;height:16px;border:1.5px solid var(--muted);border-radius:4px;margin-top:4px}
+footer{padding-top:28px;font-size:13px;color:var(--muted)}
+@media (max-width:560px){
+  h1{font-size:26px}
+  .cmp{grid-template-columns:1fr}
+  .formula .line{font-size:16px}
+}
+/* 팩샷 가이드 전용 (2026-11-17) */
+.flow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 26px;padding-top:28px}
+.flow .st{position:relative;border:1px solid #cfd6df;border-radius:12px;padding:14px 14px 12px;display:grid;gap:6px;align-content:start;background:var(--bg)}
+.flow .st:nth-child(odd)::after{content:"";position:absolute;right:-17px;top:50%;width:8px;height:8px;border-top:1.5px solid var(--muted);border-right:1.5px solid var(--muted);transform:translateY(-50%) rotate(45deg);background:var(--bg)}
+.flow .cf{justify-self:start;font-size:11.5px;font-weight:700;color:#fff;background:var(--accent);border-radius:999px;padding:2px 9px;letter-spacing:0}
+.flow .st.last .cf{background:var(--ink)}
+.flow .st.s2 .cf,.gate.s2 .cf{background:#0c8599}
+.flow .st.s3 .cf,.gate.s3 .cf{background:#2b8a3e}
+.gate.s2{border-color:#0c8599;background:#e6f6f8}
+.gate.s3{border-color:#2b8a3e;background:#ebf7ee}
+.gate.last{border-color:var(--ink);background:#eef0f3}
+.flow b{font-size:18px;letter-spacing:-0.03em;line-height:1.35}
+.flow span.s{font-size:14px;color:var(--muted);line-height:1.5}
+h3{font-size:22px;font-weight:700;margin:26px 0 0;letter-spacing:-0.03em;line-height:1.35}
+section{counter-reset:sub}
+h3::before{counter-increment:sub;content:"(" counter(sub) ") ";color:var(--accent);font-weight:700}
+.two h3{margin-top:10px}
+.warn{border-left:4px solid var(--ng);background:#fdecea;border-radius:0 10px 10px 0;padding:12px 16px;font-size:15.5px}
+.warn b{color:var(--ng)}
+.gate{background:#eef3ff;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;border:1.5px dashed var(--accent);border-radius:12px;padding:12px 16px;font-size:15.5px}
+.gate .cf{font-size:12px;font-weight:700;color:#fff;background:var(--accent);border-radius:999px;padding:3px 10px}
+.gate.last .cf{background:var(--ink)}
+.fig{background:#e9edf3;border:1px solid #d8dee6;border-radius:10px;padding:18px;display:grid;gap:10px;justify-items:center}
+.fig svg{width:100%;height:auto;display:block}
+.fig .cap{font-size:13.5px;color:var(--muted);text-align:center}
+.fig.wf svg{max-width:520px}
+.fig.wf .cap{max-width:52ch}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.two>*{min-width:0}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chip{background:#fff;border:1px solid #cfd6df;border-radius:10px;padding:10px 14px;display:grid;gap:2px}
+.chip small{font-size:13px;color:var(--muted)}
+.chip{padding:16px 18px;gap:4px}
+.chip b{font-size:24px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1.2}
+.chip span{font-size:14.5px;font-weight:600;color:var(--ink)}
+.steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;counter-reset:s}
+.steps>div{border:1px solid #cfd6df;border-radius:10px;padding:12px 14px;font-size:14.5px;display:grid;gap:4px;align-content:start}
+.steps>div b{font-size:17.5px}
+.steps>div::before{counter-increment:s;content:counter(s);font-size:12px;font-weight:700;color:var(--accent)}
+.nest{display:grid;gap:0;width:100%;max-width:420px}
+.nest div{border:1.5px solid var(--ink);border-radius:8px;padding:10px 12px 12px;display:grid;gap:8px;font-size:14px;font-weight:600;background:var(--bg)}
+.nest div div{border-style:dashed;border-color:var(--accent);background:var(--surface)}
+.nest div div div{border-style:solid;border-color:var(--muted);background:var(--bg);font-weight:500;color:var(--muted)}
+.nest small{font-weight:400;color:var(--muted)}
+td.k{white-space:nowrap}
+@media (max-width:640px){
+  .flow,.steps{grid-template-columns:1fr}
+  .flow .st::after{display:none}
+  .flow{gap:10px}
+  .two{grid-template-columns:1fr}
+}
+
+h2{font-size:34px;align-items:center;letter-spacing:-0.04em}
+h1{font-size:40px}
+h2 .n{font-size:20px;line-height:1}
+.ka{color:#1c7ed6}.kb{color:#d6336c}.kc{color:#2f9e44}
+/* 단계 색: 1단계 노랑(주황) · 2단계 민트 · 3단계 파랑 · 최종 보라 (진한 톤 + 흰 글씨) */
+.flow .cf,.gate .cf{color:#fff}
+.flow .st:not(.s2):not(.s3):not(.last) .cf,.gate:not(.s2):not(.s3):not(.last) .cf{background:#e67700}
+.gate:not(.s2):not(.s3):not(.last){border-color:#e67700;background:#fff9db}
+.flow .st.s2 .cf,.gate.s2 .cf{background:#0ca678}
+.gate.s2{border-color:#0ca678;background:#e6fcf5}
+.flow .st.s3 .cf,.gate.s3 .cf{background:#1c7ed6}
+.gate.s3{border-color:#1c7ed6;background:#e7f5ff}
+.flow .st.last .cf,.gate.last .cf{background:#7048e8}
+.gate.last{border-color:#7048e8;background:#f3f0ff}
+@media (max-width:560px){h1{font-size:30px}h2{font-size:27px}h3{font-size:20px}}
+/* 단계 카드 = 해당 영역 바로가기 */
+html{scroll-behavior:smooth}
+section[id]{scroll-margin-top:16px}
+.flow .st{text-decoration:none;color:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.flow .st::after{display:none !important}
+.flow .st:hover,.flow .st:focus-visible{border-color:var(--ink);box-shadow:0 2px 10px rgba(20,24,32,.08);outline:none}
+.flow .st .go{justify-self:end;margin-top:4px;font-size:13.5px;font-weight:700;color:#fff;background:var(--ink);border-radius:8px;padding:5px 12px}
+.flow .st:not(.s2):not(.s3):not(.last) .go{background:#2b8a3e}
+.flow .st.s2 .go{background:#2f5bd6}
+.flow .st.s3 .go{background:#7048e8}
+.flow .st.last .go{background:#c8412f}
+.flow{gap:12px}
+/* 목록 행간 줄이기 */
+body{line-height:1.55}
+ul.rules{gap:4px}
+ul.rules li::before{margin-top:9px}
+.check{gap:4px}
+.box{margin-top:3px}
+.two{column-gap:40px;row-gap:16px}
+/* 바로가기: 색 없는 화살표만 */
+.flow .st{padding-right:52px}
+.flow .st .go,.flow .st:not(.s2):not(.s3):not(.last) .go,.flow .st.s2 .go,.flow .st.s3 .go,.flow .st.last .go{position:absolute;right:18px;top:50%;transform:translateY(-50%);margin:0;padding:0;background:none;color:var(--muted);font-size:22px;font-weight:500;line-height:1}
+.flow .st:hover .go{color:var(--ink)}
+.flow .cf{font-size:13px;padding:3px 11px}.gate .cf{font-size:13px}
+/* 섹션별 단계 색 통일: 번호·중제목 번호·목록 점·주의 */
+section.k1{--st:#e67700;--stbg:#fff4e6}
+section.k2{--st:#0ca678;--stbg:#e6fcf5}
+section.k3{--st:#1c7ed6;--stbg:#e7f5ff}
+section.k4{--st:#7048e8;--stbg:#f3f0ff}
+section h2 .n,section h3::before,section .steps>div::before{color:var(--st)}
+section ul.rules li::before{background:var(--st)}
+section .warn{border-left-color:var(--st);background:var(--stbg)}
+section .warn b{color:var(--st)}
+/* 중제목-본문, 목록 항목 간격 */
+.two h3{margin-bottom:12px}
+ul.rules{gap:8px}
+.check{gap:6px}
+/* 바로가기 화살표: 단계 색 동그라미 */
+.flow .st{--c:#e67700}.flow .st.s2{--c:#0ca678}.flow .st.s3{--c:#1c7ed6}.flow .st.last{--c:#7048e8}
+.flow .st .go,.flow .st:not(.s2):not(.s3):not(.last) .go,.flow .st.s2 .go,.flow .st.s3 .go,.flow .st.last .go{width:34px;height:34px;border:1.8px solid var(--c);border-radius:50%;display:grid;place-items:center;color:var(--c);font-size:17px;font-weight:700;background:#fff}
+.flow .st:hover .go{background:var(--c);color:#fff}
+.flow .st{padding-right:64px}
+/* 본문 크기 키우기 */
+body{font-size:17px}
+table{font-size:16px}
+.warn,.gate{font-size:16.5px}
+.steps>div{font-size:15.5px}
+.flow span.s{font-size:15px}
+.fig .cap{font-size:14.5px}
+.chip span{font-size:15.5px}
+.cmp .ex{font-size:15.5px}.cmp .why{font-size:14px}
+ul.rules li::before{margin-top:10px}
+.box{margin-top:5px}
+/* 본문 한 단계 더 + 박스 안쪽 여백 */
+body{font-size:18px}
+table{font-size:16.5px}
+th,td{padding:12px 14px}
+.warn,.gate{font-size:17px;padding:16px 20px}
+.flow .st{padding:18px 64px 16px 20px;gap:8px}
+.flow span.s{font-size:15.5px}
+.steps{gap:10px}
+.steps>div{font-size:16px;padding:16px 18px;gap:6px}
+.steps>div b{font-size:18px}
+.chip{padding:18px 20px}
+.chip span{font-size:16px}
+.cmp>div{padding:16px 18px}
+.cmp .ex{font-size:16px}.cmp .why{font-size:14.5px}
+.fig{padding:22px}
+.fig .cap{font-size:15px}
+.nest div{font-size:15px;padding:12px 14px 14px}
+ul.rules li::before{margin-top:11px}
+.box{margin-top:6px}
+.steps>div::before{font-size:13.5px}
+/* 박스 글자 키우기: 박스 제목 > 박스 본문 */
+.steps>div b{font-size:20px}
+.steps>div .muted,.steps>div{font-size:17px}
+.steps>div::before{font-size:14px}
+.flow b{font-size:20px}
+.flow span.s{font-size:16.5px}
+.chip small{font-size:14.5px}
+.chip b{font-size:28px}
+.chip span{font-size:17px}
+.nest div{font-size:16px}
+.cmp .tag{font-size:14px}.cmp .ex{font-size:17px}.cmp .why{font-size:15px}
+/* 행간·문단 간격 통일: 행간 1.45, 항목 간격은 행간보다 크게 */
+body,p,td,.warn,.gate,.steps .muted,.flow span.s,.chip span,.cmp .why,.fig .cap,.nest div{line-height:1.45}
+.flow b,.steps>div b,.cmp .ex{line-height:1.3}
+ul.rules,.check{gap:14px}
+ul.rules li::before{margin-top:10px}
+.box{margin-top:4px}
+/* 박스 글자 3단계 통일: 박스 라벨 15 · 박스 제목 20 · 박스 본문 17 */
+.cmp .tag,.chip small,.steps>div::before{font-size:15px}
+.cmp .ex{font-size:20px}
+.cmp .why,.chip span,.nest div,.warn,.gate,.flow span.s,.steps .muted,.steps>div{font-size:17px}
+.cmp>div{gap:8px;padding:18px 20px}
+td{font-size:17px}th{font-size:14px}
+.fig .cap{font-size:16px}
+.meta{font-size:14px}
+/* 행간·항목 간격 최종 기준: 행간 1.6 / 항목 간격 18px (줄 사이 < 항목 사이) */
+body,p,td,.warn,.gate,.steps .muted,.flow span.s,.chip span,.cmp .why,.fig .cap,.nest div,ul.rules li,.check li{line-height:1.6}
+ul.rules,.check{gap:18px}
+ul.rules li::before{margin-top:11.5px}
+.box{margin-top:5px}
+/* 단계 카드 마우스오버 테두리 = 단계 색 */
+.flow .st:hover,.flow .st:focus-visible{border-color:var(--c)}
+/* 모바일: 폴더·파일 가이드 수준으로 */
+@media (max-width:640px){
+body,p,ul.rules li,.check li,.lede{font-size:15.5px;line-height:1.6}
+h1{font-size:26px}h2{font-size:22px}h2 .n{font-size:15px}h3{font-size:18px;margin-top:22px}
+ul.rules,.check{gap:12px}
+ul.rules li::before{margin-top:10px}
+.warn,.gate{font-size:14.5px;padding:12px 14px}
+.fig{padding:14px}.fig .cap{font-size:13.5px}
+td{font-size:14.5px;padding:10px 12px}th{font-size:12.5px}
+.cmp .tag,.chip small,.steps>div::before{font-size:12.5px}
+.cmp .ex,.steps>div b,.flow b{font-size:16px}
+.cmp .why,.chip span,.nest div,.flow span.s,.steps .muted,.steps>div{font-size:14px}
+.cmp>div,.steps>div,.chip{padding:12px 14px}
+.chip b{font-size:22px}
+.flow .st{padding:14px 56px 12px 16px;gap:6px}
+.flow .st .go{width:30px;height:30px;font-size:15px;right:14px}
+.meta{font-size:12.5px}
+}
+</style>
+<link rel="stylesheet" href="toc.css">
+</head>
+<body>
+<div class="wrap" data-toc id="root"><a class="back" href="./">← 가이드 목록</a></div>
+<script src="gdata.js"></script>
+<script>
+(function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1],g=window.GD&&GD[id],r=document.getElementById('root');
+if(!g){r.insertAdjacentHTML('beforeend','<p>가이드를 찾을 수 없음.</p>');return}
+document.title='DESIGN_4 '+g.t;r.insertAdjacentHTML('beforeend',g.h+'<footer>디자인4팀 · 초안 — 노란 표시 항목은 확인 후 업데이트.</footer>');})();
+</script>
+<script src="toc.js"></script>
+</body>
+</html>
