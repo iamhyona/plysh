@@ -2420,13 +2420,23 @@
 "w": 1
 },
 {
-"n": "THE BLACK LABEL",
+"n": "THE BLACK LABEL (3단)",
 "c": "agency",
 "b": "THE BLACK LABEL",
 "k": "더블랙레이블 블랙레이블",
 "d": 0,
 "f": "logo/ai/Agency/TheBlackLabel.ai",
 "s": "logo/svg/TheBlackLabel.svg",
+"w": 1
+},
+{
+"n": "THEBLACKLABEL (한 줄)",
+"c": "agency",
+"b": "THE BLACK LABEL",
+"k": "더블랙레이블 블랙레이블 가로 한줄",
+"d": 0,
+"f": "logo/ai/Agency/TheBlackLabel_Horizontal.ai",
+"s": "logo/svg/TheBlackLabel_Horizontal.svg",
 "w": 1
 },
 {
@@ -2590,16 +2600,6 @@
 "w": 1
 },
 {
-"n": "IU",
-"c": "artist",
-"b": "IU",
-"k": "아이유",
-"d": 0,
-"f": "logo/ai/Artist/IU.ai",
-"s": "logo/svg/IU.svg",
-"w": 1
-},
-{
 "n": "Red Velvet",
 "c": "artist",
 "b": "Red Velvet",
@@ -2627,6 +2627,16 @@
 "d": 0,
 "f": "logo/ai/Artist/fromis9.ai",
 "s": "logo/svg/fromis9.svg",
+"w": 1
+},
+{
+"n": "NHN Bugs (기업 CI)",
+"c": "distributor",
+"b": "NHN Bugs",
+"k": "NHN벅스 엔에이치엔벅스 벅스 기업로고 CI",
+"d": 0,
+"f": "logo/ai/Distributor/NHNBugs.ai",
+"s": "logo/svg/NHNBugs.svg",
 "w": 1
 },
 {
