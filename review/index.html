@@ -10,6 +10,8 @@
   --acc:#3182f6; --red:#ef4444; --redbg:#fdecec; --org:#f59e0b; --orgbg:#fff4e0; --grn:#16a34a; --grnbg:#e7f6ec; --pur:#7c3aed; --purbg:#f1ebfe; --chip:#f2f4f6; }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { margin:0; background:var(--bg); color:var(--txt); font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif; font-size:15px; letter-spacing:-0.01em; }
+button, input, select, textarea, optgroup, option { font-family:inherit; letter-spacing:inherit; }
+
 button,input,select { font:inherit; color:inherit; letter-spacing:inherit; }
 button { cursor:pointer; }
 .wrap { max-width:1080px; margin:0 auto; padding:14px 16px 80px; }
@@ -145,6 +147,11 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 #specView th, #specView td { border-bottom:1px solid var(--line); padding:6px 6px; text-align:left; vertical-align:top; }
 #specView th { color:var(--mute); font-weight:700; background:#fafbfc; }
 #specView .sv { overflow-x:auto; }
+#artInfo:not(:empty) { margin-top:12px; border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:#fafbfc; }
+.ai { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px 18px; }
+.ai div { font-size:12.5px; color:var(--mute); font-weight:600; } .ai div b { display:block; font-size:15px; color:var(--txt); font-weight:700; margin-top:2px; word-break:keep-all; }
+.ai .inp { width:100%; margin-top:3px; padding:6px 8px; font-size:13.5px; }
+@media (max-width:600px) { .ai { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 /* 결과 파일 */
 .rf button.new { border-color:var(--acc); }
 .rf .nw { font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--acc); border-radius:5px; padding:1px 5px; margin-right:5px; vertical-align:1px; }
@@ -210,6 +217,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
     </div>
     <datalist id="artL"></datalist>
     <div class="seg" id="artChips" style="margin-top:8px"></div>
+    <div id="artInfo"></div>
     <div class="note">고른 아티스트는 아티스트가 비어 있는 파일에 들어가요. 아래는 <b id="artCur">공통</b> 표기 규칙 · 생일·기념일이에요. 검수할 때는 <b>공통 + 파일의 아티스트</b> 규칙을 같이 써요. 한 줄에 하나씩 <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 · <b>[생일·기념일]</b> 월/일 내용. PLYSH 시트에 저장돼 팀이 같이 써요. <span id="rulesSt" class="mute" style="font-weight:600"></span></div>
     <div class="row" style="margin-top:10px"><button type="button" class="ib" id="rulesOpen">직접 입력</button><span class="small sub" id="rulesSum"></span></div>
     <textarea id="rulesTa" class="inp ta" style="min-height:150px" hidden></textarea>
@@ -274,8 +282,8 @@ var LIBS = {
 };
 </script>
 <script src="korean-lunar-calendar.min.js"></script>
-<script src="text.js?v=20261118e"></script>
+<script src="text.js?v=20261118f"></script>
 <script src="app.js?v=20261118e"></script>
-<script src="batch.js?v=20261118h"></script>
+<script src="batch.js?v=20261118i"></script>
 </body>
 </html>

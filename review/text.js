@@ -18,10 +18,11 @@ function cut(s, n) { s = norm(s); n = n || 30; return s.length > n ? s.slice(0, 
 var RULES_KEY = 'rv:rules';
 var RULES_EX = '[멤버]\n효진 / HYOJIN = 효 진, Hyojin\n승준 / SEUNGJUN\n\n[표기]\nONF = Onf, 온앤오프\nWM ENTERTAINMENT = WM Entertainment\nSEASON\'S GREETINGS = Season\'s Greetings, SEASONS GREETINGS\n\n[생일·기념일]\n1/13 효진 생일\n8/2 데뷔 기념일';
 function parseRules(t) {
-  var sec = '', out = { members: [], terms: [], days: [] };
+  var sec = '', out = { members: [], terms: [], days: [], info: {} };
   String(t || '').split(/\n/).forEach(function (ln) {
     ln = ln.trim(); if (!ln || ln.charAt(0) === '#') return;
-    var m = ln.match(/^\[(.+)\]$/); if (m) { sec = /멤버/.test(m[1]) ? 'm' : /생일|기념|날짜/.test(m[1]) ? 'd' : 't'; return; }
+    var m = ln.match(/^\[(.+)\]$/); if (m) { sec = /정보/.test(m[1]) ? 'i' : /멤버/.test(m[1]) ? 'm' : /생일|기념|날짜/.test(m[1]) ? 'd' : 't'; return; }
+    if (sec === 'i') { var kv = ln.match(/^([^:：]+)[:：]\s*(.*)$/); if (kv) out.info[kv[1].trim()] = kv[2].trim(); return; }
     if (sec === 'd') { var d = ln.match(/^(\d{1,2})\s*[\/.\-월]\s*(\d{1,2})\s*일?\s*(.*)$/); if (d) out.days.push({ m: +d[1], d: +d[2], label: d[3] || '' }); return; }
     var parts = ln.split('='), forms = parts[0].split('/').map(function (s) { return s.trim(); }).filter(Boolean), wrong = (parts[1] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     if (!forms.length) return;
@@ -31,25 +32,26 @@ function parseRules(t) {
 }
 function rulesText() { try { return localStorage.getItem(RULES_KEY) || ''; } catch (e) { return ''; } }
 // 팀 규칙은 PLYSH 시트(@4팀_업무보고 › PREFLIGHT 규칙 탭)에 저장해 팀이 같이 써요. 이 기기에는 마지막 내용을 캐시로만 둬요.
-var RV_KIND = { m: '멤버', t: '표기', d: '생일·기념일' };
+var RV_KIND = { m: '멤버', t: '표기', d: '생일·기념일', i: '기본 정보' };
 function rulesToRows(t) {
   var sec = 't', rows = [];
   String(t || '').split(/\n/).forEach(function (ln) {
     ln = ln.trim(); if (!ln || ln.charAt(0) === '#') return;
-    var m = ln.match(/^\[(.+)\]$/); if (m) { sec = /멤버/.test(m[1]) ? 'm' : /생일|기념|날짜/.test(m[1]) ? 'd' : 't'; return; }
+    var m = ln.match(/^\[(.+)\]$/); if (m) { sec = /정보/.test(m[1]) ? 'i' : /멤버/.test(m[1]) ? 'm' : /생일|기념|날짜/.test(m[1]) ? 'd' : 't'; return; }
+    if (sec === 'i') { var kv = ln.match(/^([^:：]+)[:：]\s*(.*)$/); if (kv) rows.push([RV_KIND.i, kv[1].trim(), kv[2].trim()]); return; }
     if (sec === 'd') { var d = ln.match(/^(\d{1,2}\s*[\/.\-월]\s*\d{1,2})\s*일?\s*(.*)$/); if (d) rows.push([RV_KIND.d, d[1].replace(/\s+/g, '').replace(/[.\-월]/, '/'), d[2] || '']); return; }
     var i = ln.indexOf('='); rows.push([RV_KIND[sec], (i < 0 ? ln : ln.slice(0, i)).trim(), i < 0 ? '' : ln.slice(i + 1).trim()]);
   });
   return rows;
 }
 function rowsToRules(rows) {
-  var g = { m: [], t: [], d: [] };
+  var g = { i: [], m: [], t: [], d: [] };
   (rows || []).forEach(function (r) {
-    var k = /멤버/.test(r[0]) ? 'm' : /생일|기념|날짜/.test(r[0]) ? 'd' : 't', a = String(r[1] || '').trim(), b = String(r[2] || '').trim(); if (!a) return;
-    g[k].push(k === 'd' ? (a + ' ' + b).trim() : b ? a + ' = ' + b : a);
+    var k = /정보/.test(r[0]) ? 'i' : /멤버/.test(r[0]) ? 'm' : /생일|기념|날짜/.test(r[0]) ? 'd' : 't', a = String(r[1] || '').trim(), b = String(r[2] || '').trim(); if (!a) return;
+    g[k].push(k === 'i' ? a + ': ' + b : k === 'd' ? (a + ' ' + b).trim() : b ? a + ' = ' + b : a);
   });
   var out = [];
-  [['m', '[멤버]'], ['t', '[표기]'], ['d', '[생일·기념일]']].forEach(function (x) { if (g[x[0]].length) out.push(x[1] + '\n' + g[x[0]].join('\n')); });
+  [['i', '[기본 정보]'], ['m', '[멤버]'], ['t', '[표기]'], ['d', '[생일·기념일]']].forEach(function (x) { if (g[x[0]].length) out.push(x[1] + '\n' + g[x[0]].join('\n')); });
   return out.join('\n\n');
 }
 function plyshApi() { // 같은 사이트 안에서 PLYSH 본 화면의 call 을 빌려 씀

@@ -18,6 +18,8 @@
   --acc:#3182f6; --red:#ef4444; --chip:#f2f4f6; }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { margin:0; background:var(--bg); color:var(--txt); font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif; font-size:15px; letter-spacing:-0.01em; }
+button, input, select, textarea, optgroup, option { font-family:inherit; letter-spacing:inherit; }
+
 button,input,select,textarea { font:inherit; color:inherit; letter-spacing:inherit; }
 button { cursor:pointer; }
 .mute { color:var(--mute); }
@@ -1101,7 +1103,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261118pf6';
+var APP_VER = '20261118pf7';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);

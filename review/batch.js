@@ -271,12 +271,38 @@ function setupFiles() {
 // ── 팀 표기 규칙 · 생일 (아티스트별) ──
 var RULES = { '공통': '' }, CUR = '공통', RKEY = 'rv:rules2', R_OLD = false;
 (function () { try { var o = JSON.parse(ls.get(RKEY) || 'null'); if (o) RULES = o; else { var t = ls.get('rv:rules'); if (t) RULES['공통'] = t; } } catch (e) {} if (RULES['공통'] == null) RULES['공통'] = ''; })();
-function rulesFor(artist) { return [RULES['공통'] || '', artist && RULES[artist] || ''].filter(function (s) { return s.trim(); }).join('\n\n'); }
+function rulesFor(artist) { return [RULES['공통'] || '', artist && RULES[artist] || '', infoRules(artist)].filter(function (s) { return s.trim(); }).join('\n\n'); }
 function cacheRules() { ls.set(RKEY, JSON.stringify(RULES)); }
 function say(t, bad) { var st = $('#rulesSt'); st.textContent = t; st.style.color = bad ? '#c2410c' : ''; }
+var INFO_KEYS = ['국문명', '영문명', '데뷔일', '팬덤명 (국문)', '팬덤명 (영문)', '소속사'], INFO_EDIT = false;
+function drawInfo() {
+  var el = $('#artInfo'); if (!el) return;
+  if (CUR === '공통') { el.innerHTML = ''; return; }
+  var info = RV2.parseRules(RULES[CUR] || '').info || {}, has = INFO_KEYS.some(function (k) { return info[k]; });
+  var h = '<div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:15px">' + esc(CUR) + ' 기본 정보</b><button type="button" class="ib" id="infoEd">' + (INFO_EDIT ? '입력 끝' : has ? '정보 고치기' : '정보 넣기') + '</button></div><div class="ai">';
+  h += INFO_KEYS.map(function (k) { return '<div>' + esc(k) + (INFO_EDIT ? '<input class="inp" data-k="' + esc(k) + '" value="' + esc(info[k] || '') + '" placeholder="' + (k === '데뷔일' ? '예: 2017-08-02' : '') + '">' : '<b>' + (info[k] ? esc(info[k]) : '<span class="mute" style="font-weight:600">—</span>') + '</b>') + '</div>'; }).join('') + '</div>';
+  if (!has && !INFO_EDIT) h += '<div class="note" style="margin-top:8px">아직 넣은 정보가 없어요. 한 번 넣으면 팀 시트에 저장돼서 다음부터 바로 보여요. 영문명·팬덤명은 파일 속 표기 검사에도 써요.</div>';
+  el.innerHTML = h;
+  $('#infoEd').onclick = function () { INFO_EDIT = !INFO_EDIT; drawInfo(); };
+  $$('#artInfo input[data-k]').forEach(function (i) { i.onchange = function () { setInfo(i.dataset.k, i.value.trim()); }; });
+}
+function setInfo(k, v) {
+  var rows = RV2.rulesToRows(RULES[CUR] || ''), found = false;
+  rows = rows.filter(function (r) { if (/정보/.test(r[0]) && r[1] === k) { if (found || !v) return false; found = true; r[2] = v; } return true; });
+  if (!found && v) rows.unshift(['기본 정보', k, v]);
+  var inf = rows.filter(function (r) { return /정보/.test(r[0]); }).sort(function (x, y) { var i = INFO_KEYS.indexOf(x[1]), j = INFO_KEYS.indexOf(y[1]); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
+  rows = inf.concat(rows.filter(function (r) { return !/정보/.test(r[0]); }));
+  var ta = $('#rulesTa'); ta.value = RV2.rowsToRules(rows); ta.oninput();
+}
+function infoRules(artist) { // 영문명·팬덤명은 표기 검사에 같이 씀
+  var info = artist && RULES[artist] ? RV2.parseRules(RULES[artist]).info || {} : {}, t = [];
+  ['영문명', '팬덤명 (영문)', '국문명', '팬덤명 (국문)'].forEach(function (k) { var v = String(info[k] || '').replace(/[\/=,]/g, ' ').trim(); if (v.length >= 2) t.push(v); });
+  return t.length ? '[표기]\n' + t.join('\n') : '';
+}
 function cnt() {
   var r = RV2.parseRules($('#rulesTa').value), n = r.members.length + r.terms.length + r.days.length;
   $('#rulesCnt').textContent = '· ' + CUR + ' 멤버 ' + r.members.length + ' · 표기 ' + r.terms.length + ' · 날짜 ' + r.days.length;
+  drawInfo();
   var sm = $('#rulesSum'); if (!sm) return;
   sm.innerHTML = n ? '<b>' + esc(CUR) + '</b> 규칙: ' + esc(r.members.map(function (m) { return m.forms.join('/'); }).slice(0, 6).join(', ') + (r.members.length > 6 ? ' 외' : '')) + (r.terms.length ? ' · 표기 ' + r.terms.length + '개' : '') + (r.days.length ? ' · 날짜 ' + r.days.length + '개' : '') : '<b>' + esc(CUR) + '</b> 규칙이 아직 없어요. 직접 입력으로 넣으면 팀 시트에 저장돼요.';
 }
@@ -295,7 +321,7 @@ function pickArtist(a) {
   Q.forEach(function (q) { if (!q.artistSet) q.artist = a; });
   setCur(a); drawQ(); fillSpecSel(); autoSpec(); drawTitle();
 }
-function setCur(a) { flush(); CUR = a || '공통'; if (RULES[CUR] == null) RULES[CUR] = ''; $('#rulesTa').value = RULES[CUR]; lastSaved[CUR] = lastSaved[CUR] != null ? lastSaved[CUR] : RULES[CUR]; cnt(); drawArtChips(); }
+function setCur(a) { INFO_EDIT = false; flush(); CUR = a || '공통'; if (RULES[CUR] == null) RULES[CUR] = ''; $('#rulesTa').value = RULES[CUR]; lastSaved[CUR] = lastSaved[CUR] != null ? lastSaved[CUR] : RULES[CUR]; cnt(); drawArtChips(); }
 var timer = null, saving = false, lastSaved = {};
 function flush() { if (timer) { clearTimeout(timer); timer = null; save(CUR); } }
 function save(a) {
