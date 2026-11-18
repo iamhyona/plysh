@@ -15,37 +15,13 @@ var PAPERS = [['', '종이 (두께)'], ['0.10', '모조 80g · 0.10mm'], ['0.12'
 var OPT = { kind: ls.get('rv:kind') || 'id', prod: ls.get('rv:prod') || 'print' };
 
 function setupUI() {
-  $('#paper').innerHTML = PAPERS.map(function (p, i) { return '<option value="' + i + '">' + p[1] + '</option>'; }).join('');
-  $('#paper').onchange = function () { $('#paperT').style.display = PAPERS[+$('#paper').value][0] === 'x' ? '' : 'none'; };
-  ['kind', 'prod'].forEach(function (k) {
-    $$('#' + k + ' button').forEach(function (b) {
-      b.classList.toggle('on', b.dataset.v === OPT[k]);
-      b.onclick = function () { OPT[k] = b.dataset.v; ls.set('rv:' + k, OPT[k]); $$('#' + k + ' button').forEach(function (x) { x.classList.toggle('on', x === b); }); prodDefaults(); };
-    });
-  });
   $('#setG').innerHTML = Object.keys(DEF).map(function (k) { return '<label>' + SET_LABEL[k] + '<input class="inp" type="number" step="any" data-k="' + k + '" value="' + SET[k] + '"></label>'; }).join('');
   $$('#setG input').forEach(function (i) { i.onchange = function () { SET[i.dataset.k] = +i.value; ls.set('rv:set', JSON.stringify(SET)); }; });
   $('#setReset').onclick = function () { for (var k in DEF) SET[k] = DEF[k]; ls.set('rv:set', '{}'); $$('#setG input').forEach(function (i) { i.value = SET[i.dataset.k]; }); };
-  var drop = $('#drop'), file = $('#file');
-  $('#pick').onclick = function () { file.click(); };
-  file.onchange = function () { if (file.files[0]) start(file.files[0]); file.value = ''; };
-  ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add('on'); }); });
-  ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove('on'); }); });
-  drop.addEventListener('drop', function (ev) { var f = ev.dataTransfer.files[0]; if (f) start(f); });
   document.addEventListener('dragover', function (e) { e.preventDefault(); }); document.addEventListener('drop', function (e) { e.preventDefault(); });
-  prodDefaults();
 }
-function prodDefaults() {
-  var b = $('#bind');
-  if (OPT.prod === 'photobook' && b.value === 'none') b.value = 'layflat';
-  if (OPT.prod === 'book' && b.value === 'none') b.value = 'perfect';
-  if (OPT.prod === 'photocard' && !$('#coat').value) $('#coat').value = 'gloss';
-  $('#kindNote').textContent = OPT.kind === 'aiF' ? '아웃라인 후 최종 파일: 살아 있는 글자가 남았는지까지 봐요. 글자 내용 검사는 아웃라인 전 파일로 해 주세요.' : OPT.kind === 'ai' ? '아웃라인 전 .ai: 글자 검사를 할 수 있어요. 인쇄 직전엔 아웃라인 후 최종 파일로 한 번 더 돌려 주세요. (.ai는 대지 크기만 들어 있어 도련 검사는 PDF로 해 주세요)' : '인디자인에서 도련 3mm 포함, 글자 살아 있는 PDF로 내보내 주세요.';
-}
-function workOrder() {
-  var p = PAPERS[+$('#paper').value || 0][0], cal = p === 'x' ? +$('#paperT').value || 0 : +p || 0;
-  return { w: +$('#wW').value || 0, h: +$('#wH').value || 0, pages: +$('#wP').value || 0, bind: $('#bind').value, cal: cal, coat: $('#coat').value, layout: $('#layout').value };
-}
+var KIND_LABEL = { id: 'PDF (인디자인 작업)', aiF: 'PDF (일러스트 outline)', ai: 'AI (일러스트 원본)', img: 'JPG·PNG (이미지)' };
+function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i + 1) + '쪽'; }
 
 // ── 라이브러리 ──
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
@@ -63,39 +39,41 @@ function faceLib() {
 }
 
 // ── 진행 표시 ──
-function prog(t, p, s) { $('#prog').hidden = false; $('#progT').textContent = t; $('#progB').style.width = Math.round((p || 0) * 100) + '%'; $('#progS').textContent = s || ''; }
+var ABORT = false;
+function prog(t, p, s) { if (ABORT) { var e = new Error('중지했어요'); e.abort = true; throw e; } if (window.RVB_prog) return RVB_prog(t, p, s); $('#prog').hidden = false; $('#progT').textContent = t; $('#progB').style.width = Math.round((p || 0) * 100) + '%'; $('#progS').textContent = s || ''; }
 
 // ── 상태 ──
 var R = null; // 보고서
 function issue(o) { o.id = R.issues.length + 1; R.issues.push(o); return o; }
 
-async function start(file) {
-  var WO = workOrder();
-  $('#rep').hidden = true; $('#rep').innerHTML = '';
-  prog('파일 읽는 중…', 0.01, file.name);
-  try { await libs(); } catch (e) { prog('검수 도구를 불러오지 못했어요', 0, '인터넷 연결을 확인하고 다시 시도해 주세요. ' + e.message); return; }
+function newR(name, size, meta) { return { file: name, size: size, WO: meta.WO, kind: meta.kind, prod: meta.prod, prodName: meta.prodName || '', artist: meta.artist || '', spec: meta.spec || '', rulesText: meta.rulesText, issues: [], pages: [], imgs: [], faces: [], notes: [], fonts: [], dups: [], repeats: [], rules: [], people: [] }; }
+function fatal(name, msg, sub) { return { file: name, fatal: msg, fatalSub: sub || '', issues: [], pages: [] }; }
+async function analyzePdf(file, meta) {
+  var WO = meta.WO, lab = meta.label || file.name;
+  prog('파일 읽는 중…', 0.01, lab);
+  try { await libs(); } catch (e) { prog('검수 도구를 불러오지 못했어요', 0, '인터넷 연결을 확인하고 다시 시도해 주세요. ' + e.message); return fatal(file.name, '검수 도구를 불러오지 못했어요', e.message); }
   var buf = new Uint8Array(await file.arrayBuffer());
   var head = String.fromCharCode.apply(null, buf.subarray(0, Math.min(1024, buf.length)));
-  if (head.indexOf('%PDF') < 0) { prog('이 파일은 읽을 수 없어요', 0, /\.ai$/i.test(file.name) ? '일러스트에서 저장할 때 “PDF 호환 파일 만들기”를 켜고 다시 저장해 주세요.' : 'PDF 또는 PDF 호환 .ai 파일만 검수할 수 있어요.'); return; }
-  R = { file: file.name, size: file.size, WO: WO, kind: OPT.kind, prod: OPT.prod, issues: [], pages: [], imgs: [], faces: [], notes: [] };
+  if (head.indexOf('%PDF') < 0) return fatal(file.name, '이 파일은 읽을 수 없어요', /\.ai$/i.test(file.name) ? '일러스트에서 저장할 때 “PDF 호환 파일 만들기”를 켜고 다시 저장해 주세요.' : 'PDF 또는 PDF 호환 AI 파일만 검수할 수 있어요.');
+  R = newR(file.name, file.size, meta);
   var pdfjs, plib;
   try {
     pdfjs = await pdfjsLib.getDocument({ data: buf.slice(), isEvalSupported: false, disableFontFace: false }).promise;
     plib = await PDFLib.PDFDocument.load(buf.slice(), { ignoreEncryption: true, updateMetadata: false, throwOnInvalidObject: false });
-  } catch (e) { prog('파일을 여는 중 문제가 생겼어요', 0, String(e && e.message || e)); return; }
+  } catch (e) { return fatal(file.name, '파일을 여는 중 문제가 생겼어요', String(e && e.message || e)); }
   var doc = PRV.open(plib), n = pdfjs.numPages;
   R.n = n;
-  var wantFaces = WO.bind !== 'none' || OPT.prod === 'photobook' || OPT.prod === 'photocard' || OPT.prod === 'book' || OPT.prod === 'calendar';
+  var wantFaces = WO.bind !== 'none' || /photobook|photocard|book|calendar/.test(meta.prod);
   var faceOK = false;
   if (wantFaces) { prog('얼굴 인식 준비 중…', 0.02); faceOK = await faceLib(); if (!faceOK) R.notes.push('얼굴 인식을 불러오지 못해 제본 안쪽 검사는 글자만 했어요.'); }
   R.faceOK = faceOK;
   for (var i = 0; i < n; i++) {
-    if (i % 4 === 0) { prog('파일 구조 읽는 중 ' + (i + 1) + ' / ' + n, 0.03 + 0.12 * i / n, file.name); await tick(); }
+    if (i % 4 === 0) { prog('파일 구조 읽는 중 ' + (i + 1) + ' / ' + n, 0.03 + 0.12 * i / n, lab); await tick(); }
     var P = PRV.page(doc, i, {}); P.no = i + 1; R.pages.push(P);
   }
   layoutPages();
   for (var j = 0; j < n; j++) {
-    prog('페이지 ' + (j + 1) + ' / ' + n + ' 검사 중' + (faceOK ? ' (얼굴 인식 포함)' : ''), 0.15 + 0.8 * j / n, file.name);
+    prog('페이지 ' + (j + 1) + ' / ' + n + ' 검사 중' + (faceOK ? ' (얼굴 인식 포함)' : ''), 0.15 + 0.8 * j / n, lab);
     await tick();
     await renderPage(pdfjs, R.pages[j], faceOK);
   }
@@ -107,9 +85,10 @@ async function start(file) {
   dupPhotos();
   designRules();
   faceAdvice();
-  if (window.RV2) { try { await RV2.run(R, pdfjs, function (t) { prog(t, 0.97); }); } catch (e) { console.warn('phase2', e); issue({ page: null, sev: 'info', cat: 'text', code: 'p2err', title: '2단계 검사 중 일부가 실패했어요', detail: String(e && e.message || e), fix: '', boxes: [] }); } }
-  $('#prog').hidden = true;
-  renderReport();
+  if (window.RV2) { try { await RV2.run(R, pdfjs, function (t) { prog(t, 0.97, lab); }); } catch (e) { if (e && e.abort) throw e; console.warn('phase2', e); issue({ page: null, sev: 'info', cat: 'text', code: 'p2err', title: '2단계 검사 중 일부가 실패했어요', detail: String(e && e.message || e), fix: '', boxes: [] }); } }
+  R.pages.forEach(function (P) { P.px = null; }); // 메모리 정리 (여러 파일 검사)
+  try { pdfjs.destroy(); } catch (e) {}
+  return R;
 }
 
 // ── 페이지 렌더 + 픽셀 검사 재료 ──
@@ -143,33 +122,148 @@ async function renderPage(pdfjs, P, faceOK) {
   });
   // 얼굴
   P.faces = [];
-  if (faceOK) {
-    try {
-      var big = Math.max(cv.width, cv.height), fcv = cv;
-      if (big > 1700) { var s2 = 1700 / big; fcv = document.createElement('canvas'); fcv.width = Math.round(cv.width * s2); fcv.height = Math.round(cv.height * s2); fcv.getContext('2d').drawImage(cv, 0, 0, fcv.width, fcv.height); }
-      var k2 = cv.width / fcv.width;
-      var det = await faceapi.detectAllFaces(fcv, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.45, maxResults: 60 })).withFaceLandmarks().withFaceDescriptors();
-      var all = det.map(function (d) { var b = d.detection.box; return { d: d, r: [b.x * k2, b.y * k2, (b.x + b.width) * k2, (b.y + b.height) * k2] }; });
-      // 제본·접지 쪽은 잘라서 한 번 더 (작게 나온 얼굴, 숙인 얼굴까지)
-      var GC = gutterCrops(P);
-      for (var gi = 0; gi < GC.length; gi++) {
-        var gr = GC[gi], gw = gr[2] - gr[0], gh = gr[3] - gr[1], gs = Math.min(1, 1400 / Math.max(gw, gh)), gc = document.createElement('canvas');
-        gc.width = Math.round(gw * gs); gc.height = Math.round(gh * gs); gc.getContext('2d').drawImage(cv, gr[0], gr[1], gw, gh, 0, 0, gc.width, gc.height);
-        var d2 = await faceapi.detectAllFaces(gc, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.3, maxResults: 40 })).withFaceLandmarks().withFaceDescriptors();
-        d2.forEach(function (d) { var b = d.detection.box, r = [gr[0] + b.x / gs, gr[1] + b.y / gs, gr[0] + (b.x + b.width) / gs, gr[1] + (b.y + b.height) / gs]; if (!all.some(function (a) { return iou(a.r, r) > 0.3; })) all.push({ d: d, r: r, low: d.detection.score < 0.5 }); });
-      }
-      all.forEach(function (a) {
-        var d = a.d, r = a.r;
-        var F = { page: P.i, px: r, box: toPt(P, r), score: d.detection.score, desc: Array.from(d.descriptor), low: !!a.low };
-        F.thumb = cropURL(cv, padR(r, 0.25, cv), 110);
-        F.skin = skinStats(P, r);
-        F.outfit = outfitColor(P, r);
-        P.faces.push(F); R.faces.push(F);
-      });
-    } catch (e) { console.warn('face', e); }
-  }
+  if (faceOK) await detectFaces(P, cv);
   pg.cleanup();
 }
+async function detectFaces(P, cv) {
+  try {
+    var big = Math.max(cv.width, cv.height), fcv = cv;
+    if (big > 1700) { var s2 = 1700 / big; fcv = document.createElement('canvas'); fcv.width = Math.round(cv.width * s2); fcv.height = Math.round(cv.height * s2); fcv.getContext('2d').drawImage(cv, 0, 0, fcv.width, fcv.height); }
+    var k2 = cv.width / fcv.width;
+    var det = await faceapi.detectAllFaces(fcv, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.45, maxResults: 60 })).withFaceLandmarks().withFaceDescriptors();
+    var all = det.map(function (d) { var b = d.detection.box; return { d: d, r: [b.x * k2, b.y * k2, (b.x + b.width) * k2, (b.y + b.height) * k2] }; });
+    // 제본·접지 쪽은 잘라서 한 번 더 (작게 나온 얼굴, 숙인 얼굴까지)
+    var GC = gutterCrops(P);
+    for (var gi = 0; gi < GC.length; gi++) {
+      var gr = GC[gi], gw = gr[2] - gr[0], gh = gr[3] - gr[1], gs = Math.min(1, 1400 / Math.max(gw, gh)), gc = document.createElement('canvas');
+      gc.width = Math.round(gw * gs); gc.height = Math.round(gh * gs); gc.getContext('2d').drawImage(cv, gr[0], gr[1], gw, gh, 0, 0, gc.width, gc.height);
+      var d2 = await faceapi.detectAllFaces(gc, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.3, maxResults: 40 })).withFaceLandmarks().withFaceDescriptors();
+      d2.forEach(function (d) { var b = d.detection.box, r = [gr[0] + b.x / gs, gr[1] + b.y / gs, gr[0] + (b.x + b.width) / gs, gr[1] + (b.y + b.height) / gs]; if (!all.some(function (a) { return iou(a.r, r) > 0.3; })) all.push({ d: d, r: r, low: d.detection.score < 0.5 }); });
+    }
+    all.forEach(function (a) {
+      var d = a.d, r = a.r;
+      var F = { page: P.i, px: r, box: toPt(P, r), score: d.detection.score, desc: Array.from(d.descriptor), low: !!a.low };
+      F.thumb = cropURL(cv, padR(r, 0.25, cv), 110);
+      F.skin = skinStats(P, r);
+      F.outfit = outfitColor(P, r);
+      P.faces.push(F); R.faces.push(F);
+    });
+  } catch (e) { console.warn('face', e); }
+}
+
+// ── JPG·PNG 이미지 (같은 품목끼리 한 묶음으로 검사) ──
+function u8str(u, a, n) { var s = ''; for (var i = a; i < Math.min(u.length, a + n); i++) s += String.fromCharCode(u[i]); return s; }
+function imgHeader(u) { // 크기, 색 모드, 투명, dpi, 색 프로파일
+  var o = { fmt: '', w: 0, h: 0, comps: 3, alpha: false, dpi: 0, icc: '' };
+  if (u[0] === 0xFF && u[1] === 0xD8) {
+    o.fmt = 'JPG'; var i = 2;
+    while (i + 4 < u.length) {
+      if (u[i] !== 0xFF) { i++; continue; }
+      var m = u[i + 1], len = (u[i + 2] << 8) | u[i + 3];
+      if (m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { i += 2; continue; }
+      if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) { o.h = (u[i + 5] << 8) | u[i + 6]; o.w = (u[i + 7] << 8) | u[i + 8]; o.comps = u[i + 9]; break; }
+      if (m === 0xE0 && u8str(u, i + 4, 4) === 'JFIF') { var unit = u[i + 11], xd = (u[i + 12] << 8) | u[i + 13]; if (unit === 1) o.dpi = xd; else if (unit === 2) o.dpi = Math.round(xd * 2.54); }
+      if (m === 0xE2 && u8str(u, i + 4, 11) === 'ICC_PROFILE') { var t = u8str(u, i + 18, Math.min(len, 4000)); var mm2 = t.match(/(sRGB[^\x00]{0,30}|Adobe RGB[^\x00]{0,20}|Display P3|ProPhoto[^\x00]{0,10}|Japan Color[^\x00]{0,20}|Coated FOGRA[^\x00]{0,10}|U\.?S\.? Web[^\x00]{0,20}|Generic[^\x00]{0,20})/); if (mm2) o.icc = mm2[1].replace(/[^\x20-\x7e]/g, '').trim(); else o.icc = o.icc || '포함'; }
+      if (m === 0xE1 && u8str(u, i + 4, 4) === 'Exif' && !o.dpi) { var ex = u8str(u, i + 10, Math.min(len, 600)); }
+      if (m === 0xDA) break;
+      i += 2 + len;
+    }
+  } else if (u[0] === 0x89 && u[1] === 0x50) {
+    o.fmt = 'PNG'; o.w = (u[16] << 24 | u[17] << 16 | u[18] << 8 | u[19]) >>> 0; o.h = (u[20] << 24 | u[21] << 16 | u[22] << 8 | u[23]) >>> 0;
+    var ct = u[25]; o.alphaType = ct === 4 || ct === 6; o.comps = ct === 0 || ct === 4 ? 1 : 3;
+    var p = 8; while (p + 8 < u.length && p < 2e6) { var L = (u[p] << 24 | u[p + 1] << 16 | u[p + 2] << 8 | u[p + 3]) >>> 0, ty = u8str(u, p + 4, 4);
+      if (ty === 'pHYs' && u[p + 16] === 1) o.dpi = Math.round(((u[p + 8] << 24 | u[p + 9] << 16 | u[p + 10] << 8 | u[p + 11]) >>> 0) * 0.0254);
+      if (ty === 'iCCP') o.icc = u8str(u, p + 8, 40).split('\x00')[0]; if (ty === 'sRGB') o.icc = 'sRGB'; if (ty === 'tRNS') o.alphaType = true;
+      if (ty === 'IDAT' || ty === 'IEND') break; p += 12 + L; }
+  }
+  return o;
+}
+async function analyzeImages(files, meta) {
+  var lab = meta.label || files[0].name;
+  prog('이미지 읽는 중…', 0.01, lab);
+  try { await libs(); } catch (e) { return fatal(files[0].name, '검수 도구를 불러오지 못했어요', e.message); }
+  R = newR(files.length > 1 ? files.length + '개 이미지 · ' + (meta.prodName || '이미지') : files[0].name, files.reduce(function (a, f) { return a + f.size; }, 0), meta);
+  R.isImg = true; R.kind = 'img'; R.n = files.length; R.bookPages = files.length; R.files = files.map(function (f) { return f.name; });
+  var web = meta.prod === 'web', faceOK = false;
+  prog('얼굴 인식 준비 중…', 0.03, lab); faceOK = await faceLib(); R.faceOK = faceOK;
+  var WO = meta.WO || {}, bl = SET.bleed;
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i]; prog('이미지 ' + (i + 1) + ' / ' + files.length + ' 검사 중', 0.05 + 0.85 * i / files.length, f.name); await tick();
+    var buf = new Uint8Array(await f.arrayBuffer()), hd = imgHeader(buf), bmp = null;
+    try { bmp = await createImageBitmap(new Blob([buf])); } catch (e) { issue({ page: null, sev: 'err', cat: 'print', code: 'imgread', title: '이미지를 열지 못했어요: ' + f.name, detail: String(e && e.message || e), fix: '', boxes: [] }); continue; }
+    var W = bmp.width, H = bmp.height, sc = Math.min(1, 2400 / Math.max(W, H)), cv = document.createElement('canvas'); cv.width = Math.round(W * sc); cv.height = Math.round(H * sc);
+    var cx = cv.getContext('2d', { willReadFrequently: true }); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(bmp, 0, 0, cv.width, cv.height);
+    // 투명 여부 (PNG)
+    var alpha = false; if (hd.alphaType) { var tc0 = document.createElement('canvas'); tc0.width = Math.min(400, W); tc0.height = Math.round(H * tc0.width / W) || 1; var tx = tc0.getContext('2d', { willReadFrequently: true }); tx.drawImage(bmp, 0, 0, tc0.width, tc0.height); var dd = tx.getImageData(0, 0, tc0.width, tc0.height).data; for (var q = 3; q < dd.length; q += 16) if (dd[q] < 250) { alpha = true; break; } }
+    bmp.close && bmp.close();
+    // 실제 크기: 사양서 크기(도련 포함/미포함 중 비율이 맞는 쪽) → 없으면 파일 dpi → 없으면 300dpi 가정
+    var ar = W / H, fitB = null, mmW, mmH, hasBleed = false, sizeSrc = '';
+    if (!web && WO.w && WO.h) {
+      var cands = [[WO.w, WO.h, false], [WO.h, WO.w, false], [WO.w + 2 * bl, WO.h + 2 * bl, true], [WO.h + 2 * bl, WO.w + 2 * bl, true]];
+      cands.forEach(function (c) { var e = Math.abs(c[0] / c[1] - ar) / ar; if (!fitB || e < fitB.e) fitB = { e: e, w: c[0], h: c[1], b: c[2] }; });
+      mmW = fitB.w; mmH = fitB.h; hasBleed = fitB.b; sizeSrc = 'spec';
+    } else { var dpi = hd.dpi > 30 ? hd.dpi : (web ? 72 : 300); mmW = W / dpi * 25.4; mmH = H / dpi * 25.4; sizeSrc = hd.dpi > 30 ? 'dpi' : 'guess'; }
+    var Wpt = mmW * MM, Hpt = mmH * MM, s = cv.width / Wpt;
+    var P = { i: i, no: i + 1, name: f.name.replace(/\.(jpe?g|png)$/i, ''), file: f.name, media: [0, 0, Wpt, Hpt], crop: [0, 0, Wpt, Hpt], fills: [], strokes: [], texts: [], images: [], annots: [], spots: {}, tc: [], spread: false, lp: [i + 1], faces: [], img: { fmt: hd.fmt || (f.type || '').replace('image/', '').toUpperCase(), w: W, h: H, comps: hd.comps, alpha: alpha, dpi: hd.dpi, icc: hd.icc, bytes: f.size, mmW: mmW, mmH: mmH, sizeSrc: sizeSrc, fit: fitB } };
+    var b0 = hasBleed ? bl * MM : 0; P.trim = [b0, b0, Wpt - b0, Hpt - b0]; P.bleed = hasBleed ? [0, 0, Wpt, Hpt] : null;
+    P.vt = [s, 0, 0, -s, 0, cv.height]; P.cw = cv.width; P.ch = cv.height; P.scale = s;
+    P.px = cx.getImageData(0, 0, cv.width, cv.height);
+    var tw = Math.min(1100, cv.width), th = Math.round(cv.height * tw / cv.width), tcv = document.createElement('canvas'); tcv.width = tw; tcv.height = th; tcv.getContext('2d').drawImage(cv, 0, 0, tw, th);
+    P.thumb = await new Promise(function (ok) { tcv.toBlob(function (b) { ok(URL.createObjectURL(b)); }, 'image/jpeg', 0.82); }); P.tw = tw; P.th = th;
+    var im = { page: i, k: 0, vis: P.crop.slice(), box: P.crop.slice(), hash: PRV.hashBytes ? PRV.hashBytes(buf) : null, px: [0, 0, cv.width, cv.height] };
+    im.hashV = dhash(cv, im.px); im.thumb = cropURL(cv, im.px, 160); im.stats = regionStats(P, im.px); P.images.push(im); R.imgs.push(im);
+    R.pages.push(P);
+    if (faceOK) await detectFaces(P, cv);
+  }
+  R.n = R.pages.length; R.bookPages = R.n; R.gz = 0; R.gNote = '';
+  prog('이미지 사이 비교 중…', 0.93, lab); await tick();
+  R.pages.forEach(function (P) { imageChecks(P, web); });
+  imageSetChecks(web);
+  dupPhotos();
+  faceAdvice();
+  R.pages.forEach(function (P) { P.px = null; });
+  return R;
+}
+function kb(n) { return n > 1048576 ? f1(n / 1048576) + 'MB' : Math.round(n / 1024) + 'KB'; }
+function imageChecks(P, web) {
+  var I = P.img, WO = R.WO || {}, pg = P.i;
+  function add(sev, cat, code, title, detail, fix, boxes, ex) { var o = { page: pg, sev: sev, cat: cat, code: code, title: title, detail: detail || '', fix: fix || '', boxes: boxes || [] }; if (ex) for (var k in ex) o[k] = ex[k]; return issue(o); }
+  var whole = [P.crop.slice()];
+  if (web) {
+    if (I.comps === 4) add('err', 'img', 'imgcmyk', '웹용 이미지가 CMYK예요', I.fmt + ' · CMYK', '화면에서 색이 크게 달라 보여요. sRGB로 바꿔 저장해 주세요.');
+    else if (I.icc && !/sRGB/i.test(I.icc) && I.icc !== '포함') add('warn', 'img', 'imgprofile', '색 프로파일이 sRGB가 아니에요: ' + I.icc, '웹·SNS에서는 sRGB가 아니면 색이 바래거나 달라 보일 수 있어요.', '내보낼 때 sRGB로 변환해 주세요.');
+    if (I.bytes > 5 * 1048576) add('warn', 'img', 'imgweight', '파일이 커요 (' + kb(I.bytes) + ')', I.w + '×' + I.h + 'px', '업로드 제한이 있는 곳이면 품질 80~90%로 다시 저장해 보세요.');
+    if (I.alpha && I.fmt === 'PNG') add('info', 'img', 'imgalpha', '투명한 부분이 있는 PNG예요', '배경이 투명하게 나와요.', '의도한 게 아니면 배경을 채워 주세요.');
+    return;
+  }
+  // 인쇄용
+  if (I.comps === 3) add('warn', 'img', 'imgrgb', 'RGB 이미지예요', I.fmt + (I.icc ? ' · ' + I.icc : ''), '인쇄소에서 CMYK로 바뀌면서 색이 달라질 수 있어요. 인쇄용이면 CMYK로 변환해 색을 확인해 주세요.', [], { sus: false });
+  if (I.alpha) add('warn', 'img', 'imgalpha', '투명한 부분이 있어요', 'PNG 투명 영역은 인쇄할 때 흰색으로 나와요.', '배경을 채운 파일로 넣어 주세요.');
+  var ppiX = I.w / (I.mmW / 25.4), ppiY = I.h / (I.mmH / 25.4), ppi = Math.min(ppiX, ppiY);
+  if (I.sizeSrc === 'spec') {
+    if (I.fit && I.fit.e > 0.02) add('warn', 'img', 'imgratio', '이미지 비율이 사양서 크기와 달라요', '이미지 ' + I.w + '×' + I.h + 'px (비율 ' + f1(I.w / I.h) + ') · 사양 ' + WO.w + '×' + WO.h + 'mm' + ' (도련 포함 ' + (WO.w + 2 * SET.bleed) + '×' + (WO.h + 2 * SET.bleed) + 'mm)', '잘리거나 늘어날 수 있어요. 사양서 비율에 맞춰 다시 내보내 주세요.');
+    else if (I.fit && !I.fit.b) add('warn', 'print', 'bleedbox', '도련(' + SET.bleed + 'mm)이 없는 크기예요', '이미지 비율이 재단 크기 ' + WO.w + '×' + WO.h + 'mm와 같아요.', '사방 ' + SET.bleed + 'mm씩 도련을 넣어 ' + (WO.w + 2 * SET.bleed) + '×' + (WO.h + 2 * SET.bleed) + 'mm로 만들어 주세요.', [], { sus: true });
+    if (ppi < SET.ppi) add('err', 'print', 'lowppi', '해상도가 낮은 이미지', '사양 크기로 인쇄하면 약 ' + Math.round(ppi) + 'ppi (기준 ' + SET.ppi + 'ppi) · ' + I.w + '×' + I.h + 'px', '최소 ' + Math.ceil(I.mmW / 25.4 * SET.ppi) + '×' + Math.ceil(I.mmH / 25.4 * SET.ppi) + 'px 이상 원본으로 바꿔 주세요.', whole);
+  } else {
+    add('info', 'img', 'imgsizeinfo', '인쇄 크기를 몰라 해상도는 추정이에요', I.w + '×' + I.h + 'px · ' + (I.sizeSrc === 'dpi' ? '파일 해상도 ' + I.dpi + 'dpi 기준 ' : '300dpi로 가정하면 ') + f1(I.mmW) + '×' + f1(I.mmH) + 'mm', '사양서에 크기를 넣으면 정확히 봐요.');
+    if (I.sizeSrc === 'dpi' && I.dpi < SET.ppi) add('warn', 'print', 'lowppi', '파일 해상도가 낮게 저장됐어요 (' + I.dpi + 'dpi)', '이 크기(' + f1(I.mmW) + '×' + f1(I.mmH) + 'mm)로 인쇄하면 기준 ' + SET.ppi + 'ppi보다 낮아요.', '실제 인쇄 크기를 사양서에 넣어 다시 확인해 주세요.', whole, { sus: true });
+  }
+  // 재단선 가까이 얼굴
+  var T = P.trim, sf = SET.safe * MM;
+  P.faces.forEach(function (F) { var b = F.box; if (b[0] < T[0] + sf || b[1] < T[1] + sf || b[2] > T[2] - sf || b[3] > T[3] - sf) add('warn', 'print', 'safeface', '재단선 가까이에 얼굴이 있어요', '재단선 안쪽 ' + SET.safe + 'mm 안에 얼굴이 걸려요' + (P.bleed ? '' : ' (도련 없는 크기 기준)') + '.', '재단이 밀리면 잘릴 수 있어요. 얼굴을 안쪽으로 옮겨 주세요.', [b], { sus: true }); });
+}
+function imageSetChecks(web) {
+  if (R.pages.length < 2) return;
+  var sz = {}; R.pages.forEach(function (P) { var k = P.img.w + '×' + P.img.h; (sz[k] = sz[k] || []).push(P); });
+  var keys = Object.keys(sz).sort(function (a, b) { return sz[b].length - sz[a].length; });
+  if (keys.length > 1 && sz[keys[0]].length >= 2) {
+    var major = keys[0];
+    keys.slice(1).forEach(function (k) { sz[k].forEach(function (P) { issue({ page: P.i, sev: 'warn', cat: 'rule', code: 'imgsize', title: '다른 이미지와 크기가 달라요', detail: P.name + ' ' + k + 'px · 대부분은 ' + major + 'px (' + sz[major].length + '개)', fix: '같은 세트면 크기를 맞춰 주세요.', boxes: [] }); }); });
+  }
+  var md = {}; R.pages.forEach(function (P) { var k = P.img.comps === 4 ? 'CMYK' : P.img.comps === 1 ? '흑백' : 'RGB'; (md[k] = md[k] || []).push(P); });
+  if (Object.keys(md).length > 1) issue({ page: null, sev: 'warn', cat: 'img', code: 'imgmix', title: '색 모드가 섞여 있어요', detail: Object.keys(md).map(function (k) { return k + ' ' + md[k].length + '개'; }).join(' · '), fix: '같은 세트는 같은 색 모드로 맞춰 주세요.', boxes: [] });
+}
+
 function iou(a, b) { var i = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0])) * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1])); return i / ((a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i); }
 function gutterCrops(P) { // 얼굴 재검사할 픽셀 영역: 펼침면 가운데 또는 낱장 제본 쪽 (±70mm)
   if (R.WO.bind === 'none' && !P.spread) return [];
@@ -544,7 +638,7 @@ function dupPhotos() {
   R.repeats = groups.filter(function (g) { return g.repeat; });
   R.dups.forEach(function (g) {
     var pages = uniq(g.items.map(function (x) { return x.page + 1; }));
-    issue({ page: null, sev: g.exact ? 'err' : 'warn', cat: 'photo', code: g.exact ? 'dup' : 'dupnear', title: g.exact ? '같은 사진이 ' + g.items.length + '번 쓰였어요' : '같은 사진으로 보여요', detail: pages.join(', ') + '쪽', fix: g.exact ? '의도한 반복이 아니면 다른 사진으로 바꿔 주세요.' : '자르기·크기만 다른 같은 컷인지 확인해 주세요.', boxes: [], pages: pages, group: g, sus: !g.exact, top: true });
+    issue({ page: null, sev: g.exact ? 'err' : 'warn', cat: 'photo', code: g.exact ? 'dup' : 'dupnear', title: g.exact ? (R.isImg ? '똑같은 이미지 파일이 ' + g.items.length + '개 있어요' : '같은 사진이 ' + g.items.length + '번 쓰였어요') : '같은 사진으로 보여요', detail: R.isImg ? uniq(g.items.map(function (x) { return pl(x.page); })).join(', ') : pages.join(', ') + '쪽', fix: g.exact ? '의도한 반복이 아니면 다른 사진으로 바꿔 주세요.' : '자르기·크기만 다른 같은 컷인지 확인해 주세요.', boxes: [], pages: pages, group: g, sus: !g.exact, top: true });
     g.items.forEach(function (x) { issue({ page: x.page, sev: g.exact ? 'err' : 'warn', cat: 'photo', code: g.exact ? 'dupP' : 'dupnearP', title: g.exact ? '중복 사진' : '중복 의심 사진', detail: '같은 사진: ' + pages.join(', ') + '쪽', fix: '', boxes: [x.vis], hidden: true }); });
   });
 }
@@ -730,32 +824,31 @@ function labD(a, b) { return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] 
 function median(a) { a = a.slice().sort(function (x, y) { return x - y; }); return a.length ? a[Math.floor(a.length / 2)] : 0; }
 
 // ── 보고서 화면 ──
-var CATS = [['all', '전체'], ['top', '가장 중요'], ['print', '인쇄'], ['bind', '제본'], ['photo', '중복 사진'], ['rule', '디자인 규칙'], ['text', '글자·표기'], ['cal', '달력'], ['face', '인물 사진']];
+var CATS = [['all', '전체'], ['top', '가장 중요'], ['print', '인쇄'], ['img', '이미지 파일'], ['bind', '제본'], ['photo', '중복 사진'], ['rule', '디자인 규칙'], ['text', '글자·표기'], ['cal', '달력'], ['face', '인물 사진']];
 var SEVN = { err: '오류', warn: '확인', info: '참고', adv: '의견' };
 var UI = { tab: 'all', onlyBad: true };
 function renderReport() {
   var I = R.issues.filter(function (x) { return !x.hidden; });
   var c = { err: 0, warn: 0, adv: 0, info: 0 }; I.forEach(function (x) { c[x.sev]++; });
   var T0 = R.pages[0] ? R.pages[0].trim : [0, 0, 0, 0];
-  var h = '<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">' + esc(R.file) + '</h3><div class="small sub" style="margin-top:4px">PDF ' + R.n + '장 · 책 ' + R.bookPages + '쪽 · 재단 ' + f1(mm(T0[2] - T0[0])) + '×' + f1(mm(T0[3] - T0[1])) + 'mm · ' + ({ id: '인디자인 PDF', ai: '일러스트 (아웃라인 전)', aiF: '일러스트 최종' })[R.kind] + '</div></div>' +
-    '<div class="row noprint"><button class="ib" id="again">다른 파일</button><button class="ib" id="print">보고서 인쇄</button></div></div>' +
+  var meta = R.isImg ? '이미지 ' + R.n + '개' + (R.WO && R.WO.w ? ' · 사양 ' + R.WO.w + '×' + R.WO.h + 'mm' : '') : 'PDF ' + R.n + '장 · 책 ' + R.bookPages + '쪽 · 재단 ' + f1(mm(T0[2] - T0[0])) + '×' + f1(mm(T0[3] - T0[1])) + 'mm';
+  var h = '<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">' + esc(R.file) + '</h3><div class="small sub" style="margin-top:4px">' + meta + ' · ' + KIND_LABEL[R.kind] + (R.prodName ? ' · ' + esc(R.prodName) : '') + (R.artist ? ' · ' + esc(R.artist) : '') + '</div></div>' +
+    '<div class="row noprint"><button class="ib" id="print">이 파일 결과지</button></div></div>' +
     '<div class="sum"><span class="pill ' + (c.err ? 'err' : 'ok') + '"><b>' + c.err + '</b>오류</span><span class="pill warn"><b>' + c.warn + '</b>확인 필요</span><span class="pill adv"><b>' + c.adv + '</b>의견</span><span class="pill"><b>' + c.info + '</b>참고</span></div>' +
     '<div class="note">“의심” 표시는 자동으로 추정한 거라 직접 한 번 더 봐 주세요. 색은 화면용(RGB)으로 바꿔 본 대략값이에요.</div></div>';
-  h += '<div class="tabs noprint" id="tabs">' + CATS.map(function (t) { var n = I.filter(function (x) { return inCat(x, t[0]); }).length; return '<button data-t="' + t[0] + '" class="' + (UI.tab === t[0] ? 'on' : '') + '">' + t[1] + '<em>' + n + '</em></button>'; }).join('') + '</div>';
+  h += '<div class="tabs noprint" id="tabs">' + CATS.filter(function (t) { return t[0] === 'all' || t[0] === 'top' || I.some(function (x) { return inCat(x, t[0]); }) || (t[0] === 'face' && R.people && R.people.length); }).map(function (t) { var n = I.filter(function (x) { return inCat(x, t[0]); }).length; return '<button data-t="' + t[0] + '" class="' + (UI.tab === t[0] ? 'on' : '') + '">' + t[1] + '<em>' + n + '</em></button>'; }).join('') + '</div>';
   h += '<div id="tabB"></div>';
   $('#rep').innerHTML = h; $('#rep').hidden = false;
-  $('#again').onclick = function () { $('#file').click(); };
-  $('#print').onclick = function () { window.print(); };
+  $('#print').onclick = function () { if (window.RVB) RVB.printSheet([VR || R]); else window.print(); };
   $$('#tabs button').forEach(function (b) { b.onclick = function () { UI.tab = b.dataset.t; $$('#tabs button').forEach(function (x) { x.classList.toggle('on', x === b); }); renderTab(); }; });
   renderTab();
-  $('#rep').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function inCat(x, t) { if (x.hidden) return false; if (t === 'all') return true; if (t === 'top') return !!x.top || x.cat === 'photo' && (x.code === 'dup' || x.code === 'dupnear'); return x.cat === t; }
 var SEVO = { err: 0, warn: 1, adv: 2, info: 3 };
 function renderTab() {
   var t = UI.tab, I = R.issues.filter(function (x) { return inCat(x, t); }), h = '';
   if (t === 'photo' || t === 'top' || t === 'all') h += dupCard(t);
-  if (t === 'rule') h += '<div class="card"><h3>찾은 디자인 규칙</h3><div class="small sub">' + (R.rules.length ? R.rules.map(function (r) { return '· ' + r.txt + ' (' + r.pages + '개 페이지에서 찾음)'; }).join('<br>') : '반복되는 칸 규칙을 찾지 못했어요. 달력처럼 같은 틀을 여러 페이지에 쓰는 파일에서 동작해요.') + '<br>· 같은 자리에 반복되는 글자(제목, 월 표시 등)의 서체·크기·색도 비교해요.</div></div>';
+  if (t === 'rule' && !R.isImg) h += '<div class="card"><h3>찾은 디자인 규칙</h3><div class="small sub">' + (R.rules.length ? R.rules.map(function (r) { return '· ' + r.txt + ' (' + r.pages + '개 페이지에서 찾음)'; }).join('<br>') : '반복되는 칸 규칙을 찾지 못했어요. 달력처럼 같은 틀을 여러 페이지에 쓰는 파일에서 동작해요.') + '<br>· 같은 자리에 반복되는 글자(제목, 월 표시 등)의 서체·크기·색도 비교해요.</div></div>';
   if (window.RV2) h += RV2.cards(t);
   if (t === 'face' || t === 'all') h += peopleCard();
   // 이슈 묶기 (같은 코드+제목)
@@ -769,18 +862,18 @@ function renderTab() {
       h += '<div class="iss"><div class="ih"><span class="sev ' + x.sev + '">' + SEVN[x.sev] + '</span><div class="t"><b>' + esc(x.title) + '</b>' + (x.sus ? '<span class="sus">의심</span>' : '') +
         (L.length === 1 || pages.length <= 1 ? '<div class="d">' + rich(x.detail) + '</div>' : '<div class="d">' + pages.length + '개 페이지 · 예: ' + rich(x.detail) + '</div>') +
         (x.fix ? '<div class="fx">→ ' + rich(x.fix) + '</div>' : '') +
-        (pages.length ? '<div class="pgs">' + pages.slice(0, 80).map(function (p) { return '<button data-pg="' + p + '" data-iss="' + L.find(function (y) { return y.page === p; }).id + '">' + (p + 1) + '쪽</button>'; }).join('') + '</div>' : '') +
+        (pages.length ? '<div class="pgs">' + pages.slice(0, 80).map(function (p) { return '<button data-pg="' + p + '" data-iss="' + L.find(function (y) { return y.page === p; }).id + '">' + esc(pl(p)) + '</button>'; }).join('') + '</div>' : '') +
         (x.ref != null && L.length <= 6 ? L.map(function (y) { return compareHTML(y); }).join('') : '') +
         '</div></div></div>';
     });
     h += '</div>';
   } else if (!h) h += '<div class="card"><div class="sub">이 항목에서 찾은 문제가 없어요.</div></div>';
-  if (t === 'all' || t === 'print') h += infoCard();
+  if (t === 'all' || t === 'print' || t === 'img') h += infoCard();
   h += pagesCard();
   $('#tabB').innerHTML = h;
   bindPg($('#tabB'));
   $$('.cmp').forEach(drawCompare);
-  $$('#pplG input').forEach(function (i) { i.onchange = function () { R.people[+i.dataset.p].name = i.value || R.people[+i.dataset.p].name; R.people[+i.dataset.p].auto = false; renderTab(); }; });
+  $$('#pplG input').forEach(function (i) { i.onchange = function () { var Rv = VR || R; Rv.people[+i.dataset.p].name = i.value || Rv.people[+i.dataset.p].name; Rv.people[+i.dataset.p].auto = false; renderTab(); }; });
   var ob = $('#onlyBad'); if (ob) ob.onchange = function () { UI.onlyBad = ob.checked; renderTab(); };
 }
 function rich(s) { return String(s || '').indexOf('<i class="swc"') > -1 ? s : esc(s); }
@@ -790,8 +883,8 @@ function bindPg(root) {
 function dupCard(t) {
   if (!R.dups.length) return t === 'photo' ? '<div class="card"><h3>중복 사진</h3><div class="sub">같은 사진이 두 번 쓰인 곳을 찾지 못했어요.</div>' + (R.repeats.length ? '<div class="note">로고·패턴처럼 여러 페이지에 반복되는 작은 이미지 ' + R.repeats.length + '종은 빼고 봤어요.</div>' : '') + '</div>' : '';
   return '<div class="card"><h3>중복 사진 <span class="mute small">' + R.dups.length + '묶음</span></h3>' + R.dups.map(function (g) {
-    return '<div class="dg"><div class="row" style="margin-bottom:8px"><span class="sev ' + (g.exact ? 'err' : 'warn') + '">' + (g.exact ? '같은 파일' : '비슷함') + '</span>' + (g.exact ? '' : '<span class="sus">의심</span>') + '<span class="small sub">' + uniq(g.items.map(function (x) { return x.page + 1; })).join(', ') + '쪽</span></div><div class="ims">' +
-      g.items.map(function (x) { return '<figure data-pg="' + x.page + '"><img src="' + x.thumb + '" alt=""><figcaption>' + (x.page + 1) + '쪽</figcaption></figure>'; }).join('') + '</div></div>';
+    return '<div class="dg"><div class="row" style="margin-bottom:8px"><span class="sev ' + (g.exact ? 'err' : 'warn') + '">' + (g.exact ? '같은 파일' : '비슷함') + '</span>' + (g.exact ? '' : '<span class="sus">의심</span>') + '<span class="small sub">' + esc(uniq(g.items.map(function (x) { return pl(x.page); })).join(', ')) + '</span></div><div class="ims">' +
+      g.items.map(function (x) { return '<figure data-pg="' + x.page + '"><img src="' + x.thumb + '" alt=""><figcaption>' + esc(pl(x.page)) + '</figcaption></figure>'; }).join('') + '</div></div>';
   }).join('') + (R.repeats.length ? '<div class="note">로고·패턴처럼 여러 페이지에 반복되는 작은 이미지 ' + R.repeats.length + '종은 뺐어요. 자르기만 다르게 한 같은 사진은 “비슷함”으로 잡히지 않을 수 있어요.</div>' : '') + '</div>';
 }
 function peopleCard() {
@@ -799,10 +892,11 @@ function peopleCard() {
   if (!R.people.length) return UI.tab === 'face' ? '<div class="card"><h3>인물 사진 의견</h3><div class="sub">사진에서 얼굴을 찾지 못했어요.</div></div>' : '';
   return '<div class="card"><h3>인물별 사진 <span class="mute small">얼굴로 자동 묶음 · 이름은 바꿀 수 있어요</span></h3><div id="pplG">' + R.people.map(function (p) {
     return '<div class="pg2"><div class="gh"><input data-p="' + p.id + '" value="' + esc(p.name) + '"><span class="small sub">' + p.items.length + '장 · ' + uniq(p.items.map(function (f) { return f.page + 1; })).length + '개 페이지' + (p.outfits && p.outfits.length > 1 ? ' · 착장 ' + p.outfits.length + '가지 추정' : '') + '</span></div><div class="pp">' +
-      p.items.map(function (f) { return '<div class="face' + (f.flag ? ' flag' : '') + '" data-pg="' + f.page + '"><img src="' + f.thumb + '" alt=""><div>' + (f.page + 1) + '쪽</div></div>'; }).join('') + '</div></div>';
+      p.items.map(function (f) { return '<div class="face' + (f.flag ? ' flag' : '') + '" data-pg="' + f.page + '"><img src="' + f.thumb + '" alt=""><div>' + esc(pl(f.page)) + '</div></div>'; }).join('') + '</div></div>';
   }).join('') + '</div><div class="note">보라색 테두리는 의견이 있는 사진이에요. 같은 사람이 둘로 나뉘거나 다른 사람이 섞일 수 있어요(의심). 멤버별 사진 수 표와 이름 매칭은 2단계에서 이 묶음을 이용해요.</div></div>';
 }
 function infoCard() {
+  if (R.isImg) return '<div class="card"><h3>이미지 정보</h3><table class="tbl"><tr><th>파일</th><th>크기</th><th>색</th><th>프로파일</th><th>해상도</th><th>용량</th></tr>' + R.pages.map(function (P) { var I = P.img; return '<tr><td>' + esc(P.file) + '</td><td>' + I.w + '×' + I.h + 'px</td><td>' + (I.comps === 4 ? 'CMYK' : I.comps === 1 ? '흑백' : 'RGB') + (I.alpha ? ' · 투명' : '') + '</td><td>' + esc(I.icc || '-') + '</td><td>' + (I.sizeSrc === 'spec' ? Math.round(Math.min(I.w / (I.mmW / 25.4), I.h / (I.mmH / 25.4))) + 'ppi (사양 크기)' : I.dpi ? I.dpi + 'dpi' : '-') + '</td><td>' + kb(I.bytes) + '</td></tr>'; }).join('') + '</table></div>';
   var h = '<div class="card"><h3>파일 정보</h3><div class="kv">';
   h += '<span>서체</span><div>' + (R.fonts.length ? R.fonts.slice(0, 30).map(function (f) { return esc(f.name) + (f.embedded ? '' : ' <b class="err-t">미포함</b>'); }).join(', ') : '없음 (아웃라인 됨)') + '</div>';
   var sp = {}; R.pages.forEach(function (P) { for (var s in P.spots) sp[s] = 1; });
@@ -815,9 +909,9 @@ function infoCard() {
 function pagesCard() {
   var cnt = {}; R.issues.forEach(function (x) { if (x.page === null || x.page === undefined || x.code === 'dieinfo') return; var c = cnt[x.page] = cnt[x.page] || { err: 0, warn: 0, adv: 0, info: 0 }; c[x.sev]++; });
   var P = R.pages.filter(function (p) { return !UI.onlyBad || (cnt[p.i] && (cnt[p.i].err + cnt[p.i].warn + cnt[p.i].adv)); });
-  var h = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">페이지별 보기</h3><label class="tgl noprint"><input type="checkbox" id="onlyBad"' + (UI.onlyBad ? ' checked' : '') + '>문제 있는 페이지만</label></div><div class="pgrid">';
-  h += P.map(function (p) { var c = cnt[p.i] || {}; return '<div class="pc" data-pg="' + p.i + '"><div class="th"><img src="' + p.thumb + '" alt="" loading="lazy">' + overlaySVG(p, p.tw, p.th, false) + '</div><div class="pm"><span>' + (p.i + 1) + '쪽' + (p.spread ? ' <span class="mute">(펼침 ' + p.lp.join('-') + ')</span>' : '') + '</span><span class="cnt">' + (c.err ? '<i class="e">' + c.err + '</i>' : '') + (c.warn ? '<i class="w">' + c.warn + '</i>' : '') + (c.adv ? '<i class="a">' + c.adv + '</i>' : '') + '</span></div></div>'; }).join('');
-  if (!P.length) h += '<div class="sub">문제 있는 페이지가 없어요.</div>';
+  var h = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">' + (R.isImg ? '이미지별 보기' : '페이지별 보기') + '</h3><label class="tgl noprint"><input type="checkbox" id="onlyBad"' + (UI.onlyBad ? ' checked' : '') + '>문제 있는 페이지만</label></div><div class="pgrid">';
+  h += P.map(function (p) { var c = cnt[p.i] || {}; return '<div class="pc" data-pg="' + p.i + '"><div class="th"><img src="' + p.thumb + '" alt="" loading="lazy">' + overlaySVG(p, p.tw, p.th, false) + '</div><div class="pm"><span>' + esc(pl(p.i)) + (p.spread ? ' <span class="mute">(펼침 ' + p.lp.join('-') + ')</span>' : '') + '</span><span class="cnt">' + (c.err ? '<i class="e">' + c.err + '</i>' : '') + (c.warn ? '<i class="w">' + c.warn + '</i>' : '') + (c.adv ? '<i class="a">' + c.adv + '</i>' : '') + '</span></div></div>'; }).join('');
+  if (!P.length) h += '<div class="sub">문제 있는 ' + (R.isImg ? '이미지' : '페이지') + '가 없어요.</div>';
   return h + '</div></div>';
 }
 // 마커 SVG (썸네일/뷰어 공용, w×h 좌표계)
@@ -837,13 +931,13 @@ function overlaySVG(P, w, h, full, only, hi) {
   R.issues.forEach(function (x) {
     if (x.page !== P.i || !x.boxes.length) return; if (only && only !== x.id) return;
     n++; var c = col[x.sev], dim = hi && hi !== x.id ? ' opacity=".18"' : '', ww = hi === x.id ? sw * 2 : sw;
-    x.boxes.slice(0, 60).forEach(function (b, bi) { s += rc(pad(b, 1.5), 'fill="' + c + '" fill-opacity="' + (hi === x.id ? '.22' : '.10') + '" stroke="' + c + '" stroke-width="' + ww + '" data-i="' + x.id + '"' + dim); });
-    if (full) { var r = toPx(P, x.boxes[0]); s += '<g data-i="' + x.id + '"' + dim + '><circle cx="' + (r[0] * k) + '" cy="' + (r[1] * k) + '" r="9" fill="' + c + '"/><text x="' + (r[0] * k) + '" y="' + (r[1] * k + 3.5) + '" font-size="10" font-weight="800" text-anchor="middle" fill="#fff">' + x.id + '</text></g>'; }
+    x.boxes.slice(0, 60).forEach(function (b, bi) { if (b && b.b) b = b.b; s += rc(pad(b, 1.5), 'fill="' + c + '" fill-opacity="' + (hi === x.id ? '.22' : '.10') + '" stroke="' + c + '" stroke-width="' + ww + '" data-i="' + x.id + '"' + dim); });
+    if (full) { var r = toPx(P, x.boxes[0].b || x.boxes[0]); s += '<g data-i="' + x.id + '"' + dim + '><circle cx="' + (r[0] * k) + '" cy="' + (r[1] * k) + '" r="9" fill="' + c + '"/><text x="' + (r[0] * k) + '" y="' + (r[1] * k + 3.5) + '" font-size="10" font-weight="800" text-anchor="middle" fill="#fff">' + x.id + '</text></g>'; }
   });
   return s + '</svg>';
 }
 // 디자인 규칙 비교 (이 페이지 vs 기준 페이지)
-function compareHTML(x) { return '<div class="cmp row" style="gap:10px;margin-top:8px" data-a="' + x.page + '" data-b="' + x.ref + '" data-bx="' + x.refBox.join(',') + '"><div class="small sub" style="width:100%">왼쪽 ' + (x.page + 1) + '쪽(이 페이지) · 오른쪽 ' + (x.ref + 1) + '쪽(기준)</div></div>'; }
+function compareHTML(x) { return '<div class="cmp row" style="gap:10px;margin-top:8px" data-a="' + x.page + '" data-b="' + x.ref + '" data-bx="' + x.refBox.join(',') + '"><div class="small sub" style="width:100%">왼쪽 ' + esc(pl(x.page)) + '(이 페이지) · 오른쪽 ' + esc(pl(x.ref)) + '(기준)</div></div>'; }
 function drawCompare(el) {
   var A = R.pages[+el.dataset.a], B = R.pages[+el.dataset.b], bx = el.dataset.bx.split(',').map(Number);
   [A, B].forEach(function (P) {
@@ -862,7 +956,7 @@ var V = { p: 0, zoom: false, hi: null };
 function openViewer(pi, iss) { V.p = pi; V.hi = iss; $('#ov').classList.add('open'); document.body.style.overflow = 'hidden'; drawViewer(); }
 function closeViewer() { $('#ov').classList.remove('open'); document.body.style.overflow = ''; }
 function drawViewer() {
-  var P = R.pages[V.p]; $('#vT').textContent = (P.i + 1) + '쪽' + (P.spread ? ' (펼침 ' + P.lp.join('-') + '쪽)' : P.lp[0] !== P.i + 1 ? ' (책 ' + P.lp[0] + '쪽)' : '') + ' / ' + R.n;
+  var P = R.pages[V.p]; $('#vT').textContent = pl(P.i) + (P.spread ? ' (펼침 ' + P.lp.join('-') + '쪽)' : P.lp[0] !== P.i + 1 ? ' (책 ' + P.lp[0] + '쪽)' : '') + ' / ' + R.n;
   var st = $('#stage'), vc = $('#vc'), aw = vc.clientWidth - 24, ah = vc.clientHeight - 24, ratio = P.cw / P.ch;
   var w = V.zoom ? Math.max(aw, 1400) : Math.min(aw, ah * ratio); st.style.width = w + 'px';
   st.innerHTML = '<img src="' + P.thumb + '" style="width:100%;display:block" alt="">' + overlaySVG(P, P.tw, P.th, true, null, V.hi);
@@ -882,14 +976,24 @@ function hilite(id) {
 }
 $('#vX').onclick = closeViewer; $('#ov').onclick = function (e) { if (e.target === $('#ov')) closeViewer(); };
 $('#vPrev').onclick = function () { if (V.p > 0) { V.p--; V.hi = null; drawViewer(); } };
-$('#vNext').onclick = function () { if (V.p < R.n - 1) { V.p++; V.hi = null; drawViewer(); } };
+$('#vNext').onclick = function () { if (V.p < (VR || R).n - 1) { V.p++; V.hi = null; drawViewer(); } };
 $('#vZoom').onclick = function () { V.zoom = !V.zoom; $('#vZoom').textContent = V.zoom ? '맞춤' : '확대'; drawViewer(); };
 window.addEventListener('resize', function () { if ($('#ov').classList.contains('open')) drawViewer(); });
 document.addEventListener('keydown', function (e) { if (!$('#ov').classList.contains('open')) return; if (e.key === 'Escape') closeViewer(); if (e.key === 'ArrowLeft') $('#vPrev').click(); if (e.key === 'ArrowRight') $('#vNext').click(); });
 
 function avgPx(P, b) { var r = toPx(P, b), s = [0, 0, 0], n = 0; for (var y = r[1]; y < r[3]; y += 2) for (var x = r[0]; x < r[2]; x += 2) { var p = pix(P, x, y); s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; n++; } return n ? [s[0] / n, s[1] / n, s[2] / n] : null; }
 function toPxVp(vp, b) { var a = vp.convertToViewportPoint(b[0], b[1]), c = vp.convertToViewportPoint(b[2], b[3]); return [Math.min(a[0], c[0]), Math.min(a[1], c[1]), Math.max(a[0], c[0]), Math.max(a[1], c[1])]; }
+// 화면(보고서·크게 보기)은 VR, 검사는 R — 여러 파일 검사 중에도 끝난 결과를 볼 수 있게 화면 함수만 VR로 잠깐 바꿔 씀
+var VR = null;
+function withV(fn) { return function () { var o = R; R = VR || R; try { return fn.apply(this, arguments); } finally { R = o; } }; }
+renderReport = withV(renderReport); renderTab = withV(renderTab); openViewer = withV(openViewer); drawViewer = withV(drawViewer); drawCompare = withV(drawCompare);
 setupUI();
 if (window.RV2) RV2.attach({ issue: issue, MM: MM, mm: mm, toPx: toPx, toPxVp: toPxVp, overlaps: overlaps, esc: esc, tick: tick, avgPx: avgPx, R: function () { return R; } });
-window.PLYSH_REVIEW = { start: start, get R() { return R; } };
+window.PLYSH_REVIEW = {
+  analyzePdf: analyzePdf, analyzeImages: analyzeImages, prog: prog, SET: SET, KIND_LABEL: KIND_LABEL, esc: esc, pl: function (r, i) { var o = R; R = r; var s = pl(i); R = o; return s; },
+  show: function (r) { VR = r; UI.tab = 'all'; if (!r || r.fatal) { $('#rep').hidden = true; return; } renderReport(); },
+  view: function (r, pg, iss) { VR = r; openViewer(pg, iss || null); },
+  abort: function (v) { ABORT = !!v; }, toPx: function (P, b) { return toPx(P, b); },
+  get R() { return R; }
+};
 })();
