@@ -832,7 +832,7 @@ function renderReport() {
   var c = { err: 0, warn: 0, adv: 0, info: 0 }; I.forEach(function (x) { c[x.sev]++; });
   var T0 = R.pages[0] ? R.pages[0].trim : [0, 0, 0, 0];
   var meta = R.isImg ? '이미지 ' + R.n + '개' + (R.WO && R.WO.w ? ' · 사양 ' + R.WO.w + '×' + R.WO.h + 'mm' : '') : 'PDF ' + R.n + '장 · 책 ' + R.bookPages + '쪽 · 재단 ' + f1(mm(T0[2] - T0[0])) + '×' + f1(mm(T0[3] - T0[1])) + 'mm';
-  var h = '<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">' + esc(R.file) + '</h3><div class="small sub" style="margin-top:4px">' + meta + ' · ' + KIND_LABEL[R.kind] + (R.prodName ? ' · ' + esc(R.prodName) : '') + (R.artist ? ' · ' + esc(R.artist) : '') + '</div></div>' +
+  var h = '<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">' + esc(R.file) + '</h3><div class="small sub" style="margin-top:4px">' + meta + ' · ' + KIND_LABEL[R.kind] + (R.prodName ? ' · ' + esc(R.prodName) : '') + (R.title ? ' · ' + esc(R.title) : '') + (R.artist ? ' · ' + esc(R.artist) : '') + '</div></div>' +
     '<div class="row noprint"><button class="ib" id="print">이 파일 결과지</button></div></div>' +
     '<div class="sum"><span class="pill ' + (c.err ? 'err' : 'ok') + '"><b>' + c.err + '</b>오류</span><span class="pill warn"><b>' + c.warn + '</b>확인 필요</span><span class="pill adv"><b>' + c.adv + '</b>의견</span><span class="pill"><b>' + c.info + '</b>참고</span></div>' +
     '<div class="note">“의심” 표시는 자동으로 추정한 거라 직접 한 번 더 봐 주세요. 색은 화면용(RGB)으로 바꿔 본 대략값이에요.</div></div>';

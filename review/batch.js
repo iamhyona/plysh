@@ -75,20 +75,40 @@ function itemsFromText(t) {
   return out;
 }
 function specItems() { return SPEC.items; }
+var MODE = 'plysh';
 function rebuildItems() {
   var it = [];
-  if (SPEC.sheet) it = it.concat(SPEC.sheet.items);
-  it = it.concat(itemsFromText(SPEC.text));
-  SPEC.att.forEach(function (a) { if (a.text) it = it.concat(itemsFromText(a.text)); });
+  if ((MODE === 'plysh' || MODE === 'link') && SPEC.sheet) it = SPEC.sheet.items.slice();
+  if (MODE === 'text') it = itemsFromText(SPEC.text);
+  if (MODE === 'file') SPEC.att.forEach(function (a) { if (a.text) it = it.concat(itemsFromText(a.text)); });
   SPEC.items = it; showSpecSum(); Q.forEach(autoItem); drawQ();
 }
+function setMode(m) {
+  MODE = m; $$('#specMode button').forEach(function (b) { b.classList.toggle('on', b.dataset.m === m); });
+  $$('#specCard .sm').forEach(function (d) { d.hidden = d.dataset.m !== m; });
+  rebuildItems();
+}
+function specTable() {
+  var it = SPEC.items; if (!it.length) return '';
+  return '<div class="sv"><table><tr><th>품목</th><th>크기</th><th>종이</th><th>쪽수</th><th>코팅</th><th>제본</th></tr>' + it.map(function (o) {
+    return '<tr><td><b>' + esc(o.name) + '</b></td><td>' + esc(o.size || (o.w ? o.w + '×' + o.h + 'mm' : '')) + '</td><td>' + esc(o.paperTxt || o.paper || '') + '</td><td>' + (o.pages ? o.pages + 'p' : '') + '</td><td>' + (o.coat ? (o.coat === 'matte' ? '무광' : '유광') : '') + '</td><td>' + esc(o.bindTxt || (o.bind ? BIND_N[o.bind] : '')) + '</td></tr>';
+  }).join('') + '</table></div>';
+}
 function showSpecSum() {
-  var it = SPEC.items, h = '';
-  if (SPEC.sheet) h += '<b>' + esc(SPEC.sheet.name) + '</b>' + (SPEC.sheet.tab ? ' · ' + esc(SPEC.sheet.tab) + ' 탭' : '') + ' 에서 ';
-  if (it.length) h += '품목 ' + it.length + '개를 읽었어요. 파일마다 맞는 품목을 골라 크기·쪽수·제본·코팅을 맞춰 봐요.<br>' + it.slice(0, 12).map(function (o) { return '· ' + esc(o.name) + (o.w ? ' ' + o.w + '×' + o.h + 'mm' : '') + (o.pages ? ' ' + o.pages + 'p' : '') + (o.bind ? ' ' + BIND_N[o.bind] : '') + (o.coat ? ' ' + (o.coat === 'matte' ? '무광' : '유광') : ''); }).join('<br>') + (it.length > 12 ? '<br>· 외 ' + (it.length - 12) + '개' : '');
-  else if (SPEC.text.trim() || SPEC.att.length) h += '사양서에서 크기(예: 55×85mm)를 찾지 못했어요. 이미지 사양서는 참고용으로만 첨부되고, 크기는 파일에서 직접 읽어요.';
-  else h = '사양서가 없어도 검수할 수 있어요. 넣으면 크기·쪽수·제본이 사양과 맞는지도 봐요.';
-  $('#specSum').innerHTML = h;
+  var it = SPEC.items, h = '', v = '';
+  if (MODE === 'none') { $('#specSum').innerHTML = '사양서 없이 검수해요. 크기·쪽수는 파일 기준으로만 봐요.'; $('#specView').innerHTML = ''; return; }
+  if ((MODE === 'plysh' || MODE === 'link') && SPEC.sheet) {
+    var sh = SPEC.sheet, url = sh.url || 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit';
+    h += (sh.auto ? '<span class="mute">파일 아티스트로 가장 최근 사양서를 골라 뒀어요. 다르면 위에서 바꿔 주세요.</span><br>' : '') + '<b>' + esc(sh.name) + '</b> <a href="' + esc(url) + '" target="_blank" rel="noopener">시트 열기</a>';
+    if (sh.tabs && sh.tabs.length > 1) h += ' · 탭 <select class="inp" id="specTab" style="padding:3px 6px;font-size:12.5px">' + sh.tabs.map(function (t) { return '<option' + (t === sh.tab ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</select>';
+    h += '<br>품목 ' + it.length + '개를 읽었어요. 아래 내용이 맞는지 확인해 주세요.';
+  } else if (it.length) h += '품목 ' + it.length + '개를 읽었어요. 아래 내용이 맞는지 확인해 주세요.';
+  else if (MODE === 'plysh') h = SPEC.specs.length ? '사양서를 고르면 내용을 보여줘요.' : '';
+  else if (MODE === 'link') h = '링크를 넣으면 사양서를 읽어 와요.';
+  else if (MODE === 'text') h = SPEC.text.trim() ? '크기(예: 55×85mm)를 찾지 못했어요.' : '한 줄에 품목 하나씩 적어 주세요.';
+  else if (MODE === 'file') h = SPEC.att.length ? '첨부한 파일에서 크기를 찾지 못했어요. 이미지는 참고용으로만 붙어요.' : 'PDF·텍스트 사양서는 글자를 읽고, 이미지는 참고용으로 붙여요.';
+  $('#specSum').innerHTML = h; $('#specView').innerHTML = specTable();
+  var tb = $('#specTab'); if (tb) tb.onchange = function () { pickSpec(SPEC.sheet.id, tb.value); };
 }
 var BIND_N = { none: '제본 없음', saddle: '중철', perfect: '무선', pur: 'PUR', hard: '양장', layflat: '레이플랫' };
 function loadSpecs() {
@@ -101,11 +121,11 @@ function loadSpecs() {
     autoSpec();
   }, function () { $('#specSel').innerHTML = '<option value="">사양서 목록을 불러오지 못했어요</option>'; });
 }
-function autoSpec() { // 사양서를 아직 안 골랐으면 파일의 아티스트로 가장 최근 사양서를 골라 둠
-  if (SPEC.sheet || $('#specSel').value || !Q.length || !SPEC.specs.length) return;
-  var a = Q.map(function (q) { return q.artist; }).filter(Boolean)[0]; if (!a) return;
+function autoSpec() { // 사양서를 아직 안 골랐으면 아티스트로 가장 최근 사양서를 골라 둠
+  if (MODE !== 'plysh' || (SPEC.sheet && !SPEC.sheet.auto) || SPEC.userPicked || !SPEC.specs.length) return;
+  var a = SELART || Q.map(function (q) { return q.artist; }).filter(Boolean)[0]; if (!a) return;
   var s = SPEC.specs.find(function (x) { return x.artist === a || String(x.name).indexOf(a) >= 0; });
-  if (s) { $('#specSel').value = s.id; pickSpec(s.id, '', true); }
+  if (s && (!SPEC.sheet || SPEC.sheet.id !== s.id)) { $('#specSel').value = s.id; pickSpec(s.id, '', true); }
 }
 function pickSpec(id, tab, auto) {
   if (!id) { SPEC.sheet = null; rebuildItems(); return; }
@@ -114,22 +134,22 @@ function pickSpec(id, tab, auto) {
   $('#specSum').textContent = '사양서 읽는 중…';
   A.call('appSpec', A.pin, id, tab || '').then(function (o) {
     var items = []; (o.rows || []).forEach(function (r) { var x = itemFromRow(o.head || [], r); if (x) items.push(x); });
-    SPEC.sheet = { id: id, name: meta.name, tab: o.tab, tabs: o.tabs, items: items, auto: auto };
+    SPEC.sheet = { id: id, name: meta.name, url: meta.url, tab: o.tab, tabs: o.tabs, items: items, auto: auto };
     rebuildItems();
-    if (auto) $('#specSum').insertAdjacentHTML('afterbegin', '<span class="mute">파일 아티스트로 가장 최근 사양서를 골라 뒀어요. 다르면 위에서 바꿔 주세요.</span><br>');
   }, function (e) { SPEC.sheet = null; $('#specSum').textContent = '사양서를 읽지 못했어요: ' + (e && e.message || e); });
 }
 function setupSpec() {
-  $('#specSel').onchange = function () { pickSpec(this.value); };
+  $$('#specMode button').forEach(function (b) { b.onclick = function () { setMode(b.dataset.m); }; });
+  $('#specSel').onchange = function () { SPEC.userPicked = !!this.value; pickSpec(this.value); };
   var tmr = null;
-  $('#specTa').oninput = function () {
-    var v = this.value; clearTimeout(tmr);
-    tmr = setTimeout(function () {
-      SPEC.text = v;
-      var m = v.match(/docs\.google\.com\/spreadsheets\/d\/([\w-]{20,})/);
-      if (m && (!SPEC.sheet || SPEC.sheet.id !== m[1])) { if (A) { SPEC.specs.some(function (s) { return s.id === m[1]; }) || SPEC.specs.push({ id: m[1], name: '링크로 연결한 사양서' }); pickSpec(m[1]); return; } }
-      rebuildItems();
-    }, 500);
+  $('#specTa').oninput = function () { var v = this.value; clearTimeout(tmr); tmr = setTimeout(function () { SPEC.text = v; rebuildItems(); }, 400); };
+  $('#specLink').oninput = function () {
+    var m = this.value.match(/spreadsheets\/d\/([\w-]{20,})/) || this.value.trim().match(/^([\w-]{30,})$/);
+    if (!m) { if (!this.value.trim()) { SPEC.sheet = null; rebuildItems(); } else $('#specSum').textContent = '구글 시트 링크가 아닌 것 같아요.'; return; }
+    if (SPEC.sheet && SPEC.sheet.id === m[1]) return;
+    if (!A) { $('#specSum').textContent = 'PLYSH 안에서 열어야 링크를 읽을 수 있어요.'; return; }
+    SPEC.specs.some(function (s) { return s.id === m[1]; }) || SPEC.specs.push({ id: m[1], name: '링크로 연결한 사양서' });
+    SPEC.userPicked = true; pickSpec(m[1]);
   };
   $('#specAttB').onclick = function () { $('#specFile').click(); };
   $('#specFile').onchange = function () { addSpecFiles(this.files); this.value = ''; };
@@ -180,7 +200,8 @@ async function addFiles(fl) {
     autoItem(q); Q.push(q);
     if (q.artist) { addArtist(q.artist); fillArtistList(); }
   }
-  drawQ(); autoSpec(); drawArtChips();
+  if (!SELART) { var fa = Q.map(function (q) { return q.artist; }).filter(Boolean)[0]; if (fa) { SELART = fa; $('#artQ').value = fa; setCur(fa); } }
+  drawQ(); autoSpec(); drawArtChips(); drawTitle();
 }
 function autoItem(q) { // 파일 이름과 가장 잘 맞는 사양서 품목
   if (q.itemSet) return; var n = q.file.name.replace(/[_\-.]+/g, ' ').toLowerCase(), best = -1, bs = 0;
@@ -249,8 +270,16 @@ function drawArtChips() {
   var fileA = Q.map(function (q) { return q.artist; }).filter(Boolean), list = ['공통'];
   fileA.concat(Object.keys(RULES)).forEach(function (a) { if (a && list.indexOf(a) < 0) list.push(a); });
   $('#artChips').innerHTML = list.map(function (a) { var n = (RULES[a] || '').trim() ? RV2.parseRules(RULES[a]) : null, c = n ? n.members.length + n.terms.length + n.days.length : 0; return '<button type="button" data-a="' + esc(a) + '" class="' + (a === CUR ? 'on' : '') + '">' + esc(a) + (fileA.indexOf(a) >= 0 ? ' ·파일' : '') + ' <span class="mute">' + c + '</span></button>'; }).join('');
-  $$('#artChips button').forEach(function (b) { b.onclick = function () { setCur(b.dataset.a); }; });
+  $$('#artChips button').forEach(function (b) { b.onclick = function () { if (b.dataset.a === '공통') setCur('공통'); else pickArtist(b.dataset.a); }; });
   $('#artCur').textContent = CUR;
+}
+var SELART = '';
+function pickArtist(a) {
+  a = String(a || '').trim(); if (a === SELART) return; SELART = a; $('#artQ').value = a;
+  if (!a) { drawArtChips(); return; }
+  if (addArtist(a)) fillArtistList();
+  Q.forEach(function (q) { if (!q.artistSet) q.artist = a; });
+  setCur(a); drawQ(); autoSpec(); drawTitle();
 }
 function setCur(a) { flush(); CUR = a || '공통'; if (RULES[CUR] == null) RULES[CUR] = ''; $('#rulesTa').value = RULES[CUR]; lastSaved[CUR] = lastSaved[CUR] != null ? lastSaved[CUR] : RULES[CUR]; cnt(); drawArtChips(); }
 var timer = null, saving = false, lastSaved = {};
@@ -270,9 +299,9 @@ function setupRules() {
   ta.oninput = function () { RULES[CUR] = ta.value; cacheRules(); cnt(); drawArtChips(); if (A) { say('입력 중…'); var a = CUR; clearTimeout(timer); timer = setTimeout(function () { timer = null; save(a); }, 1500); } };
   ta.onblur = function () { flush(); };
   $('#rulesEx').onclick = function () { ta.value = ta.value.trim() ? ta.value.replace(/\s+$/, '') + '\n\n' + RV2.RULES_EX : RV2.RULES_EX; ta.oninput(); };
-  function go() { var a = $('#artQ').value.trim(); if (!a) return; if (addArtist(a)) fillArtistList(); setCur(a); $('#artQ').value = ''; }
-  $('#artGo').onclick = go; $('#artQ').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } };
-  $('#artQ').onchange = function () { if (ARTISTS.indexOf(this.value.trim()) >= 0) go(); };
+  $('#artQ').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); pickArtist(this.value); } };
+  $('#artQ').onchange = function () { pickArtist(this.value); };
+  $('#artQ').oninput = function () { if (ARTISTS.indexOf(this.value.trim()) >= 0) pickArtist(this.value); };
   $('#artCommon').onclick = function () { setCur('공통'); };
   cnt(); drawArtChips();
   if (!A) { say('PLYSH 밖에서 열어서 이 기기에만 저장돼요'); return; }
@@ -288,6 +317,27 @@ function setupRules() {
   }, function (e) { say('팀 시트를 불러오지 못했어요 · 이 기기 내용으로 검수해요', true); });
 }
 function scheduleArtists() { try { (A && A.S.D && A.S.D.files || []).forEach(function (f) { var n = String(f && (f.name || f) || ''), m = n.match(/^\s*\[?([^\]\s]+)/); if (m && !/^\d/.test(m[1])) addArtist(m[1]); }); } catch (e) {} fillArtistList(); }
+
+// ── 프로젝트 타이틀 (직접 쓰거나, 비우면 파일 이름에서) ──
+var STOPW = /^(final|fin|최종|수정|v\d+|ver\d*|rev\d*|\d{1,3}|\d{6,8}|outline|ol|cmyk|rgb|print|인쇄용|웹용|내지|표지|커버|cover|앞|뒤|앞면|뒷면|copy|사본)$/i;
+function inferTitle() {
+  if (!Q.length) return '';
+  var cnt = {}, order = [];
+  Q.forEach(function (q) {
+    var n = q.file.name.replace(/\.[a-z0-9]+$/i, '').replace(/^\s*\[[^\]]*\]/, ' '), seen = {};
+    ARTISTS.concat([q.artist, q.prodName]).forEach(function (a) { if (a && a.length > 1) n = n.split(a).join(' '); });
+    PROD_WORDS.forEach(function (w) { n = n.split(w).join(' '); });
+    n.split(/[_\-\s.()]+/).forEach(function (t) { t = t.trim(); if (!t || STOPW.test(t) || seen[t]) return; seen[t] = 1; if (!cnt[t]) { cnt[t] = 0; order.push(t); } cnt[t]++; });
+  });
+  var need = Math.max(1, Math.ceil(Q.length / 2)), out = order.filter(function (t) { return cnt[t] >= need; });
+  return out.join(' ').trim();
+}
+function titleOf() { var t = $('#ttl').value.trim(); return t || inferTitle(); }
+function drawTitle() {
+  var t = $('#ttl').value.trim(), g = inferTitle();
+  $('#ttlNote').innerHTML = t ? '파일 속 글자에서 <b>' + esc(t) + '</b> 표기가 다르게 쓰인 곳을 찾아요. (대소문자·띄어쓰기)' : g ? '파일 이름에서 읽은 타이틀: <b>' + esc(g) + '</b> · 다르면 위에 직접 적어 주세요.' : (Q.length ? '파일 이름에서 공통 타이틀을 찾지 못했어요. 필요하면 위에 직접 적어 주세요.' : '파일을 넣으면 파일 이름에서 타이틀을 찾아봐요.') + ' 나중에 PLYSH 프로젝트와 연동할 자리예요.';
+}
+function titleRule(t) { t = String(t || '').replace(/[\/=,]/g, ' ').replace(/\s+/g, ' ').trim(); return t.length >= 2 && /[A-Za-z가-힣]/.test(t) ? '[표기]\n' + t : ''; }
 
 // ── 검수 실행 ──
 var RS = [], CURR = null, RUN = false;
@@ -313,7 +363,7 @@ async function run() {
   RS = []; CURR = null; $('#results').hidden = true; RV.show(null); drawChecklist(null);
   var jobs = [], imgG = {};
   Q.forEach(function (q) {
-    var meta = { WO: woOf(q), kind: q.kind, prod: q.prod, prodName: q.prodName || CLS_NAME[q.prod], artist: q.artist, spec: SPEC.items[q.item] ? SPEC.items[q.item].raw : '', rulesText: rulesFor(q.artist) };
+    var meta = { WO: woOf(q), kind: q.kind, prod: q.prod, prodName: q.prodName || CLS_NAME[q.prod], artist: q.artist, spec: SPEC.items[q.item] ? SPEC.items[q.item].raw : '', title: titleOf(), rulesText: [rulesFor(q.artist), titleRule(titleOf())].filter(Boolean).join('\n\n') };
     if (q.kind === 'img') { var k = q.prod + '|' + q.prodName + '|' + q.artist + '|' + q.item; if (!imgG[k]) { imgG[k] = { img: true, files: [], meta: meta, st: 'wait' }; jobs.push(imgG[k]); } imgG[k].files.push(q.file); }
     else jobs.push({ file: q.file, meta: meta, st: 'wait' });
   });
@@ -328,7 +378,7 @@ async function run() {
       console.error(e); r = { file: j.img ? j.files[0].name : j.file.name, fatal: '검수 중 문제가 생겼어요', fatalSub: String(e && e.message || e), issues: [], pages: [] };
     }
     j.ms = Date.now() - t1; j.st = r.fatal ? 'fail' : 'done';
-    r.checked = {}; RS.push(r); drawResults(); drawProg();
+    r.checked = {}; r.title = j.meta.title; RS.push(r); drawResults(); drawProg();
     if (i === 0) select(r);
     if (STOPPED) break;
   }
@@ -340,7 +390,7 @@ async function run() {
 function counts(r) { var c = { err: 0, warn: 0, adv: 0, info: 0 }; (r.issues || []).forEach(function (x) { if (!x.hidden) c[x.sev]++; }); return c; }
 function drawResults() {
   if (!RS.length) { $('#results').hidden = true; return; }
-  var h = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">검수 결과 · 파일 ' + RS.length + '개' + (RUN ? ' <span class="mute small" style="font-weight:600">· 끝난 파일부터 바로 눌러 볼 수 있어요</span>' : '') + '</h3><div class="row"><button class="ib" id="pAll"' + (RUN ? ' disabled' : '') + '>전체 결과지</button><button class="ib" id="again">파일 비우고 새로</button></div></div><div class="rf">';
+  var h = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 class="sh" style="margin:0">검수 결과 · 파일 ' + RS.length + '개' + (RUN ? ' <span class="mute small" style="font-weight:600">· 끝난 파일부터 바로 눌러 볼 수 있어요</span>' : '') + '</h3><div class="row"><button class="ib" id="pAll"' + (RUN ? ' disabled' : '') + '>전체 결과지</button><button class="ib" id="again">파일 비우고 새로</button></div></div><div class="rf">';
   h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : !r._seen ? 'new' : '') + '"><b>' + (!r._seen && r !== CURR ? '<em class="nw">새 결과</em>' : '') + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.err ? '<i class="e">오류 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">확인 ' + c.warn + '</i>' : '') + (!c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
   $('#results').innerHTML = h + '</div>'; $('#results').hidden = false;
   $$('#results .rf button').forEach(function (b) { b.onclick = function () { select(RS[+b.dataset.i]); }; });
@@ -479,7 +529,7 @@ async function fillCrops(r, el) {
 }
 
 function drawChecklist(r) {
-  var h = '<div class="row" style="justify-content:space-between"><h3 style="margin:0">검사 항목' + (r ? ' · ' + esc(r.file) : '') + '</h3>' + (r && !r.fatal ? '<button class="ib" id="ckPrint">이 파일 결과지</button>' : '') + '</div>';
+  var h = '<div class="row" style="justify-content:space-between"><h3 class="sh" style="margin:0">검사 항목' + (r ? ' · ' + esc(r.file) : '') + '</h3>' + (r && !r.fatal ? '<button class="ib" id="ckPrint">이 파일 결과지</button>' : '') + '</div>';
   h += '<div class="note" style="margin-bottom:6px">' + (r ? '항목을 열면 어느 페이지인지 보여요. “확인” 항목은 직접 보고 눌러서 <b>확인함</b>으로 바꿀 수 있어요.' : '파일을 넣고 검수를 시작하면 항목마다 통과 · 확인 · 오류가 표시돼요.') + '</div>';
   CHECK.forEach(function (cat, ci) {
     var E = cat[1].map(function (it) { return evalItem(r, it); }), n = { err: 0, warn: 0, ok: 0, na: 0 };
@@ -520,7 +570,7 @@ async function printSheet(Rs) {
   }
   Rs.forEach(function (r) {
     var c = counts(r), I = r.issues.filter(function (x) { return !x.hidden && x.sev !== 'info'; });
-    h += '<section><h1>PREFLIGHT 결과지</h1><div class="meta"><b>' + esc(r.file) + '</b><br>' + esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist, r.isImg ? '이미지 ' + r.n + '개' : 'PDF ' + r.n + '장 · ' + r.bookPages + '쪽', r.spec ? '사양: ' + r.spec : ''].filter(Boolean).join(' · ')) + '<br>' + date + ' · 오류 ' + c.err + ' · 확인 ' + c.warn + ' · 의견 ' + c.adv + '</div>';
+    h += '<section><h1>PREFLIGHT 결과지</h1><div class="meta"><b>' + esc(r.file) + '</b><br>' + esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist, r.title, r.isImg ? '이미지 ' + r.n + '개' : 'PDF ' + r.n + '장 · ' + r.bookPages + '쪽', r.spec ? '사양: ' + r.spec : ''].filter(Boolean).join(' · ')) + '<br>' + date + ' · 오류 ' + c.err + ' · 확인 ' + c.warn + ' · 의견 ' + c.adv + '</div>';
     h += '<h2>체크리스트</h2><table><tr><th style="width:16%">구분</th><th>항목</th><th style="width:12%">결과</th><th style="width:34%">내용 · 위치</th></tr>';
     CHECK.forEach(function (cat) {
       cat[1].forEach(function (it, i) {
@@ -552,7 +602,7 @@ async function printSheet(Rs) {
 function strip(s) { return String(s || '').replace(/<[^>]+>/g, '').replace(/\*\*/g, ''); }
 
 // ── 시작 ──
-setupFiles(); setupSpec(); setupRules(); scheduleArtists(); loadSpecs(); showSpecSum(); drawQ(); drawChecklist(null);
+setupFiles(); setupSpec(); setupRules(); $('#ttl').oninput = drawTitle; drawTitle(); scheduleArtists(); loadSpecs(); showSpecSum(); drawQ(); drawChecklist(null);
 $('#go').onclick = run;
 window.RVB = { printSheet: printSheet, addFiles: addFiles, get Q() { return Q; }, get RS() { return RS; }, SPEC: SPEC, rulesFor: rulesFor };
 })();

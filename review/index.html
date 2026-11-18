@@ -137,6 +137,11 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 .crops figure { margin:0; width:168px; cursor:pointer; }
 .crops img { width:100%; aspect-ratio:4/3; object-fit:contain; background:var(--chip); border:1px solid var(--line); border-radius:8px; display:block; }
 .crops figcaption { font-size:11.5px; color:var(--sub); margin-top:3px; font-weight:600; }
+.sh { font-size:20px; font-weight:800; margin:0 0 12px; letter-spacing:-.2px; }
+#specView table { width:100%; border-collapse:collapse; font-size:12.5px; margin-top:10px; }
+#specView th, #specView td { border-bottom:1px solid var(--line); padding:6px 6px; text-align:left; vertical-align:top; }
+#specView th { color:var(--mute); font-weight:700; background:#fafbfc; }
+#specView .sv { overflow-x:auto; }
 /* 결과 파일 */
 .rf button.new { border-color:var(--acc); }
 .rf .nw { font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--acc); border-radius:5px; padding:1px 5px; margin-right:5px; vertical-align:1px; }
@@ -184,6 +189,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   <h2 class="noprint">PREFLIGHT <span class="mute small" style="font-weight:600">인쇄 전 검수 · PDF · AI · JPG · PNG</span></h2>
 
   <div class="card noprint" id="setup">
+    <h3 class="sh">검수할 파일</h3>
     <div class="drop" id="drop">
       <b>PDF · AI · JPG · PNG 파일을 여기에 끌어다 놓기</b>
       <div class="sub small">여러 개를 한 번에 넣어도 돼요. 파일 이름으로 종류·품목·아티스트를 알아서 골라요.</div>
@@ -191,34 +197,47 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
       <input type="file" id="file" accept=".pdf,.ai,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" multiple hidden>
     </div>
     <div id="flist"></div>
+  </div>
 
-    <div class="fl">사양서 <span class="mute" style="font-weight:600">(최종 사양서를 고르거나, 링크·파일·글로 자유롭게)</span></div>
-    <div class="row">
-      <select class="inp" id="specSel" style="max-width:100%"><option value="">PLYSH 사양서에서 고르기</option></select>
-      <button type="button" class="ib" id="specAttB">파일·이미지 첨부</button>
-      <input type="file" id="specFile" accept=".pdf,.txt,.csv,image/*" multiple hidden>
+  <div class="card noprint" id="specCard">
+    <h3 class="sh">사양서 선택</h3>
+    <div class="seg" id="specMode">
+      <button type="button" data-m="plysh" class="on">PLYSH 사양서에서 고르기</button>
+      <button type="button" data-m="link">링크 입력</button>
+      <button type="button" data-m="text">직접 쓰기</button>
+      <button type="button" data-m="file">파일·이미지 첨부</button>
+      <button type="button" data-m="none">사양서 없이</button>
     </div>
-    <textarea id="specTa" class="inp ta" placeholder="사양서 링크(구글 시트)를 붙여 넣거나 내용을 적어 주세요.&#10;예) 포토카드 55×85mm 유광 코팅&#10;    포토북 210×297mm 40p 레이플랫&#10;    엽서 100×148mm 스노우 250g"></textarea>
-    <div id="specAtt" class="row" style="margin-top:6px"></div>
+    <div class="sm" data-m="plysh"><select class="inp" id="specSel" style="width:100%;margin-top:10px"><option value="">PLYSH 사양서에서 고르기</option></select></div>
+    <div class="sm" data-m="link" hidden><input class="inp" id="specLink" placeholder="사양서 구글 시트 링크를 붙여 넣어 주세요" style="width:100%;margin-top:10px"></div>
+    <div class="sm" data-m="text" hidden><textarea id="specTa" class="inp ta" placeholder="사양을 한 줄에 하나씩 적어 주세요.&#10;예) 포토카드 55×85mm 유광 코팅&#10;    포토북 210×297mm 40p 레이플랫&#10;    엽서 100×148mm 스노우 250g"></textarea></div>
+    <div class="sm" data-m="file" hidden><button type="button" class="ib" id="specAttB" style="margin-top:10px">파일·이미지 고르기</button><input type="file" id="specFile" accept=".pdf,.txt,.csv,image/*" multiple hidden><div id="specAtt" class="row" style="margin-top:8px"></div></div>
     <div id="specSum" class="note"></div>
+    <div id="specView"></div>
+  </div>
 
-    <details class="set" id="rulesBox">
-      <summary>팀 표기 규칙 · 생일·기념일 <span class="mute" id="rulesCnt" style="font-weight:600"></span></summary>
-      <div class="row" style="margin-top:8px">
-        <input class="inp" id="artQ" list="artL" placeholder="아티스트 검색 (예: 온앤오프)" style="width:220px" autocomplete="off">
-        <button type="button" class="ib" id="artGo">불러오기</button>
-        <button type="button" class="ib" id="artCommon">공통 규칙</button>
-      </div>
-      <datalist id="artL"></datalist>
-      <div class="seg" id="artChips" style="margin-top:8px"></div>
-      <div class="note">지금 고치는 목록: <b id="artCur">공통</b>. 검수할 때는 <b>공통 + 파일의 아티스트</b> 규칙을 같이 써요. 한 줄에 하나씩 <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 · <b>[생일·기념일]</b> 월/일 내용. PLYSH 시트에 저장돼 팀이 같이 써요. <span id="rulesSt" class="mute" style="font-weight:600"></span> <button type="button" id="rulesEx" class="lnk">예시 넣기</button></div>
-      <textarea id="rulesTa" class="inp ta" style="min-height:170px"></textarea>
-    </details>
-    <details class="set">
-      <summary>검수 기준 바꾸기</summary>
-      <div class="grid2" id="setG"></div>
-      <div class="note">바꾼 값은 이 기기에 저장돼요. <button type="button" id="setReset" class="lnk">기본값으로</button></div>
-    </details>
+  <div class="card noprint" id="rulesBox">
+    <h3 class="sh">아티스트명 선택 <span class="mute" id="rulesCnt" style="font-size:13px;font-weight:600"></span></h3>
+    <div class="row">
+      <input class="inp" id="artQ" list="artL" placeholder="아티스트 검색 또는 선택" style="width:260px" autocomplete="off">
+      <button type="button" class="ib" id="artCommon">공통 규칙 고치기</button>
+    </div>
+    <datalist id="artL"></datalist>
+    <div class="seg" id="artChips" style="margin-top:8px"></div>
+    <div class="note">고른 아티스트는 아티스트가 비어 있는 파일에 들어가요. 아래는 <b id="artCur">공통</b> 표기 규칙 · 생일·기념일이에요. 검수할 때는 <b>공통 + 파일의 아티스트</b> 규칙을 같이 써요. 한 줄에 하나씩 <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 · <b>[생일·기념일]</b> 월/일 내용. PLYSH 시트에 저장돼 팀이 같이 써요. <span id="rulesSt" class="mute" style="font-weight:600"></span> <button type="button" id="rulesEx" class="lnk">예시 넣기</button></div>
+    <textarea id="rulesTa" class="inp ta" style="min-height:150px"></textarea>
+  </div>
+
+  <div class="card noprint" id="titleCard">
+    <h3 class="sh">프로젝트 타이틀명</h3>
+    <input class="inp" id="ttl" placeholder="예: 2027 SEASON'S GREETINGS · 비워 두면 파일 이름에서 읽어요" style="width:100%">
+    <div class="note" id="ttlNote"></div>
+  </div>
+
+  <div class="card noprint" id="setCard">
+    <h3 class="sh">검수 기준 확인</h3>
+    <div class="grid2" id="setG"></div>
+    <div class="note">바꾼 값은 이 기기에 저장돼요. <button type="button" id="setReset" class="lnk">기본값으로</button></div>
     <div style="margin-top:16px"><button type="button" class="go" id="go" disabled>검수 시작</button></div>
   </div>
 
@@ -251,8 +270,8 @@ var LIBS = {
 };
 </script>
 <script src="korean-lunar-calendar.min.js"></script>
-<script src="text.js?v=20261118d"></script>
-<script src="app.js?v=20261118d"></script>
-<script src="batch.js?v=20261118d"></script>
+<script src="text.js?v=20261118e"></script>
+<script src="app.js?v=20261118e"></script>
+<script src="batch.js?v=20261118e"></script>
 </body>
 </html>
