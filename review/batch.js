@@ -275,9 +275,38 @@ function rulesFor(artist) { return [RULES['공통'] || '', artist && RULES[artis
 function cacheRules() { ls.set(RKEY, JSON.stringify(RULES)); }
 function say(t, bad) { var st = $('#rulesSt'); st.textContent = t; st.style.color = bad ? '#c2410c' : ''; }
 var INFO_KEYS = ['국문명', '영문명', '데뷔일', '팬덤명 (국문)', '팬덤명 (영문)', '소속사'], INFO_EDIT = false;
+// 아티스트 기본 정보 시트 (PLASH › 05_아티스트정보) — 열: 아티스트 | 별칭 | 국문명 | 영문명 | 데뷔일 | 팬덤명 국문 | 팬덤명 영문 | 소속사 | 확인 필요 | 확인일
+var AINFO = {}, AINFO_URL = '', AINFO_LIST = [];
+function aiKey(a) { return String(a || '').toLowerCase().replace(/[\s.\-_·]/g, ''); }
+function aiFor(a) { return a ? AINFO[aiKey(a)] || null : null; }
+function loadArtistInfo() {
+  if (!A) return;
+  A.call('appArtistInfo', A.pin).then(function (o) {
+    if (!o || !o.info) return;
+    AINFO = {}; AINFO_LIST = []; AINFO_URL = o.url || '';
+    o.info.forEach(function (r) {
+      var e = { name: String(r[0]).trim(), info: {}, note: String(r[8] || '').trim(), at: String(r[9] || '').trim(), members: [] };
+      INFO_KEYS.forEach(function (k, i) { e.info[k] = String(r[i + 2] || '').trim(); });
+      AINFO_LIST.push(e);
+      [e.name, e.info['국문명'], e.info['영문명']].concat(String(r[1] || '').split(/[,，]/)).forEach(function (n) { var k = aiKey(n); if (k.length >= 2 && !AINFO[k]) AINFO[k] = e; });
+    });
+    (o.members || []).forEach(function (r) { var e = aiFor(r[0]); if (e) e.members.push({ ko: String(r[1] || '').trim(), en: String(r[2] || '').trim(), bd: String(r[3] || '').trim(), y: String(r[4] || '').trim(), note: String(r[5] || '').trim() }); });
+    drawInfo();
+  }, function () {});
+}
+
 function drawInfo() {
   var el = $('#artInfo'); if (!el) return;
   if (CUR === '공통') { el.innerHTML = ''; return; }
+  var ai = aiFor(CUR);
+  if (ai) {
+    var g = '<div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:15px">' + esc(ai.name) + ' 기본 정보</b>' + (AINFO_URL ? '<a class="ib" href="' + esc(AINFO_URL) + '" target="_blank" rel="noopener">시트에서 고치기</a>' : '') + '</div><div class="ai">';
+    g += INFO_KEYS.map(function (k) { return '<div>' + esc(k) + '<b>' + (ai.info[k] ? esc(ai.info[k]) : '<span class="mute" style="font-weight:600">—</span>') + '</b></div>'; }).join('') + '</div>';
+    var solo = ai.members.length === 1 && aiKey(ai.members[0].ko) === aiKey(ai.info['국문명'] || ai.name);
+    if (ai.members.length) g += '<div class="aim">' + (solo ? '<span class="mute">생일</span> ' : '<span class="mute">멤버 ' + ai.members.length + '명</span> ') + ai.members.map(function (m) { var b = m.bd.split('-'); return '<span>' + (solo ? '' : esc(m.ko) + (m.en ? ' <i>' + esc(m.en) + '</i> ' : ' ')) + (b.length === 2 ? +b[0] + '/' + +b[1] : esc(m.bd)) + '</span>'; }).join('') + '</div>';
+    if (ai.note) g += '<div class="note" style="margin-top:8px">확인 필요: ' + esc(ai.note) + '</div>';
+    el.innerHTML = g; return;
+  }
   var info = RV2.parseRules(RULES[CUR] || '').info || {}, has = INFO_KEYS.some(function (k) { return info[k]; });
   var h = '<div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:15px">' + esc(CUR) + ' 기본 정보</b><button type="button" class="ib" id="infoEd">' + (INFO_EDIT ? '입력 끝' : has ? '정보 고치기' : '정보 넣기') + '</button></div><div class="ai">';
   h += INFO_KEYS.map(function (k) { return '<div>' + esc(k) + (INFO_EDIT ? '<input class="inp" data-k="' + esc(k) + '" value="' + esc(info[k] || '') + '" placeholder="' + (k === '데뷔일' ? '예: 2017-08-02' : '') + '">' : '<b>' + (info[k] ? esc(info[k]) : '<span class="mute" style="font-weight:600">—</span>') + '</b>') + '</div>'; }).join('') + '</div>';
@@ -294,10 +323,17 @@ function setInfo(k, v) {
   rows = inf.concat(rows.filter(function (r) { return !/정보/.test(r[0]); }));
   var ta = $('#rulesTa'); ta.value = RV2.rowsToRules(rows); ta.oninput();
 }
-function infoRules(artist) { // 영문명·팬덤명은 표기 검사에 같이 씀
-  var info = artist && RULES[artist] ? RV2.parseRules(RULES[artist]).info || {} : {}, t = [];
-  ['영문명', '팬덤명 (영문)', '국문명', '팬덤명 (국문)'].forEach(function (k) { var v = String(info[k] || '').replace(/[\/=,]/g, ' ').trim(); if (v.length >= 2) t.push(v); });
-  return t.length ? '[표기]\n' + t.join('\n') : '';
+function infoRules(artist) { // 영문명·팬덤명은 표기 검사에, 시트의 멤버·생일은 멤버/날짜 검사에 같이 씀
+  var own = artist && RULES[artist] ? RV2.parseRules(RULES[artist]) : { info: {}, members: [], days: [] }, ai = aiFor(artist), info = {}, t = [], out = [];
+  INFO_KEYS.forEach(function (k) { info[k] = (own.info || {})[k] || (ai && ai.info[k]) || ''; });
+  ['영문명', '팬덤명 (영문)', '국문명', '팬덤명 (국문)'].forEach(function (k) { var v = String(info[k] || '').replace(/[\/=,]/g, ' ').trim(); if (v.length >= 2 && t.indexOf(v) < 0) t.push(v); });
+  if (t.length) out.push('[표기]\n' + t.join('\n'));
+  if (ai && ai.members.length) {
+    var solo = ai.members.length === 1;
+    if (!solo && !own.members.length) out.push('[멤버]\n' + ai.members.map(function (m) { return m.ko + (m.en ? ' / ' + m.en : ''); }).join('\n'));
+    if (!own.days.length) { var d = ai.members.filter(function (m) { return /^\d{1,2}-\d{1,2}$/.test(m.bd); }).map(function (m) { var b = m.bd.split('-'); return +b[0] + '/' + +b[1] + ' ' + m.ko + ' 생일'; }); if (d.length) out.push('[생일·기념일]\n' + d.join('\n')); }
+  }
+  return out.join('\n\n');
 }
 function cnt() {
   var r = RV2.parseRules($('#rulesTa').value), n = r.members.length + r.terms.length + r.days.length;
@@ -345,6 +381,7 @@ function setupRules() {
   $('#artCommon').onclick = function () { setCur('공통'); };
   cnt(); drawArtChips();
   if (!A) { say('PLYSH 밖에서 열어서 이 기기에만 저장돼요'); return; }
+  loadArtistInfo();
   say('팀 시트에서 불러오는 중…');
   A.call('appRvRules', A.pin).then(function (o) {
     var rows = (o && o.rows) || [], by = {};
