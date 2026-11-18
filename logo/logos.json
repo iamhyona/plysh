@@ -2600,16 +2600,6 @@
 "w": 1
 },
 {
-"n": "Red Velvet",
-"c": "artist",
-"b": "Red Velvet",
-"k": "레드벨벳 레벨",
-"d": 0,
-"f": "logo/ai/Artist/RedVelvet.ai",
-"s": "logo/svg/RedVelvet.svg",
-"w": 1
-},
-{
 "n": "TAEYANG",
 "c": "artist",
 "b": "TAEYANG",
@@ -2717,6 +2707,176 @@
 "d": 0,
 "f": "logo/ai/Artist/TXT_Wordmark.ai",
 "s": "logo/svg/TXT_Wordmark.svg",
+"w": 1
+},
+{
+"n": "Blitzway Entertainment",
+"c": "actor",
+"b": "Blitzway Entertainment",
+"k": "블리츠웨이 블리츠웨이엔터 채종협 소속사 배우",
+"d": 0,
+"f": "logo/ai/Agency/Blitzway.ai",
+"s": "logo/svg/Blitzway.svg",
+"w": 1
+},
+{
+"n": "Management SOOP",
+"c": "actor",
+"b": "Management SOOP",
+"k": "매니지먼트숲 숲 공유 공효진 배우",
+"d": 0,
+"f": "logo/ai/Agency/ManagementSoop.ai",
+"s": "logo/svg/ManagementSoop.svg",
+"w": 1
+},
+{
+"n": "BH Entertainment",
+"c": "actor",
+"b": "BH Entertainment",
+"k": "비에이치 BH엔터 이병헌 배우",
+"d": 0,
+"f": "logo/ai/Agency/BH.ai",
+"s": "logo/svg/BH.svg",
+"w": 1
+},
+{
+"n": "NAMOO ACTORS",
+"c": "actor",
+"b": "NAMOO ACTORS",
+"k": "나무엑터스 문근영 신세경 배우",
+"d": 0,
+"f": "logo/ai/Agency/NamooActors.ai",
+"s": "logo/svg/NamooActors.svg",
+"w": 1
+},
+{
+"n": "SARAM Entertainment",
+"c": "actor",
+"b": "SARAM Entertainment",
+"k": "사람엔터테인먼트 사람엔터 배우",
+"d": 0,
+"f": "logo/ai/Agency/Saram.ai",
+"s": "logo/svg/Saram.svg",
+"w": 1
+},
+{
+"n": "SARAM Entertainment (가로)",
+"c": "actor",
+"b": "SARAM Entertainment",
+"k": "사람엔터테인먼트 사람엔터 가로 배우",
+"d": 0,
+"f": "logo/ai/Agency/Saram_Horizontal.ai",
+"s": "logo/svg/Saram_Horizontal.svg",
+"w": 1
+},
+{
+"n": "ACE FACTORY",
+"c": "actor",
+"b": "ACE FACTORY",
+"k": "에이스팩토리 에이스 팩토리 배우",
+"d": 0,
+"f": "logo/ai/Agency/AceFactory.ai",
+"s": "logo/svg/AceFactory.svg",
+"w": 1
+},
+{
+"n": "HB Entertainment",
+"c": "actor",
+"b": "HB Entertainment",
+"k": "에이치비 HB엔터 배우",
+"d": 0,
+"f": "logo/ai/Agency/HB.ai",
+"s": "logo/svg/HB.svg",
+"w": 1
+},
+{
+"n": "KEYEAST",
+"c": "actor",
+"b": "KEYEAST",
+"k": "키이스트 김수현 배우",
+"d": 0,
+"f": "logo/ai/Agency/Keyeast.ai",
+"s": "logo/svg/Keyeast.svg",
+"w": 1
+},
+{
+"n": "CJeS STUDIOS",
+"c": "actor",
+"b": "CJeS STUDIOS",
+"k": "씨제스 씨제스스튜디오 배우",
+"d": 0,
+"f": "logo/ai/Agency/CJeS.ai",
+"s": "logo/svg/CJeS.svg",
+"w": 1
+},
+{
+"n": "ANDMARQ",
+"c": "actor",
+"b": "ANDMARQ",
+"k": "앤드마크 앤마크 배우",
+"d": 0,
+"f": "logo/ai/Agency/Andmark.ai",
+"s": "logo/svg/Andmark.svg",
+"w": 1
+},
+{
+"n": "51K",
+"c": "actor",
+"b": "51K",
+"k": "피프티원케이 소지섭 배우",
+"d": 0,
+"f": "logo/ai/Agency/51K.ai",
+"s": "logo/svg/51K.svg",
+"w": 1
+},
+{
+"n": "ARTIST COMPANY",
+"c": "actor",
+"b": "ARTIST COMPANY",
+"k": "아티스트컴퍼니 정우성 이정재 배우",
+"d": 0,
+"f": "logo/ai/Agency/ArtistCompany.ai",
+"s": "logo/svg/ArtistCompany.svg",
+"w": 1
+},
+{
+"n": "BLOSSOM Entertainment",
+"c": "actor",
+"b": "BLOSSOM Entertainment",
+"k": "블러썸엔터테인먼트 블러썸 송중기 배우",
+"d": 0,
+"f": "logo/ai/Agency/Blossom.ai",
+"s": "logo/svg/Blossom.svg",
+"w": 1
+},
+{
+"n": "JUST Entertainment",
+"c": "actor",
+"b": "JUST Entertainment",
+"k": "저스트엔터테인먼트 저스트 배우",
+"d": 0,
+"f": "logo/ai/Agency/Just.ai",
+"s": "logo/svg/Just.svg",
+"w": 1
+},
+{
+"n": "management mmm",
+"c": "actor",
+"b": "management mmm",
+"k": "매니지먼트엠엠엠 매니지먼트mmm 배우",
+"d": 0,
+"f": "logo/ai/Agency/MMM.ai",
+"s": "logo/svg/MMM.svg",
+"w": 1
+},
+{
+"n": "CHAE JONG HYEOP",
+"c": "artist",
+"b": "CHAE JONG HYEOP",
+"k": "채종협 배우 개인로고",
+"d": 0,
+"f": "logo/ai/Artist/ChaeJonghyeop.ai",
+"s": "logo/svg/ChaeJonghyeop.svg",
 "w": 1
 }
 ]

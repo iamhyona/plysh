@@ -75,7 +75,7 @@ function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function 
 var S={view:'logo'};
 // LOGO 메뉴 (2026-11-18): 소속사·아티스트·인쇄·세탁·분리배출 로고 미리보기 + 한글/영어 검색 + .ai 다운로드
 var LG = { list: null, tab: ls.get('d4:lgtab') || 'all', vw: ls.get('d4:lgvw') || 'grid', q: '' };
-var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['distributor', '유통사'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
+var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['actor', '배우 소속사'], ['artist', '아티스트'], ['distributor', '유통사'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
 var LG_SUB = { Laundry: { Wash: '물세탁', Bleach: '표백', TumbleDry: '텀블건조', Dry: '자연건조', Iron: '다림질', DryClean: '드라이클리닝', WetClean: '웻클리닝' } };
 function lgNorm(t) { return String(t || '').toLowerCase().replace(/[\s_\-().·]/g, ''); }
 function renderLogo() {
