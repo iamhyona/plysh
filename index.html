@@ -1506,7 +1506,7 @@ function render() {
 }
 // LOGO 메뉴 (2026-11-18): 소속사·아티스트·인쇄·세탁·분리배출 로고 미리보기 + 한글/영어 검색 + .ai 다운로드
 var LG = { list: null, tab: ls.get('d4:lgtab') || 'all', vw: ls.get('d4:lgvw') || 'grid', q: '' };
-var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
+var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['distributor', '유통사'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
 var LG_SUB = { Laundry: { Wash: '물세탁', Bleach: '표백', TumbleDry: '텀블건조', Dry: '자연건조', Iron: '다림질', DryClean: '드라이클리닝', WetClean: '웻클리닝' } };
 function lgNorm(t) { return String(t || '').toLowerCase().replace(/[\s_\-().·]/g, ''); }
 function renderLogo() {
@@ -1553,7 +1553,7 @@ function lgBody() {
   });
   flush();
   if (!L.length) h += '<div class="ld">찾는 로고가 없어요</div>';
-  h += '<div class="lgnote">원본 보관: 구글 드라이브 PLASH / 05_LOGO · 다운로드는 일러스트 .ai (글자 아웃라인)<br>웹 수집 로고는 위키미디어 공용 자료라 실제 사용 전 소속사 공식 파일과 대조해 주세요.</div>';
+  h += '<div class="lgnote">원본 보관: 구글 드라이브 PLASH / 05_LOGO · 다운로드는 일러스트 .ai (글자 아웃라인)<br>웹 수집 로고는 위키백과·공식 사이트 자료라 실제 사용 전 소속사 공식 파일과 대조해 주세요.</div>';
   $('#lgB').innerHTML = h;
 }
 // GUIDE 메뉴 (2026-11-10): 목록은 화면에, 문서는 아래에서 올라오는 창으로
