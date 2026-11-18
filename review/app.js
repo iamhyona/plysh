@@ -377,7 +377,7 @@ function pageChecks(P) {
   // 재단 사이즈
   if (WO.w && WO.h) {
     var tw = mm(T[2] - T[0]), th = mm(T[3] - T[1]), ew = P.spread ? WO.w * 2 : WO.w;
-    if (Math.abs(tw - ew) > 0.6 || Math.abs(th - WO.h) > 0.6) { if (!(Math.abs(tw - WO.h) < 0.6 && Math.abs(th - ew) < 0.6)) add('err', 'print', 'trimsize', '재단 사이즈가 작업지시서와 달라요', '파일 ' + f1(tw) + '×' + f1(th) + 'mm · 작업지시서 ' + f1(ew) + '×' + WO.h + 'mm', '문서 크기를 작업지시서에 맞춰 주세요.', [T]); }
+    if (Math.abs(tw - ew) > 0.6 || Math.abs(th - WO.h) > 0.6) { if (!(Math.abs(tw - WO.h) < 0.6 && Math.abs(th - ew) < 0.6)) add('err', 'print', 'trimsize', '재단 사이즈가 사양서와 달라요', '파일 ' + f1(tw) + '×' + f1(th) + 'mm · 사양서 ' + f1(ew) + '×' + WO.h + 'mm', '문서 크기를 사양서에 맞춰 주세요.', [T]); }
   }
   // 도련 상자
   if (!isAI) {
@@ -578,7 +578,7 @@ function docChecks() {
   var bp = R.bookPages;
   if (WO.bind === 'saddle' && bp % 4) add('err', 'bind', 'pages4', '중철은 4의 배수여야 해요', '지금 ' + bp + '쪽 → ' + (Math.ceil(bp / 4) * 4) + '쪽으로 맞춰야 해요 (' + (Math.ceil(bp / 4) * 4 - bp) + '쪽 추가 또는 ' + (bp % 4) + '쪽 줄이기).', '');
   if ((WO.bind === 'perfect' || WO.bind === 'pur' || WO.bind === 'hard' || WO.bind === 'layflat') && bp % 2) add('err', 'bind', 'pages2', '책 쪽수가 홀수예요', '지금 ' + bp + '쪽. 제본하려면 짝수여야 해요.', '빈 페이지를 넣거나 쪽수를 맞춰 주세요.');
-  if (WO.pages && WO.pages !== bp && WO.pages !== R.n) add('err', 'bind', 'pagecount', '쪽수가 작업지시서와 달라요', '파일 ' + bp + '쪽 (PDF ' + R.n + '장) · 작업지시서 ' + WO.pages + '쪽', '빠지거나 더 들어간 페이지가 없는지 확인해 주세요.');
+  if (WO.pages && WO.pages !== bp && WO.pages !== R.n) add('err', 'bind', 'pagecount', '쪽수가 사양서와 달라요', '파일 ' + bp + '쪽 (PDF ' + R.n + '장) · 사양서 ' + WO.pages + '쪽', '빠지거나 더 들어간 페이지가 없는지 확인해 주세요.');
   if (R.gNote) add('info', 'bind', 'gutteradv', '제본 안쪽 여백 제안', R.gNote, '', { top: false });
   // 서체
   var ne = R.fonts.filter(function (f) { return !f.embedded && f.type !== 'Type3'; });
