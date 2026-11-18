@@ -30,14 +30,64 @@ function parseRules(t) {
   return out;
 }
 function rulesText() { try { return localStorage.getItem(RULES_KEY) || ''; } catch (e) { return ''; } }
+// 팀 규칙은 PLYSH 시트(@4팀_업무보고 › PREFLIGHT 규칙 탭)에 저장해 팀이 같이 써요. 이 기기에는 마지막 내용을 캐시로만 둬요.
+var RV_KIND = { m: '멤버', t: '표기', d: '생일·기념일' };
+function rulesToRows(t) {
+  var sec = 't', rows = [];
+  String(t || '').split(/\n/).forEach(function (ln) {
+    ln = ln.trim(); if (!ln || ln.charAt(0) === '#') return;
+    var m = ln.match(/^\[(.+)\]$/); if (m) { sec = /멤버/.test(m[1]) ? 'm' : /생일|기념|날짜/.test(m[1]) ? 'd' : 't'; return; }
+    if (sec === 'd') { var d = ln.match(/^(\d{1,2}\s*[\/.\-월]\s*\d{1,2})\s*일?\s*(.*)$/); if (d) rows.push([RV_KIND.d, d[1].replace(/\s+/g, '').replace(/[.\-월]/, '/'), d[2] || '']); return; }
+    var i = ln.indexOf('='); rows.push([RV_KIND[sec], (i < 0 ? ln : ln.slice(0, i)).trim(), i < 0 ? '' : ln.slice(i + 1).trim()]);
+  });
+  return rows;
+}
+function rowsToRules(rows) {
+  var g = { m: [], t: [], d: [] };
+  (rows || []).forEach(function (r) {
+    var k = /멤버/.test(r[0]) ? 'm' : /생일|기념|날짜/.test(r[0]) ? 'd' : 't', a = String(r[1] || '').trim(), b = String(r[2] || '').trim(); if (!a) return;
+    g[k].push(k === 'd' ? (a + ' ' + b).trim() : b ? a + ' = ' + b : a);
+  });
+  var out = [];
+  [['m', '[멤버]'], ['t', '[표기]'], ['d', '[생일·기념일]']].forEach(function (x) { if (g[x[0]].length) out.push(x[1] + '\n' + g[x[0]].join('\n')); });
+  return out.join('\n\n');
+}
+function plyshApi() { // 같은 사이트 안에서 PLYSH 본 화면의 call 을 빌려 씀
+  try { var P = window.parent; if (P && P !== window && typeof P.call === 'function' && P.S && P.S.pin) return { call: P.call, pin: P.S.pin, preview: !!P.PLYSH_PREVIEW }; } catch (e) {}
+  return null;
+}
 function setupRulesUI() {
   var box = document.getElementById('rulesBox'); if (!box) return;
-  var ta = document.getElementById('rulesTa'); ta.value = rulesText(); ta.placeholder = RULES_EX;
-  ta.oninput = function () { try { localStorage.setItem(RULES_KEY, ta.value); } catch (e) {} cnt(); };
-  document.getElementById('rulesEx').onclick = function () { if (!ta.value.trim() || confirmEx()) { ta.value = RULES_EX; ta.oninput(); } };
-  function confirmEx() { ta.value += '\n\n' + RULES_EX; ta.oninput(); return false; }
+  var ta = document.getElementById('rulesTa'), st = document.getElementById('rulesSt'); ta.value = rulesText(); ta.placeholder = RULES_EX;
+  var api = plyshApi(), timer = null, saving = false, dirty = false, lastSaved = ta.value;
+  function say(t, bad) { if (st) { st.textContent = t; st.style.color = bad ? 'var(--warn, #c2410c)' : ''; } }
+  function cache(v) { try { localStorage.setItem(RULES_KEY, v); } catch (e) {} }
+  function hm() { var d = new Date(); return d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2); }
   function cnt() { var r = parseRules(ta.value); document.getElementById('rulesCnt').textContent = '멤버 ' + r.members.length + ' · 표기 ' + r.terms.length + ' · 날짜 ' + r.days.length; }
+  function noApi(e) { return /알 수 없는 요청/.test(String(e && e.message || e)); }
+  function save() {
+    if (!api || saving) return; if (ta.value === lastSaved) { dirty = false; return; }
+    saving = true; dirty = false; var v = ta.value; say('팀 시트에 저장 중…');
+    api.call('appRvRulesSet', api.pin, rulesToRows(v)).then(function () {
+      saving = false; lastSaved = v; say(api.preview ? '미리보기라 실제 시트 대신 임시로 저장했어요 · ' + hm() : '팀 시트에 저장했어요 · ' + hm());
+      if (dirty || ta.value !== v) { clearTimeout(timer); timer = setTimeout(save, 600); }
+    }, function (e) {
+      saving = false; say(noApi(e) ? '시트 쪽 스크립트 업데이트 전이라 이 기기에만 저장했어요' : '시트에 저장하지 못했어요 (' + (e && e.message || e) + ') · 이 기기에는 저장됨', true);
+    });
+  }
+  ta.oninput = function () { cache(ta.value); cnt(); dirty = true; if (api) { say('입력 중…'); clearTimeout(timer); timer = setTimeout(save, 1500); } };
+  ta.onblur = function () { if (api && ta.value !== lastSaved) { clearTimeout(timer); save(); } };
+  document.getElementById('rulesEx').onclick = function () { ta.value = ta.value.trim() ? ta.value.replace(/\s+$/, '') + '\n\n' + RULES_EX : RULES_EX; ta.oninput(); };
   cnt();
+  if (!api) { say('PLYSH 밖에서 열어서 이 기기에만 저장돼요'); return; }
+  say('팀 시트에서 불러오는 중…');
+  api.call('appRvRules', api.pin).then(function (o) {
+    var v = rowsToRules(o && o.rows);
+    if (!(o && o.rows && o.rows.length) && ta.value.trim()) { lastSaved = ''; say('팀 시트가 비어 있어서 이 기기 내용을 올릴게요'); save(); return; }
+    if (dirty) { save(); return; } // 불러오는 사이 고쳤으면 고친 걸 우선
+    ta.value = v; lastSaved = v; cache(v); cnt();
+    say((api.preview ? '미리보기 임시 저장소' : '팀 시트') + '에서 불러왔어요' + (o.at ? ' · 마지막 수정 ' + o.at : ''));
+  }, function (e) { say(noApi(e) ? '시트 쪽 스크립트 업데이트 전이라 이 기기에만 저장돼요' : '팀 시트를 불러오지 못했어요 · 이 기기 내용으로 검수해요', true); });
 }
 
 // ── 줄 만들기 (pdf.js 글자 조각 → 같은 기준선끼리) ──
@@ -343,16 +393,77 @@ async function barcodes(R, pdfjs) {
 function ean13ok(d) { var s = 0; for (var i = 0; i < 12; i++) s += (+d[i]) * (i % 2 ? 3 : 1); return (10 - s % 10) % 10 === +d[12]; }
 
 // ── 달력 ──
-var HOL = { // 대한민국 공휴일 (대체공휴일 포함). 매년 확인 필요
-  2026: ['1-1 신정', '2-16 설날 연휴', '2-17 설날', '2-18 설날 연휴', '3-1 삼일절', '3-2 대체공휴일', '5-5 어린이날', '5-24 부처님오신날', '5-25 대체공휴일', '6-3 지방선거', '6-6 현충일', '8-15 광복절', '8-17 대체공휴일', '9-24 추석 연휴', '9-25 추석', '9-26 추석 연휴', '10-3 개천절', '10-5 대체공휴일', '10-9 한글날', '12-25 성탄절'],
-  2027: ['1-1 신정', '2-6 설날 연휴', '2-7 설날', '2-8 설날 연휴', '2-9 대체공휴일', '3-1 삼일절', '5-5 어린이날', '5-13 부처님오신날', '6-6 현충일', '8-15 광복절', '8-16 대체공휴일', '9-14 추석 연휴', '9-15 추석', '9-16 추석 연휴', '10-3 개천절', '10-4 대체공휴일', '10-9 한글날', '10-11 대체공휴일', '12-25 성탄절', '12-27 대체공휴일'],
-  2028: ['1-1 신정', '1-25 설날 연휴', '1-26 설날', '1-27 설날 연휴', '3-1 삼일절', '4-12 국회의원 선거', '5-2 부처님오신날', '5-5 어린이날', '6-6 현충일', '8-15 광복절', '10-2 추석 연휴', '10-3 추석·개천절', '10-4 추석 연휴', '10-5 대체공휴일', '10-9 한글날', '12-25 성탄절']
-};
+// 대한민국 공휴일: 해마다 자동 계산 (양력 고정일 + 음력 명절 + 대체공휴일 규칙)
+// 선거일·임시공휴일은 PLYSH 달력의 공휴일 목록에서 가져와 합쳐요.
+var HOL_FIX = [[1, 1, '신정'], [3, 1, '삼일절'], [5, 5, '어린이날'], [6, 6, '현충일'], [7, 17, '제헌절'], [8, 15, '광복절'], [10, 3, '개천절'], [10, 9, '한글날'], [12, 25, '성탄절']];
+var HOL_CACHE = {}, HOL_FAIL = {};
+function ymdKey(y, m, d) { return y + '-' + m + '-' + d; }
+function lunarToSolar(y, m, d) {
+  var K = window.KoreanLunarCalendar; if (!K) return null;
+  var c = new K(); if (!c.setLunarDate(y, m, d, false)) return null;
+  var r = c.getSolarCalendar(); return new Date(r.year, r.month - 1, r.day);
+}
+function plyshHol() { // PLYSH 본 화면이 가진 공휴일 (선거일·임시공휴일 포함)
+  var h = null;
+  try { if (window.parent && window.parent !== window && window.parent.S && window.parent.S.D && window.parent.S.D.hol) h = window.parent.S.D.hol; } catch (e) {}
+  if (!h) try { var c = JSON.parse(localStorage.getItem('d4:data') || 'null'); h = c && c.hol; } catch (e) {}
+  return h || {};
+}
+function korHolidays(y) {
+  if (HOL_CACHE[y]) return HOL_CACHE[y];
+  var map = {}, groups = [];
+  function add(dt, name, sub, grp) { var k = ymdKey(dt.getFullYear(), dt.getMonth() + 1, dt.getDate()); (map[k] = map[k] || []).push({ n: name, sub: sub, grp: grp }); return k; }
+  HOL_FIX.forEach(function (h) {
+    if (h[2] === '제헌절' && y < 2026) return; // 2026년부터 다시 공휴일
+    var dt = new Date(y, h[0] - 1, h[1]);
+    // 대체공휴일 적용: 어린이날(2014~), 삼일절·광복절·개천절·한글날(2021~), 성탄절(2023~)
+    var sub = h[2] === '어린이날' ? y >= 2014 : /삼일절|광복절|개천절|한글날/.test(h[2]) ? y >= 2021 : h[2] === '제헌절' ? true : h[2] === '성탄절' ? y >= 2023 : false;
+    groups.push({ keys: [add(dt, h[2], sub ? 'we' : '', null)], sub: sub ? 'we' : '' });
+  });
+  var seol = lunarToSolar(y, 1, 1), chu = lunarToSolar(y, 8, 15), bud = lunarToSolar(y, 4, 8);
+  if (!seol || !chu || !bud) HOL_FAIL[y] = true;
+  [[seol, '설날'], [chu, '추석']].forEach(function (L) {
+    if (!L[0]) return; var keys = [];
+    for (var i = -1; i <= 1; i++) { var dt = new Date(L[0].getFullYear(), L[0].getMonth(), L[0].getDate() + i); keys.push(add(dt, i ? L[1] + ' 연휴' : L[1], y >= 2014 ? 'sun' : '', L[1])); }
+    groups.push({ keys: keys, sub: y >= 2014 ? 'sun' : '' });
+  });
+  if (bud) groups.push({ keys: [add(bud, '부처님오신날', y >= 2023 ? 'we' : '', null)], sub: y >= 2023 ? 'we' : '' });
+  // 대체공휴일: 겹치는 날마다 하나씩, 묶음이 끝난 뒤 처음 오는 평일(공휴일 아님)에
+  function dateOf(k) { var p = k.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  var subs = [], done = {};
+  groups.sort(function (a, b) { return dateOf(a.keys[0]) - dateOf(b.keys[0]); }).forEach(function (g) {
+    if (!g.sub) return; var need = 0;
+    g.keys.forEach(function (k) {
+      var w = dateOf(k).getDay(), over = map[k].length > 1, wk = g.sub === 'sun' ? w === 0 : (w === 0 || w === 6);
+      if ((wk || over) && !done[k]) { need++; done[k] = true; }
+    });
+    var cur = dateOf(g.keys[g.keys.length - 1]);
+    while (need > 0) {
+      cur = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + 1);
+      var k = ymdKey(cur.getFullYear(), cur.getMonth() + 1, cur.getDate()), w = cur.getDay();
+      if (w === 0 || w === 6 || map[k] || subs.indexOf(k) > -1) continue;
+      subs.push(k); need--;
+    }
+  });
+  var out = {};
+  Object.keys(map).forEach(function (k) { var ns = []; map[k].forEach(function (h) { if (ns.indexOf(h.n) < 0) ns.push(h.n); }); out[k] = ns.join('·'); });
+  subs.forEach(function (k) { out[k] = '대체공휴일'; });
+  // PLYSH 공휴일 목록(선거일·임시공휴일) 합치기
+  var ph = plyshHol();
+  Object.keys(ph).forEach(function (d) { var m = String(d).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/); if (!m || +m[1] !== y || /신정|설날|삼일절|어린이날|부처님|현충일|제헌절|광복절|추석|개천절|한글날|성탄|대체/.test(ph[d])) return; var k = ymdKey(+m[1], +m[2], +m[3]); if (!out[k]) out[k] = ph[d]; });
+  // 선거일 (법정 공휴일): 국회의원 4/10 이후 첫 수요일(4년마다, 2028~), 지방선거 6/1 이후 첫 수요일(4년마다, 2026~). 대통령선거는 정해지면 PLYSH 목록으로
+  function firstWed(m, d) { var t = new Date(y, m - 1, d); while (t.getDay() !== 3) t.setDate(t.getDate() + 1); return t; }
+  [[y >= 2028 && y % 4 === 0, 4, 10, '국회의원선거'], [y >= 2026 && y % 4 === 2, 6, 1, '지방선거']].forEach(function (e) {
+    if (!e[0] || Object.keys(out).some(function (k) { return +k.split('-')[0] === y && out[k].indexOf(e[3].slice(0, 2)) > -1; })) return;
+    var t = firstWed(e[1], e[2]), k = ymdKey(y, t.getMonth() + 1, t.getDate()); if (!out[k]) out[k] = e[3];
+  });
+  return (HOL_CACHE[y] = out);
+}
+function holOf(ymd) { var y = +String(ymd).split('-')[0]; return y ? korHolidays(y)[ymd] || '' : ''; }
 var MON = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 var DOW = [/^(SUN|SUNDAY|일|일요일|S)$/i, /^(MON|MONDAY|월|월요일|M)$/i, /^(TUE|TUESDAY|화|화요일|T)$/i, /^(WED|WEDNESDAY|수|수요일|W)$/i, /^(THU|THURSDAY|목|목요일|T)$/i, /^(FRI|FRIDAY|금|금요일|F)$/i, /^(SAT|SATURDAY|토|토요일|S)$/i];
 function calendar(R, rules) {
   var issue = X.issue, MM = X.MM, months = [];
-  var holData = {}; Object.keys(HOL).forEach(function (y) { HOL[y].forEach(function (h) { var m = h.match(/^(\d+)-(\d+) (.+)$/); holData[y + '-' + m[1] + '-' + m[2]] = m[3]; }); });
   R.pages.forEach(function (P) {
     var items = (P.tc || []).filter(function (t) { return /^\s*\d{1,2}\s*$/.test(t.s) && +t.s >= 1 && +t.s <= 31; });
     if (items.length < 20) return;
@@ -416,13 +527,13 @@ function calendar(R, rules) {
     var P = M.P, notMarked = [], oddMark = [], birthMiss = [];
     M.cells.forEach(function (c) {
       if (!c.own || !c.date) return;
-      var ymd = c.date, md = c.date.split('-').slice(1).join('-'), hol = holData[ymd], isB = bd[md];
+      var ymd = c.date, md = c.date.split('-').slice(1).join('-'), hol = holOf(ymd), isB = bd[md];
       var marked = c.mark !== base;
       if (sunDiff && hol && c.dow !== 0 && c.mark !== sunMark) notMarked.push({ c: c, why: hol });
       if (marked && !hol && !isB && c.dow !== 0 && !(c.dow === 6)) oddMark.push(c);
       if (isB && !marked && rules.days.length) birthMiss.push({ c: c, why: isB });
     });
-    if (notMarked.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calhol', title: '공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시해 주세요. (공휴일 목록은 매년 정부 발표로 한 번 더 확인)', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
+    if (notMarked.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calhol', title: '공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시해 주세요. 공휴일은 음력 명절과 대체공휴일까지 자동 계산하고, 선거일·임시공휴일은 PLYSH 달력 목록을 따라요.', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
     if (oddMark.length) issue({ page: P.i, sev: 'warn', cat: 'cal', code: 'calodd', title: '표시된 날인데 공휴일·생일 목록에 없어요', detail: oddMark.map(function (c) { return c.d + '일'; }).join(', ') + (rules.days.length ? '' : ' (팀 규칙에 생일·기념일을 넣으면 더 정확해요)'), fix: '생일·기념일이면 팀 규칙 목록에 넣어 주세요. 아니면 표시를 지워 주세요.', boxes: oddMark.map(function (c) { return c.t.b; }), sus: true });
     if (birthMiss.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calbirth', title: '생일·기념일이 표시되지 않았어요', detail: birthMiss.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '다른 생일과 같은 방식으로 표시해 주세요.', boxes: birthMiss.map(function (n) { return n.c.t.b; }) });
     // 생일 글자 확인: 칸 근처 작은 글자에 이름이 있으면 날짜 맞는지
@@ -464,7 +575,7 @@ window.RV2 = {
     var rules = parseRules(rulesText()); R.rulesN = rules;
     step('글자 검사 중…'); await X.tick(); textChecks(R, rules);
     repeatChecks(R); pageNumbers(R);
-    step('달력·멤버 사진 확인 중…'); await X.tick(); calendar(R, rules); members(R, rules);
+    step('달력·멤버 사진 확인 중…'); await X.tick(); calendar(R, rules); var hf = Object.keys(HOL_FAIL); if (hf.length) X.issue({ page: null, sev: 'info', cat: 'cal', code: 'holfail', title: hf.join(', ') + '년 음력 명절은 계산하지 못했어요', detail: '음력 변환표가 2050년까지라서 그 뒤의 설날·추석·부처님오신날은 빠져 있어요.', fix: '해당 연도 공휴일은 직접 확인해 주세요.', boxes: [] }); members(R, rules);
     step('바코드·QR 읽는 중…'); await X.tick(); try { await barcodes(R, pdfjs); } catch (e) { console.warn(e); }
   },
   cards: cards, parseRules: parseRules

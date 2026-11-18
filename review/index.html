@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PLYSH 검수</title>
+<title>PLYSH PREFLIGHT</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --faint:#b0b8c1;
@@ -113,7 +113,7 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 </head>
 <body>
 <div class="wrap">
-  <h2 class="noprint">검수 <span class="mute small" style="font-weight:600">인쇄 전 PDF·일러스트 파일 점검</span></h2>
+  <h2 class="noprint">PREFLIGHT <span class="mute small" style="font-weight:600">인쇄 전 검수 · PDF·일러스트 파일 점검</span></h2>
 
   <div class="card noprint" id="setup">
     <div class="drop" id="drop">
@@ -151,7 +151,7 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 
     <details class="set" id="rulesBox">
       <summary>팀 표기 규칙 · 생일·기념일 <span class="mute" id="rulesCnt" style="font-weight:600"></span></summary>
-      <div class="note" style="margin-top:6px">한 줄에 하나씩. <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 (소속사, 아티스트, 타이틀, 품목명) · <b>[생일·기념일]</b> 월/일 내용. 이 기기에 저장돼요. <button type="button" id="rulesEx" style="border:0;background:none;color:var(--acc);font-weight:700;padding:0">예시 넣기</button></div>
+      <div class="note" style="margin-top:6px">한 줄에 하나씩. <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 (소속사, 아티스트, 타이틀, 품목명) · <b>[생일·기념일]</b> 월/일 내용. 팀 모두가 같이 쓰도록 PLYSH 시트(@4팀_업무보고 › PREFLIGHT 규칙 탭)에 저장돼요. <span id="rulesSt" class="mute" style="font-weight:600"></span> <button type="button" id="rulesEx" style="border:0;background:none;color:var(--acc);font-weight:700;padding:0">예시 넣기</button></div>
       <textarea id="rulesTa" class="inp" style="width:100%;min-height:170px;margin-top:8px;font-size:13px;line-height:1.6;resize:vertical"></textarea>
     </details>
     <details class="set">
@@ -195,7 +195,8 @@ var LIBS = {
   zxing: 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'
 };
 </script>
-<script src="text.js?v=20261118b"></script>
-<script src="app.js?v=20261118b"></script>
+<script src="korean-lunar-calendar.min.js"></script>
+<script src="text.js?v=20261118c"></script>
+<script src="app.js?v=20261118c"></script>
 </body>
 </html>
