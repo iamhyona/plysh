@@ -34,6 +34,9 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 .grid2 { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px 14px; margin-top:8px; }
 .grid2 label { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:var(--sub); }
 .grid2 .inp { width:72px; }
+#setG { grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px 22px; }
+@media (max-width:760px) { #setG { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:480px) { #setG { grid-template-columns:1fr; } }
 .bar { height:8px; border-radius:4px; background:var(--chip); overflow:hidden; margin:10px 0 6px; }
 .bar i { display:block; height:100%; background:var(--acc); width:0; transition:width .2s; }
 /* 요약 */
@@ -110,7 +113,7 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 .err-t { color:var(--red); font-weight:700; }
 .ta { width:100%; min-height:96px; margin-top:8px; font-size:13px; line-height:1.6; resize:vertical; }
 .lnk { border:0; background:none; color:var(--acc); font-weight:700; padding:0; }
-.go { border:0; background:var(--acc); color:#fff; border-radius:12px; padding:12px 20px; font-weight:800; font-size:15px; width:100%; }
+.go { border:0; background:var(--acc); color:#fff; border-radius:14px; padding:18px 24px; font-weight:800; font-size:18px; width:100%; letter-spacing:-.2px; }
 .go:disabled { background:var(--faint); }
 /* 파일 목록 */
 .fr { display:grid; grid-template-columns:minmax(0,1.6fr) 200px minmax(0,1fr) minmax(0,1fr) 28px; gap:6px 8px; align-items:center; padding:9px 0; border-top:1px solid var(--line); font-size:13px; }
@@ -207,8 +210,9 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
     </div>
     <datalist id="artL"></datalist>
     <div class="seg" id="artChips" style="margin-top:8px"></div>
-    <div class="note">고른 아티스트는 아티스트가 비어 있는 파일에 들어가요. 아래는 <b id="artCur">공통</b> 표기 규칙 · 생일·기념일이에요. 검수할 때는 <b>공통 + 파일의 아티스트</b> 규칙을 같이 써요. 한 줄에 하나씩 <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 · <b>[생일·기념일]</b> 월/일 내용. PLYSH 시트에 저장돼 팀이 같이 써요. <span id="rulesSt" class="mute" style="font-weight:600"></span> <button type="button" id="rulesEx" class="lnk">예시 넣기</button></div>
-    <textarea id="rulesTa" class="inp ta" style="min-height:150px"></textarea>
+    <div class="note">고른 아티스트는 아티스트가 비어 있는 파일에 들어가요. 아래는 <b id="artCur">공통</b> 표기 규칙 · 생일·기념일이에요. 검수할 때는 <b>공통 + 파일의 아티스트</b> 규칙을 같이 써요. 한 줄에 하나씩 <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 · <b>[생일·기념일]</b> 월/일 내용. PLYSH 시트에 저장돼 팀이 같이 써요. <span id="rulesSt" class="mute" style="font-weight:600"></span></div>
+    <div class="row" style="margin-top:10px"><button type="button" class="ib" id="rulesOpen">직접 입력</button><span class="small sub" id="rulesSum"></span></div>
+    <textarea id="rulesTa" class="inp ta" style="min-height:150px" hidden></textarea>
   </div>
 
   <div class="card noprint" id="titleCard">
@@ -272,6 +276,6 @@ var LIBS = {
 <script src="korean-lunar-calendar.min.js"></script>
 <script src="text.js?v=20261118e"></script>
 <script src="app.js?v=20261118e"></script>
-<script src="batch.js?v=20261118g"></script>
+<script src="batch.js?v=20261118h"></script>
 </body>
 </html>
