@@ -99,7 +99,7 @@ function showSpecSum() {
   if (MODE === 'none') { $('#specSum').innerHTML = '사양서 없이 검수해요. 크기·쪽수는 파일 기준으로만 봐요.'; $('#specView').innerHTML = ''; return; }
   if ((MODE === 'plysh' || MODE === 'link') && SPEC.sheet) {
     var sh = SPEC.sheet, tg = (sh.tabs || []).find(function (t) { return t && t.n === sh.tab; }), url = 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' + (tg && tg.g != null ? '#gid=' + tg.g : '');
-    h += (sh.auto ? '<span class="mute">파일 아티스트로 가장 최근 사양서를 골라 뒀어요. 다르면 위에서 바꿔 주세요.</span><br>' : '') + '<b>' + esc(sh.name) + '</b> <a href="' + esc(url) + '" target="_blank" rel="noopener">시트 열기</a>';
+    h += (sh.auto ? '<span class="mute">고른 아티스트의 가장 최근 사양서를 골라 뒀어요. 다르면 위에서 바꿔 주세요.</span><br>' : '') + '<b>' + esc(sh.name) + '</b> <a href="' + esc(url) + '" target="_blank" rel="noopener">시트 열기</a>';
     if (sh.tabs && sh.tabs.length > 1) h += ' · 탭 <select class="inp" id="specTab" style="padding:3px 6px;font-size:12.5px">' + sh.tabs.map(function (t) { var n = t && t.n != null ? t.n : t; return '<option' + (n === sh.tab ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select>';
     h += '<br>품목 ' + it.length + '개를 읽었어요. 아래 내용이 맞는지 확인해 주세요.';
   } else if (it.length) h += '품목 ' + it.length + '개를 읽었어요. 아래 내용이 맞는지 확인해 주세요.';
@@ -117,9 +117,18 @@ function loadSpecs() {
     SPEC.specs = (L || []).slice().sort(function (a, b) { return String(b.at || '').localeCompare(String(a.at || '')); });
     SPEC.specs.forEach(function (s) { if (addArtist(s.artist)) {} });
     fillArtistList(); Q.forEach(function (q) { if (!q.artistSet) q.artist = artistOf(q.file.name); }); drawQ();
-    $('#specSel').innerHTML = '<option value="">PLYSH 사양서에서 고르기 (' + SPEC.specs.length + '개)</option>' + SPEC.specs.map(function (s) { return '<option value="' + esc(s.id) + '">' + esc(s.name) + '</option>'; }).join('');
+    fillSpecSel();
     autoSpec();
   }, function () { $('#specSel').innerHTML = '<option value="">사양서 목록을 불러오지 못했어요</option>'; });
+}
+function fillSpecSel() { // 고른 아티스트의 사양서를 위에, 나머지는 아래 묶음으로
+  var sel = $('#specSel'), cur = sel.value, a = SELART;
+  var mine = a ? SPEC.specs.filter(function (x) { return x.artist === a || String(x.name).indexOf(a) >= 0; }) : [];
+  var rest = SPEC.specs.filter(function (x) { return mine.indexOf(x) < 0; });
+  var opt = function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.name) + '</option>'; };
+  sel.innerHTML = '<option value="">' + (a ? (mine.length ? a + ' 사양서 ' + mine.length + '개 중에서 고르기' : a + ' 사양서가 없어요 · 다른 사양서에서 고르기') : '아티스트를 먼저 고르면 그 사양서만 보여요 (' + SPEC.specs.length + '개)') + '</option>' +
+    (mine.length ? '<optgroup label="' + esc(a) + '">' + mine.map(opt).join('') + '</optgroup>' + (rest.length ? '<optgroup label="다른 아티스트">' + rest.map(opt).join('') + '</optgroup>' : '') : rest.map(opt).join(''));
+  sel.value = cur;
 }
 function autoSpec() { // 사양서를 아직 안 골랐으면 아티스트로 가장 최근 사양서를 골라 둠
   if (MODE !== 'plysh' || (SPEC.sheet && !SPEC.sheet.auto) || SPEC.userPicked || !SPEC.specs.length) return;
@@ -200,7 +209,7 @@ async function addFiles(fl) {
     autoItem(q); Q.push(q);
     if (q.artist) { addArtist(q.artist); fillArtistList(); }
   }
-  if (!SELART) { var fa = Q.map(function (q) { return q.artist; }).filter(Boolean)[0]; if (fa) { SELART = fa; $('#artQ').value = fa; setCur(fa); } }
+  if (!SELART) { var fa = Q.map(function (q) { return q.artist; }).filter(Boolean)[0]; if (fa) { SELART = fa; $('#artQ').value = fa; setCur(fa); fillSpecSel(); } }
   drawQ(); autoSpec(); drawArtChips(); drawTitle();
 }
 function autoItem(q) { // 파일 이름과 가장 잘 맞는 사양서 품목
@@ -279,7 +288,7 @@ function pickArtist(a) {
   if (!a) { drawArtChips(); return; }
   if (addArtist(a)) fillArtistList();
   Q.forEach(function (q) { if (!q.artistSet) q.artist = a; });
-  setCur(a); drawQ(); autoSpec(); drawTitle();
+  setCur(a); drawQ(); fillSpecSel(); autoSpec(); drawTitle();
 }
 function setCur(a) { flush(); CUR = a || '공통'; if (RULES[CUR] == null) RULES[CUR] = ''; $('#rulesTa').value = RULES[CUR]; lastSaved[CUR] = lastSaved[CUR] != null ? lastSaved[CUR] : RULES[CUR]; cnt(); drawArtChips(); }
 var timer = null, saving = false, lastSaved = {};
