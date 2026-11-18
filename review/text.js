@@ -363,7 +363,15 @@ async function barcodes(R, pdfjs) {
       var out = []; list.forEach(function (f) { var c = out.find(function (o) { return f.box[0] < o[2] + 4 * MM && f.box[2] > o[0] - 4 * MM && f.box[1] < o[3] + 4 * MM && f.box[3] > o[1] - 4 * MM; }); if (c) { c[0] = Math.min(c[0], f.box[0]); c[1] = Math.min(c[1], f.box[1]); c[2] = Math.max(c[2], f.box[2]); c[3] = Math.max(c[3], f.box[3]); c.n++; } else { var o = f.box.slice(); o.n = 1; out.push(o); } }); return out.filter(function (o) { return o.n >= minN; });
     }
     cluster(bars, 20).forEach(function (b) { cands.push({ P: P, b: b, kind: 'bar' }); });
-    cluster(sq, 60).forEach(function (b) { cands.push({ P: P, b: b, kind: 'qr' }); });
+    cluster(sq, 60).forEach(function (b) { // QR은 정사각형 · 모듈 크기 일정 · 채움 30~75% (FSC 같은 로고 제외)
+      var w = b[2] - b[0], h = b[3] - b[1]; if (w < 6 * MM || h / w < 0.8 || h / w > 1.25) return;
+      var inb = sq.filter(function (f) { return f.box[0] >= b[0] - 0.01 && f.box[2] <= b[2] + 0.01 && f.box[1] >= b[1] - 0.01 && f.box[3] <= b[3] + 0.01; });
+      var sz = inb.map(function (f) { return f.box[2] - f.box[0]; }).sort(function (x, y) { return x - y; }), mod = sz[Math.floor(sz.length / 2)] || 1;
+      var same = sz.filter(function (v) { return Math.abs(v - mod) < 0.15 * mod || Math.abs(v / mod - Math.round(v / mod)) < 0.15; }).length / Math.max(1, sz.length);
+      var cover = inb.reduce(function (a, f) { return a + (f.box[2] - f.box[0]) * (f.box[3] - f.box[1]); }, 0) / (w * h);
+      if (same < 0.8 || cover < 0.25 || cover > 0.8) return;
+      cands.push({ P: P, b: b, kind: 'qr' });
+    });
     (P.images || []).forEach(function (im) { /* 이미지 속 바코드는 아래 전체 페이지 스캔으로 */ });
     if (isbn.length) P._isbn = isbn;
   });
@@ -380,10 +388,27 @@ async function barcodes(R, pdfjs) {
     cv.width = Math.max(10, Math.round(r[2] - r[0])); cv.height = Math.max(10, Math.round(r[3] - r[1]));
     var cx = cv.getContext('2d', { willReadFrequently: true }); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.translate(-r[0], -r[1]);
     await pg.render({ canvasContext: cx, viewport: vp, intent: 'print' }).promise;
-    try { var src = new ZXing.HTMLCanvasElementLuminanceSource(cv), bmp = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src)); var res = reader.decode(bmp); return { text: res.getText(), fmt: ZXing.BarcodeFormat[res.getBarcodeFormat()] }; } catch (e) { return null; }
+    try { var src = new ZXing.HTMLCanvasElementLuminanceSource(cv), bmp = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src)); var res = reader.decode(bmp); return { text: res.getText(), fmt: ZXing.BarcodeFormat[res.getBarcodeFormat()] }; } catch (e) { decodeRegion.last = cv; return null; }
+  }
+  // QR 모서리 표식(검-흰-검검검-흰-검 1:1:3:1:1)이 3곳 이상 있어야 진짜 QR로 봄
+  function hasFinders(cv) {
+    var W = cv.width, H = cv.height, d = cv.getContext('2d').getImageData(0, 0, W, H).data, hits = [];
+    for (var y = 0; y < H; y += 2) {
+      var runs = [], cur = -1, len = 0, x0 = 0;
+      for (var x = 0; x < W; x++) { var i = (y * W + x) * 4, k = (d[i] + d[i + 1] + d[i + 2]) < 384 ? 1 : 0; if (k === cur) len++; else { if (cur >= 0) runs.push([cur, len, x0]); cur = k; len = 1; x0 = x; } }
+      runs.push([cur, len, x0]);
+      for (var r = 0; r + 4 < runs.length; r++) {
+        if (runs[r][0] !== 1) continue; var u = (runs[r][1] + runs[r + 1][1] + runs[r + 2][1] + runs[r + 3][1] + runs[r + 4][1]) / 7; if (u < 1.5) continue;
+        var ok = [1, 1, 3, 1, 1].every(function (m, j) { return Math.abs(runs[r + j][1] - m * u) < 0.5 * m * u + 1; });
+        if (ok) hits.push([runs[r + 2][2] + runs[r + 2][1] / 2, y, u]);
+      }
+    }
+    var groups = []; hits.forEach(function (h) { var g = groups.find(function (g) { return Math.abs(g.x - h[0]) < 3 * h[2] && Math.abs(g.y - h[1]) < 5 * h[2]; }); if (g) { g.n++; g.y = h[1]; } else groups.push({ x: h[0], y: h[1], n: 1 }); });
+    return groups.filter(function (g) { return g.n >= 2; }).length >= 3;
   }
   for (var i = 0; i < cands.length && i < 40; i++) {
     var c = cands[i], res = await decodeRegion(c.P, c.b);
+    if (!res && c.kind === 'qr' && !(decodeRegion.last && hasFinders(decodeRegion.last))) continue; // QR 모양이 아니면(로고 등) 알리지 않음
     if (!res) { issue({ page: c.P.i, sev: 'err', cat: 'print', code: 'bcfail', title: (c.kind === 'qr' ? 'QR코드' : '바코드') + '가 읽히지 않아요', detail: '크기 ' + mm(c.b[2] - c.b[0]).toFixed(1) + '×' + mm(c.b[3] - c.b[1]).toFixed(1) + 'mm', fix: c.kind === 'qr' ? '여백(조용한 영역)과 크기(최소 15mm)를 확인해 주세요.' : '크기(80% 이상), 바 색(K100), 여백을 확인해 주세요.', boxes: [c.b], sus: true }); continue; }
     c.res = res;
     var msg = res.fmt + ' · ' + res.text, bad = '';
