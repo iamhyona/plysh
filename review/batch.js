@@ -330,6 +330,7 @@ function infoRules(artist) { // 영문명·팬덤명은 표기 검사에, 시트
   if (t.length) out.push('[표기]\n' + t.join('\n'));
   if (ai && ai.members.length) {
     var solo = ai.members.length === 1;
+    out.push('[기본 정보]\n인원: ' + ai.members.length);
     if (!solo && !own.members.length) out.push('[멤버]\n' + ai.members.map(function (m) { return m.ko + (m.en ? ' / ' + m.en : ''); }).join('\n'));
     if (!own.days.length) { var d = ai.members.filter(function (m) { return /^\d{1,2}-\d{1,2}$/.test(m.bd); }).map(function (m) { var b = m.bd.split('-'); return +b[0] + '/' + +b[1] + ' ' + m.ko + ' 생일'; }); if (d.length) out.push('[생일·기념일]\n' + d.join('\n')); }
   }

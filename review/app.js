@@ -769,8 +769,14 @@ function faceAdvice() {
     if (!best) { best = { c: f.desc.slice(), items: [] }; P.push(best); }
     best.items.push(f); var n = best.items.length; best.c = best.c.map(function (v, i) { return v + (f.desc[i] - v) / n; });
   });
+  // 팀 정보의 인원수로 묶음 보정: 1인 아티스트면 한 사람으로, 여러 명이면 가까운 묶음끼리 합침
+  var nP = 0; try { nP = +((window.RV2.parseRules(R.rulesText || '').info || {})['인원']) || 0; } catch (e) {}
+  function mergeP(x, y) { x.items = x.items.concat(y.items); var n = x.items.length; x.c = x.c.map(function (v, i) { return (v * (n - y.items.length) + y.c[i] * y.items.length) / n; }); P.splice(P.indexOf(y), 1); }
+  if (nP === 1 && P.length > 1) { P.sort(function (a, b) { return b.items.length - a.items.length; }); while (P.length > 1) mergeP(P[0], P[1]); }
+  else if (nP > 1) while (P.length > nP) { var bp = null, bd2 = 0.62; for (var i1 = 0; i1 < P.length; i1++) for (var j1 = i1 + 1; j1 < P.length; j1++) { var dd = edist(P[i1].c, P[j1].c); if (dd < bd2) { bd2 = dd; bp = [P[i1], P[j1]]; } } if (!bp) break; mergeP(bp[0], bp[1]); }
   P.sort(function (a, b) { return b.items.length - a.items.length; });
-  P.forEach(function (p, i) { p.name = '인물 ' + String.fromCharCode(65 + (i % 26)) + (i >= 26 ? Math.floor(i / 26) : ''); p.id = i; });
+  P.forEach(function (p, i) { p.name = nP === 1 && R.artist ? R.artist : '인물 ' + String.fromCharCode(65 + (i % 26)) + (i >= 26 ? Math.floor(i / 26) : ''); p.id = i; });
+  R.solo = nP === 1;
   R.people = P;
   var card = R.prod === 'photocard', coat = !!R.WO.coat || card, book = R.prod === 'photobook';
   // 같은 사람 + 같은 옷끼리 톤 비교
