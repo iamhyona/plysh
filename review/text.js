@@ -179,9 +179,12 @@ function textChecks(R, rules) {
     var hits = []; all.forEach(function (s) { var m = s.t.match(o[0]); if (m) hits.push({ P: s.P, b: subBox(s, s.t.indexOf(m[0]), 1), s: s.t }); });
     perPage('oddchar', 'warn', '헷갈리는 글자가 있어요: ' + o[1], '보기엔 비슷해도 다른 글자예요. 다시 입력해 주세요.', hits, function (L) { return L.length + '곳 · ' + L.slice(0, 2).map(function (h) { return '“' + cut(h.s, 24) + '”'; }).join(', '); });
   });
-  // v·z·w 들어간 영문 단어 모아 보기
-  var vzw = {}; all.forEach(function (s) { (s.t.match(/[A-Za-z]*[vzwVZW][A-Za-z]*/g) || []).forEach(function (w) { if (w.length < 2) return; (vzw[w] = vzw[w] || new Set()).add(s.P.i + 1); }); });
-  var vk = Object.keys(vzw); if (vk.length) issue({ page: null, sev: 'info', cat: 'text', code: 'vzw', title: 'v·z·w 들어간 영문 단어 모아 보기', detail: vk.slice(0, 40).map(function (w) { return w + ' (' + Array.from(vzw[w]).slice(0, 4).join(',') + '쪽)'; }).join(', '), fix: '철자·서체 모양이 맞는지 한 번 훑어봐 주세요.', boxes: [] });
+  // 인디자인 단축키(v · z · w 등)가 실수로 찍혀 혼자 떨어져 있는 영문 한 글자
+  var stray = []; all.forEach(function (s) { var re = /(^|[^A-Za-z0-9'’&.-])([vzwVZWtTpP])(?=$|[^A-Za-z0-9'’&.])/g, m; while ((m = re.exec(s.t))) {
+    var at = m.index + m[1].length, ch = m[2];
+    if (/[tTpP]/.test(ch) && !/^\s*$/.test(s.t.replace(ch, ''))) continue; // t · p는 그 글자만 따로 있는 덩어리일 때만
+    stray.push({ P: s.P, b: subBox(s, Math.max(0, at - 2), 5), s: s.t.slice(Math.max(0, at - 10), at + 10), ch: ch }); } });
+  perPage('vzw', 'warn', '혼자 떨어진 영문 한 글자', '단축키(v · z · w 등)가 잘못 찍힌 것 같으면 지우기', stray, function (L) { return L.length + '곳 · ' + L.slice(0, 3).map(function (h) { return '“' + cut(h.s, 20) + '”'; }).join(', '); });
   // 4) 오타 의심: 한글 자주 틀리는 말, 같은 단어 반복, 사전·문서 안 단어와 한두 글자 차이
   var tk = []; all.forEach(function (s) { TYPO_KO.forEach(function (t) { var re = new RegExp(t[0].source, 'g'), m; while ((m = re.exec(s.t))) tk.push({ P: s.P, b: subBox(s, m.index, m[0].length), w: m[0], to: t[1] }); }); });
   perPage('typoko', 'warn', '맞춤법 의심', '바른 표기를 확인해 주세요.', tk, function (L) { return L.slice(0, 4).map(function (h) { return h.w + ' → ' + h.to; }).join(', '); }, true);

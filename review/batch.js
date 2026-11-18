@@ -535,7 +535,7 @@ var CHECK = [
   ['글자 · 표기', [
     ['두 칸 띄어쓰기', ['dblspace'], isText],
     ['문장부호 통일 · ′″ 따옴표', ['punct', 'prime'], isText],
-    ['v / z / w 등 헷갈리는 글자', ['oddchar', 'vzw'], isText],
+    ['헷갈리는 글자 · 혼자 떨어진 v / z / w', ['oddchar', 'vzw'], isText],
     ['오타 · 반복 단어', ['typoko', 'typoen', 'repword'], isText],
     ['글자 중간에 스타일 바뀜', ['midstyle', 'sizemix'], isText],
     ['팀 표기 규칙 (멤버·소속사·타이틀·품목명)', ['rule', 'rulecase', 'case'], isText],
