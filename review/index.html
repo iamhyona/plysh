@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PLYSH 검수</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --faint:#b0b8c1;
+  --acc:#3182f6; --red:#ef4444; --redbg:#fdecec; --org:#f59e0b; --orgbg:#fff4e0; --grn:#16a34a; --grnbg:#e7f6ec; --pur:#7c3aed; --purbg:#f1ebfe; --chip:#f2f4f6; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; background:var(--bg); color:var(--txt); font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif; font-size:15px; letter-spacing:-0.01em; }
+button,input,select { font:inherit; color:inherit; letter-spacing:inherit; }
+button { cursor:pointer; }
+.wrap { max-width:1080px; margin:0 auto; padding:14px 16px 80px; }
+.card { background:var(--card); border-radius:20px; padding:18px; margin-bottom:12px; }
+h2 { font-size:20px; font-weight:800; margin:4px 4px 12px; }
+h3 { font-size:16px; font-weight:800; margin:0 0 10px; }
+.mute { color:var(--mute); } .sub { color:var(--sub); }
+.small { font-size:13px; }
+.drop { border:2px dashed var(--faint); border-radius:18px; padding:30px 16px; text-align:center; background:#fafbfc; transition:.15s; }
+.drop.on { border-color:var(--acc); background:#eef5ff; }
+.drop b { display:block; font-size:17px; margin-bottom:6px; }
+.drop .pick { display:inline-block; margin-top:12px; border:0; background:var(--txt); color:#fff; border-radius:999px; padding:10px 18px; font-weight:700; }
+.seg { display:flex; flex-wrap:wrap; gap:6px; }
+.seg button { border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 13px; font-size:13.5px; font-weight:600; color:var(--sub); }
+.seg button.on { background:var(--txt); border-color:var(--txt); color:#fff; }
+.fl { font-size:13px; font-weight:700; color:var(--sub); margin:14px 0 7px; }
+.row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.inp { border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff; width:84px; }
+select.inp { width:auto; }
+.note { font-size:12.5px; color:var(--mute); line-height:1.55; margin-top:8px; }
+details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:var(--sub); margin-top:14px; }
+.grid2 { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px 14px; margin-top:8px; }
+.grid2 label { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:var(--sub); }
+.grid2 .inp { width:72px; }
+.bar { height:8px; border-radius:4px; background:var(--chip); overflow:hidden; margin:10px 0 6px; }
+.bar i { display:block; height:100%; background:var(--acc); width:0; transition:width .2s; }
+/* 요약 */
+.sum { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.pill { border-radius:12px; padding:9px 13px; font-size:13px; font-weight:700; background:var(--chip); }
+.pill b { font-size:18px; margin-right:4px; }
+.pill.err { background:var(--redbg); color:var(--red); } .pill.warn { background:var(--orgbg); color:#b45309; } .pill.adv { background:var(--purbg); color:var(--pur); } .pill.ok { background:var(--grnbg); color:var(--grn); }
+.tabs { display:flex; gap:6px; overflow-x:auto; margin:4px 0 12px; scrollbar-width:none; }
+.tabs button { flex:none; border:0; background:#fff; border-radius:999px; padding:8px 14px; font-size:13.5px; font-weight:700; color:var(--mute); }
+.tabs button.on { background:var(--txt); color:#fff; }
+.tabs button em { font-style:normal; font-weight:600; opacity:.7; margin-left:4px; }
+/* 이슈 */
+.iss { border-top:1px solid var(--line); padding:12px 0; }
+.iss:first-of-type { border-top:0; padding-top:2px; }
+.ih { display:flex; gap:8px; align-items:flex-start; cursor:pointer; }
+.sev { flex:none; font-size:11.5px; font-weight:800; border-radius:6px; padding:3px 7px; margin-top:1px; }
+.sev.err { background:var(--redbg); color:var(--red); } .sev.warn { background:var(--orgbg); color:#b45309; } .sev.info { background:var(--chip); color:var(--sub); } .sev.adv { background:var(--purbg); color:var(--pur); } .sev.ok { background:var(--grnbg); color:var(--grn); }
+.sus { font-size:11px; font-weight:700; color:var(--mute); border:1px solid var(--line); border-radius:6px; padding:2px 6px; margin-left:4px; vertical-align:1px; }
+.ih .t { flex:1; min-width:0; }
+.ih .t b { font-size:15px; }
+.ih .t .d { font-size:13px; color:var(--sub); margin-top:3px; line-height:1.5; }
+.ih .t .fx { font-size:13px; color:var(--acc); margin-top:3px; line-height:1.5; }
+.pgs { display:flex; flex-wrap:wrap; gap:4px; margin-top:7px; }
+.pgs button { border:0; background:var(--chip); border-radius:7px; padding:3px 8px; font-size:12px; font-weight:700; color:var(--sub); }
+.pgs button:hover { background:#e5e8eb; }
+/* 중복 사진 */
+.dg { border:1px solid var(--line); border-radius:14px; padding:10px; margin-top:10px; }
+.dg .ims { display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; }
+.dg figure { margin:0; flex:none; width:120px; cursor:pointer; }
+.dg figure img { width:120px; height:120px; object-fit:contain; background:var(--chip); border-radius:10px; display:block; }
+.dg figcaption { font-size:12px; color:var(--sub); font-weight:700; margin-top:4px; text-align:center; }
+/* 페이지 그리드 */
+.pgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.pc { background:#fff; border-radius:14px; padding:8px; cursor:pointer; position:relative; }
+.pc .th { position:relative; background:var(--chip); border-radius:8px; overflow:hidden; }
+.pc .th img { width:100%; display:block; }
+.pc .th svg { position:absolute; inset:0; width:100%; height:100%; }
+.pc .pm { display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:12.5px; font-weight:700; }
+.cnt { display:flex; gap:3px; } .cnt i { font-style:normal; font-size:11px; border-radius:5px; padding:1px 5px; }
+.cnt .e { background:var(--redbg); color:var(--red); } .cnt .w { background:var(--orgbg); color:#b45309; } .cnt .a { background:var(--purbg); color:var(--pur); }
+.tgl { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--sub); font-weight:600; }
+/* 뷰어 */
+.ov { position:fixed; inset:0; z-index:50; background:rgba(25,31,40,.55); display:none; }
+.ov.open { display:flex; }
+.vw { margin:auto; width:min(1180px,100%); height:min(100%,100vh); background:var(--bg); display:flex; flex-direction:column; }
+@media (min-width:800px) { .vw { height:calc(100% - 32px); border-radius:20px; overflow:hidden; } }
+.vh { display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff; border-bottom:1px solid var(--line); }
+.vh b { flex:1; font-size:15px; }
+.ib { border:0; background:var(--chip); border-radius:10px; min-width:36px; height:36px; font-weight:800; padding:0 10px; }
+.vb { flex:1; display:flex; min-height:0; }
+.vc { flex:1; overflow:auto; position:relative; padding:12px; }
+.vc .stage { position:relative; margin:0 auto; box-shadow:0 1px 6px rgba(0,0,0,.12); background:#fff; }
+.vc canvas { display:block; width:100%; }
+.vc svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.vl { width:330px; flex:none; overflow:auto; background:#fff; border-left:1px solid var(--line); padding:12px 14px; }
+@media (max-width:799px) { .vb { flex-direction:column; } .vl { width:auto; border-left:0; border-top:1px solid var(--line); max-height:42%; } }
+.vl .iss { padding:9px 6px; margin:0 -6px; border-radius:10px; cursor:pointer; } .vl .iss.on { background:#f2f6ff; } .vl .ih .t b { font-size:14px; }
+.vl .num { flex:none; width:20px; height:20px; border-radius:50%; background:var(--red); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+.vl .num.w { background:var(--org); } .vl .num.a { background:var(--pur); } .vl .num.i { background:var(--mute); }
+.leg { display:flex; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--sub); margin:2px 0 10px; }
+.leg i { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-right:4px; }
+.hl { animation:hl 1.2s ease 2; } @keyframes hl { 50% { opacity:.25; } }
+/* 사람 */
+.pp { display:flex; gap:10px; flex-wrap:wrap; }
+.pp .face { width:76px; text-align:center; font-size:11.5px; color:var(--sub); font-weight:700; cursor:pointer; }
+.pp .face img { width:76px; height:76px; border-radius:12px; object-fit:cover; display:block; background:var(--chip); }
+.pp .face.flag img { outline:3px solid var(--pur); outline-offset:-3px; }
+.pg2 { border:1px solid var(--line); border-radius:14px; padding:10px; margin-top:10px; }
+.pg2 .gh { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:14px; font-weight:800; }
+.pg2 .gh input { border:1px solid var(--line); border-radius:8px; padding:5px 8px; width:120px; font-weight:700; }
+.kv { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:13px; } .kv span { color:var(--mute); }
+.tbl { width:100%; border-collapse:collapse; font-size:13px; } .tbl td, .tbl th { border-top:1px solid var(--line); padding:7px 6px; text-align:left; } .tbl th { color:var(--mute); font-weight:700; border-top:0; }
+.phase { font-size:13px; line-height:1.7; color:var(--sub); } .phase b { color:var(--txt); }
+.err-t { color:var(--red); font-weight:700; }
+@media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 class="noprint">검수 <span class="mute small" style="font-weight:600">인쇄 전 PDF·일러스트 파일 점검</span></h2>
+
+  <div class="card noprint" id="setup">
+    <div class="drop" id="drop">
+      <b>PDF 또는 .ai 파일을 여기에 끌어다 놓기</b>
+      <div class="sub small">인디자인 PDF(글자 살아 있는 그대로) · 일러스트는 PDF 호환으로 저장한 .ai</div>
+      <button class="pick" id="pick" type="button">파일 고르기</button>
+      <input type="file" id="file" accept=".pdf,.ai,application/pdf" hidden>
+    </div>
+
+    <div class="fl">파일 종류</div>
+    <div class="seg" id="kind">
+      <button data-v="id" class="on">인디자인 PDF</button><button data-v="ai">일러스트 .ai (아웃라인 전)</button><button data-v="aiF">일러스트 최종 (아웃라인 후)</button>
+    </div>
+    <div class="note" id="kindNote">글자 검사까지 하려면 글자가 살아 있는 파일, 인쇄 검사는 최종 파일로 한 번 더 돌려 주세요.</div>
+
+    <div class="fl">품목</div>
+    <div class="seg" id="prod">
+      <button data-v="print" class="on">일반 인쇄물</button><button data-v="book">책자</button><button data-v="photobook">포토북</button><button data-v="photocard">포토카드</button><button data-v="calendar">달력</button>
+    </div>
+
+    <div class="fl">작업지시서 기준 <span class="mute" style="font-weight:600">(아는 것만 넣어 주세요)</span></div>
+    <div class="row">
+      <span class="small sub">재단</span><input class="inp" id="wW" type="number" step="0.1" placeholder="가로 mm"><span class="mute">×</span><input class="inp" id="wH" type="number" step="0.1" placeholder="세로 mm">
+      <span class="small sub" style="margin-left:6px">페이지</span><input class="inp" id="wP" type="number" placeholder="쪽수">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <select class="inp" id="bind">
+        <option value="none">제본 없음</option><option value="saddle">중철</option><option value="perfect">무선</option><option value="pur">PUR</option><option value="hard">양장</option><option value="layflat">포토북 (레이플랫)</option>
+      </select>
+      <select class="inp" id="paper"></select>
+      <input class="inp" id="paperT" type="number" step="0.01" placeholder="두께 mm" style="display:none">
+      <select class="inp" id="coat"><option value="">코팅 없음</option><option value="gloss">유광 코팅</option><option value="matte">무광 코팅</option></select>
+      <select class="inp" id="layout"><option value="auto">PDF 형태 자동</option><option value="single">낱장</option><option value="spread">펼침면(스프레드)</option></select>
+    </div>
+
+    <details class="set">
+      <summary>검수 기준 바꾸기</summary>
+      <div class="grid2" id="setG"></div>
+      <div class="note">바꾼 값은 이 기기에 저장돼요. <button type="button" id="setReset" style="border:0;background:none;color:var(--acc);font-weight:700;padding:0">기본값으로</button></div>
+    </details>
+  </div>
+
+  <div class="card noprint" id="prog" hidden>
+    <b id="progT">준비 중…</b>
+    <div class="bar"><i id="progB"></i></div>
+    <div class="small mute" id="progS"></div>
+  </div>
+
+  <div id="rep" hidden></div>
+
+  <div class="card noprint">
+    <h3>단계별로 들어가는 검사</h3>
+    <div class="phase">
+      <b>1단계 (지금)</b> 해상도 250ppi · 도련 3mm와 재단선 안쪽 3mm · 펼침면 가운데 가이드선 · 아웃라인 · 별색·단색 선 오버프린트 · 작은 검정 글자 K100 오버프린트 · 넓은 면 리치블랙(C30 M20 Y20 K100) · 칼선·박·형압 등 후가공 별색과 오버프린트 · 너무 작은 글자 · 어두운 바탕 흰 글자 · 잉크 총량 · RGB와 의도 안 한 별색 · 흰색 오버프린트 · 얇은 선과 4도 작은 글자 · 재단 사이즈·쪽수와 제본 · 포토북 첫·끝 페이지 풀칠 3mm · 무선제본 안쪽 여백 제안 · 칼선 위치 · <b>중복 사진</b> · <b>제본 안쪽에 걸린 얼굴·글자</b> · 인물 사진 의견(얼굴 크기, 밝기·피부톤, 코팅 후 어두워짐)<br>
+      <b>2단계 (다음)</b> 이중 띄어쓰기 · 오타 의심 · v/z/w 등 헷갈리는 글자 · 따옴표와 ′″ 혼용 · 일부만 적용된 스타일 · 여백·정렬 의심 · 멤버명·소속사·아티스트·타이틀·품목명 표기(팀 규칙 목록) · 페이지 순서·목차 · 저작권·판권 · 영문/한글 혼용 · 멤버별 사진 수 표 · 사진과 이름 매칭 · 바코드·ISBN·QR 읽힘 · 달력 주말·공휴일·생일·기념일·중복/누락 날짜<br>
+      <span class="mute">이미지가 파일에 포함(임베드)됐는지는 PDF만으로 알 수 없어요. 일러스트·인디자인의 링크 패널이나 데스크탑 스크립트로 확인해 주세요.</span>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="vw">
+  <div class="vh"><button class="ib" id="vPrev" aria-label="이전 페이지">‹</button><b id="vT"></b><button class="ib" id="vZoom">확대</button><button class="ib" id="vNext" aria-label="다음 페이지">›</button><button class="ib" id="vX" aria-label="닫기">✕</button></div>
+  <div class="vb"><div class="vc" id="vc"><div class="stage" id="stage"></div></div><div class="vl" id="vl"></div></div>
+</div></div>
+
+<script>
+// 라이브러리 위치 (미리보기 빌드에서 로컬 경로로 바뀜)
+var LIBS = {
+  pdfjs: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  worker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  pdflib: 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js',
+  face: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js',
+  model: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/'
+};
+</script>
+<script src="app.js?v=20261118a"></script>
+</body>
+</html>
