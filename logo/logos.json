@@ -2430,10 +2430,10 @@
 "w": 1
 },
 {
-"n": "WM Entertainment",
+"n": "WM Entertainment (구 · 현 StrangeLab)",
 "c": "agency",
-"b": "WM Entertainment",
-"k": "더블유엠 WM",
+"b": "WM",
+"k": "더블유엠 WM 구로고 스트레인지랩 이전",
 "d": 0,
 "f": "logo/ai/Agency/WM.ai",
 "s": "logo/svg/WM.svg",
@@ -2450,10 +2450,10 @@
 "w": 1
 },
 {
-"n": "Yuehua Entertainment",
+"n": "Yuehua (구 로고 · 현 YH)",
 "c": "agency",
-"b": "Yuehua Entertainment",
-"k": "위에화",
+"b": "Yuehua",
+"k": "위에화 구로고 YH엔터테인먼트 이전",
 "d": 0,
 "f": "logo/ai/Agency/Yuehua.ai",
 "s": "logo/svg/Yuehua.svg",
@@ -2510,9 +2510,9 @@
 "w": 1
 },
 {
-"n": "TOMORROW X TOGETHER",
+"n": "TXT 심볼 (앨범 시즌)",
 "c": "artist",
-"b": "TOMORROW X TOGETHER",
+"b": "TXT",
 "k": "투모로우바이투게더 투바투 TXT",
 "d": 0,
 "f": "logo/ai/Artist/TXT.ai",
@@ -2630,10 +2630,10 @@
 "w": 1
 },
 {
-"n": "NHN Bugs",
+"n": "Bugs!",
 "c": "distributor",
 "b": "NHN Bugs",
-"k": "벅스 NHN벅스",
+"k": "벅스 NHN벅스 서비스로고",
 "d": 0,
 "f": "logo/ai/Distributor/Bugs.ai",
 "s": "logo/svg/Bugs.svg",
@@ -2677,6 +2677,36 @@
 "d": 0,
 "f": "logo/ai/Distributor/Mirrorball.ai",
 "s": "logo/svg/Mirrorball.svg",
+"w": 1
+},
+{
+"n": "YH Entertainment",
+"c": "agency",
+"b": "YH Entertainment",
+"k": "와이에이치 YH엔터 위에화",
+"d": 0,
+"f": "logo/ai/Agency/YH.ai",
+"s": "logo/svg/YH.svg",
+"w": 1
+},
+{
+"n": "StrangeLab",
+"c": "agency",
+"b": "StrangeLab",
+"k": "스트레인지랩 스트레인지 랩 WM",
+"d": 0,
+"f": "logo/ai/Agency/StrangeLab.ai",
+"s": "logo/svg/StrangeLab.svg",
+"w": 1
+},
+{
+"n": "TOMORROW X TOGETHER",
+"c": "artist",
+"b": "TOMORROW X TOGETHER",
+"k": "투모로우바이투게더 투바투 TXT 워드마크",
+"d": 0,
+"f": "logo/ai/Artist/TXT_Wordmark.ai",
+"s": "logo/svg/TXT_Wordmark.svg",
 "w": 1
 }
 ]
