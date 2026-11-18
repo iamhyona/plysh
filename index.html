@@ -676,7 +676,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .gdc span { grid-column:1; font-size:13.5px; color:var(--sub); line-height:1.5; }
 .gdg + .gdg { margin-top:22px; }
 .gdg h4 { margin:0 4px 10px; font-size:13px; font-weight:700; color:var(--sub); letter-spacing:0.02em; }
-.gdc .gds { display:flex; flex-wrap:wrap; gap:6px; grid-column:1 / span 2; margin-top:6px; }
+.gdc .gds { display:none; /* 2026-11-18 섹션 버튼 숨김 */ display:none !important; flex-wrap:wrap; gap:6px; grid-column:1 / span 2; margin-top:6px; }
 .gds button { font:inherit; font-size:12.5px; font-weight:600; color:var(--sub); background:#f1f3f6; border:0; border-radius:999px; padding:5px 11px; cursor:pointer; }
 .gds button:hover { color:var(--txt); background:#e6e9ee; }
 .gdl .gdc i { grid-row:1; }
@@ -1098,7 +1098,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261118qp1';
+var APP_VER = '20261118gd6';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1558,7 +1558,7 @@ function lgBody() {
 }
 // GUIDE 메뉴 (2026-11-10): 목록은 화면에, 문서는 아래에서 올라오는 창으로
 // 2026-11-18: 업무 및 행정 / 디자인 작업 2그룹, 아래 항목은 해당 섹션 바로가기
-var GUIDE_GROUPS = [{"g":"업무 및 행정","i":[{"f":"g.html?id=office","t":"사무실 이용 가이드","s":[["사무실 출입","door"],["나스(NAS)","nas"],["와이파이","wifi"],["복합기 사용","printer"]]},{"f":"g.html?id=admin","t":"행정업무 가이드","s":[["퀵","quick"],["법인택시","taxi"],["법인카드 사용","corpcard"],["개인 지출결의 작성","expense"],["명함 제작","namecard"]]},{"f":"g.html?id=system","t":"업무 시스템 가이드","s":[["위하고 접속","wehago"],["메일플러그 접속","mailplug"],["메일 서명 수정","signature"]]}]},{"g":"디자인 작업","i":[{"f":"folder-file.html","t":"폴더 및 파일 가이드","s":[]},{"f":"g.html?id=illustrator","t":"일러스트 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["새 문서·저장","save"]]},{"f":"g.html?id=photoshop","t":"포토샵 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["문서 기준","doc"]]},{"f":"g.html?id=indesign","t":"인디자인 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["저장·전달","save"]]},{"f":"g.html?id=bridge","t":"브릿지 셋팅","s":[["색상 설정 동기화","color"],["작업 영역","workspace"],["환경설정","prefs"],["일괄 이름 바꾸기","rename"],["레이블·별점","label"]]},{"f":"g.html?id=acrobat","t":"아크로뱃 셋팅","s":[["작업 영역 (도구·탭)","workspace"],["환경설정","prefs"],["인쇄 PDF 검수","check"],["피드백·비교","feedback"]]},{"f":"g.html?id=label","t":"상품 라벨 스티커 데이터 (와우프레스)","s":[["주문 옵션","option"],["데이터 만들기","data"],["체크 포인트","check"]]},{"f":"packshot.html","t":"시즌그리팅 팩샷 작업가이드","s":[]},{"f":"g.html?id=photocard","t":"포토카드 제작 유의사항","s":[["기본 규격","spec"],["사진 작업","image"],["앞·뒷면","back"],["발주·검수","order"]]}]}];
+var GUIDE_GROUPS = [{"g":"업무 및 행정","i":[{"f":"g.html?id=office","t":"사무실 이용 가이드","s":[["사무실 출입","door"],["나스(NAS)","nas"],["와이파이","wifi"],["복합기 사용","printer"]]},{"f":"g.html?id=admin","t":"행정업무 가이드","s":[["퀵","quick"],["법인택시","taxi"],["법인카드 사용","corpcard"],["개인 지출결의 작성","expense"],["명함 제작","namecard"]]},{"f":"g.html?id=system","t":"업무 시스템 가이드","s":[["위하고 접속","wehago"],["메일플러그 접속","mailplug"],["메일 서명 수정","signature"]]}]},{"g":"디자인 작업 기본설정","i":[{"f":"folder-file.html","t":"폴더 및 파일 가이드","s":[]},{"f":"g.html?id=illustrator","t":"일러스트 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["새 문서·저장","save"]]},{"f":"g.html?id=photoshop","t":"포토샵 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["문서 기준","doc"]]},{"f":"g.html?id=indesign","t":"인디자인 셋팅","s":[["작업 영역 (툴박스·패널·탭)","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["저장·전달","save"]]},{"f":"g.html?id=bridge","t":"브릿지 셋팅","s":[["색상 설정 동기화","color"],["작업 영역","workspace"],["환경설정","prefs"],["일괄 이름 바꾸기","rename"],["레이블·별점","label"]]},{"f":"g.html?id=acrobat","t":"아크로뱃 셋팅","s":[["작업 영역 (도구·탭)","workspace"],["환경설정","prefs"],["인쇄 PDF 검수","check"],["피드백·비교","feedback"]]}]},{"g":"디자인 실무","i":[{"f":"g.html?id=label","t":"상품 라벨 스티커 (와우프레스)","s":[["주문 옵션","option"],["데이터 만들기","data"],["체크 포인트","check"]]},{"f":"packshot.html","t":"시즌그리팅 팩샷","s":[]},{"f":"g.html?id=photocard","t":"포토카드","s":[["기본 규격","spec"],["사진 작업","image"],["앞·뒷면","back"],["발주·검수","order"]]}]}];
 var GUIDES = [];
 GUIDE_GROUPS.forEach(function (gr) { gr.i.forEach(function (g) { GUIDES.push(g); }); });
 function renderGuide() {
@@ -3291,8 +3291,29 @@ function qpDraw() {
   $('#qpCap').textContent = mp ? '미리보기 · A4 한 장에 주소 + 지도 1개' : '미리보기 · A4 한 장에 2개 (위·아래 같은 라벨)';
   $('#qpTo').innerHTML = mp ? '<div class="qklb full">' + qpHtml(r) + '<img class="mp" src="' + mp + '" alt=""></div>' : '<div class="qklb">' + qpHtml(r) + '</div>';
 }
+function qpFrame(html) {
+  var o = document.getElementById('qpFr'); if (o) o.remove();
+  var f = document.createElement('iframe'); f.id = 'qpFr'; f.setAttribute('aria-hidden', 'true');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(f);
+  var css = '';
+  [].forEach.call(document.styleSheets, function (ss) { try { [].forEach.call(ss.cssRules, function (r) { if (r.media && /print/.test(r.media.mediaText)) [].forEach.call(r.cssRules, function (x) { css += x.cssText + '\n'; }); }); } catch (e) {} });
+  var links = [].map.call(document.querySelectorAll('link[rel="stylesheet"]'), function (l) { return '<link rel="stylesheet" href="' + l.href + '">'; }).join('');
+  var d = f.contentWindow.document;
+  d.open();
+  d.write('<!doctype html><html><head><meta charset="utf-8">' + links + '<style>html,body{margin:0;background:#fff;font-family:' + getComputedStyle(document.body).fontFamily.replace(/"/g, "'") + ';}' + css + '</style></head><body><div id="qkLabel">' + html + '</div></body></html>');
+  d.close();
+  var w = f.contentWindow, done = false, go = function () { if (done) return; done = true; try { w.focus(); w.print(); } catch (e) { toast('인쇄를 열지 못했어요'); } };
+  var im = d.querySelector('img'), ready = [];
+  if (im && !im.complete) ready.push(new Promise(function (ok) { im.onload = im.onerror = ok; }));
+  if (d.fonts && d.fonts.ready) ready.push(d.fonts.ready);
+  Promise.all(ready).then(function () { setTimeout(go, 120); });
+  setTimeout(go, 2500); // 혹시 로딩이 멈춰도 인쇄 창은 열리게
+}
 $('#qpGo').onclick = function () {
   var mp = qpMap(QP.r);
+  // 2026-11-18: 지도 있는 라벨은 앱 화면 대신 숨은 창(iframe)에서 인쇄 — 앱 화면이 인쇄 화면으로 바뀌고 미리보기가 안 뜨던 문제
+  if (mp) { closeBs(); qpFrame('<div class="lbp"><div class="lbh lbfull">' + qpHtml(QP.r) + '<img class="lbmap" src="' + new URL(mp, location.href).href + '" alt=""></div></div>'); return; }
   $('#qkLabel').innerHTML = mp ? '<div class="lbp"><div class="lbh lbfull">' + qpHtml(QP.r) + '<img class="lbmap" src="' + mp + '" alt=""></div></div>' : '<div class="lbp"><div class="lbh">' + qpHtml(QP.r) + '</div><div class="lbcut"></div><div class="lbh lbh2">' + qpHtml(QP.r) + '</div></div>';
   closeBs();
   // 2026-11-18: 지도 이미지는 미리보기에서 이미 불러와 있어서 기다리지 않고 바로 인쇄 (기다리면 인쇄 창이 안 뜨는 문제)
