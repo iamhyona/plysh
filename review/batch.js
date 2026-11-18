@@ -98,9 +98,9 @@ function showSpecSum() {
   var it = SPEC.items, h = '', v = '';
   if (MODE === 'none') { $('#specSum').innerHTML = '사양서 없이 검수해요. 크기·쪽수는 파일 기준으로만 봐요.'; $('#specView').innerHTML = ''; return; }
   if ((MODE === 'plysh' || MODE === 'link') && SPEC.sheet) {
-    var sh = SPEC.sheet, url = sh.url || 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit';
+    var sh = SPEC.sheet, tg = (sh.tabs || []).find(function (t) { return t && t.n === sh.tab; }), url = 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' + (tg && tg.g != null ? '#gid=' + tg.g : '');
     h += (sh.auto ? '<span class="mute">파일 아티스트로 가장 최근 사양서를 골라 뒀어요. 다르면 위에서 바꿔 주세요.</span><br>' : '') + '<b>' + esc(sh.name) + '</b> <a href="' + esc(url) + '" target="_blank" rel="noopener">시트 열기</a>';
-    if (sh.tabs && sh.tabs.length > 1) h += ' · 탭 <select class="inp" id="specTab" style="padding:3px 6px;font-size:12.5px">' + sh.tabs.map(function (t) { return '<option' + (t === sh.tab ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</select>';
+    if (sh.tabs && sh.tabs.length > 1) h += ' · 탭 <select class="inp" id="specTab" style="padding:3px 6px;font-size:12.5px">' + sh.tabs.map(function (t) { var n = t && t.n != null ? t.n : t; return '<option' + (n === sh.tab ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select>';
     h += '<br>품목 ' + it.length + '개를 읽었어요. 아래 내용이 맞는지 확인해 주세요.';
   } else if (it.length) h += '품목 ' + it.length + '개를 읽었어요. 아래 내용이 맞는지 확인해 주세요.';
   else if (MODE === 'plysh') h = SPEC.specs.length ? '사양서를 고르면 내용을 보여줘요.' : '';
