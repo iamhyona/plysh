@@ -274,7 +274,12 @@ var RULES = { '공통': '' }, CUR = '공통', RKEY = 'rv:rules2', R_OLD = false;
 function rulesFor(artist) { return [RULES['공통'] || '', artist && RULES[artist] || ''].filter(function (s) { return s.trim(); }).join('\n\n'); }
 function cacheRules() { ls.set(RKEY, JSON.stringify(RULES)); }
 function say(t, bad) { var st = $('#rulesSt'); st.textContent = t; st.style.color = bad ? '#c2410c' : ''; }
-function cnt() { var r = RV2.parseRules($('#rulesTa').value); $('#rulesCnt').textContent = '· ' + CUR + ' 멤버 ' + r.members.length + ' · 표기 ' + r.terms.length + ' · 날짜 ' + r.days.length; }
+function cnt() {
+  var r = RV2.parseRules($('#rulesTa').value), n = r.members.length + r.terms.length + r.days.length;
+  $('#rulesCnt').textContent = '· ' + CUR + ' 멤버 ' + r.members.length + ' · 표기 ' + r.terms.length + ' · 날짜 ' + r.days.length;
+  var sm = $('#rulesSum'); if (!sm) return;
+  sm.innerHTML = n ? '<b>' + esc(CUR) + '</b> 규칙: ' + esc(r.members.map(function (m) { return m.forms.join('/'); }).slice(0, 6).join(', ') + (r.members.length > 6 ? ' 외' : '')) + (r.terms.length ? ' · 표기 ' + r.terms.length + '개' : '') + (r.days.length ? ' · 날짜 ' + r.days.length + '개' : '') : '<b>' + esc(CUR) + '</b> 규칙이 아직 없어요. 직접 입력으로 넣으면 팀 시트에 저장돼요.';
+}
 function drawArtChips() {
   var fileA = Q.map(function (q) { return q.artist; }).filter(Boolean), list = ['공통'];
   fileA.concat(Object.keys(RULES)).forEach(function (a) { if (a && list.indexOf(a) < 0) list.push(a); });
@@ -304,10 +309,10 @@ function save(a) {
   }, function (e) { saving = false; say('시트에 저장하지 못했어요 (' + (e && e.message || e) + ') · 이 기기에는 저장됨', true); });
 }
 function setupRules() {
-  var ta = $('#rulesTa'); ta.placeholder = RV2.RULES_EX; ta.value = RULES[CUR] || '';
+  var ta = $('#rulesTa'); ta.placeholder = '한 줄에 하나씩 적어 주세요.\n[멤버]\n한글 이름 / 영문 이름 = 틀린 표기, 틀린 표기\n\n[표기]\n정식 표기 = 틀린 표기\n\n[생일·기념일]\n월/일 내용'; ta.value = RULES[CUR] || '';
+  $('#rulesOpen').onclick = function () { ta.hidden = !ta.hidden; this.textContent = ta.hidden ? '직접 입력' : '입력 닫기'; if (!ta.hidden) ta.focus(); };
   ta.oninput = function () { RULES[CUR] = ta.value; cacheRules(); cnt(); drawArtChips(); if (A) { say('입력 중…'); var a = CUR; clearTimeout(timer); timer = setTimeout(function () { timer = null; save(a); }, 1500); } };
   ta.onblur = function () { flush(); };
-  $('#rulesEx').onclick = function () { ta.value = ta.value.trim() ? ta.value.replace(/\s+$/, '') + '\n\n' + RV2.RULES_EX : RV2.RULES_EX; ta.oninput(); };
   $('#artQ').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); pickArtist(this.value); } };
   $('#artQ').onchange = function () { pickArtist(this.value); };
   $('#artQ').oninput = function () { if (ARTISTS.indexOf(this.value.trim()) >= 0) pickArtist(this.value); };
