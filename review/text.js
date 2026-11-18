@@ -179,9 +179,12 @@ function textChecks(R, rules) {
     var hits = []; all.forEach(function (s) { var m = s.t.match(o[0]); if (m) hits.push({ P: s.P, b: subBox(s, s.t.indexOf(m[0]), 1), s: s.t }); });
     perPage('oddchar', 'warn', '헷갈리는 글자가 있어요: ' + o[1], '보기엔 비슷해도 다른 글자예요. 다시 입력해 주세요.', hits, function (L) { return L.length + '곳 · ' + L.slice(0, 2).map(function (h) { return '“' + cut(h.s, 24) + '”'; }).join(', '); });
   });
-  // v·z·w 들어간 영문 단어 모아 보기
-  var vzw = {}; all.forEach(function (s) { (s.t.match(/[A-Za-z]*[vzwVZW][A-Za-z]*/g) || []).forEach(function (w) { if (w.length < 2) return; (vzw[w] = vzw[w] || new Set()).add(s.P.i + 1); }); });
-  var vk = Object.keys(vzw); if (vk.length) issue({ page: null, sev: 'info', cat: 'text', code: 'vzw', title: 'v·z·w 들어간 영문 단어 모아 보기', detail: vk.slice(0, 40).map(function (w) { return w + ' (' + Array.from(vzw[w]).slice(0, 4).join(',') + '쪽)'; }).join(', '), fix: '철자·서체 모양이 맞는지 한 번 훑어봐 주세요.', boxes: [] });
+  // 인디자인 단축키(v · z · w 등)가 실수로 찍혀 혼자 떨어져 있는 영문 한 글자
+  var stray = []; all.forEach(function (s) { var re = /(^|[^A-Za-z0-9'’&.-])([vzwVZWtTpP])(?=$|[^A-Za-z0-9'’&.])/g, m; while ((m = re.exec(s.t))) {
+    var at = m.index + m[1].length, ch = m[2];
+    if (/[tTpP]/.test(ch) && !/^\s*$/.test(s.t.replace(ch, ''))) continue; // t · p는 그 글자만 따로 있는 덩어리일 때만
+    stray.push({ P: s.P, b: subBox(s, Math.max(0, at - 2), 5), s: s.t.slice(Math.max(0, at - 10), at + 10), ch: ch }); } });
+  perPage('vzw', 'warn', '혼자 떨어진 영문 한 글자', '단축키(v · z · w 등)가 잘못 찍힌 것 같으면 지우기', stray, function (L) { return L.length + '곳 · ' + L.slice(0, 3).map(function (h) { return '“' + cut(h.s, 20) + '”'; }).join(', '); });
   // 4) 오타 의심: 한글 자주 틀리는 말, 같은 단어 반복, 사전·문서 안 단어와 한두 글자 차이
   var tk = []; all.forEach(function (s) { TYPO_KO.forEach(function (t) { var re = new RegExp(t[0].source, 'g'), m; while ((m = re.exec(s.t))) tk.push({ P: s.P, b: subBox(s, m.index, m[0].length), w: m[0], to: t[1] }); }); });
   perPage('typoko', 'warn', '맞춤법 의심', '바른 표기를 확인해 주세요.', tk, function (L) { return L.slice(0, 4).map(function (h) { return h.w + ' → ' + h.to; }).join(', '); }, true);
@@ -271,15 +274,15 @@ function repeatChecks(R) {
     });
   });
   // 판권·저작권
-  var cr = /(©|\(c\)|copyright|all rights reserved|판권|무단\s*(복제|전재|배포)|unauthorized|manufactured by|distributed by)/i, crP = [];
+  var cr = /(©|℗|Ⓟ|Ⓒ|\(c\)|\(p\)\s*&|copyright|all rights reserved|판권|무단\s*(복제|전재|배포)|unauthorized|manufactured by|distributed by)/i, crP = [];
   R.pages.forEach(function (P) { if (segsOf(P).some(function (s) { return cr.test(s.t); })) crP.push(P.i); });
   var txt = R.pages.some(function (P) { return (P.tc || []).length; });
-  if (txt && !crP.length) issue({ page: null, sev: 'warn', cat: 'text', code: 'nocopy', title: '판권·저작권 표기를 찾지 못했어요', detail: '©, Copyright, All rights reserved, 판권, 무단 복제 같은 문구가 없어요.', fix: '판권 면이나 하단 저작권 문구가 들어가야 하는 품목인지 확인해 주세요.', boxes: [], sus: true });
+  if (txt && !crP.length) issue({ page: null, sev: 'warn', cat: 'text', code: 'nocopy', title: '리걸 문구 없음', detail: '©, Ⓟ&Ⓒ, All rights reserved 없음', fix: '필요 품목인지 확인', boxes: [], sus: true });
   if (crP.length) {
     var years = {}; R.pages.forEach(function (P) { segsOf(P).forEach(function (s) { if (!/©|\(c\)|copyright/i.test(s.t)) return; var y = s.t.match(/(19|20)\d{2}/); if (y) (years[y[0]] = years[y[0]] || []).push({ P: P, s: s }); }); });
     var ys = Object.keys(years).sort(function (a, b) { return years[b].length - years[a].length; });
     if (ys.length > 1) ys.slice(1).forEach(function (y) { years[y].forEach(function (x) { issue({ page: x.P.i, sev: 'warn', cat: 'text', code: 'copyyear', title: '저작권 연도가 다른 페이지와 달라요', detail: '이 페이지 ' + y + ' · 다른 페이지 ' + ys[0] + ' (' + years[ys[0]].length + '곳)', fix: '연도를 확인해 주세요.', boxes: [x.s.b] }); }); });
-    issue({ page: null, sev: 'info', cat: 'text', code: 'copyok', title: '판권·저작권 문구', detail: crP.length + '개 페이지에 있어요 (' + crP.slice(0, 10).map(function (p) { return p + 1; }).join(',') + '쪽)', fix: '', boxes: [] });
+    issue({ page: null, sev: 'info', cat: 'text', code: 'copyok', title: '리걸 문구', detail: crP.length + '개 페이지에 있어요 (' + crP.slice(0, 10).map(function (p) { return p + 1; }).join(',') + '쪽)', fix: '', boxes: [] });
   }
 }
 function diffHint(a, b) {
@@ -363,7 +366,15 @@ async function barcodes(R, pdfjs) {
       var out = []; list.forEach(function (f) { var c = out.find(function (o) { return f.box[0] < o[2] + 4 * MM && f.box[2] > o[0] - 4 * MM && f.box[1] < o[3] + 4 * MM && f.box[3] > o[1] - 4 * MM; }); if (c) { c[0] = Math.min(c[0], f.box[0]); c[1] = Math.min(c[1], f.box[1]); c[2] = Math.max(c[2], f.box[2]); c[3] = Math.max(c[3], f.box[3]); c.n++; } else { var o = f.box.slice(); o.n = 1; out.push(o); } }); return out.filter(function (o) { return o.n >= minN; });
     }
     cluster(bars, 20).forEach(function (b) { cands.push({ P: P, b: b, kind: 'bar' }); });
-    cluster(sq, 60).forEach(function (b) { cands.push({ P: P, b: b, kind: 'qr' }); });
+    cluster(sq, 60).forEach(function (b) { // QR은 정사각형 · 모듈 크기 일정 · 채움 30~75% (FSC 같은 로고 제외)
+      var w = b[2] - b[0], h = b[3] - b[1]; if (w < 6 * MM || h / w < 0.8 || h / w > 1.25) return;
+      var inb = sq.filter(function (f) { return f.box[0] >= b[0] - 0.01 && f.box[2] <= b[2] + 0.01 && f.box[1] >= b[1] - 0.01 && f.box[3] <= b[3] + 0.01; });
+      var sz = inb.map(function (f) { return f.box[2] - f.box[0]; }).sort(function (x, y) { return x - y; }), mod = sz[Math.floor(sz.length / 2)] || 1;
+      var same = sz.filter(function (v) { return Math.abs(v - mod) < 0.15 * mod || Math.abs(v / mod - Math.round(v / mod)) < 0.15; }).length / Math.max(1, sz.length);
+      var cover = inb.reduce(function (a, f) { return a + (f.box[2] - f.box[0]) * (f.box[3] - f.box[1]); }, 0) / (w * h);
+      if (same < 0.8 || cover < 0.25 || cover > 0.8) return;
+      cands.push({ P: P, b: b, kind: 'qr' });
+    });
     (P.images || []).forEach(function (im) { /* 이미지 속 바코드는 아래 전체 페이지 스캔으로 */ });
     if (isbn.length) P._isbn = isbn;
   });
@@ -380,15 +391,35 @@ async function barcodes(R, pdfjs) {
     cv.width = Math.max(10, Math.round(r[2] - r[0])); cv.height = Math.max(10, Math.round(r[3] - r[1]));
     var cx = cv.getContext('2d', { willReadFrequently: true }); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.translate(-r[0], -r[1]);
     await pg.render({ canvasContext: cx, viewport: vp, intent: 'print' }).promise;
-    try { var src = new ZXing.HTMLCanvasElementLuminanceSource(cv), bmp = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src)); var res = reader.decode(bmp); return { text: res.getText(), fmt: ZXing.BarcodeFormat[res.getBarcodeFormat()] }; } catch (e) { return null; }
+    try { var src = new ZXing.HTMLCanvasElementLuminanceSource(cv), bmp = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src)); var res = reader.decode(bmp); return { text: res.getText(), fmt: ZXing.BarcodeFormat[res.getBarcodeFormat()] }; } catch (e) { decodeRegion.last = cv; return null; }
+  }
+  // QR 모서리 표식(검-흰-검검검-흰-검 1:1:3:1:1)이 3곳 이상 있어야 진짜 QR로 봄
+  function hasFinders(cv) {
+    var W = cv.width, H = cv.height, d = cv.getContext('2d').getImageData(0, 0, W, H).data, hits = [];
+    for (var y = 0; y < H; y += 2) {
+      var runs = [], cur = -1, len = 0, x0 = 0;
+      for (var x = 0; x < W; x++) { var i = (y * W + x) * 4, k = (d[i] + d[i + 1] + d[i + 2]) < 384 ? 1 : 0; if (k === cur) len++; else { if (cur >= 0) runs.push([cur, len, x0]); cur = k; len = 1; x0 = x; } }
+      runs.push([cur, len, x0]);
+      for (var r = 0; r + 4 < runs.length; r++) {
+        if (runs[r][0] !== 1) continue; var u = (runs[r][1] + runs[r + 1][1] + runs[r + 2][1] + runs[r + 3][1] + runs[r + 4][1]) / 7; if (u < 1.5) continue;
+        var ok = [1, 1, 3, 1, 1].every(function (m, j) { return Math.abs(runs[r + j][1] - m * u) < 0.5 * m * u + 1; });
+        if (ok) hits.push([runs[r + 2][2] + runs[r + 2][1] / 2, y, u]);
+      }
+    }
+    var groups = []; hits.forEach(function (h) { var g = groups.find(function (g) { return Math.abs(g.x - h[0]) < 3 * h[2] && Math.abs(g.y - h[1]) < 5 * h[2]; }); if (g) { g.n++; g.y = h[1]; } else groups.push({ x: h[0], y: h[1], n: 1 }); });
+    return groups.filter(function (g) { return g.n >= 2; }).length >= 3;
   }
   for (var i = 0; i < cands.length && i < 40; i++) {
     var c = cands[i], res = await decodeRegion(c.P, c.b);
+    if (!res && c.kind === 'qr' && !(decodeRegion.last && hasFinders(decodeRegion.last))) continue; // QR 모양이 아니면(로고 등) 알리지 않음
     if (!res) { issue({ page: c.P.i, sev: 'err', cat: 'print', code: 'bcfail', title: (c.kind === 'qr' ? 'QR코드' : '바코드') + '가 읽히지 않아요', detail: '크기 ' + mm(c.b[2] - c.b[0]).toFixed(1) + '×' + mm(c.b[3] - c.b[1]).toFixed(1) + 'mm', fix: c.kind === 'qr' ? '여백(조용한 영역)과 크기(최소 15mm)를 확인해 주세요.' : '크기(80% 이상), 바 색(K100), 여백을 확인해 주세요.', boxes: [c.b], sus: true }); continue; }
     c.res = res;
-    var msg = res.fmt + ' · ' + res.text, bad = '';
+    var dg = String(res.text).replace(/\D/g, ''), chk = null;
+    if (/EAN_13|EAN_8|UPC_A|UPC_E/.test(res.fmt) && dg.length >= 8) { var sm = 0; for (var qq = dg.length - 2, ww = 3; qq >= 0; qq--, ww = 4 - ww) sm += +dg[qq] * ww; chk = (10 - sm % 10) % 10 === +dg[dg.length - 1]; }
+    var bw = mm(c.b[2] - c.b[0]), bh = mm(c.b[3] - c.b[1]);
+    var msg = res.fmt + ' · ' + res.text + ' · ' + bw.toFixed(1) + '×' + bh.toFixed(1) + 'mm' + (chk === null ? '' : chk ? ' · 체크 숫자 맞음' : ' · 체크 숫자 틀림'), bad = chk === false ? '바코드 체크 숫자 틀림' : '';
     if (/EAN_13/.test(res.fmt) && c.P._isbn) { var t = c.P._isbn.map(function (s) { return s.t.replace(/\D/g, ''); }).join(' '); if (t.indexOf(res.text) < 0) bad = '바코드 번호(' + res.text + ')가 ISBN 글자와 달라요'; }
-    issue({ page: c.P.i, sev: bad ? 'err' : 'info', cat: 'print', code: 'bcok', title: bad || ((c.kind === 'qr' ? 'QR코드' : '바코드') + ' 읽힘'), detail: msg, fix: bad ? '바코드와 번호를 다시 확인해 주세요.' : (c.kind === 'qr' ? '주소가 맞는지 열어 봐 주세요.' : ''), boxes: [c.b] });
+    issue({ page: c.P.i, sev: bad ? 'err' : 'info', cat: 'print', code: 'bcok', title: bad || ((c.kind === 'qr' ? 'QR코드' : '바코드') + ' 읽힘'), detail: msg, fix: bad ? '바코드와 번호를 다시 확인해 주세요.' : (c.kind === 'qr' ? '주소가 맞는지 열어 봐 주세요.' : ''), boxes: [c.b], bc: { fmt: res.fmt, text: res.text, w: bw, h: bh, chk: chk, kind: c.kind } });
   }
   pagesISBN.forEach(function (P) { if (!cands.some(function (c) { return c.P === P; })) issue({ page: P.i, sev: 'warn', cat: 'print', code: 'isbnbar', title: 'ISBN 글자는 있는데 바코드를 찾지 못했어요', detail: '이미지로 들어간 바코드면 판독을 못 했을 수 있어요.', fix: '바코드가 있는지, 벡터(K100)로 들어갔는지 확인해 주세요.', boxes: P._isbn.map(function (s) { return s.b; }), sus: true }); });
 }
