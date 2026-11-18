@@ -137,6 +137,7 @@ nav button { flex:none; border:0; background:none; padding:12px 0 10px; font-siz
 nav button.on { color:var(--txt); border-bottom-color:var(--txt); }
 
 main { max-width:560px; margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
+#rvWrap { max-width:1120px; margin:0 auto; } #rvF { display:block; width:100%; border:0; background:var(--bg); }
 .card { background:var(--card); border-radius:20px; padding:22px 20px; margin-bottom:12px; }
 .ct { font-size:17px; font-weight:700; margin:0 0 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .ct small { font-size:13px; font-weight:500; color:var(--mute); }
@@ -871,10 +872,12 @@ details.fday:not([open]) > summary { margin-bottom:0; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="pj">PROJECT</button><button data-v="month">CALENDAR</button><button data-v="qk">QUICK</button><button data-v="todo">TO DO LIST</button><button data-v="exp">EXPENSE</button><button data-v="wl">WORK LOG</button><button data-v="logo" type="button">LOGO</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
+    <button data-v="pj">PROJECT</button><button data-v="month">CALENDAR</button><button data-v="qk">QUICK</button><button data-v="todo">TO DO LIST</button><button data-v="exp">EXPENSE</button><button data-v="wl">WORK LOG</button><button data-v="logo" type="button">LOGO</button><button data-v="review" type="button">PREFLIGHT</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
   </nav>
 </header>
 <main id="main"><div class="ld">불러오는 중…</div></main>
+<!-- 검수 메뉴 (2026-11-18): review/ 페이지를 그대로 띄움. 다른 메뉴 갔다 와도 결과 유지 -->
+<div id="rvWrap" class="hide"><iframe id="rvF" title="PREFLIGHT"></iframe></div>
 <button class="fab" id="fab" aria-label="일정 추가"></button>
 <div class="dimbg" id="dimbg"></div>
 
@@ -1098,7 +1101,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261118qp5';
+var APP_VER = '20261118pf1';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1575,12 +1578,20 @@ function openGd(g, anchor) {
   var was = !!$('.bs.open'); closeBs();
   setTimeout(function () { openBs('#gd'); $('#gd').style.height = $('#gd').style.maxHeight; }, was ? 230 : 0);
 }
+// 검수 메뉴 (2026-11-18): 인쇄 전 PDF·.ai 검수. 화면 높이에 맞춘 iframe 으로 review/ 를 띄운다
+function rvSize() { var f = $('#rvF'), h = document.querySelector('header'); if (f) f.style.height = (window.innerHeight - (h ? h.offsetHeight : 0)) + 'px'; }
+function renderReview() {
+  var f = $('#rvF'); if (!f.getAttribute('src')) f.setAttribute('src', 'review/?v=' + APP_VER);
+  rvSize(); window.scrollTo(0, 0);
+}
+window.addEventListener('resize', function () { if (S.view === 'review') rvSize(); });
 function renderView() {
+  var rvOn = S.view === 'review'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#main').classList.toggle('hide', rvOn);
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' ? 'pj' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || S.view === 'review' || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
