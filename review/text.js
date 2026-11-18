@@ -83,7 +83,7 @@ var DICT = ('JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER
   'BEHIND SCENES MAKING STORY MEMORIES MOMENT MOMENTS SUMMER WINTER SPRING AUTUMN FALL HOLIDAY WEEKEND WEEKLY MONTHLY SCHEDULE PLANNER NOTE NOTES PHOTO PHOTOS PICTURE IMAGE COVER CONTENTS INDEX ' +
   'THANK THANKS LOVE FOREVER TOGETHER FRIENDS FAMILY DREAM DREAMS SPECIAL ORIGINAL VERSION PREMIUM COLLECTION SERIES VOLUME CHAPTER EPISODE MARKET FESTIVAL').split(' ');
 var DICTS = {}; DICT.forEach(function (w) { DICTS[w] = 1; });
-var ODD = [[/[！-～]/, '전각(넓은) 영문·기호'], [/[Ѐ-ӿ]/, '키릴 문자(러시아 글자)'], [/[Ͱ-Ͽ]/, '그리스 문자'], [/[​-‍⁠﻿]/, '보이지 않는 글자(폭 없는 공백)'], [/[-]/, '서체 전용 글자(PUA)'], [/�/, '깨진 글자(�)'], [/[ㄱ-ㆎ](?=[가-힣])|[가-힣][ㄱ-ㆎ]/, '낱자모(ㄱ,ㅏ 등)가 글자 사이에']];
+var ODD = [[/[！-～]/, '전각(넓은) 영문·기호'], [/[Ѐ-ӿ]/, '키릴 문자(러시아 글자)'], [/[Ͱ-Ͽ]/, '그리스 문자'], [/[​-‍⁠﻿]/, '보이지 않는 글자(폭 없는 공백)'], [/[-]/, '서체 전용 글자(PUA)'], [/\ufffd/, '깨진 글자(\ufffd)'], [/[ㄱ-ㆎ](?=[가-힣])|[가-힣][ㄱ-ㆎ]/, '낱자모(ㄱ,ㅏ 등)가 글자 사이에']];
 
 function textChecks(R, rules) {
   var all = [], issue = X.issue;
