@@ -108,57 +108,105 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 .tbl { width:100%; border-collapse:collapse; font-size:13px; } .tbl td, .tbl th { border-top:1px solid var(--line); padding:7px 6px; text-align:left; } .tbl th { color:var(--mute); font-weight:700; border-top:0; }
 .phase { font-size:13px; line-height:1.7; color:var(--sub); } .phase b { color:var(--txt); }
 .err-t { color:var(--red); font-weight:700; }
+.ta { width:100%; min-height:96px; margin-top:8px; font-size:13px; line-height:1.6; resize:vertical; }
+.lnk { border:0; background:none; color:var(--acc); font-weight:700; padding:0; }
+.go { border:0; background:var(--acc); color:#fff; border-radius:12px; padding:12px 20px; font-weight:800; font-size:15px; width:100%; }
+.go:disabled { background:var(--faint); }
+/* 파일 목록 */
+.fr { display:grid; grid-template-columns:minmax(0,1.6fr) 200px minmax(0,1fr) minmax(0,1fr) 28px; gap:6px 8px; align-items:center; padding:9px 0; border-top:1px solid var(--line); font-size:13px; }
+.fr:first-child { border-top:0; }
+.fr .fn { font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fr .fm { grid-column:1 / -1; font-size:12px; color:var(--mute); margin-top:-2px; }
+.fr .inp { width:100%; padding:6px 8px; font-size:12.5px; }
+.fr select.inp { width:100%; }
+.fr .x { border:0; background:var(--chip); border-radius:8px; width:28px; height:28px; font-weight:800; color:var(--sub); }
+#flist:not(:empty) { margin-top:12px; }
+.flh { display:grid; grid-template-columns:minmax(0,1.6fr) 200px minmax(0,1fr) minmax(0,1fr) 28px; gap:6px 8px; font-size:12px; color:var(--mute); font-weight:700; padding:0 0 2px; }
+@media (max-width:700px) { .fr, .flh { grid-template-columns:1fr 1fr; } .fr .fn { grid-column:1 / -1; } .flh { display:none; } }
+.att { display:inline-flex; align-items:center; gap:6px; background:var(--chip); border-radius:10px; padding:4px 6px 4px 8px; font-size:12.5px; font-weight:600; }
+.att img { width:28px; height:28px; object-fit:cover; border-radius:6px; }
+.att button { border:0; background:none; font-weight:800; color:var(--mute); }
+/* 결과 파일 */
+.rf { display:flex; flex-wrap:wrap; gap:8px; }
+.rf button { border:1px solid var(--line); background:#fff; border-radius:12px; padding:8px 12px; text-align:left; font-size:13px; max-width:100%; }
+.rf button.on { border-color:var(--txt); box-shadow:0 0 0 1px var(--txt) inset; }
+.rf button b { display:block; font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px; }
+.rf .c { display:flex; gap:4px; margin-top:4px; } .rf .c i { font-style:normal; font-size:11.5px; font-weight:800; border-radius:5px; padding:1px 6px; }
+.rf .c .e { background:var(--redbg); color:var(--red); } .rf .c .w { background:var(--orgbg); color:#b45309; } .rf .c .o { background:var(--grnbg); color:var(--grn); } .rf .c .f { background:var(--chip); color:var(--sub); }
+/* 체크리스트 */
+details.ck { border-top:1px solid var(--line); }
+details.ck:first-of-type { border-top:0; }
+details.ck > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px; padding:12px 2px; font-weight:800; font-size:15px; }
+details.ck > summary::-webkit-details-marker { display:none; }
+details.ck > summary::before { content:'›'; display:inline-block; width:14px; color:var(--mute); transition:transform .15s; font-size:18px; line-height:1; }
+details.ck[open] > summary::before { transform:rotate(90deg); }
+details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
+.bd i { font-style:normal; font-size:11.5px; font-weight:800; border-radius:6px; padding:2px 7px; }
+.bd .e { background:var(--redbg); color:var(--red); } .bd .w { background:var(--orgbg); color:#b45309; } .bd .o { background:var(--grnbg); color:var(--grn); } .bd .n { background:var(--chip); color:var(--mute); }
+.ci { display:flex; gap:10px; align-items:flex-start; padding:8px 2px 8px 22px; font-size:14px; border-top:1px dashed var(--line); }
+.ci .st { flex:none; width:22px; height:22px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; background:var(--chip); color:var(--faint); }
+.ci .st.ok { background:var(--grnbg); color:var(--grn); } .ci .st.err { background:var(--redbg); color:var(--red); } .ci .st.warn { background:var(--orgbg); color:#b45309; } .ci .st.na { background:var(--chip); color:var(--faint); } .ci .st.man, .ci .st.info { background:#eef5ff; color:var(--acc); }
+.ci .tx { flex:1; min-width:0; } .ci .tx small { display:block; color:var(--sub); font-size:12.5px; margin-top:2px; line-height:1.5; }
+.ci.na .tx { color:var(--mute); }
+.ci .pgs { margin-top:4px; }
+/* 결과지 (인쇄 전용) */
+#sheet { display:none; }
+@media print {
+  body.sheeting .wrap, body.sheeting .ov { display:none !important; }
+  body.sheeting #sheet { display:block; }
+  #sheet section { page-break-after:always; font-size:11.5px; color:#191f28; }
+  #sheet section:last-child { page-break-after:auto; }
+  #sheet h1 { font-size:18px; margin:0 0 4px; } #sheet h2 { font-size:14px; margin:14px 0 6px; }
+  #sheet .meta { color:#4e5968; margin-bottom:10px; }
+  #sheet table { width:100%; border-collapse:collapse; } #sheet td, #sheet th { border:1px solid #d1d6db; padding:4px 6px; text-align:left; vertical-align:top; }
+  #sheet th { background:#f2f4f6; }
+  #sheet .s-err { color:#dc2626; font-weight:800; } #sheet .s-warn { color:#b45309; font-weight:800; } #sheet .s-ok { color:#16a34a; font-weight:800; } #sheet .s-na { color:#8b95a1; }
+  #sheet .thumbs { display:flex; flex-wrap:wrap; gap:6px; } #sheet .thumbs figure { margin:0; width:23%; } #sheet .thumbs img { width:100%; border:1px solid #d1d6db; } #sheet figcaption { font-size:10px; color:#4e5968; }
+}
 @media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h2 class="noprint">PREFLIGHT <span class="mute small" style="font-weight:600">인쇄 전 검수 · PDF·일러스트 파일 점검</span></h2>
+  <h2 class="noprint">PREFLIGHT <span class="mute small" style="font-weight:600">인쇄 전 검수 · PDF · AI · JPG · PNG</span></h2>
 
   <div class="card noprint" id="setup">
     <div class="drop" id="drop">
-      <b>PDF 또는 .ai 파일을 여기에 끌어다 놓기</b>
-      <div class="sub small">인디자인 PDF(글자 살아 있는 그대로) · 일러스트는 PDF 호환으로 저장한 .ai</div>
+      <b>PDF · AI · JPG · PNG 파일을 여기에 끌어다 놓기</b>
+      <div class="sub small">여러 개를 한 번에 넣어도 돼요. 파일 이름으로 종류·품목·아티스트를 알아서 골라요.</div>
       <button class="pick" id="pick" type="button">파일 고르기</button>
-      <input type="file" id="file" accept=".pdf,.ai,application/pdf" hidden>
+      <input type="file" id="file" accept=".pdf,.ai,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" multiple hidden>
     </div>
+    <div id="flist"></div>
 
-    <div class="fl">파일 종류</div>
-    <div class="seg" id="kind">
-      <button data-v="id" class="on">인디자인 PDF</button><button data-v="ai">일러스트 .ai (아웃라인 전)</button><button data-v="aiF">일러스트 최종 (아웃라인 후)</button>
-    </div>
-    <div class="note" id="kindNote">글자 검사까지 하려면 글자가 살아 있는 파일, 인쇄 검사는 최종 파일로 한 번 더 돌려 주세요.</div>
-
-    <div class="fl">품목</div>
-    <div class="seg" id="prod">
-      <button data-v="print" class="on">일반 인쇄물</button><button data-v="book">책자</button><button data-v="photobook">포토북</button><button data-v="photocard">포토카드</button><button data-v="calendar">달력</button>
-    </div>
-
-    <div class="fl">작업지시서 기준 <span class="mute" style="font-weight:600">(아는 것만 넣어 주세요)</span></div>
+    <div class="fl">사양서 <span class="mute" style="font-weight:600">(최종 사양서를 고르거나, 링크·파일·글로 자유롭게)</span></div>
     <div class="row">
-      <span class="small sub">재단</span><input class="inp" id="wW" type="number" step="0.1" placeholder="가로 mm"><span class="mute">×</span><input class="inp" id="wH" type="number" step="0.1" placeholder="세로 mm">
-      <span class="small sub" style="margin-left:6px">페이지</span><input class="inp" id="wP" type="number" placeholder="쪽수">
+      <select class="inp" id="specSel" style="max-width:100%"><option value="">PLYSH 사양서에서 고르기</option></select>
+      <button type="button" class="ib" id="specAttB">파일·이미지 첨부</button>
+      <input type="file" id="specFile" accept=".pdf,.txt,.csv,image/*" multiple hidden>
     </div>
-    <div class="row" style="margin-top:8px">
-      <select class="inp" id="bind">
-        <option value="none">제본 없음</option><option value="saddle">중철</option><option value="perfect">무선</option><option value="pur">PUR</option><option value="hard">양장</option><option value="layflat">포토북 (레이플랫)</option>
-      </select>
-      <select class="inp" id="paper"></select>
-      <input class="inp" id="paperT" type="number" step="0.01" placeholder="두께 mm" style="display:none">
-      <select class="inp" id="coat"><option value="">코팅 없음</option><option value="gloss">유광 코팅</option><option value="matte">무광 코팅</option></select>
-      <select class="inp" id="layout"><option value="auto">PDF 형태 자동</option><option value="single">낱장</option><option value="spread">펼침면(스프레드)</option></select>
-    </div>
+    <textarea id="specTa" class="inp ta" placeholder="사양서 링크(구글 시트)를 붙여 넣거나 내용을 적어 주세요.&#10;예) 포토카드 55×85mm 유광 코팅&#10;    포토북 210×297mm 40p 레이플랫&#10;    엽서 100×148mm 스노우 250g"></textarea>
+    <div id="specAtt" class="row" style="margin-top:6px"></div>
+    <div id="specSum" class="note"></div>
 
     <details class="set" id="rulesBox">
       <summary>팀 표기 규칙 · 생일·기념일 <span class="mute" id="rulesCnt" style="font-weight:600"></span></summary>
-      <div class="note" style="margin-top:6px">한 줄에 하나씩. <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 (소속사, 아티스트, 타이틀, 품목명) · <b>[생일·기념일]</b> 월/일 내용. 팀 모두가 같이 쓰도록 PLYSH 시트(@4팀_업무보고 › PREFLIGHT 규칙 탭)에 저장돼요. <span id="rulesSt" class="mute" style="font-weight:600"></span> <button type="button" id="rulesEx" style="border:0;background:none;color:var(--acc);font-weight:700;padding:0">예시 넣기</button></div>
-      <textarea id="rulesTa" class="inp" style="width:100%;min-height:170px;margin-top:8px;font-size:13px;line-height:1.6;resize:vertical"></textarea>
+      <div class="row" style="margin-top:8px">
+        <input class="inp" id="artQ" list="artL" placeholder="아티스트 검색 (예: 온앤오프)" style="width:220px" autocomplete="off">
+        <button type="button" class="ib" id="artGo">불러오기</button>
+        <button type="button" class="ib" id="artCommon">공통 규칙</button>
+      </div>
+      <datalist id="artL"></datalist>
+      <div class="seg" id="artChips" style="margin-top:8px"></div>
+      <div class="note">지금 고치는 목록: <b id="artCur">공통</b>. 검수할 때는 <b>공통 + 파일의 아티스트</b> 규칙을 같이 써요. 한 줄에 하나씩 <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 · <b>[생일·기념일]</b> 월/일 내용. PLYSH 시트에 저장돼 팀이 같이 써요. <span id="rulesSt" class="mute" style="font-weight:600"></span> <button type="button" id="rulesEx" class="lnk">예시 넣기</button></div>
+      <textarea id="rulesTa" class="inp ta" style="min-height:170px"></textarea>
     </details>
     <details class="set">
       <summary>검수 기준 바꾸기</summary>
       <div class="grid2" id="setG"></div>
-      <div class="note">바꾼 값은 이 기기에 저장돼요. <button type="button" id="setReset" style="border:0;background:none;color:var(--acc);font-weight:700;padding:0">기본값으로</button></div>
+      <div class="note">바꾼 값은 이 기기에 저장돼요. <button type="button" id="setReset" class="lnk">기본값으로</button></div>
     </details>
+    <div style="margin-top:16px"><button type="button" class="go" id="go" disabled>검수 시작</button></div>
   </div>
 
   <div class="card noprint" id="prog" hidden>
@@ -167,17 +215,11 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
     <div class="small mute" id="progS"></div>
   </div>
 
+  <div class="card noprint" id="results" hidden></div>
+  <div class="card" id="chk"></div>
   <div id="rep" hidden></div>
-
-  <div class="card noprint">
-    <h3>단계별로 들어가는 검사</h3>
-    <div class="phase">
-      <b>1단계</b> 해상도 250ppi · 도련 3mm와 재단선 안쪽 3mm · 펼침면 가운데 가이드선 · 아웃라인 · 별색·단색 선 오버프린트 · 작은 검정 글자 K100 오버프린트 · 넓은 면 리치블랙(C30 M20 Y20 K100) · 칼선·박·형압 등 후가공 별색과 오버프린트 · 너무 작은 글자 · 어두운 바탕 흰 글자 · 잉크 총량 · RGB와 의도 안 한 별색 · 흰색 오버프린트 · 얇은 선과 4도 작은 글자 · 재단 사이즈·쪽수와 제본 · 포토북 첫·끝 페이지 풀칠 3mm · 무선제본 안쪽 여백 제안 · 칼선 위치 · <b>중복 사진</b> · <b>제본 안쪽에 걸린 얼굴·글자</b> · 인물 사진 의견(얼굴 크기, 밝기·피부톤, 코팅 후 어두워짐)<br>
-      <b>2단계</b> 이중 띄어쓰기 · 오타 의심(맞춤법, 영문 철자, 같은 단어 반복) · 헷갈리는 글자(전각·키릴·보이지 않는 글자)와 v·z·w 단어 모아 보기 · 따옴표와 ′″, 가운뎃점·물결·말줄임 혼용 · 단어 중간에 바뀐 스타일 · 대소문자 섞임 · 멤버명·소속사·아티스트·타이틀·품목명 표기(팀 규칙 목록) · 영문/한글 혼용 · 다른 페이지와 조금 다른 반복 문구 · 쪽 번호와 목차 · 판권·저작권 · 멤버별 사진 수 표 · 사진과 이름 매칭 · 바코드·ISBN·QR 읽힘 · 달력 날짜 중복·누락·요일·공휴일·생일·기념일<br>
-      <span class="mute">이미지가 파일에 포함(임베드)됐는지는 PDF만으로 알 수 없어요. 일러스트·인디자인의 링크 패널이나 데스크탑 스크립트로 확인해 주세요.</span>
-    </div>
-  </div>
 </div>
+<div id="sheet"></div>
 
 <div class="ov" id="ov"><div class="vw">
   <div class="vh"><button class="ib" id="vPrev" aria-label="이전 페이지">‹</button><b id="vT"></b><button class="ib" id="vZoom">확대</button><button class="ib" id="vNext" aria-label="다음 페이지">›</button><button class="ib" id="vX" aria-label="닫기">✕</button></div>
@@ -196,7 +238,8 @@ var LIBS = {
 };
 </script>
 <script src="korean-lunar-calendar.min.js"></script>
-<script src="text.js?v=20261118c"></script>
-<script src="app.js?v=20261118c"></script>
+<script src="text.js?v=20261118d"></script>
+<script src="app.js?v=20261118d"></script>
+<script src="batch.js?v=20261118d"></script>
 </body>
 </html>

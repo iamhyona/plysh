@@ -570,9 +570,10 @@ function cards(t) {
 }
 
 window.RV2 = {
-  attach: function (x) { X = x; setupRulesUI(); },
+  attach: function (x) { X = x; },
+  parseRules: parseRules, rulesToRows: rulesToRows, rowsToRules: rowsToRules, RULES_EX: RULES_EX, korHolidays: korHolidays,
   run: async function (R, pdfjs, step) {
-    var rules = parseRules(rulesText()); R.rulesN = rules;
+    var rules = parseRules(R.rulesText != null ? R.rulesText : rulesText()); R.rulesN = rules;
     step('글자 검사 중…'); await X.tick(); textChecks(R, rules);
     repeatChecks(R); pageNumbers(R);
     step('달력·멤버 사진 확인 중…'); await X.tick(); calendar(R, rules); var hf = Object.keys(HOL_FAIL); if (hf.length) X.issue({ page: null, sev: 'info', cat: 'cal', code: 'holfail', title: hf.join(', ') + '년 음력 명절은 계산하지 못했어요', detail: '음력 변환표가 2050년까지라서 그 뒤의 설날·추석·부처님오신날은 빠져 있어요.', fix: '해당 연도 공휴일은 직접 확인해 주세요.', boxes: [] }); members(R, rules);
