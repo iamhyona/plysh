@@ -199,23 +199,6 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
     <div id="flist"></div>
   </div>
 
-  <div class="card noprint" id="specCard">
-    <h3 class="sh">사양서 선택</h3>
-    <div class="seg" id="specMode">
-      <button type="button" data-m="plysh" class="on">PLYSH 사양서에서 고르기</button>
-      <button type="button" data-m="link">링크 입력</button>
-      <button type="button" data-m="text">직접 쓰기</button>
-      <button type="button" data-m="file">파일·이미지 첨부</button>
-      <button type="button" data-m="none">사양서 없이</button>
-    </div>
-    <div class="sm" data-m="plysh"><select class="inp" id="specSel" style="width:100%;margin-top:10px"><option value="">PLYSH 사양서에서 고르기</option></select></div>
-    <div class="sm" data-m="link" hidden><input class="inp" id="specLink" placeholder="사양서 구글 시트 링크를 붙여 넣어 주세요" style="width:100%;margin-top:10px"></div>
-    <div class="sm" data-m="text" hidden><textarea id="specTa" class="inp ta" placeholder="사양을 한 줄에 하나씩 적어 주세요.&#10;예) 포토카드 55×85mm 유광 코팅&#10;    포토북 210×297mm 40p 레이플랫&#10;    엽서 100×148mm 스노우 250g"></textarea></div>
-    <div class="sm" data-m="file" hidden><button type="button" class="ib" id="specAttB" style="margin-top:10px">파일·이미지 고르기</button><input type="file" id="specFile" accept=".pdf,.txt,.csv,image/*" multiple hidden><div id="specAtt" class="row" style="margin-top:8px"></div></div>
-    <div id="specSum" class="note"></div>
-    <div id="specView"></div>
-  </div>
-
   <div class="card noprint" id="rulesBox">
     <h3 class="sh">아티스트명 선택 <span class="mute" id="rulesCnt" style="font-size:13px;font-weight:600"></span></h3>
     <div class="row">
@@ -232,6 +215,23 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
     <h3 class="sh">프로젝트 타이틀명</h3>
     <input class="inp" id="ttl" placeholder="예: 2027 SEASON'S GREETINGS · 비워 두면 파일 이름에서 읽어요" style="width:100%">
     <div class="note" id="ttlNote"></div>
+  </div>
+
+  <div class="card noprint" id="specCard">
+    <h3 class="sh">사양서 선택</h3>
+    <div class="seg" id="specMode">
+      <button type="button" data-m="plysh" class="on">PLYSH 사양서에서 고르기</button>
+      <button type="button" data-m="link">링크 입력</button>
+      <button type="button" data-m="text">직접 쓰기</button>
+      <button type="button" data-m="file">파일·이미지 첨부</button>
+      <button type="button" data-m="none">사양서 없이</button>
+    </div>
+    <div class="sm" data-m="plysh"><select class="inp" id="specSel" style="width:100%;margin-top:10px"><option value="">PLYSH 사양서에서 고르기</option></select></div>
+    <div class="sm" data-m="link" hidden><input class="inp" id="specLink" placeholder="사양서 구글 시트 링크를 붙여 넣어 주세요" style="width:100%;margin-top:10px"></div>
+    <div class="sm" data-m="text" hidden><textarea id="specTa" class="inp ta" placeholder="사양을 한 줄에 하나씩 적어 주세요.&#10;예) 포토카드 55×85mm 유광 코팅&#10;    포토북 210×297mm 40p 레이플랫&#10;    엽서 100×148mm 스노우 250g"></textarea></div>
+    <div class="sm" data-m="file" hidden><button type="button" class="ib" id="specAttB" style="margin-top:10px">파일·이미지 고르기</button><input type="file" id="specFile" accept=".pdf,.txt,.csv,image/*" multiple hidden><div id="specAtt" class="row" style="margin-top:8px"></div></div>
+    <div id="specSum" class="note"></div>
+    <div id="specView"></div>
   </div>
 
   <div class="card noprint" id="setCard">
@@ -272,6 +272,6 @@ var LIBS = {
 <script src="korean-lunar-calendar.min.js"></script>
 <script src="text.js?v=20261118e"></script>
 <script src="app.js?v=20261118e"></script>
-<script src="batch.js?v=20261118f"></script>
+<script src="batch.js?v=20261118g"></script>
 </body>
 </html>
