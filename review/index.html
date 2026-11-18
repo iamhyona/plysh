@@ -149,6 +149,11 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
       <select class="inp" id="layout"><option value="auto">PDF 형태 자동</option><option value="single">낱장</option><option value="spread">펼침면(스프레드)</option></select>
     </div>
 
+    <details class="set" id="rulesBox">
+      <summary>팀 표기 규칙 · 생일·기념일 <span class="mute" id="rulesCnt" style="font-weight:600"></span></summary>
+      <div class="note" style="margin-top:6px">한 줄에 하나씩. <b>[멤버]</b> 한글 / 영문 = 틀린 표기들 · <b>[표기]</b> 정식 표기 = 틀린 표기들 (소속사, 아티스트, 타이틀, 품목명) · <b>[생일·기념일]</b> 월/일 내용. 이 기기에 저장돼요. <button type="button" id="rulesEx" style="border:0;background:none;color:var(--acc);font-weight:700;padding:0">예시 넣기</button></div>
+      <textarea id="rulesTa" class="inp" style="width:100%;min-height:170px;margin-top:8px;font-size:13px;line-height:1.6;resize:vertical"></textarea>
+    </details>
     <details class="set">
       <summary>검수 기준 바꾸기</summary>
       <div class="grid2" id="setG"></div>
@@ -167,8 +172,8 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
   <div class="card noprint">
     <h3>단계별로 들어가는 검사</h3>
     <div class="phase">
-      <b>1단계 (지금)</b> 해상도 250ppi · 도련 3mm와 재단선 안쪽 3mm · 펼침면 가운데 가이드선 · 아웃라인 · 별색·단색 선 오버프린트 · 작은 검정 글자 K100 오버프린트 · 넓은 면 리치블랙(C30 M20 Y20 K100) · 칼선·박·형압 등 후가공 별색과 오버프린트 · 너무 작은 글자 · 어두운 바탕 흰 글자 · 잉크 총량 · RGB와 의도 안 한 별색 · 흰색 오버프린트 · 얇은 선과 4도 작은 글자 · 재단 사이즈·쪽수와 제본 · 포토북 첫·끝 페이지 풀칠 3mm · 무선제본 안쪽 여백 제안 · 칼선 위치 · <b>중복 사진</b> · <b>제본 안쪽에 걸린 얼굴·글자</b> · 인물 사진 의견(얼굴 크기, 밝기·피부톤, 코팅 후 어두워짐)<br>
-      <b>2단계 (다음)</b> 이중 띄어쓰기 · 오타 의심 · v/z/w 등 헷갈리는 글자 · 따옴표와 ′″ 혼용 · 일부만 적용된 스타일 · 여백·정렬 의심 · 멤버명·소속사·아티스트·타이틀·품목명 표기(팀 규칙 목록) · 페이지 순서·목차 · 저작권·판권 · 영문/한글 혼용 · 멤버별 사진 수 표 · 사진과 이름 매칭 · 바코드·ISBN·QR 읽힘 · 달력 주말·공휴일·생일·기념일·중복/누락 날짜<br>
+      <b>1단계</b> 해상도 250ppi · 도련 3mm와 재단선 안쪽 3mm · 펼침면 가운데 가이드선 · 아웃라인 · 별색·단색 선 오버프린트 · 작은 검정 글자 K100 오버프린트 · 넓은 면 리치블랙(C30 M20 Y20 K100) · 칼선·박·형압 등 후가공 별색과 오버프린트 · 너무 작은 글자 · 어두운 바탕 흰 글자 · 잉크 총량 · RGB와 의도 안 한 별색 · 흰색 오버프린트 · 얇은 선과 4도 작은 글자 · 재단 사이즈·쪽수와 제본 · 포토북 첫·끝 페이지 풀칠 3mm · 무선제본 안쪽 여백 제안 · 칼선 위치 · <b>중복 사진</b> · <b>제본 안쪽에 걸린 얼굴·글자</b> · 인물 사진 의견(얼굴 크기, 밝기·피부톤, 코팅 후 어두워짐)<br>
+      <b>2단계</b> 이중 띄어쓰기 · 오타 의심(맞춤법, 영문 철자, 같은 단어 반복) · 헷갈리는 글자(전각·키릴·보이지 않는 글자)와 v·z·w 단어 모아 보기 · 따옴표와 ′″, 가운뎃점·물결·말줄임 혼용 · 단어 중간에 바뀐 스타일 · 대소문자 섞임 · 멤버명·소속사·아티스트·타이틀·품목명 표기(팀 규칙 목록) · 영문/한글 혼용 · 다른 페이지와 조금 다른 반복 문구 · 쪽 번호와 목차 · 판권·저작권 · 멤버별 사진 수 표 · 사진과 이름 매칭 · 바코드·ISBN·QR 읽힘 · 달력 날짜 중복·누락·요일·공휴일·생일·기념일<br>
       <span class="mute">이미지가 파일에 포함(임베드)됐는지는 PDF만으로 알 수 없어요. 일러스트·인디자인의 링크 패널이나 데스크탑 스크립트로 확인해 주세요.</span>
     </div>
   </div>
@@ -186,9 +191,11 @@ var LIBS = {
   worker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
   pdflib: 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js',
   face: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js',
-  model: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/'
+  model: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/',
+  zxing: 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'
 };
 </script>
-<script src="app.js?v=20261118a"></script>
+<script src="text.js?v=20261118b"></script>
+<script src="app.js?v=20261118b"></script>
 </body>
 </html>
