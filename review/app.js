@@ -429,7 +429,9 @@ function pageChecks(P) {
   if (rgbI.length) add('warn', 'print', 'rgbimg', 'RGB 이미지가 있어요', rgbI.length + '개', '포토샵에서 CMYK로 바꿔 주세요. 의도한 거면 인쇄소 변환 방식을 확인해 주세요.', rgbI);
   var rv = P.rgb.fill + P.rgb.stroke + P.rgb.text + P.rgb.shade;
   if (rv) add('warn', 'print', 'rgbvec', 'RGB 색이 남아 있어요 (도형·글자)', rv + '곳', '색상 견본을 CMYK로 바꿔 주세요.', P.rgb.boxes.filter(function (b, i) { return i < 30; }));
-  if (P.reg.length) add('err', 'print', 'reg', '레지스트레이션 색(모든 판 100%)이 쓰였어요', P.reg.length + '곳', '재단 표시 외에는 K100 또는 리치블랙으로 바꿔 주세요.', P.reg);
+  // 재단선 · 맞춤표는 원래 레지스트레이션이라 재단선 바깥은 빼고, 재단 안쪽 디자인에 쓰인 것만 알림
+  var regIn = P.reg.filter(function (b) { var T = P.trim, e = 0.3 * MM; return b && b[0] < T[2] - e && b[2] > T[0] + e && b[1] < T[3] - e && b[3] > T[1] + e; });
+  if (regIn.length) add('err', 'print', 'reg', '재단 안쪽에 레지스트레이션 색', regIn.length + '곳', '재단 표시 외에는 K100 또는 리치블랙으로 바꿔 주세요.', regIn);
   if (P.annots) add('warn', 'print', 'annot', '메모·주석이 남아 있어요', P.annots + '개', '인쇄될 수 있으니 지우고 다시 내보내 주세요.');
   // 칠·선
   var kOP = [], tacB = [], tacE = [], kBig = [], rbOff = [], wOP = [], sOP = [], hair = [], h0 = [], t4 = [], finOff = [];
