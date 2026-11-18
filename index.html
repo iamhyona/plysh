@@ -718,7 +718,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .qklb .fr { font-size:9px; font-weight:600; letter-spacing:.18em; margin-top:16px; color:#666; }
 .qklb .fra { font-size:9px; font-weight:500; margin-top:3px; color:#666; }
 .qklb .ct { font-size:15px; font-weight:500; line-height:1.4; color:#000; margin-top:10px; }
-.qklb.full { aspect-ratio:210/297; justify-content:flex-start; padding:9.5% 9.5% 0; container-type:inline-size; }
+.qklb.full { width:47%; margin:0 auto; aspect-ratio:210/297; /* 2026-11-18: 다른 라벨 미리보기와 같은 높이 */ justify-content:flex-start; padding:9.5% 9.5% 0; container-type:inline-size; }
 .qklb.full .ad, .qklb.full .co { font-size:4.7cqw; }
 .qklb.full .ct { font-size:3.4cqw; margin-top:2.4cqw; }
 .qklb.full .nt { font-size:3.36cqw; margin-top:2.9cqw; }
@@ -1098,7 +1098,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261118qp3';
+var APP_VER = '20261118qp4';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3291,29 +3291,8 @@ function qpDraw() {
   $('#qpCap').textContent = mp ? '미리보기 · A4 한 장에 주소 + 지도 1개' : '미리보기 · A4 한 장에 2개 (위·아래 같은 라벨)';
   $('#qpTo').innerHTML = mp ? '<div class="qklb full">' + qpHtml(r) + '<img class="mp" src="' + mp + '" alt=""></div>' : '<div class="qklb">' + qpHtml(r) + '</div>';
 }
-// 2026-11-18: 지도 있는 라벨은 새 탭에서 A4 라벨 페이지로 열어 인쇄 (앱 화면이 인쇄 화면으로 덮이던 문제)
-function qpWin(html, title) {
-  var w = window.open('', '_blank');
-  if (!w) { toast('팝업이 막혀 있어요. 주소창 오른쪽에서 팝업을 허용해 주세요'); return; }
-  var css = '';
-  [].forEach.call(document.styleSheets, function (ss) { try { [].forEach.call(ss.cssRules, function (r) { if (r.media && /print/.test(r.media.mediaText)) [].forEach.call(r.cssRules, function (x) { if (/^(body|html)/.test(x.selectorText || '')) return; css += x.cssText + '\n'; }); }); } catch (e) {} });
-  var links = [].map.call(document.querySelectorAll('link[rel="stylesheet"]'), function (l) { return '<link rel="stylesheet" href="' + l.href + '">'; }).join('');
-  var ff = getComputedStyle(document.body).fontFamily.replace(/"/g, "'");
-  var d = w.document;
-  d.open();
-  d.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(title) + '</title>' + links +
-    '<style>html,body{margin:0;font-family:' + ff + ';}body{background:#e9ecf0;}' + css +
-    '.bar{position:sticky;top:0;z-index:2;display:flex;justify-content:center;gap:10px;align-items:center;padding:14px;background:#e9ecf0;font-size:14px;color:#5d6675}.bar button{font:inherit;font-weight:700;font-size:15px;color:#fff;background:#191c22;border:0;border-radius:10px;padding:10px 22px;cursor:pointer}' +
-    '.lbp{margin:0 auto 40px;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12)}' +
-    '@media print{.bar{display:none}body{background:#fff}.lbp{margin:0;box-shadow:none}}</style></head><body>' +
-    '<div class="bar"><span>A4 · 여백 없음으로 인쇄</span><button onclick="print()">인쇄하기</button></div><div id="qkLabel">' + html + '</div>' +
-    '<script>(function(){var im=document.querySelector("img"),ok=function(){setTimeout(function(){print()},300)};var p=[];if(im&&!im.complete)p.push(new Promise(function(r){im.onload=im.onerror=r}));if(document.fonts&&document.fonts.ready)p.push(document.fonts.ready);Promise.all(p).then(ok);})();<\/script></body></html>');
-  d.close();
-}
 $('#qpGo').onclick = function () {
   var mp = qpMap(QP.r);
-  // 2026-11-18: 지도 있는 라벨은 앱 화면 대신 숨은 창(iframe)에서 인쇄 — 앱 화면이 인쇄 화면으로 바뀌고 미리보기가 안 뜨던 문제
-  if (mp) { qpWin('<div class="lbp"><div class="lbh lbfull">' + qpHtml(QP.r) + '<img class="lbmap" src="' + new URL(mp, location.href).href + '" alt=""></div></div>', '라벨 인쇄 · ' + (QP.r.c || '')); closeBs(); return; }
   $('#qkLabel').innerHTML = mp ? '<div class="lbp"><div class="lbh lbfull">' + qpHtml(QP.r) + '<img class="lbmap" src="' + mp + '" alt=""></div></div>' : '<div class="lbp"><div class="lbh">' + qpHtml(QP.r) + '</div><div class="lbcut"></div><div class="lbh lbh2">' + qpHtml(QP.r) + '</div></div>';
   closeBs();
   // 2026-11-18: 지도 이미지는 미리보기에서 이미 불러와 있어서 기다리지 않고 바로 인쇄 (기다리면 인쇄 창이 안 뜨는 문제)
