@@ -1541,7 +1541,7 @@ function lgBody() {
   function card(x) {
     var nm = x.n.replace(/^Laundry_/, '').replace(/_/g, ' ');
     var p = '<div class="lgp' + (x.d ? ' dk' : '') + '"><img loading="lazy" src="' + esc(x.s) + '" alt="' + esc(x.n) + '"></div>';
-    var m = '<div class="lgm"><div><b>' + esc(nm) + '</b><small>' + esc(x.k || x.b) + '</small></div><a class="lgd" href="' + esc(x.f) + '" download="' + esc(x.n) + '.ai" title=".ai 다운로드">AI</a></div>';
+    var m = '<div class="lgm"><div><b>' + esc(nm) + '</b><small>' + esc(x.k || x.b) + '</small></div><a class="lgd" href="' + esc(x.f) + '" download="' + esc(x.f.split('/').pop()) + '" title=".ai 다운로드">AI</a></div>';
     return LG.vw === 'grid' ? '<div class="lgc">' + p + m + '</div>' : '<div class="lgr">' + p + m + '</div>';
   }
   var h = '<div class="lgn">' + (qs.length ? '검색 결과 ' : (cat[LG.tab] + ' ')) + L.length + '개</div>', last = null, buf = [];
