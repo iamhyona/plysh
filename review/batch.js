@@ -291,39 +291,64 @@ function scheduleArtists() { try { (A && A.S.D && A.S.D.files || []).forEach(fun
 
 // ── 검수 실행 ──
 var RS = [], CURR = null, RUN = false;
+var JOBS = [], JI = -1, T0 = 0, pending = false, STOPPED = false;
+function jobName(j) { return j.img ? j.files.length + '개 이미지 · ' + (j.meta.prodName || '이미지') : j.file.name; }
+function sec(ms) { var s = Math.round(ms / 1000); return s < 60 ? s + '초' : Math.floor(s / 60) + '분 ' + (s % 60) + '초'; }
+window.RVB_prog = function (t, p) { var j = JOBS[JI]; if (!j) return; j.pct = Math.max(j.pct || 0, Math.min(0.99, p || 0)); j.step = t; if (!pending) { pending = true; requestAnimationFrame(function () { pending = false; drawProg(); }); } };
+function drawProg() {
+  var n = JOBS.length, done = JOBS.filter(function (j) { return j.st === 'done' || j.st === 'fail'; }).length, cur = JOBS[JI], tot = n ? (done + (cur && cur.st === 'run' ? cur.pct || 0 : 0)) / n : 0;
+  var SN = { wait: '대기', run: '검수 중', done: '완료', fail: '열지 못함', stop: '중지됨' };
+  var h = '<div class="row" style="justify-content:space-between;align-items:center"><div><b style="font-size:16px">' + (RUN ? '검수 중 · ' + Math.min(done + 1, n) + ' / ' + n : STOPPED ? '중지했어요 · ' + done + ' / ' + n + ' 완료' : '검수 끝 · ' + n + '개') + '</b> <span class="mute small">전체 ' + Math.round(tot * 100) + '% · ' + sec(Date.now() - T0) + '</span></div>' +
+    (RUN ? '<button type="button" class="ib" id="stop" style="color:var(--red)">중지</button>' : '') + '</div><div class="bar" style="margin:10px 0 6px"><i style="width:' + Math.round(tot * 100) + '%"></i></div>';
+  h += JOBS.map(function (j, i) {
+    var pc = j.st === 'done' || j.st === 'fail' ? 100 : j.st === 'run' ? Math.round((j.pct || 0) * 100) : 0;
+    return '<div class="pj ' + j.st + '"><div class="pjh"><span class="pjn">' + esc(jobName(j)) + '</span><span class="pjm">' + esc([j.meta.prodName, j.meta.artist].filter(Boolean).join(' · ')) + '</span><span class="pjs">' + (j.st === 'run' ? pc + '%' : SN[j.st]) + (j.ms ? ' · ' + sec(j.ms) : '') + '</span></div>' +
+      (j.st === 'run' ? '<div class="bar sm"><i style="width:' + pc + '%"></i></div><div class="small mute" style="margin-top:3px">' + esc(j.step || '') + '</div>' : '') + '</div>';
+  }).join('');
+  $('#prog').innerHTML = h; $('#prog').hidden = false;
+  var sb = $('#stop'); if (sb) sb.onclick = function () { sb.disabled = true; sb.textContent = '중지하는 중…'; STOPPED = true; RV.abort(true); };
+}
 async function run() {
-  if (RUN || !Q.length) return; flush(); RUN = true; drawQ();
-  RS = []; $('#results').hidden = true; $('#rep').hidden = true;
+  if (RUN || !Q.length) return; flush(); RUN = true; STOPPED = false; RV.abort(false); drawQ();
+  RS = []; CURR = null; $('#results').hidden = true; RV.show(null); drawChecklist(null);
   var jobs = [], imgG = {};
   Q.forEach(function (q) {
     var meta = { WO: woOf(q), kind: q.kind, prod: q.prod, prodName: q.prodName || CLS_NAME[q.prod], artist: q.artist, spec: SPEC.items[q.item] ? SPEC.items[q.item].raw : '', rulesText: rulesFor(q.artist) };
-    if (q.kind === 'img') { var k = q.prod + '|' + q.prodName + '|' + q.artist + '|' + q.item; if (!imgG[k]) { imgG[k] = { img: true, files: [], meta: meta }; jobs.push(imgG[k]); } imgG[k].files.push(q.file); }
-    else jobs.push({ file: q.file, meta: meta });
+    if (q.kind === 'img') { var k = q.prod + '|' + q.prodName + '|' + q.artist + '|' + q.item; if (!imgG[k]) { imgG[k] = { img: true, files: [], meta: meta, st: 'wait' }; jobs.push(imgG[k]); } imgG[k].files.push(q.file); }
+    else jobs.push({ file: q.file, meta: meta, st: 'wait' });
   });
+  JOBS = jobs; T0 = Date.now(); drawProg();
+  $('#prog').scrollIntoView({ behavior: 'smooth', block: 'start' });
   for (var i = 0; i < jobs.length; i++) {
-    var j = jobs[i], r;
-    j.meta.label = '파일 ' + (i + 1) + ' / ' + jobs.length + ' · ' + (j.img ? j.files.length + '개 이미지' : j.file.name);
+    var j = jobs[i], r, t1 = Date.now(); JI = i; j.st = 'run'; j.pct = 0; drawProg();
+    j.meta.label = jobName(j);
     try { r = j.img ? await RV.analyzeImages(j.files, j.meta) : await RV.analyzePdf(j.file, j.meta); }
-    catch (e) { console.error(e); r = { file: j.img ? j.files[0].name : j.file.name, fatal: '검수 중 문제가 생겼어요', fatalSub: String(e && e.message || e), issues: [], pages: [] }; }
-    r.checked = {}; RS.push(r); drawResults();
+    catch (e) {
+      if (e && e.abort) { j.st = 'stop'; break; }
+      console.error(e); r = { file: j.img ? j.files[0].name : j.file.name, fatal: '검수 중 문제가 생겼어요', fatalSub: String(e && e.message || e), issues: [], pages: [] };
+    }
+    j.ms = Date.now() - t1; j.st = r.fatal ? 'fail' : 'done';
+    r.checked = {}; RS.push(r); drawResults(); drawProg();
     if (i === 0) select(r);
+    if (STOPPED) break;
   }
-  $('#prog').hidden = true; RUN = false; drawQ(); drawResults();
+  JOBS.forEach(function (j) { if (j.st === 'wait' || j.st === 'run') j.st = 'stop'; });
+  RV.abort(false); RUN = false; JI = -1; drawProg(); drawQ(); drawResults();
   if (CURR) select(CURR);
-  $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (RS.length) $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function counts(r) { var c = { err: 0, warn: 0, adv: 0, info: 0 }; (r.issues || []).forEach(function (x) { if (!x.hidden) c[x.sev]++; }); return c; }
 function drawResults() {
   if (!RS.length) { $('#results').hidden = true; return; }
-  var h = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">검수 결과 · 파일 ' + RS.length + '개' + (RUN ? ' <span class="mute small">검사 중…</span>' : '') + '</h3><div class="row"><button class="ib" id="pAll"' + (RUN ? ' disabled' : '') + '>전체 결과지</button><button class="ib" id="again">파일 비우고 새로</button></div></div><div class="rf">';
-  h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : '') + '"><b>' + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.err ? '<i class="e">오류 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">확인 ' + c.warn + '</i>' : '') + (!c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
+  var h = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">검수 결과 · 파일 ' + RS.length + '개' + (RUN ? ' <span class="mute small" style="font-weight:600">· 끝난 파일부터 바로 눌러 볼 수 있어요</span>' : '') + '</h3><div class="row"><button class="ib" id="pAll"' + (RUN ? ' disabled' : '') + '>전체 결과지</button><button class="ib" id="again">파일 비우고 새로</button></div></div><div class="rf">';
+  h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : !r._seen ? 'new' : '') + '"><b>' + (!r._seen && r !== CURR ? '<em class="nw">새 결과</em>' : '') + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.err ? '<i class="e">오류 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">확인 ' + c.warn + '</i>' : '') + (!c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
   $('#results').innerHTML = h + '</div>'; $('#results').hidden = false;
   $$('#results .rf button').forEach(function (b) { b.onclick = function () { select(RS[+b.dataset.i]); }; });
   $('#pAll').onclick = function () { printSheet(RS); };
   $('#again').onclick = function () { Q = []; RS = []; CURR = null; drawQ(); drawResults(); drawChecklist(null); RV.show(null); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 }
 function select(r) {
-  CURR = r; $$('#results .rf button').forEach(function (b) { b.classList.toggle('on', RS[+b.dataset.i] === r); });
+  CURR = r; r._seen = true; drawResults();
   drawChecklist(r);
   if (r.fatal) { RV.show(null); $('#chk').insertAdjacentHTML('afterbegin', '<div class="note" style="color:var(--red);margin:0 0 8px"><b>' + esc(r.fatal) + '</b> ' + esc(r.fatalSub || '') + '</div>'); return; }
   RV.show(r);
@@ -420,6 +445,39 @@ function evalItem(r, it) {
   if (st === 'warn' && r.checked && r.checked[key]) st = 'chk';
   return { st: st, L: bad };
 }
+// ── 문제 부분 캡처 (페이지 미리보기에서 잘라 빨간 상자 표시) ──
+var IMGC = {};
+function loadImg(u) { return IMGC[u] || (IMGC[u] = new Promise(function (ok) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ok(null); }; i.src = u; })); }
+function boxesOf(x) { return (x.boxes || []).map(function (b) { return b && b.b ? b.b : b; }).filter(function (b) { return Array.isArray(b) && b.length === 4 && b.every(isFinite); }).slice(0, 30); }
+async function crop(r, x) {
+  if (x._crop !== undefined) return x._crop;
+  var P = r.pages[x.page]; if (!P || !P.thumb) return (x._crop = null);
+  var im = await loadImg(P.thumb); if (!im) return (x._crop = null);
+  var W = im.naturalWidth, H = im.naturalHeight, k = W / P.cw, bs = boxesOf(x).map(function (b) { return RV.toPx(P, b).map(function (v) { return v * k; }); }), u = null;
+  bs.forEach(function (q) { u = u ? [Math.min(u[0], q[0]), Math.min(u[1], q[1]), Math.max(u[2], q[2]), Math.max(u[3], q[3])] : q.slice(); });
+  var rx;
+  if (u && (u[2] - u[0]) * (u[3] - u[1]) < W * H * 0.6) {
+    var cx = (u[0] + u[2]) / 2, cy = (u[1] + u[3]) / 2, w = Math.max(220, (u[2] - u[0]) * 1.8), hh = Math.max(160, (u[3] - u[1]) * 1.8);
+    w = Math.min(W, Math.max(w, hh * 1.2)); hh = Math.min(H, Math.max(hh, w * 0.6));
+    var x0 = Math.min(Math.max(0, cx - w / 2), W - w), y0 = Math.min(Math.max(0, cy - hh / 2), H - hh); rx = [x0, y0, x0 + w, y0 + hh];
+  } else rx = [0, 0, W, H];
+  var ow = Math.min(520, Math.round(rx[2] - rx[0]) * 2), sc = ow / (rx[2] - rx[0]), oh = Math.round((rx[3] - rx[1]) * sc);
+  var cv = document.createElement('canvas'); cv.width = ow; cv.height = oh; var c = cv.getContext('2d');
+  c.drawImage(im, rx[0], rx[1], rx[2] - rx[0], rx[3] - rx[1], 0, 0, ow, oh);
+  c.strokeStyle = x.sev === 'err' ? '#ef4444' : '#f59e0b'; c.lineWidth = 3;
+  bs.forEach(function (q) { c.strokeRect((q[0] - rx[0]) * sc - 3, (q[1] - rx[1]) * sc - 3, (q[2] - q[0]) * sc + 6, (q[3] - q[1]) * sc + 6); });
+  return (x._crop = cv.toDataURL('image/jpeg', 0.85));
+}
+function firstPerPage(L, n) { var seen = {}, out = []; L.forEach(function (x) { if (x.page != null && !seen[x.page] && out.length < n) { seen[x.page] = 1; out.push(x); } }); return out; }
+function capLabel(r, x) { return (r.prodName ? r.prodName + ' · ' : '') + RV.pl(r, x.page); }
+async function fillCrops(r, el) {
+  var ids = el.dataset.ids.split(',').map(Number);
+  for (var i = 0; i < ids.length; i++) {
+    var x = r.issues.find(function (y) { return y.id === ids[i]; }); if (!x) continue;
+    var u = await crop(r, x), fg = el.querySelector('[data-iss="' + x.id + '"]'); if (fg && u) fg.querySelector('img').src = u;
+  }
+}
+
 function drawChecklist(r) {
   var h = '<div class="row" style="justify-content:space-between"><h3 style="margin:0">검사 항목' + (r ? ' · ' + esc(r.file) : '') + '</h3>' + (r && !r.fatal ? '<button class="ib" id="ckPrint">이 파일 결과지</button>' : '') + '</div>';
   h += '<div class="note" style="margin-bottom:6px">' + (r ? '항목을 열면 어느 페이지인지 보여요. “확인” 항목은 직접 보고 눌러서 <b>확인함</b>으로 바꿀 수 있어요.' : '파일을 넣고 검수를 시작하면 항목마다 통과 · 확인 · 오류가 표시돼요.') + '</div>';
@@ -435,12 +493,15 @@ function drawChecklist(r) {
       var canChk = r && (e.st === 'warn' || e.st === 'man' || e.st === 'chk');
       h += '<div class="ci ' + e.st + '"><span class="st ' + e.st + '"' + (canChk ? ' data-ck="' + ci + ':' + ii + '" style="cursor:pointer" title="눌러서 확인함 표시"' : '') + '>' + STI[e.st] + '</span><div class="tx">' + esc(it[0]) + ' <span class="mute small">' + STN[e.st] + '</span>' +
         (titles.length ? '<small>' + titles.slice(0, 3).map(esc).join(' · ') + (titles.length > 3 ? ' 외 ' + (titles.length - 3) : '') + '</small>' : '') +
-        (pages.length ? '<div class="pgs">' + pages.slice(0, 40).map(function (p) { var x = e.L.find(function (y) { return y.page === p; }); return '<button data-pg="' + p + '" data-iss="' + x.id + '">' + esc(RV.pl(r, p)) + '</button>'; }).join('') + (pages.length > 40 ? ' …' : '') + '</div>' : '') + '</div></div>';
+        (pages.length ? '<div class="crops" data-ids="' + firstPerPage(e.L, 8).map(function (x) { return x.id; }).join(',') + '">' + firstPerPage(e.L, 8).map(function (x) { return '<figure data-pg="' + x.page + '" data-iss="' + x.id + '"><img alt=""><figcaption>' + esc(capLabel(r, x)) + '</figcaption></figure>'; }).join('') + '</div>' : '') +
+        (pages.length > 8 ? '<div class="pgs">' + pages.slice(0, 40).map(function (p) { var x = e.L.find(function (y) { return y.page === p; }); return '<button data-pg="' + p + '" data-iss="' + x.id + '">' + esc(RV.pl(r, p)) + '</button>'; }).join('') + (pages.length > 40 ? ' …' : '') + '</div>' : '') + '</div></div>';
     });
     h += '</details>';
   });
   $('#chk').innerHTML = h;
   if (!r) return;
+  $$('#chk details').forEach(function (d) { var go = function () { $$('.crops', d).forEach(function (c) { if (!c.dataset.done) { c.dataset.done = 1; fillCrops(r, c); } }); }; if (d.open) go(); d.addEventListener('toggle', function () { if (d.open) go(); }); });
+  $$('#chk .crops figure').forEach(function (b) { b.onclick = function () { var x = r.issues.find(function (y) { return y.id === +b.dataset.iss; }); RV.view(r, +b.dataset.pg, x); }; });
   $$('#chk .pgs button').forEach(function (b) { b.onclick = function () { var x = r.issues.find(function (y) { return y.id === +b.dataset.iss; }); RV.view(r, +b.dataset.pg, x); }; });
   $$('#chk [data-ck]').forEach(function (s) { s.onclick = function () { var p = s.dataset.ck.split(':'), k = CHECK[+p[0]][1][+p[1]][0]; r.checked[k] = !r.checked[k]; var op = $$('#chk details').map(function (d) { return d.open; }); drawChecklist(r); $$('#chk details').forEach(function (d, i) { d.open = op[i]; }); }; });
   var pb = $('#ckPrint'); if (pb) pb.onclick = function () { printSheet([r]); };
@@ -448,8 +509,9 @@ function drawChecklist(r) {
 
 // ── 결과지 ──
 var SEVN = { err: '오류', warn: '확인', adv: '의견', info: '참고' };
-function printSheet(Rs) {
+async function printSheet(Rs) {
   Rs = Rs.filter(function (r) { return r && !r.fatal; }); if (!Rs.length) return;
+  for (var ri = 0; ri < Rs.length; ri++) { var rr = Rs[ri], G0 = {}; rr.issues.forEach(function (x) { if (!x.hidden && x.sev !== 'info' && x.page != null) { var k = x.code + '|' + x.title; (G0[k] = G0[k] || []).push(x); } }); for (var k0 in G0) { var L0 = firstPerPage(G0[k0], 4); for (var li = 0; li < L0.length; li++) await crop(rr, L0[li]); } }
   var d = new Date(), date = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) + ' ' + hm();
   var h = '';
   if (Rs.length > 1) {
@@ -475,11 +537,9 @@ function printSheet(Rs) {
       order.sort(function (a, b) { var o = { err: 0, warn: 1, adv: 2 }; return o[G[a][0].sev] - o[G[b][0].sev]; });
       h += '<h2>고칠 것</h2><table><tr><th style="width:8%">등급</th><th>내용</th><th style="width:22%">위치</th></tr>' + order.map(function (k) {
         var L = G[k], x = L[0], pages = []; L.forEach(function (y) { if (y.page != null && pages.indexOf(y.page) < 0) pages.push(y.page); });
-        return '<tr><td class="s-' + x.sev + '">' + SEVN[x.sev] + '</td><td><b>' + esc(x.title) + '</b><br>' + esc(strip(x.detail)) + (x.fix ? '<br>→ ' + esc(strip(x.fix)) : '') + '</td><td>' + esc(pages.slice(0, 30).map(function (p) { return RV.pl(r, p); }).join(', ')) + '</td></tr>';
+        var cr = firstPerPage(L, 4).filter(function (y) { return y._crop; });
+        return '<tr><td class="s-' + x.sev + '">' + SEVN[x.sev] + '</td><td><b>' + esc(x.title) + '</b><br>' + esc(strip(x.detail)) + (x.fix ? '<br>→ ' + esc(strip(x.fix)) : '') + (cr.length ? '<div class="thumbs">' + cr.map(function (y) { return '<figure><img src="' + y._crop + '" alt=""><figcaption>' + esc(capLabel(r, y)) + '</figcaption></figure>'; }).join('') + '</div>' : '') + '</td><td>' + esc((r.prodName ? r.prodName + ' · ' : '') + pages.slice(0, 30).map(function (p) { return RV.pl(r, p); }).join(', ')) + '</td></tr>';
       }).join('') + '</table>';
-      var tp = []; I.forEach(function (x) { if (x.sev === 'err' && x.page != null && tp.indexOf(x.page) < 0) tp.push(x.page); });
-      tp = tp.slice(0, 8);
-      if (tp.length) h += '<h2>오류가 있는 페이지</h2><div class="thumbs">' + tp.map(function (p) { var P = r.pages[p]; return P && P.thumb ? '<figure><img src="' + P.thumb + '" alt=""><figcaption>' + esc(RV.pl(r, p)) + '</figcaption></figure>' : ''; }).join('') + '</div>';
     }
     h += '</section>';
   });

@@ -126,7 +126,20 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 .att { display:inline-flex; align-items:center; gap:6px; background:var(--chip); border-radius:10px; padding:4px 6px 4px 8px; font-size:12.5px; font-weight:600; }
 .att img { width:28px; height:28px; object-fit:cover; border-radius:6px; }
 .att button { border:0; background:none; font-weight:800; color:var(--mute); }
+.pj { padding:8px 0; border-top:1px solid var(--line); font-size:13.5px; }
+.pjh { display:flex; gap:8px; align-items:baseline; }
+.pjn { font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1 1 auto; }
+.pjm { color:var(--mute); font-size:12.5px; white-space:nowrap; }
+.pjs { margin-left:auto; font-weight:800; white-space:nowrap; color:var(--sub); }
+.pj.run .pjs { color:var(--acc); } .pj.done .pjs { color:var(--grn); } .pj.fail .pjs, .pj.stop .pjs { color:var(--red); } .pj.wait { opacity:.6; }
+.bar.sm { height:5px; margin-top:6px; }
+.crops { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.crops figure { margin:0; width:168px; cursor:pointer; }
+.crops img { width:100%; aspect-ratio:4/3; object-fit:contain; background:var(--chip); border:1px solid var(--line); border-radius:8px; display:block; }
+.crops figcaption { font-size:11.5px; color:var(--sub); margin-top:3px; font-weight:600; }
 /* 결과 파일 */
+.rf button.new { border-color:var(--acc); }
+.rf .nw { font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--acc); border-radius:5px; padding:1px 5px; margin-right:5px; vertical-align:1px; }
 .rf { display:flex; flex-wrap:wrap; gap:8px; }
 .rf button { border:1px solid var(--line); background:#fff; border-radius:12px; padding:8px 12px; text-align:left; font-size:13px; max-width:100%; }
 .rf button.on { border-color:var(--txt); box-shadow:0 0 0 1px var(--txt) inset; }
@@ -161,7 +174,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   #sheet table { width:100%; border-collapse:collapse; } #sheet td, #sheet th { border:1px solid #d1d6db; padding:4px 6px; text-align:left; vertical-align:top; }
   #sheet th { background:#f2f4f6; }
   #sheet .s-err { color:#dc2626; font-weight:800; } #sheet .s-warn { color:#b45309; font-weight:800; } #sheet .s-ok { color:#16a34a; font-weight:800; } #sheet .s-na { color:#8b95a1; }
-  #sheet .thumbs { display:flex; flex-wrap:wrap; gap:6px; } #sheet .thumbs figure { margin:0; width:23%; } #sheet .thumbs img { width:100%; border:1px solid #d1d6db; } #sheet figcaption { font-size:10px; color:#4e5968; }
+  #sheet .thumbs { display:flex; flex-wrap:wrap; gap:6px; } #sheet .thumbs { margin-top:6px; } #sheet .thumbs figure { margin:0; width:31%; break-inside:avoid; } #sheet .thumbs img { width:100%; border:1px solid #d1d6db; } #sheet figcaption { font-size:10px; color:#4e5968; }
 }
 @media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
 </style>

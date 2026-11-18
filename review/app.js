@@ -39,7 +39,8 @@ function faceLib() {
 }
 
 // ── 진행 표시 ──
-function prog(t, p, s) { $('#prog').hidden = false; $('#progT').textContent = t; $('#progB').style.width = Math.round((p || 0) * 100) + '%'; $('#progS').textContent = s || ''; }
+var ABORT = false;
+function prog(t, p, s) { if (ABORT) { var e = new Error('중지했어요'); e.abort = true; throw e; } if (window.RVB_prog) return RVB_prog(t, p, s); $('#prog').hidden = false; $('#progT').textContent = t; $('#progB').style.width = Math.round((p || 0) * 100) + '%'; $('#progS').textContent = s || ''; }
 
 // ── 상태 ──
 var R = null; // 보고서
@@ -84,7 +85,7 @@ async function analyzePdf(file, meta) {
   dupPhotos();
   designRules();
   faceAdvice();
-  if (window.RV2) { try { await RV2.run(R, pdfjs, function (t) { prog(t, 0.97, lab); }); } catch (e) { console.warn('phase2', e); issue({ page: null, sev: 'info', cat: 'text', code: 'p2err', title: '2단계 검사 중 일부가 실패했어요', detail: String(e && e.message || e), fix: '', boxes: [] }); } }
+  if (window.RV2) { try { await RV2.run(R, pdfjs, function (t) { prog(t, 0.97, lab); }); } catch (e) { if (e && e.abort) throw e; console.warn('phase2', e); issue({ page: null, sev: 'info', cat: 'text', code: 'p2err', title: '2단계 검사 중 일부가 실패했어요', detail: String(e && e.message || e), fix: '', boxes: [] }); } }
   R.pages.forEach(function (P) { P.px = null; }); // 메모리 정리 (여러 파일 검사)
   try { pdfjs.destroy(); } catch (e) {}
   return R;
@@ -838,7 +839,7 @@ function renderReport() {
   h += '<div class="tabs noprint" id="tabs">' + CATS.filter(function (t) { return t[0] === 'all' || t[0] === 'top' || I.some(function (x) { return inCat(x, t[0]); }) || (t[0] === 'face' && R.people && R.people.length); }).map(function (t) { var n = I.filter(function (x) { return inCat(x, t[0]); }).length; return '<button data-t="' + t[0] + '" class="' + (UI.tab === t[0] ? 'on' : '') + '">' + t[1] + '<em>' + n + '</em></button>'; }).join('') + '</div>';
   h += '<div id="tabB"></div>';
   $('#rep').innerHTML = h; $('#rep').hidden = false;
-  $('#print').onclick = function () { if (window.RVB) RVB.printSheet([R]); else window.print(); };
+  $('#print').onclick = function () { if (window.RVB) RVB.printSheet([VR || R]); else window.print(); };
   $$('#tabs button').forEach(function (b) { b.onclick = function () { UI.tab = b.dataset.t; $$('#tabs button').forEach(function (x) { x.classList.toggle('on', x === b); }); renderTab(); }; });
   renderTab();
 }
@@ -872,7 +873,7 @@ function renderTab() {
   $('#tabB').innerHTML = h;
   bindPg($('#tabB'));
   $$('.cmp').forEach(drawCompare);
-  $$('#pplG input').forEach(function (i) { i.onchange = function () { R.people[+i.dataset.p].name = i.value || R.people[+i.dataset.p].name; R.people[+i.dataset.p].auto = false; renderTab(); }; });
+  $$('#pplG input').forEach(function (i) { i.onchange = function () { var Rv = VR || R; Rv.people[+i.dataset.p].name = i.value || Rv.people[+i.dataset.p].name; Rv.people[+i.dataset.p].auto = false; renderTab(); }; });
   var ob = $('#onlyBad'); if (ob) ob.onchange = function () { UI.onlyBad = ob.checked; renderTab(); };
 }
 function rich(s) { return String(s || '').indexOf('<i class="swc"') > -1 ? s : esc(s); }
@@ -975,19 +976,24 @@ function hilite(id) {
 }
 $('#vX').onclick = closeViewer; $('#ov').onclick = function (e) { if (e.target === $('#ov')) closeViewer(); };
 $('#vPrev').onclick = function () { if (V.p > 0) { V.p--; V.hi = null; drawViewer(); } };
-$('#vNext').onclick = function () { if (V.p < R.n - 1) { V.p++; V.hi = null; drawViewer(); } };
+$('#vNext').onclick = function () { if (V.p < (VR || R).n - 1) { V.p++; V.hi = null; drawViewer(); } };
 $('#vZoom').onclick = function () { V.zoom = !V.zoom; $('#vZoom').textContent = V.zoom ? '맞춤' : '확대'; drawViewer(); };
 window.addEventListener('resize', function () { if ($('#ov').classList.contains('open')) drawViewer(); });
 document.addEventListener('keydown', function (e) { if (!$('#ov').classList.contains('open')) return; if (e.key === 'Escape') closeViewer(); if (e.key === 'ArrowLeft') $('#vPrev').click(); if (e.key === 'ArrowRight') $('#vNext').click(); });
 
 function avgPx(P, b) { var r = toPx(P, b), s = [0, 0, 0], n = 0; for (var y = r[1]; y < r[3]; y += 2) for (var x = r[0]; x < r[2]; x += 2) { var p = pix(P, x, y); s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; n++; } return n ? [s[0] / n, s[1] / n, s[2] / n] : null; }
 function toPxVp(vp, b) { var a = vp.convertToViewportPoint(b[0], b[1]), c = vp.convertToViewportPoint(b[2], b[3]); return [Math.min(a[0], c[0]), Math.min(a[1], c[1]), Math.max(a[0], c[0]), Math.max(a[1], c[1])]; }
+// 화면(보고서·크게 보기)은 VR, 검사는 R — 여러 파일 검사 중에도 끝난 결과를 볼 수 있게 화면 함수만 VR로 잠깐 바꿔 씀
+var VR = null;
+function withV(fn) { return function () { var o = R; R = VR || R; try { return fn.apply(this, arguments); } finally { R = o; } }; }
+renderReport = withV(renderReport); renderTab = withV(renderTab); openViewer = withV(openViewer); drawViewer = withV(drawViewer); drawCompare = withV(drawCompare);
 setupUI();
 if (window.RV2) RV2.attach({ issue: issue, MM: MM, mm: mm, toPx: toPx, toPxVp: toPxVp, overlaps: overlaps, esc: esc, tick: tick, avgPx: avgPx, R: function () { return R; } });
 window.PLYSH_REVIEW = {
   analyzePdf: analyzePdf, analyzeImages: analyzeImages, prog: prog, SET: SET, KIND_LABEL: KIND_LABEL, esc: esc, pl: function (r, i) { var o = R; R = r; var s = pl(i); R = o; return s; },
-  show: function (r) { R = r; UI.tab = 'all'; if (!r || r.fatal) { $('#rep').hidden = true; return; } renderReport(); },
-  view: function (r, pg, iss) { R = r; openViewer(pg, iss || null); },
+  show: function (r) { VR = r; UI.tab = 'all'; if (!r || r.fatal) { $('#rep').hidden = true; return; } renderReport(); },
+  view: function (r, pg, iss) { VR = r; openViewer(pg, iss || null); },
+  abort: function (v) { ABORT = !!v; }, toPx: function (P, b) { return toPx(P, b); },
   get R() { return R; }
 };
 })();
