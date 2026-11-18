@@ -718,10 +718,10 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .qklb .fr { font-size:9px; font-weight:600; letter-spacing:.18em; margin-top:16px; color:#666; }
 .qklb .fra { font-size:9px; font-weight:500; margin-top:3px; color:#666; }
 .qklb .ct { font-size:15px; font-weight:500; line-height:1.4; color:#000; margin-top:10px; }
-.qklb.full { width:47%; margin:0 auto; aspect-ratio:210/297; /* 2026-11-18: 다른 라벨 미리보기와 같은 높이 */ justify-content:flex-start; padding:9.5% 9.5% 0; container-type:inline-size; }
-.qklb.full .ad, .qklb.full .co { font-size:4.7cqw; }
-.qklb.full .ct { font-size:3.4cqw; margin-top:2.4cqw; }
-.qklb.full .nt { font-size:3.36cqw; margin-top:2.9cqw; }
+.qklb.qkmap { width:47%; margin:0 auto; aspect-ratio:210/297; /* 2026-11-18: 다른 라벨 미리보기와 같은 높이 */ justify-content:flex-start; padding:9.5% 9.5% 0; container-type:inline-size; }
+.qklb.qkmap .ad, .qklb.qkmap .co { font-size:4.7cqw; }
+.qklb.qkmap .ct { font-size:3.4cqw; margin-top:2.4cqw; }
+.qklb.qkmap .nt { font-size:3.36cqw; margin-top:2.9cqw; }
 .qklb .mp { width:100%; margin-top:3.8cqw; }
 @media print {
   @page { size:A4 portrait; margin:0; }
@@ -1098,7 +1098,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261118qp4';
+var APP_VER = '20261118qp5';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3289,7 +3289,7 @@ function qpDraw() {
   $$('#qpA button').forEach(function (b) { b.onclick = function () { QP.a = b.dataset.a; qpDraw(); }; });
   var mp = qpMap(r);
   $('#qpCap').textContent = mp ? '미리보기 · A4 한 장에 주소 + 지도 1개' : '미리보기 · A4 한 장에 2개 (위·아래 같은 라벨)';
-  $('#qpTo').innerHTML = mp ? '<div class="qklb full">' + qpHtml(r) + '<img class="mp" src="' + mp + '" alt=""></div>' : '<div class="qklb">' + qpHtml(r) + '</div>';
+  $('#qpTo').innerHTML = mp ? '<div class="qklb qkmap">' + qpHtml(r) + '<img class="mp" src="' + mp + '" alt=""></div>' : '<div class="qklb">' + qpHtml(r) + '</div>';
 }
 $('#qpGo').onclick = function () {
   var mp = qpMap(QP.r);
