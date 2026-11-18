@@ -107,7 +107,7 @@ function showSpecSum() {
   else if (MODE === 'link') h = '링크를 넣으면 사양서를 읽어 와요.';
   else if (MODE === 'text') h = SPEC.text.trim() ? '크기(예: 55×85mm)를 찾지 못했어요.' : '한 줄에 품목 하나씩 적어 주세요.';
   else if (MODE === 'file') h = SPEC.att.length ? '첨부한 파일에서 크기를 찾지 못했어요. 이미지는 참고용으로만 붙어요.' : 'PDF·텍스트 사양서는 글자를 읽고, 이미지는 참고용으로 붙여요.';
-  $('#specSum').innerHTML = h; $('#specView').innerHTML = specTable();
+  $('#specSum').innerHTML = h; $('#specView').innerHTML = specTable(); specChkState();
   var tb = $('#specTab'); if (tb) tb.onchange = function () { pickSpec(SPEC.sheet.id, tb.value); };
 }
 var BIND_N = { none: '제본 없음', saddle: '중철', perfect: '무선', pur: 'PUR', hard: '양장', layflat: '레이플랫' };
@@ -143,11 +143,39 @@ function pickSpec(id, tab, auto) {
   $('#specSum').textContent = '사양서 읽는 중…';
   A.call('appSpec', A.pin, id, tab || '').then(function (o) {
     var items = []; (o.rows || []).forEach(function (r) { var x = itemFromRow(o.head || [], r); if (x) items.push(x); });
-    SPEC.sheet = { id: id, name: meta.name, url: meta.url, tab: o.tab, tabs: o.tabs, items: items, auto: auto };
+    SPEC.sheet = { id: id, name: meta.name, url: meta.url, tab: o.tab, tabs: o.tabs, items: items, auto: auto, raw: o };
     rebuildItems();
   }, function (e) { SPEC.sheet = null; $('#specSum').textContent = '사양서를 읽지 못했어요: ' + (e && e.message || e); });
 }
+// ── 사양서 검수: 사양서 자체의 빈칸·숫자·날짜·표기 (spec.js) ──
+function specChkState() {
+  var b = $('#specChkGo'); if (!b) return;
+  var ok = (MODE === 'plysh' || MODE === 'link') && SPEC.sheet && SPEC.sheet.raw;
+  b.disabled = !ok;
+  $('#specChkNote').textContent = ok ? '사양서 자체의 빈칸 · 장수·쪽수 · 날짜 · 표기를 봐요. 인쇄 파일 없이도 돼요.' : (MODE === 'plysh' || MODE === 'link') ? '사양서를 고르면 검수할 수 있어요.' : '구글 시트 사양서만 검수할 수 있어요.';
+}
+function specArtist() {
+  var m = String(SPEC.sheet && SPEC.sheet.name || '').match(/\[([^\]]+)\]/);
+  return (m && m[1]) || SELART || '';
+}
+function runSpecChk() {
+  var SC = window.PLYSH_SPECCHECK, sh = SPEC.sheet; if (!SC || !sh || !sh.raw) return;
+  var art = specArtist(), ai = aiFor(art), mem = ai && ai.members ? ai.members.length : 0;
+  var R = SC.check({ head: sh.raw.head, rows: sh.raw.rows, info: sh.raw.info, tab: sh.tab, name: sh.name }, { members: mem, artist: art });
+  var tg = (sh.tabs || []).find(function (t) { return t && t.n === sh.tab; }), url = 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' + (tg && tg.g != null ? '#gid=' + tg.g : '');
+  var el = $('#specRep');
+  el.innerHTML = '<div class="row noprint" style="justify-content:flex-end;margin-bottom:8px"><button type="button" class="ib" id="specRepPdf">PDF 저장</button><button type="button" class="ib" id="specRepX">닫기</button></div>' + SC.render(R, { url: url });
+  el.hidden = false; el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('#specRepX').onclick = function () { el.hidden = true; el.innerHTML = ''; };
+  $('#specRepPdf').onclick = function () {
+    document.body.classList.add('spking');
+    var t = document.title; document.title = (art ? '[' + art + ']' : '') + '사양서검수_' + String(sh.tab || '').replace(/\D/g, '').slice(-6);
+    setTimeout(function () { window.print(); document.title = t; document.body.classList.remove('spking'); }, 50);
+  };
+}
 function setupSpec() {
+  if (window.PLYSH_SPECCHECK && !$('#spkCss')) { var st = document.createElement('style'); st.id = 'spkCss'; st.textContent = window.PLYSH_SPECCHECK.CSS; document.head.appendChild(st); }
+  $('#specChkGo').onclick = runSpecChk;
   $$('#specMode button').forEach(function (b) { b.onclick = function () { setMode(b.dataset.m); }; });
   $('#specSel').onchange = function () { SPEC.userPicked = !!this.value; pickSpec(this.value); };
   var tmr = null;
