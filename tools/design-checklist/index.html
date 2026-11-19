@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>디자인 사고방지 체크리스트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #f2f4f6;
+    --surface: #ffffff;
+    --surface2: #f2f4f6;
+    --border: #e5e8eb;
+    --accent: #3182f6;
+    --danger: #ef4444;
+    --text: #191f28;
+    --text2: #4e5968;
+    --text3: #8b95a1;
+    --check-bg: #e8f3ff;
+    --admin: #f59e0b;
+    --radius: 12px;
+    --tab-h: 56px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:14px; line-height:1.6; color-scheme:light; }
+
+  /* ── APP SHELL ── */
+  #app { display:flex; flex-direction:column; height:100dvh; }
+
+  /* ── HEADER ── */
+  header {
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:0 20px; display:flex; align-items:center; justify-content:space-between;
+    height:56px; flex-shrink:0; position:relative; z-index:10;
+  }
+  .logo { font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--accent); font-family:'Pretendard Variable',Pretendard,sans-serif; }
+  .logo span { color:var(--text2); font-weight:400; }
+  .header-right { display:flex; gap:10px; align-items:center; }
+  .stat-pill {
+    background:var(--surface2); border:1px solid var(--border); border-radius:20px;
+    padding:4px 12px; font-size:11px; font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--text2);
+  }
+  .stat-pill strong { color:var(--accent); font-weight:500; }
+  .admin-toggle {
+    padding:5px 12px; border-radius:8px; font-size:11px; font-weight:700;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; cursor:pointer; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text3); transition:all .2s; letter-spacing:.04em;
+  }
+  .admin-toggle:hover { color:var(--text2); }
+  .admin-toggle.active { background:rgba(245,166,35,.12); border-color:rgba(245,166,35,.4); color:var(--admin); }
+
+  /* ── ADMIN BANNER ── */
+  .admin-banner {
+    display:none; background:rgba(245,166,35,.08); border-bottom:1px solid rgba(245,166,35,.25);
+    padding:8px 20px; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0;
+  }
+  .admin-banner.visible { display:flex; }
+  .admin-banner-text { font-size:11px; color:var(--admin); font-family:'Pretendard Variable',Pretendard,sans-serif; letter-spacing:.04em; }
+  .admin-banner-actions { display:flex; gap:8px; }
+  .ab-btn {
+    padding:4px 12px; border-radius:6px; font-size:11px; font-weight:700;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; cursor:pointer; border:none; transition:all .2s;
+  }
+  .ab-btn.add-tab { background:rgba(245,166,35,.2); color:var(--admin); }
+  .ab-btn.add-tab:hover { background:rgba(245,166,35,.35); }
+
+  /* ── TABS ── */
+  .tabs-wrapper {
+    background:var(--surface); border-bottom:1px solid var(--border);
+    overflow-x:auto; flex-shrink:0; scrollbar-width:none; -ms-overflow-style:none;
+    scroll-snap-type:x mandatory;
+  }
+  .tabs-wrapper::-webkit-scrollbar { display:none; }
+  .tabs { display:flex; padding:0 12px; min-width:max-content; }
+  .tab {
+    padding:0 16px; height:var(--tab-h); display:flex; align-items:center; gap:8px;
+    cursor:pointer; white-space:nowrap; font-size:13px; color:var(--text3);
+    border-bottom:2px solid transparent; transition:color .2s,border-color .2s;
+    position:relative; scroll-snap-align:start;
+  }
+  .tab:hover { color:var(--text2); }
+  .tab.active { color:var(--text); border-bottom-color:var(--accent); }
+  .tab .tab-badge {
+    font-size:10px; font-family:'Pretendard Variable',Pretendard,sans-serif; background:var(--surface2);
+    border-radius:8px; padding:1px 6px; color:var(--text3); transition:background .2s,color .2s;
+  }
+  .tab.active .tab-badge { background:var(--check-bg); color:var(--accent); }
+  .tab .tab-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); opacity:0; transition:opacity .2s; }
+  .tab.has-checks .tab-dot { opacity:1; }
+  /* admin tab controls */
+  .tab-edit-btn {
+    display:none; width:18px; height:18px; border-radius:4px; border:none;
+    background:rgba(245,166,35,.15); color:var(--admin); cursor:pointer;
+    font-size:10px; align-items:center; justify-content:center; flex-shrink:0;
+    transition:background .2s;
+  }
+  .tab-edit-btn:hover { background:rgba(245,166,35,.3); }
+  .admin-mode .tab-edit-btn { display:flex; }
+
+  /* ── CONTENT ── */
+  .content { flex:1; overflow-y:auto; scroll-behavior:smooth; }
+  .content-inner { padding:20px 16px 110px; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { margin-bottom:20px; }
+  .section-title { font-size:22px; font-weight:700; color:var(--text); letter-spacing:-.01em; }
+  .section-desc { font-size:13px; color:var(--text2); margin-top:4px; }
+  .section-progress { margin-top:14px; display:flex; align-items:center; gap:12px; }
+  .progress-bar { flex:1; height:4px; background:var(--surface2); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width .4s cubic-bezier(.4,0,.2,1); }
+  .progress-label { font-size:12px; font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--text2); flex-shrink:0; }
+
+  /* ── CHECK CARD ── */
+  .check-group { margin-bottom:20px; }
+  .check-group-header {
+    display:flex; align-items:center; gap:8px; margin-bottom:8px;
+  }
+  .check-group-label {
+    font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--text3); padding:0 2px; flex:1;
+  }
+  .group-edit-btn {
+    display:none; padding:2px 8px; border-radius:5px; font-size:10px; border:none;
+    cursor:pointer; transition:all .2s; font-family:'Pretendard Variable',Pretendard,sans-serif;
+  }
+  .group-add-btn { background:rgba(49,130,246,.1); color:var(--accent); }
+  .group-add-btn:hover { background:rgba(49,130,246,.2); }
+  .group-rename-btn { background:rgba(245,166,35,.1); color:var(--admin); }
+  .group-rename-btn:hover { background:rgba(245,166,35,.2); }
+  .group-delete-btn { background:rgba(255,95,95,.1); color:var(--danger); }
+  .group-delete-btn:hover { background:rgba(255,95,95,.2); }
+  .admin-mode .group-edit-btn { display:inline-flex; align-items:center; gap:3px; }
+
+  .check-list { display:flex; flex-direction:column; gap:2px; }
+  .check-item {
+    display:flex; align-items:center; gap:14px; padding:13px 14px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    transition:all .15s; user-select:none; -webkit-user-select:none; position:relative;
+  }
+  .check-item:not(.edit-mode) { cursor:pointer; }
+  .check-item:not(.edit-mode):active { transform:scale(.99); }
+  .check-item.checked { background:var(--check-bg); border-color:rgba(49,130,246,.18); }
+  .check-item.checked .check-text { text-decoration:line-through; color:var(--text3); }
+  .check-box {
+    width:20px; height:20px; border-radius:6px; border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:all .2s; background:var(--surface2);
+  }
+  .check-item.checked .check-box { background:var(--accent); border-color:var(--accent); }
+  .check-box svg { display:none; }
+  .check-item.checked .check-box svg { display:block; }
+  .check-no { font-size:10px; font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--text3); width:18px; flex-shrink:0; text-align:right; }
+  .check-text { flex:1; font-size:13.5px; color:var(--text); transition:color .2s; }
+
+  /* drag handle */
+  .drag-handle {
+    display:none; cursor:grab; color:var(--text3); flex-shrink:0;
+    padding:0 2px; touch-action:none;
+  }
+  .drag-handle:active { cursor:grabbing; }
+  .admin-mode .drag-handle { display:flex; align-items:center; }
+  .drag-handle svg { pointer-events:none; }
+
+  /* item action btns */
+  .item-actions {
+    display:none; gap:4px; flex-shrink:0;
+  }
+  .admin-mode .item-actions { display:flex; }
+  .ia-btn {
+    width:26px; height:26px; border-radius:6px; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:12px;
+    transition:background .15s;
+  }
+  .ia-edit { background:rgba(245,166,35,.1); color:var(--admin); }
+  .ia-edit:hover { background:rgba(245,166,35,.25); }
+  .ia-move { background:rgba(91,156,246,.1); color:#3182f6; }
+  .ia-move:hover { background:rgba(91,156,246,.25); }
+  .ia-del { background:rgba(255,95,95,.1); color:var(--danger); }
+  .ia-del:hover { background:rgba(255,95,95,.25); }
+
+  /* dragging state */
+  .check-item.dragging { opacity:.4; border-style:dashed; }
+  .check-item.drag-over { border-color:var(--accent); background:rgba(49,130,246,.05); }
+
+  /* add item row */
+  .add-item-row {
+    display:none; margin-top:4px;
+  }
+  .admin-mode .add-item-row { display:flex; }
+  .add-item-input {
+    flex:1; background:var(--surface2); border:1px dashed var(--border); border-radius:10px;
+    padding:11px 14px; color:var(--text); font-size:13px; font-family:'Pretendard Variable',Pretendard,sans-serif;
+    outline:none; transition:border-color .2s;
+  }
+  .add-item-input:focus { border-color:var(--accent); border-style:solid; }
+  .add-item-input::placeholder { color:var(--text3); }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    position:fixed; bottom:0; left:0; right:0;
+    padding:12px 16px 20px;
+    background:linear-gradient(transparent, var(--bg) 30%);
+    display:flex; gap:10px; pointer-events:none;
+  }
+  .bottom-bar .page-reset {
+    pointer-events:all; flex:1; height:48px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text2); font-size:13px;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; border-radius:12px; cursor:pointer;
+    transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .bottom-bar .page-reset:hover { background:var(--surface2); color:var(--text); }
+  .bottom-bar .complete-btn {
+    pointer-events:all; height:48px; padding:0 24px; background:var(--accent);
+    color:#fff; font-size:13px; font-weight:700; font-family:'Pretendard Variable',Pretendard,sans-serif;
+    border:none; border-radius:12px; cursor:pointer; transition:all .2s;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .complete-btn:hover { filter:brightness(1.1); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+    z-index:200; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.visible { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:24px; width:100%; max-width:420px;
+  }
+  .modal-title { font-size:16px; font-weight:700; margin-bottom:16px; }
+  .modal-input {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; color:var(--text); font-size:14px;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; outline:none; margin-bottom:8px;
+    transition:border-color .2s;
+  }
+  .modal-input:focus { border-color:var(--accent); }
+  .modal-sub { font-size:12px; color:var(--text3); margin-bottom:16px; }
+  .modal-actions { display:flex; gap:8px; justify-content:flex-end; }
+  .modal-btn {
+    padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; cursor:pointer; border:none; transition:all .2s;
+  }
+  .modal-btn.cancel { background:var(--surface2); color:var(--text2); }
+  .modal-btn.cancel:hover { color:var(--text); }
+  .modal-btn.confirm { background:var(--accent); color:#fff; }
+  .modal-btn.confirm:hover { filter:brightness(1.1); }
+  .modal-btn.danger { background:rgba(255,95,95,.15); color:var(--danger); }
+  .modal-btn.danger:hover { background:rgba(255,95,95,.3); }
+
+  /* move modal select */
+  .modal-select {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; color:var(--text); font-size:14px;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; outline:none; margin-bottom:16px;
+    cursor:pointer; appearance:none; -webkit-appearance:none;
+  }
+  .modal-select:focus { border-color:var(--accent); }
+
+  /* ── TOAST ── */
+  #toast {
+    position:fixed; bottom:88px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--accent); color:#fff; padding:10px 20px; border-radius:20px;
+    font-size:13px; font-weight:700; opacity:0; transition:all .3s;
+    pointer-events:none; white-space:nowrap; z-index:300;
+  }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ── PC ── */
+  @media (min-width:768px) {
+    header { padding:0 32px; height:60px; }
+    .logo { font-size:14px; }
+    .content-inner { padding:28px 32px 80px; max-width:960px; margin:0 auto; }
+    .bottom-bar { max-width:960px; left:50%; transform:translateX(-50%); padding:12px 32px 24px; }
+    .check-item { padding:14px 18px; }
+    .check-text { font-size:14px; }
+    .section-title { font-size:26px; }
+    .check-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .check-grid .check-group { margin-bottom:0; }
+    .admin-banner { padding:8px 32px; }
+  }
+  @media (min-width:1200px) {
+    .content-inner { max-width:1100px; padding:32px 40px 80px; }
+    .bottom-bar { max-width:1100px; }
+  }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">CHECKLIST<span> / 디자인 사고방지</span></div>
+    <div class="header-right">
+      <div class="stat-pill">전체 체크 항목 <strong id="global-done">0</strong>/<strong id="global-total">0</strong></div>
+      <button class="admin-toggle" id="admin-toggle">EDIT</button>
+    </div>
+  </header>
+
+  <div class="admin-banner" id="admin-banner">
+    <span class="admin-banner-text">✦ 편집 모드 — 항목을 추가·수정·삭제하거나 드래그로 순서를 바꿀 수 있어요</span>
+    <div class="admin-banner-actions">
+      <button class="ab-btn add-tab" id="add-tab-btn">+ 새 탭</button>
+    </div>
+  </div>
+
+  <div class="tabs-wrapper">
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="content" id="content"></div>
+
+  <div class="bottom-bar" id="bottom-bar" style="display:none">
+    <button class="page-reset" id="page-reset">↩ 초기화</button>
+    <button class="complete-btn" id="complete-btn">✓ 완료 처리</button>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">제목</div>
+      <input class="modal-input" id="modal-input" type="text" />
+      <div class="modal-sub" id="modal-sub"></div>
+      <select class="modal-select" id="modal-select" style="display:none"></select>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+// ── DATA ──
+const DEFAULT_DATA = {
+  "자가체크": {
+    desc:"디자인 컨펌 요청 전 작업자 본인이 먼저 확인해야 하는 기본 체크리스트",
+    items:[
+      {id:"i1",cat:"디자인",text:"정렬 이상 없음"},
+      {id:"i2",cat:"디자인",text:"여백 밸런스 확인"},
+      {id:"i3",cat:"디자인",text:"타이포 밀도 확인"},
+      {id:"i4",cat:"디자인",text:"컬러 톤 일관성 확인"},
+      {id:"i5",cat:"실물 기준",text:"실제 크기 기준 가독성 확인"},
+      {id:"i6",cat:"실물 기준",text:"축소 출력 또는 실물 사이즈 확인"},
+      {id:"i7",cat:"데이터",text:"오버셋 텍스트 없음"},
+      {id:"i8",cat:"데이터",text:"링크 이미지 누락 없음"},
+      {id:"i9",cat:"데이터",text:"폰트 정리 완료"},
+      {id:"i10",cat:"공유",text:"현재 고민 포인트 작성"},
+      {id:"i11",cat:"공유",text:"확인받고 싶은 부분 명확히 작성"},
+    ]
+  },
+  "오탈자체크": {
+    desc:"문서 구조, 페이지 순서, 텍스트 표기, 공식 명칭, 리걸, 상품번호를 점검",
+    items:[
+      {id:"j1",cat:"텍스트",text:"아티스트 공식 표기법 확인 (대소문자 민감)"},
+      {id:"j2",cat:"텍스트",text:"오탈자 확인"},
+      {id:"j3",cat:"텍스트",text:"띄어쓰기 통일 확인 (두 칸 이상 없는지)"},
+      {id:"j4",cat:"텍스트",text:"대소문자 사용 가능 여부 확인"},
+      {id:"j5",cat:"텍스트",text:"대소문자 통일 확인"},
+      {id:"j6",cat:"텍스트",text:"리걸 표기법 확인"},
+      {id:"j7",cat:"텍스트",text:"리걸 대소문자 통일 확인"},
+      {id:"j8",cat:"텍스트",text:"상품번호 확인"},
+      {id:"j9",cat:"텍스트",text:"바코드 번호 확인"},
+      {id:"j10",cat:"텍스트",text:"수량 표기법 확인"},
+      {id:"j11",cat:"텍스트",text:"수량 표기법 통일 확인"},
+      {id:"j12",cat:"텍스트",text:"실픅 사이즈 소수점 반올림 기준 통일 확인"},
+      {id:"j13",cat:"텍스트",text:"불필요한 정보는 없는지"},
+    ]
+  },
+  "표기법체크": {
+    desc:"자주 혼용되는 앨범/굿즈/인쇄 표기법을 최종 점검",
+    items:[
+      {id:"k1",cat:"표기법",text:"🟢 CREDITS (CREDIT ❌)"},
+      {id:"k2",cat:"표기법",text:"🟢 1st / 2nd / 3rd"},
+      {id:"k3",cat:"표기법",text:"🟢 TRACK LIST (TRACKLIST ❌)"},
+      {id:"k4",cat:"표기법",text:"🟢 PHOTOCARD (PHOTO CARD ❌)"},
+      {id:"k5",cat:"표기법",text:"🟢 PHOTO BOOK (PHOTOBOOK ❌)"},
+      {id:"k6",cat:"표기법",text:"🟢 RANDOM N OUT OF NN"},
+      {id:"k7",cat:"표기법",text:"🟢 POSTCARD (POST CARD ❌)"},
+      {id:"k8",cat:"표기법",text:"🟢 Digipack (Digi Pack ❌)"},
+      {id:"k9",cat:"표기법",text:"🟢 Jewel Case (Jewelcase ❌)"},
+      {id:"k10",cat:"표기법",text:"🟢 Mini Album (MINI ALBUM ❌)"},
+      {id:"k11",cat:"표기법",text:"🟢 Folded Poster (Folding Poster ❌)"},
+      {id:"k12",cat:"표기법",text:"🟢 Double-Sided Poster (Double Side Poster ❌)"},
+      {id:"k13",cat:"표기법",text:"🟢 Image Card (Imagecard ❌)"},
+      {id:"k14",cat:"표기법",text:"🟢 Sticker Set (Stickerset ❌)"},
+      {id:"k15",cat:"표기법",text:"🟢 The 1st Mini Album (1th Mini Album ❌)"},
+      {id:"k16",cat:"표기법",text:"🟢 The 2nd Album (2th Album ❌)"},
+      {id:"k17",cat:"표기법",text:"🟢 CD-R (CDR ❌)"},
+    ]
+  },
+  "이미지체크": {
+    desc:"사진 링크, 리터칭 최종본, 해상도, 컬러모드, 얼굴 크기와 피부톤을 점검",
+    items:[
+      {id:"l1",cat:"이미지",text:"Adobe RGB 사용 여부 확인"},
+      {id:"l2",cat:"이미지",text:"고해상도 이미지 여부 확인"},
+      {id:"l3",cat:"이미지",text:"이미지 깨짐 여부 확인"},
+      {id:"l4",cat:"이미지",text:"이미지 좌우, 상하 반전 여부 확인"},
+      {id:"l5",cat:"이미지",text:"포토카드 얼굴 크기 밸런스 확인"},
+      {id:"l6",cat:"이미지",text:"멤버별, 페이지별 피부톤 통일 확인"},
+      {id:"l7",cat:"이미지",text:"인쇄물 사진 밝기 최종 확인"},
+      {id:"l8",cat:"이미지",text:"암부 뭉침 확인"},
+      {id:"l9",cat:"이미지",text:"사진 정렬 확인"},
+      {id:"l10",cat:"이미지",text:"사진 링크 최종 경로 연결 여부 확인"},
+      {id:"l11",cat:"이미지",text:"리터칭 최종본 교체 여부 확인"},
+      {id:"l12",cat:"이미지",text:"유효 PPI 확인"},
+      {id:"l13",cat:"이미지",text:"흑백 사진 변환 시 컨트라스트 및 밝기 조정"},
+    ]
+  },
+  "그래픽체크": {
+    desc:"컬러, 별색, 오버프린트, 선 두께, 후가공 그래픽 요소를 점검",
+    items:[
+      {id:"m1",cat:"로고",text:"로고 해상도 확인"},
+      {id:"m2",cat:"로고",text:"로고 최신 버전 사용 여부 확인"},
+      {id:"m3",cat:"로고",text:"로고 좌우 반전 여부 확인"},
+      {id:"m4",cat:"로고",text:"로고 상하 반전 여부 확인"},
+      {id:"m5",cat:"로고",text:"로고 비율 변형 여부 확인"},
+      {id:"m6",cat:"로고",text:"로고 컬러 지정 확인"},
+      {id:"m7",cat:"라인",text:"일반 선 두께 적정 여부 (0.15pt 이상) 확인"},
+      {id:"m8",cat:"라인",text:"역상 선 두께 적정 여부 (0.3pt 이상) 확인"},
+      {id:"m9",cat:"라인",text:"박·형압 라인 0.5pt 이상 확인"},
+      {id:"m10",cat:"라인",text:"프레임 선 핀 확인"},
+      {id:"m11",cat:"컬러(웹)",text:"sRGB 모드에서 작업했는지 확인"},
+      {id:"m12",cat:"컬러(웹)",text:"그라데이션 경계질 경우 컬러 비트수 상승"},
+      {id:"m13",cat:"컬러(웹)",text:"웹 배경화이트 공간 고려 테두리나 그림자 사용"},
+      {id:"m14",cat:"컬러(웹)",text:"일러스트에서 사용하지 않는 스와치 정리"},
+      {id:"m15",cat:"먹(인쇄)",text:"작은 텍스트에 리치블랙 사용 지양"},
+      {id:"m16",cat:"먹(인쇄)",text:"검정 배경 위 흰 라인 두께 확인"},
+      {id:"m17",cat:"먹(인쇄)",text:"검정 배경 역상 텍스트 가독성 확인"},
+      {id:"m18",cat:"먹(인쇄)",text:"먹1도 / 먹2도 / 먹4도 여부 확인"},
+      {id:"m19",cat:"컬러(인쇄)",text:"밝은 배경 위 컬러 오버프린트 여부 확인"},
+      {id:"m20",cat:"컬러(인쇄)",text:"녹아웃 현상 확인"},
+      {id:"m21",cat:"컬러(인쇄)",text:"별색 PANTONE 사용 여부 확인"},
+      {id:"m22",cat:"컬러(인쇄)",text:"Spot Color 설정 확인"},
+      {id:"m23",cat:"컬러(인쇄)",text:"불필요한 별색 및 미사용 컬러 스와치에서 삭제"},
+      {id:"m24",cat:"컬러(인쇄)",text:"사용한 컬러 스와치 지정 확인"},
+      {id:"m25",cat:"컬러(인쇄)",text:"총 잉크량 TAC 확인"},
+      {id:"m26",cat:"컬러(인쇄)",text:"5% 이하 농도 ❌, 10% 농도 주의"},
+    ]
+  },
+  "레이아웃체크": {
+    desc:"정렬, 여백, 재단, 접지, 후두리, 양면 방향과 펼침 이미지를 점검",
+    items:[
+      {id:"n1",cat:"문서",text:"페이지 수 확인"},
+      {id:"n2",cat:"문서",text:"페이지 순서 확인"},
+      {id:"n3",cat:"문서",text:"페이지 번호 확인"},
+      {id:"n4",cat:"문서",text:"페이지 번호 위치 확인"},
+      {id:"n5",cat:"문서",text:"치수 소수점 반올림 기준 통일 확인"},
+      {id:"n6",cat:"문서",text:"실제 제작 사이즈 확인"},
+      {id:"n7",cat:"문서",text:"펼침 순서 확인"},
+      {id:"n8",cat:"레이아웃",text:"실제 마진 기준 정렬 확인"},
+      {id:"n9",cat:"레이아웃",text:"여백 밸런스 확인"},
+      {id:"n10",cat:"레이아웃",text:"텍스트박스 기준 정렬 여부 확인"},
+      {id:"n11",cat:"레이아웃",text:"시각적 중심 정렬 확인"},
+      {id:"n12",cat:"레이아웃",text:"오브젝트 끝선 기준 정렬 확인"},
+      {id:"n13",cat:"레이아웃",text:"착시 정렬 여부 확인"},
+      {id:"n14",cat:"레이아웃",text:"텍스트 넘침 없는지 확인"},
+      {id:"n15",cat:"레이아웃",text:"텍스트 가림 없는지 확인"},
+      {id:"n16",cat:"타입",text:"폰트 유실 없는지 확인"},
+      {id:"n17",cat:"타입",text:"옵티컬 커닝 설정 확인"},
+      {id:"n18",cat:"타입",text:"실제 웹에서 판독 가능한 폰트 사이즈인지"},
+      {id:"n19",cat:"타입",text:"실제 인쇄물에서 판독 가능한 폰트 사이즈 (4pt 이상)"},
+      {id:"n20",cat:"타입",text:"위계 정렬로 폰트를 활용했는지 (4pt 이상)"},
+      {id:"n21",cat:"타입",text:"저작권에 문제없는 폰트 (Adobe Fonts 사용권고)"},
+      {id:"n22",cat:"타입",text:"일반 한글 5.5~6pt 이상 확인"},
+      {id:"n23",cat:"타입",text:"일반 영문 5pt 이상 확인"},
+      {id:"n24",cat:"타입",text:"역상 흰글씨 6~7pt 이상 확인"},
+      {id:"n25",cat:"타입",text:"박 / 형압 텍스트 7pt 이상 확인"},
+      {id:"n26",cat:"타입",text:"리걸 3.5~4.5pt 가능하나 안정 기준 아님"},
+    ]
+  },
+  "인쇄파일체크": {
+    desc:"PDF검수, 프리플라이트, 바코드, 인증마크, 최소 인쇄 기준을 점검",
+    items:[
+      {id:"o1",cat:"데이터",text:"마스터 중첩 적용 여부 확인"},
+      {id:"o2",cat:"데이터",text:"숨겨진 레이어 확인"},
+      {id:"o3",cat:"데이터",text:"사용하지 않는 스와치 삭제 확인"},
+      {id:"o4",cat:"데이터",text:"사용하지 않는 스타일 삭제 확인"},
+      {id:"o5",cat:"데이터",text:"후두리 확보 여부 확인"},
+      {id:"o6",cat:"데이터",text:"오버셋 텍스트 확인"},
+      {id:"o7",cat:"데이터",text:"칼선 지정 확인"},
+      {id:"o8",cat:"데이터",text:"접지선 지정 확인"},
+      {id:"o9",cat:"데이터",text:"톰슨선 확인"},
+      {id:"o10",cat:"데이터",text:"톰슨 목형 부분 뾰족하지 않고 둥글게 확인"},
+      {id:"o11",cat:"데이터",text:"톰슨 개체 당 최소 간격 3mm"},
+      {id:"o12",cat:"데이터",text:"톰슨 개체당 이미지 여분 2mm"},
+      {id:"o13",cat:"데이터",text:"후가공 레이어 분리 확인"},
+      {id:"o14",cat:"후가공",text:"후가공 핀 정렬 (오차) 확인"},
+      {id:"o15",cat:"후가공",text:"박, 에폭시, UV 위치 확인"},
+      {id:"o16",cat:"후가공",text:"후가공 명칭 정확히 영어로 입력 확인"},
+      {id:"o17",cat:"후가공",text:"별색 컬러명 정확히 지정 확인"},
+      {id:"o18",cat:"후가공",text:"박명칭 정확히 입력 확인"},
+      {id:"o19",cat:"후가공",text:"Spot Color 설정 확인"},
+      {id:"o20",cat:"여분",text:"재단 여분값 (3mm) 확인"},
+      {id:"o21",cat:"여분",text:"접지 최소 여분값 (0.5) 확인"},
+      {id:"o22",cat:"여분",text:"안전영역 침범 여부 확인"},
+      {id:"o23",cat:"접지",text:"접지 방향 확인"},
+      {id:"o24",cat:"접지",text:"접힘부 여분 확인"},
+      {id:"o25",cat:"접지",text:"접힘부 컬러 비침 여부 확인"},
+      {id:"o26",cat:"접지",text:"접지 오차 대비 여분 확인"},
+    ]
+  },
+  "최종PDF체크": {
+    desc:"최종 PDF 인쇄물 납품 전 실물 기준을 점검",
+    items:[
+      {id:"p1",cat:"PDF검수",text:"PDF출력시 프리셋 확인"},
+      {id:"p2",cat:"PDF검수",text:"PDF출력시 재단선 포함 여부 확인"},
+      {id:"p3",cat:"PDF검수",text:"PDF출력시 도련 설정 확인"},
+      {id:"p4",cat:"PDF검수",text:"폰트 아웃라인 여부 확인"},
+      {id:"p5",cat:"PDF검수",text:"이미지 임베딩 여부 확인"},
+      {id:"p6",cat:"PDF검수",text:"투명도 플래튼 여부 확인"},
+      {id:"p7",cat:"PDF검수",text:"출력 미리보기 확인"},
+      {id:"p8",cat:"PDF검수",text:"분판 확인"},
+      {id:"p9",cat:"PDF검수",text:"오버프린트 미리보기 ON 확인"},
+      {id:"p10",cat:"PDF검수",text:"별색 확인"},
+      {id:"p11",cat:"PDF검수",text:"TAC 확인"},
+      {id:"p12",cat:"PDF검수",text:"프리플라이트 에러 확인"},
+      {id:"p13",cat:"PDF검수",text:"저해상도 이미지 확인"},
+    ]
+  },
+  "감리체크": {
+    desc:"감리 전·중·후 확인사항을 점검",
+    items:[
+      {id:"q1",cat:"파일전달",text:"감리 전 최종 데이터 맞는지 확인"},
+      {id:"q2",cat:"파일전달",text:"최종 사양서 용지, 컬러, 후가공과 일치하는지 확인"},
+      {id:"q3",cat:"파일전달",text:"최종 터잡기 PDF파일로 최종 오류 확인"},
+      {id:"q4",cat:"파일전달",text:"포장 시 유의사항 순서 및 구성 전달"},
+      {id:"q5",cat:"감리",text:"감리 시간, 일정, 품목별 감리 순서 확인"},
+      {id:"q6",cat:"감리",text:"색감 기준 확인"},
+      {id:"q7",cat:"감리",text:"박·에폭시·후가공 위치 확인"},
+      {id:"q8",cat:"감리",text:"초상 품목 확인 범위 기록"},
+      {id:"q9",cat:"감리",text:"피부톤 확인"},
+      {id:"q10",cat:"감리",text:"검정 뭉침 확인"},
+      {id:"q11",cat:"감리",text:"녹아웃 현상 확인"},
+      {id:"q12",cat:"감리",text:"오버프린트로 사라진 개체 확인"},
+      {id:"q13",cat:"감리",text:"오버프린트로 컬러 변동 여부 확인"},
+      {id:"q14",cat:"감리",text:"후가공 핀 확인"},
+      {id:"q15",cat:"감리",text:"최종 납품 수량 확인"},
+    ]
+  }
+};
+
+// ── STORAGE ──
+const STRUCT_KEY = 'wms_structure_v2';
+const STATE_KEY  = 'wms_checks_v2';
+
+function loadStructure() {
+  try {
+    const s = localStorage.getItem(STRUCT_KEY);
+    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+}
+function saveStructure() {
+  try { localStorage.setItem(STRUCT_KEY, JSON.stringify(SHEETS)); } catch(e) {}
+}
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(checkState)); } catch(e) {}
+}
+
+let SHEETS = loadStructure();
+// Ensure tab order array
+if (!SHEETS.__tabOrder) {
+  SHEETS.__tabOrder = Object.keys(SHEETS).filter(k => k !== '__tabOrder');
+}
+let checkState = loadState();
+
+function tabNames() { return SHEETS.__tabOrder || Object.keys(SHEETS).filter(k => k !== '__tabOrder'); }
+function genId() { return 'id' + Date.now() + Math.random().toString(36).slice(2,6); }
+
+// ── ADMIN MODE ──
+let adminMode = false;
+const appEl = document.getElementById('app');
+const ADMIN_PW = '5525';
+
+document.getElementById('admin-toggle').addEventListener('click', () => {
+  if (adminMode) {
+    // 끄기는 바로
+    adminMode = false;
+    document.getElementById('admin-toggle').classList.remove('active');
+    document.getElementById('admin-banner').classList.remove('visible');
+    appEl.classList.remove('admin-mode');
+    renderContent();
+  } else {
+    // 켜기는 비밀번호 확인
+    openModal({
+      title: '편집 모드 잠금 해제',
+      placeholder: '비밀번호 입력',
+      sub: '',
+      confirmLabel: '확인',
+      onConfirm: pw => {
+        if (pw === ADMIN_PW) {
+          adminMode = true;
+          document.getElementById('admin-toggle').classList.add('active');
+          document.getElementById('admin-banner').classList.add('visible');
+          appEl.classList.add('admin-mode');
+          renderContent();
+        } else {
+          showToast('비밀번호가 틀렸어요');
+        }
+      }
+    });
+    // input type을 password로
+    setTimeout(() => {
+      const inp = document.getElementById('modal-input');
+      if (inp) inp.type = 'password';
+    }, 30);
+  }
+});
+
+// ── TABS ──
+let activeTab = tabNames()[0];
+const tabsEl  = document.getElementById('tabs');
+const contentEl = document.getElementById('content');
+
+function renderTabs() {
+  tabsEl.innerHTML = '';
+  tabNames().forEach(name => {
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (name === activeTab ? ' active' : '');
+    const checks = checkState[name] || {};
+    const total = SHEETS[name].items.length;
+    const done  = Object.values(checks).filter(Boolean).length;
+    if (done > 0) tab.classList.add('has-checks');
+
+    const editBtn = `<button class="tab-edit-btn" data-tab="${name}" title="탭 편집">⋯</button>`;
+    tab.innerHTML = `<span class="tab-dot"></span>${name}<span class="tab-badge">${done}/${total}</span>${editBtn}`;
+
+    // click tab (not edit btn)
+    tab.addEventListener('click', e => {
+      if (e.target.classList.contains('tab-edit-btn')) return;
+      activeTab = name; render();
+    });
+    tab.querySelector('.tab-edit-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      openTabEditModal(name);
+    });
+    tabsEl.appendChild(tab);
+  });
+}
+
+// ── CONTENT ──
+function renderContent() {
+  contentEl.innerHTML = '';
+  const sheet = SHEETS[activeTab];
+  const checks = checkState[activeTab] || {};
+  const total = sheet.items.length;
+  const done  = Object.values(checks).filter(Boolean).length;
+  const pct   = total > 0 ? Math.round(done/total*100) : 0;
+
+  const inner = document.createElement('div');
+  inner.className = 'content-inner';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'page active';
+  wrapper.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">${activeTab}</div>
+      <div class="section-desc">${sheet.desc}</div>
+      <div class="section-progress">
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:${pct}%"></div></div>
+        <div class="progress-label" id="prog-label">${done} / ${total}</div>
+      </div>
+    </div>`;
+
+  // group items by cat (preserve order)
+  const groups = {};
+  const groupOrder = [];
+  sheet.items.forEach(item => {
+    if (!groups[item.cat]) { groups[item.cat] = []; groupOrder.push(item.cat); }
+    groups[item.cat].push(item);
+  });
+
+  const grid = document.createElement('div');
+  grid.className = 'check-grid';
+
+  groupOrder.forEach(cat => {
+    const group = document.createElement('div');
+    group.className = 'check-group';
+    group.dataset.cat = cat;
+
+    group.innerHTML = `
+      <div class="check-group-header">
+        <div class="check-group-label">${cat}</div>
+        <button class="group-edit-btn group-rename-btn" data-cat="${cat}">✎ 이름</button>
+        <button class="group-edit-btn group-add-btn" data-cat="${cat}">+ 항목</button>
+        <button class="group-edit-btn group-delete-btn" data-cat="${cat}">✕ 삭제</button>
+      </div>`;
+
+    // bind group buttons
+    group.querySelector('.group-rename-btn').addEventListener('click', () => openRenameGroupModal(cat));
+    group.querySelector('.group-add-btn').addEventListener('click', () => openAddItemModal(cat));
+    group.querySelector('.group-delete-btn').addEventListener('click', () => openDeleteGroupModal(cat));
+
+    const list = document.createElement('div');
+    list.className = 'check-list';
+    list.dataset.cat = cat;
+
+    groups[cat].forEach(item => buildItemEl(item, list, checks));
+
+    // add item input row per group
+    const addRow = document.createElement('div');
+    addRow.className = 'add-item-row';
+    const inp = document.createElement('input');
+    inp.className = 'add-item-input';
+    inp.placeholder = `+ "${cat}"에 항목 추가 후 Enter`;
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && inp.value.trim()) {
+        addItem(cat, inp.value.trim());
+        inp.value = '';
+      }
+    });
+    addRow.appendChild(inp);
+
+    group.appendChild(list);
+    group.appendChild(addRow);
+    grid.appendChild(group);
+  });
+
+  wrapper.appendChild(grid);
+  inner.appendChild(wrapper);
+  contentEl.appendChild(inner);
+  document.getElementById('bottom-bar').style.display = 'flex';
+
+  // init drag-drop
+  if (adminMode) initDragDrop();
+}
+
+function buildItemEl(item, list, checks) {
+  const isChecked = !!checks[item.id];
+  const div = document.createElement('div');
+  div.className = 'check-item' + (isChecked ? ' checked' : '');
+  div.dataset.id = item.id;
+  div.draggable = adminMode;
+  div.innerHTML = `
+    <div class="drag-handle" title="드래그로 순서 변경">
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor">
+        <circle cx="3" cy="2.5" r="1.3"/><circle cx="7" cy="2.5" r="1.3"/>
+        <circle cx="3" cy="7" r="1.3"/><circle cx="7" cy="7" r="1.3"/>
+        <circle cx="3" cy="11.5" r="1.3"/><circle cx="7" cy="11.5" r="1.3"/>
+      </svg>
+    </div>
+    <div class="check-box">
+      <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+        <path d="M1 5l3.5 3.5L11 1" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="check-text">${item.text}</span>
+    <div class="item-actions">
+      <button class="ia-btn ia-edit" title="이름 수정">✎</button>
+      <button class="ia-btn ia-move" title="탭 이동">⇄</button>
+      <button class="ia-btn ia-del" title="삭제">✕</button>
+    </div>`;
+
+  // check toggle — only when not clicking action buttons or drag handle
+  div.addEventListener('click', e => {
+    if (adminMode) return;
+    if (e.target.closest('.item-actions') || e.target.closest('.drag-handle')) return;
+    toggleCheck(item.id, div);
+  });
+
+  div.querySelector('.ia-edit').addEventListener('click', e => { e.stopPropagation(); openEditItemModal(item); });
+  div.querySelector('.ia-move').addEventListener('click', e => { e.stopPropagation(); openMoveItemModal(item); });
+  div.querySelector('.ia-del').addEventListener('click',  e => { e.stopPropagation(); deleteItem(item.id); });
+
+  list.appendChild(div);
+}
+
+// ── CHECK TOGGLE ──
+function toggleCheck(id, el) {
+  if (!checkState[activeTab]) checkState[activeTab] = {};
+  checkState[activeTab][id] = !checkState[activeTab][id];
+  saveState();
+  el.classList.toggle('checked', !!checkState[activeTab][id]);
+  updateProgress();
+}
+
+function updateProgress() {
+  const checks = checkState[activeTab] || {};
+  const total = SHEETS[activeTab].items.length;
+  const done  = Object.values(checks).filter(Boolean).length;
+  const pct   = total > 0 ? Math.round(done/total*100) : 0;
+  const fill  = document.getElementById('prog-fill');
+  const label = document.getElementById('prog-label');
+  if (fill)  fill.style.width = pct + '%';
+  if (label) label.textContent = `${done} / ${total}`;
+  renderTabs();
+  updateGlobalStats();
+}
+
+function updateGlobalStats() {
+  let totalDone=0, totalAll=0;
+  tabNames().forEach(name => {
+    const checks = checkState[name] || {};
+    totalAll  += SHEETS[name].items.length;
+    totalDone += Object.values(checks).filter(Boolean).length;
+  });
+  document.getElementById('global-done').textContent = totalDone;
+  document.getElementById('global-total').textContent = totalAll;
+}
+
+// ── DRAG & DROP (within same tab, reorder) ──
+let dragSrcId = null;
+
+function initDragDrop() {
+  const items = contentEl.querySelectorAll('.check-item');
+  items.forEach(el => {
+    el.addEventListener('dragstart', e => {
+      dragSrcId = el.dataset.id;
+      setTimeout(() => el.classList.add('dragging'), 0);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      contentEl.querySelectorAll('.check-item').forEach(i => i.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (el.dataset.id !== dragSrcId) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if (!dragSrcId || el.dataset.id === dragSrcId) return;
+      reorderItem(dragSrcId, el.dataset.id);
+    });
+  });
+}
+
+function reorderItem(srcId, targetId) {
+  const items = SHEETS[activeTab].items;
+  const srcIdx = items.findIndex(i => i.id === srcId);
+  const tgtIdx = items.findIndex(i => i.id === targetId);
+  if (srcIdx === -1 || tgtIdx === -1) return;
+  const [moved] = items.splice(srcIdx, 1);
+  items.splice(tgtIdx, 0, moved);
+  saveStructure();
+  renderContent();
+  showToast('순서 변경 완료');
+}
+
+// ── ITEM CRUD ──
+function addItem(cat, text) {
+  const item = { id: genId(), cat, text };
+  SHEETS[activeTab].items.push(item);
+  saveStructure();
+  renderContent();
+  updateGlobalStats();
+  showToast('항목 추가됨');
+}
+
+function deleteItem(id) {
+  SHEETS[activeTab].items = SHEETS[activeTab].items.filter(i => i.id !== id);
+  if (checkState[activeTab]) delete checkState[activeTab][id];
+  saveStructure(); saveState();
+  renderContent();
+  updateProgress();
+  showToast('항목 삭제됨');
+}
+
+function editItemText(id, newText) {
+  const item = SHEETS[activeTab].items.find(i => i.id === id);
+  if (item) { item.text = newText; saveStructure(); renderContent(); showToast('항목 수정됨'); }
+}
+
+function moveItemToTab(id, targetTab, targetCat) {
+  const srcItems = SHEETS[activeTab].items;
+  const idx = srcItems.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const [item] = srcItems.splice(idx, 1);
+  item.cat = targetCat;
+  SHEETS[targetTab].items.push(item);
+  // move check state
+  if (checkState[activeTab] && checkState[activeTab][id]) {
+    if (!checkState[targetTab]) checkState[targetTab] = {};
+    checkState[targetTab][id] = checkState[activeTab][id];
+    delete checkState[activeTab][id];
+  }
+  saveStructure(); saveState();
+  renderContent();
+  updateGlobalStats();
+  showToast(`"${targetTab}"으로 이동됨`);
+}
+
+// ── GROUP CRUD ──
+function renameGroup(oldCat, newCat) {
+  if (!newCat || newCat === oldCat) return;
+  SHEETS[activeTab].items.forEach(i => { if (i.cat === oldCat) i.cat = newCat; });
+  saveStructure(); renderContent(); showToast('카테고리 이름 변경됨');
+}
+
+function deleteGroup(cat) {
+  const toDelete = SHEETS[activeTab].items.filter(i => i.cat === cat).map(i => i.id);
+  SHEETS[activeTab].items = SHEETS[activeTab].items.filter(i => i.cat !== cat);
+  toDelete.forEach(id => { if (checkState[activeTab]) delete checkState[activeTab][id]; });
+  saveStructure(); saveState();
+  renderContent(); updateProgress(); showToast('카테고리 삭제됨');
+}
+
+// ── TAB CRUD ──
+function addTab(name, desc) {
+  if (!name || SHEETS[name]) return;
+  SHEETS[name] = { desc: desc || '', items: [] };
+  SHEETS.__tabOrder.push(name);
+  saveStructure();
+  activeTab = name;
+  render();
+  showToast(`"${name}" 탭 추가됨`);
+}
+
+function renameTab(oldName, newName) {
+  if (!newName || newName === oldName || SHEETS[newName]) return;
+  SHEETS[newName] = SHEETS[oldName];
+  delete SHEETS[oldName];
+  const idx = SHEETS.__tabOrder.indexOf(oldName);
+  if (idx !== -1) SHEETS.__tabOrder[idx] = newName;
+  if (checkState[oldName]) { checkState[newName] = checkState[oldName]; delete checkState[oldName]; }
+  if (activeTab === oldName) activeTab = newName;
+  saveStructure(); saveState(); render(); showToast('탭 이름 변경됨');
+}
+
+function deleteTab(name) {
+  if (tabNames().length <= 1) { showToast('탭이 하나만 남아서 삭제할 수 없어요'); return; }
+  delete SHEETS[name];
+  SHEETS.__tabOrder = SHEETS.__tabOrder.filter(n => n !== name);
+  delete checkState[name];
+  if (activeTab === name) activeTab = tabNames()[0];
+  saveStructure(); saveState(); render(); showToast('탭 삭제됨');
+}
+
+// ── MODAL SYSTEM ──
+function openModal({ title, placeholder, value='', sub='', showSelect=false, selectOptions=[], confirmLabel='확인', confirmClass='confirm', onConfirm, extraBtns=[] }) {
+  document.getElementById('modal-title').textContent = title;
+  const inp = document.getElementById('modal-input');
+  inp.placeholder = placeholder || '';
+  inp.value = value;
+  inp.style.display = showSelect ? 'none' : 'block';
+  document.getElementById('modal-sub').textContent = sub;
+  const sel = document.getElementById('modal-select');
+  if (showSelect) {
+    sel.style.display = 'block';
+    sel.innerHTML = selectOptions.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+  } else {
+    sel.style.display = 'none';
+  }
+  const actionsEl = document.getElementById('modal-actions');
+  actionsEl.innerHTML = '';
+  // cancel
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'modal-btn cancel'; cancelBtn.textContent = '취소';
+  cancelBtn.addEventListener('click', closeModal);
+  actionsEl.appendChild(cancelBtn);
+  // extra
+  extraBtns.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-btn ' + b.cls; btn.textContent = b.label;
+    btn.addEventListener('click', () => { closeModal(); b.onClick(); });
+    actionsEl.appendChild(btn);
+  });
+  // confirm
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'modal-btn ' + confirmClass; confirmBtn.textContent = confirmLabel;
+  confirmBtn.addEventListener('click', () => {
+    const val = showSelect ? sel.value : inp.value.trim();
+    closeModal();
+    onConfirm(val);
+  });
+  actionsEl.appendChild(confirmBtn);
+  document.getElementById('modal').classList.add('visible');
+  if (!showSelect) setTimeout(() => inp.focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('visible');
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+
+// ── MODAL HELPERS ──
+function openAddItemModal(cat) {
+  openModal({ title:`"${cat}"에 항목 추가`, placeholder:'새 항목 이름', confirmLabel:'추가', onConfirm: text => { if (text) addItem(cat, text); } });
+}
+function openEditItemModal(item) {
+  openModal({ title:'항목 이름 수정', placeholder:'항목 이름', value: item.text, confirmLabel:'저장', onConfirm: text => { if (text) editItemText(item.id, text); } });
+}
+function openMoveItemModal(item) {
+  const otherTabs = tabNames().filter(n => n !== activeTab);
+  if (!otherTabs.length) { showToast('이동할 탭이 없어요'); return; }
+  const options = otherTabs.map(t => ({ value: t, label: t }));
+  openModal({
+    title: '다른 탭으로 이동', showSelect: true, selectOptions: options,
+    sub: '이동할 탭을 선택하세요. 카테고리는 이동 후 수정할 수 있어요.',
+    confirmLabel: '이동', onConfirm: targetTab => {
+      if (!targetTab) return;
+      // pick first cat of target or use same cat name
+      const targetCats = [...new Set(SHEETS[targetTab].items.map(i => i.cat))];
+      const cat = targetCats.includes(item.cat) ? item.cat : (targetCats[0] || item.cat);
+      moveItemToTab(item.id, targetTab, cat);
+    }
+  });
+}
+function openRenameGroupModal(cat) {
+  openModal({ title:'카테고리 이름 변경', placeholder:'새 이름', value: cat, confirmLabel:'저장', onConfirm: name => { if (name) renameGroup(cat, name); } });
+}
+function openDeleteGroupModal(cat) {
+  const count = SHEETS[activeTab].items.filter(i => i.cat === cat).length;
+  openModal({ title:`"${cat}" 삭제`, sub:`항목 ${count}개가 함께 삭제됩니다. 되돌릴 수 없어요.`, placeholder:'', confirmLabel:'삭제', confirmClass:'danger', onConfirm: () => deleteGroup(cat) });
+}
+function openTabEditModal(name) {
+  openModal({
+    title: `"${name}" 탭 편집`, placeholder: '탭 이름', value: name,
+    sub: '이름을 바꾸거나 탭을 삭제할 수 있어요.',
+    confirmLabel: '이름 변경',
+    extraBtns: [{ label:'탭 삭제', cls:'danger', onClick: () => {
+      if (confirm(`"${name}" 탭과 항목 ${SHEETS[name].items.length}개를 모두 삭제할까요?`)) deleteTab(name);
+    }}],
+    onConfirm: newName => { if (newName && newName !== name) renameTab(name, newName); }
+  });
+}
+
+// new tab
+document.getElementById('add-tab-btn').addEventListener('click', () => {
+  openModal({
+    title: '새 탭 추가', placeholder: '탭 이름 (예: 웹디자인체크)',
+    sub: '탭 이름을 입력하세요. 항목은 나중에 추가할 수 있어요.',
+    confirmLabel: '추가', onConfirm: name => { if (name) addTab(name, ''); }
+  });
+});
+
+// ── BOTTOM BUTTONS ──
+document.getElementById('page-reset').addEventListener('click', () => {
+  if (confirm(`"${activeTab}" 체크리스트를 초기화할까요?`)) {
+    checkState[activeTab] = {};
+    saveState(); render();
+  }
+});
+document.getElementById('complete-btn').addEventListener('click', () => {
+  const total = SHEETS[activeTab].items.length;
+  const done  = Object.values(checkState[activeTab] || {}).filter(Boolean).length;
+  if (done < total && !confirm(`아직 ${total - done}개 항목이 남았습니다. 완료 처리할까요?`)) return;
+  if (!checkState[activeTab]) checkState[activeTab] = {};
+  SHEETS[activeTab].items.forEach(i => { checkState[activeTab][i.id] = true; });
+  saveState(); render();
+  showToast('✓ ' + activeTab + ' 완료!');
+});
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── RENDER ──
+function render() {
+  renderTabs();
+  renderContent();
+  updateGlobalStats();
+  requestAnimationFrame(() => {
+    const el = tabsEl.querySelector('.tab.active');
+    if (el) el.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' });
+  });
+}
+
+updateGlobalStats();
+render();
+</script>
+</body>
+</html>

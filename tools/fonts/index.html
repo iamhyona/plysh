@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SPECIMEN</title>
+<meta name="description" content="Google · Adobe · 한글 무료폰트를 한 곳에서 찾고 분류·시대별로 보고 즐겨찾기하는 폰트 아카이브">
+<meta property="og:title" content="SPECIMEN">
+<meta property="og:description" content="폰트를 한 곳에서 — 분류 · 시대 · 즐겨찾기">
+<meta property="og:image" content="https://iamhyona.github.io/fonts/og.png">
+<meta name="theme-color" content="#f2f4f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SPECIMEN">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#f2f4f6;--bg2:#eef0f3;--card:#ffffff;--card2:#f9fafb;--line:#e5e8eb;--line2:#eef0f3;
+  --tx:#191f28;--tx2:#4e5968;--tx3:#8b95a1;--acc:#3182f6;--grn:#00a661;--gold:#d97706;--red:#ef4444;
+  --r:14px;--hdr:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--tx);font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+body{min-height:100vh;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* header */
+header{position:sticky;top:0;z-index:30;background:rgba(242,244,246,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.hbar{height:var(--hdr);display:flex;align-items:center;gap:10px;padding:0 16px;max-width:1600px;margin:0 auto}
+.logo{font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:500;font-size:16px;letter-spacing:.06em}
+.logo small{font-size:10px;color:var(--tx3);margin-left:6px;letter-spacing:.04em}
+.hsp{flex:1}
+.rbtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--tx2);position:relative}
+.rbtn:hover{color:var(--tx);border-color:#d1d6db}
+.rbtn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--gold);display:none}
+.rbtn.pending .dot{display:block}
+.rbtn.spin svg{animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+nav.tabs{display:flex;gap:4px;padding:0 16px 8px;max-width:1600px;margin:0 auto}
+nav.tabs button{padding:7px 14px;border-radius:999px;color:var(--tx2);font-weight:600;font-size:13px;letter-spacing:.02em}
+nav.tabs button.on{background:var(--tx);color:#fff}
+nav.tabs .cnt{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;opacity:.6;margin-left:4px}
+
+main{max-width:1600px;margin:0 auto;padding:14px 16px 120px}
+
+/* tool bar */
+.tools{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center}
+.fld{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px;height:42px;min-width:0}
+.fld input{flex:1;min-width:0;background:none;border:0;outline:0;font-size:14px}
+.fld input::placeholder{color:var(--tx3)}
+.fld svg{color:var(--tx3)}
+.fld .x{color:var(--tx3);display:none}
+.fld.has .x{display:block}
+.szw{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px;height:42px}
+.szw input[type=range]{width:110px;accent-color:var(--tx)}
+.szw span{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;color:var(--tx2);width:30px;text-align:right}
+.vbtn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--tx3)}
+.vbtn.on{color:var(--tx);background:var(--card2)}
+
+.chipsrow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0;margin-top:10px;align-items:center}
+.chipsrow::-webkit-scrollbar{display:none}
+.chipsrow .lbl{font-size:11px;color:var(--tx3);font-family:'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.06em;flex:none;width:44px}
+.chip{flex:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--tx2);font-size:13px;white-space:nowrap;background:transparent}
+.chip:hover{color:var(--tx)}
+.chip.on{background:var(--tx);color:#fff;border-color:var(--tx);font-weight:600}
+.chip .n{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10.5px;opacity:.55;margin-left:4px}
+.chip.sub{font-size:12px;padding:5px 10px}
+.chip.sub.on{background:#e8f3ff;color:#1b64da;border-color:#c9e2ff}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
+.seg button{padding:5px 12px;border-radius:999px;font-size:13px;color:var(--tx2);white-space:nowrap}
+.seg button.on{background:var(--card2);color:var(--tx);font-weight:600}
+.src-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.sg{background:#60a5fa}.sa{background:#f87171}.sk{background:#34d399}
+
+.meta-row{display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;gap:10px}
+.meta-row .count{color:var(--tx2);font-size:13px}
+.meta-row .count b{color:var(--tx);font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:500}
+.meta-row select{background:var(--card);border:1px solid var(--line);border-radius:10px;height:34px;padding:0 10px;color:var(--tx2);font-size:13px}
+.linkbtn{color:var(--tx2);font-size:13px;display:inline-flex;gap:4px;align-items:center}
+.linkbtn:hover{color:var(--tx)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.grid.list{grid-template-columns:1fr}
+.card{background:var(--card);border:1px solid var(--line2);border-radius:var(--r);padding:14px 16px 12px;display:flex;flex-direction:column;gap:10px;min-width:0;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:#d1d6db}
+.card .top{display:flex;align-items:flex-start;gap:8px}
+.card .nm{font-weight:600;font-size:14px;line-height:1.3;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .sub2{font-size:12px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.star{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--tx3);flex:none;margin:-4px -6px 0 0}
+.star:hover{color:var(--tx)}
+.star.on{color:var(--gold)}
+.star.on svg{fill:var(--gold)}
+.pv{font-size:var(--pvs,40px);line-height:1.18;overflow:hidden;word-break:keep-all;overflow-wrap:anywhere;min-height:1.2em;max-height:calc(var(--pvs,40px)*2.45);color:var(--tx)}
+.grid.list .pv{max-height:calc(var(--pvs,40px)*1.25);white-space:nowrap;text-overflow:ellipsis}
+.pv.loading{opacity:.25}
+.pv.nopv{font-family:'Pretendard Variable',sans-serif!important;color:var(--tx3);font-size:13px;display:flex;align-items:center;gap:8px;min-height:calc(var(--pvs,40px)*1.2);max-height:none}
+.pv.nopv .ph{flex:1;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;line-height:1.5}
+.tags{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.tg{font-size:11px;color:var(--tx2);background:var(--bg2);border:1px solid var(--line2);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.tg.era{color:var(--tx)}
+.tg.mono{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10.5px}
+.more{display:flex;justify-content:center;padding:26px}
+.empty{color:var(--tx3);text-align:center;padding:60px 20px;line-height:1.8}
+
+/* era view */
+.eras{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.erac{background:var(--card);border:1px solid var(--line2);border-radius:var(--r);padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:104px;position:relative;overflow:hidden}
+.erac.on{border-color:var(--tx)}
+.erac .yr{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;color:var(--tx3)}
+.erac .t{font-weight:700;font-size:15px}
+.erac .st{font-size:11.5px;color:var(--tx2);line-height:1.4}
+.erac .c{position:absolute;right:12px;top:10px;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;color:var(--tx3)}
+.erac .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--tx2);opacity:.5}
+.timeline{display:flex;align-items:center;gap:0;margin:4px 0 14px;overflow-x:auto;scrollbar-width:none}
+.notice{font-size:12px;color:var(--tx3);margin:16px 0 12px;line-height:1.6}
+
+/* favorites */
+.favtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.fsec{margin-top:22px}
+.fsec h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.fsec h3 .n{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;color:var(--tx3);font-weight:400}
+.fsec h3 .act{margin-left:auto;display:flex;gap:4px}
+.fsec h4{font-size:12px;color:var(--tx3);font-weight:500;margin:14px 0 8px;letter-spacing:.02em}
+.ib{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--tx3)}
+.ib:hover{color:var(--tx);background:var(--card)}
+.memo{font-size:12px;color:var(--tx2);background:var(--bg2);border-radius:8px;padding:6px 9px;line-height:1.5}
+
+/* sheet / modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;display:none;align-items:flex-end;justify-content:center}
+.ov.show{display:flex}
+@media(min-width:760px){.ov{align-items:center}}
+.sheet{background:var(--bg2);border:1px solid var(--line);border-radius:20px 20px 0 0;width:100%;max-width:880px;max-height:92vh;overflow:auto;padding:18px 18px calc(22px + env(safe-area-inset-bottom))}
+@media(min-width:760px){.sheet{border-radius:20px;max-height:88vh}}
+.sheet.sm{max-width:440px}
+.shh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.shh h2{font-size:18px;font-weight:700;flex:1;min-width:0}
+.shh .ttl2{font-size:12px;color:var(--tx3);font-weight:400;display:block;margin-top:2px}
+.dpv{font-size:56px;line-height:1.15;word-break:keep-all;overflow-wrap:anywhere;padding:18px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
+.wts{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+.wts div{font-size:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 0;border-bottom:1px solid var(--line2)}
+.wts div small{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;color:var(--tx3);display:inline-block;width:34px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:0;font-size:13px}
+.kv>div{padding:9px 0;border-bottom:1px solid var(--line2)}
+.kv>div:nth-child(odd){color:var(--tx3)}
+.desc{font-size:13px;color:var(--tx2);line-height:1.7;margin:12px 0}
+.lic{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin:6px 0}
+.lic div{background:var(--card);border-radius:9px;padding:8px 10px;font-size:12px}
+.lic div b{display:block;font-weight:600;font-size:12px;margin-top:2px}
+.ok{color:var(--grn)}.cond{color:var(--gold)}.no{color:var(--red)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{height:40px;padding:0 16px;border-radius:11px;background:var(--card);border:1px solid var(--line);display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13px}
+.btn.pri{background:var(--tx);color:#fff;border-color:var(--tx)}
+.btn:disabled{opacity:.4}
+.flist{display:flex;flex-direction:column;gap:2px;margin:6px 0 10px}
+.flist label{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line2);cursor:pointer}
+.flist input{width:18px;height:18px;accent-color:var(--tx)}
+.inp{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;height:40px;padding:0 12px;outline:0}
+textarea.inp{height:70px;padding:10px 12px;resize:vertical}
+.row{display:flex;gap:8px;align-items:center}
+.lab{font-size:12px;color:var(--tx3);margin:14px 0 6px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--tx);color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:90;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.loadingx{color:var(--tx3);padding:80px 0;text-align:center}
+.hint{font-size:12px;color:var(--tx3);line-height:1.6}
+.sw{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line2);gap:10px}
+.sw input{width:18px;height:18px;accent-color:var(--tx)}
+
+@media(max-width:820px){
+  .tools{grid-template-columns:1fr 1fr}
+  .tools .sample{grid-column:1/-1;order:-1}
+  .szw input[type=range]{width:70px}
+  .grid{grid-template-columns:1fr}
+  .dpv{font-size:40px}
+}
+@media(max-width:520px){
+  .hbar{gap:7px;padding:0 12px}
+  .logo small{display:none}
+  main{padding:12px 12px 120px}
+  nav.tabs{padding:0 12px 8px}
+  .tools{grid-template-columns:1fr auto}
+  .szw{padding:0 8px}
+  .szw input[type=range]{width:64px}
+  .chipsrow .lbl{width:36px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="logo">SPECIMEN<small>FONT ARCHIVE</small></div>
+    <div class="hsp"></div>
+    <button class="rbtn" id="bSync" title="동기화"><span class="dot"></span><svg class="i" viewBox="0 0 24 24"><path d="M4 8h14l-3.5-3.5"/><path d="M20 16H6l3.5 3.5"/></svg></button>
+    <a class="rbtn" id="bSheet" title="즐겨찾기 시트 열기" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15"/></svg></a>
+    <button class="rbtn" id="bSet" title="설정"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-t="browse" class="on">BROWSE</button>
+    <button data-t="era">ERA</button>
+    <button data-t="saved">SAVED<span class="cnt" id="favCnt">0</span></button>
+  </nav>
+</header>
+
+<main>
+  <section id="toolArea">
+    <div class="tools">
+      <div class="fld" id="fQ"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input id="q" placeholder="폰트 · 디자이너 · 제작사 검색" autocomplete="off"><button class="x" data-clear="q"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="fld sample" id="fS"><svg class="i" viewBox="0 0 24 24"><path d="M5 19 10.5 5h1L17 19M7.2 14h8.6"/><path d="M19 9v10"/></svg><input id="sample" placeholder="샘플 텍스트 입력 — 전체 미리보기에 적용" autocomplete="off"><button class="x" data-clear="sample"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="szw"><svg class="i" viewBox="0 0 24 24" style="color:var(--tx3)"><path d="M4 18 8 7h1l4 11M5.4 14.5h6.2"/><path d="M15 18l2.6-6.5h.8L21 18M15.9 16h4.2"/></svg><input type="range" id="size" min="16" max="120" value="40"><span id="sizeV">40</span></div>
+    </div>
+    <div id="filters"></div>
+  </section>
+  <section id="eraArea" style="display:none"></section>
+  <section id="favTop" style="display:none"></section>
+  <div class="meta-row" id="metaRow">
+    <div class="count" id="count"></div>
+    <div class="row">
+      <select id="sort"><option value="rel">기본순</option><option value="name">이름순</option><option value="new">최근 추가순</option><option value="era">시대순</option><option value="pop">인기순(눈누)</option><option value="wt">굵기 많은순</option></select>
+      <button class="vbtn on" data-v="grid" title="그리드"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></button>
+      <button class="vbtn" data-v="list" title="리스트"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+  </div>
+  <div id="out"><div class="loadingx">폰트 목록 불러오는 중…</div></div>
+</main>
+
+<div class="ov" id="ov"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ---------- constants ---------- */
+const MAJOR={serif:'세리프',sans:'산세리프',slab:'슬랩',script:'스크립트',hand:'손글씨',display:'디스플레이',mono:'모노',black:'블랙레터',
+  kgothic:'한글 고딕',kmyung:'한글 명조',khand:'한글 손글씨',kdisplay:'한글 디스플레이'};
+const MAJOR_ORDER=['kgothic','kmyung','khand','kdisplay','serif','sans','slab','script','hand','display','mono','black'];
+const SUB={venetian:'휴머니스트(베네치안)',garalde:'올드스타일(가랄드)',transitional:'트랜지셔널',didone:'디돈·모던',scotch:'스카치',fatface:'팻페이스',glyphic:'글리픽',wedge:'웨지',softserif:'소프트',contemporary:'컨템퍼러리',
+  grotesque:'그로테스크',neogrotesque:'네오그로테스크',geometric:'지오메트릭',humanist:'휴머니스트',rounded:'라운드',superellipse:'슈퍼엘립스',condensed:'컨덴스드',
+  clarendon:'클라렌돈',geoslab:'지오메트릭 슬랩',humslab:'휴머니스트 슬랩',typewriter:'타자기',
+  formal:'포멀',informal:'캐주얼',upright:'업라이트',brush:'브러시',handwritten:'손글씨체',calligraphy:'캘리그래피',
+  artdeco:'아르데코',artnouveau:'아르누보',stencil:'스텐실',inline:'인라인',pixel:'픽셀',distressed:'디스트레스',woodtype:'우드타입',tuscan:'투스칸',shaded:'섀도',
+  techno:'테크노·퓨처',wacky:'위트·펑키',blobby:'블로비',medieval:'중세',inscription:'로마 비문',retro:'레트로',outline:'아웃라인',
+  kround:'둥근',ksquare:'각진',kbook:'책·본문',kpen:'펜글씨',kbrush:'붓글씨',kcute:'귀여운',kretro:'레트로',kpixel:'픽셀',kwide:'넓은',kthin:'가는',kbold:'굵은',kcoding:'코딩',ktitle:'제목용',kfull:'꽉찬',kfree:'탈네모꼴'};
+const ERAS=[['ancient','고대·중세','~1449','블랙레터 · 로마 비문'],['c15','15세기','1450–1499','베네치안 · 초기 인쇄'],['c16','16–17세기','1500–1699','가라몽 · 올드스타일'],
+  ['c18','18세기','1700–1799','캐즐론 · 배스커빌 · 보도니'],['c19a','19세기 전반','1800–1859','디돈 · 팻페이스 · 클라렌돈'],['c19b','19세기 후반','1860–1899','그로테스크 · 우드타입'],
+  ['e1900','1900–10s','1900–1919','아르누보 · 초기 고딕'],['e1920','1920–30s','1920–1939','지오메트릭 · 아르데코 · 바우하우스'],['e1940','1940–50s','1940–1959','네오그로테스크 · 스위스'],
+  ['e1960','1960–70s','1960–1979','슈퍼엘립스 · 사이키델릭'],['e1980','1980–90s','1980–1999','디지털 · 픽셀 · 테크노'],['e2000','2000s~ 현대','2000–','현대 디지털 서체']];
+const ERA_IDX=Object.fromEntries(ERAS.map((e,i)=>[e[0],i]));
+const SRC={g:'Google',a:'Adobe',k:'한글 무료'};
+const EH={manual:'원작 연도 보강',desc:'설명 기반',tag:'태그 기반',style:'양식 기반',default:'현대(추정)'};
+const DEF_KO='다람쥐 헌 쳇바퀴에 타고파';
+const DEF_LA='The quick brown fox jumps';
+const LS=k=>{try{return JSON.parse(localStorage.getItem('spc_'+k))}catch(e){return null}};
+const SS=(k,v)=>{try{localStorage.setItem('spc_'+k,JSON.stringify(v))}catch(e){}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ICON={
+  star:'<svg class="i" viewBox="0 0 24 24"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>',
+  close:'<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  ext:'<svg class="i" viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></svg>',
+  edit:'<svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  trash:'<svg class="i" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>',
+  plus:'<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  folder:'<svg class="i" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>',
+  filter:'<svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  copy:'<svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M5 15V6a1 1 0 0 1 1-1h9"/></svg>',
+  up:'<svg class="i" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5"/></svg>',
+  down:'<svg class="i" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>'
+};
+
+/* ---------- state ---------- */
+const S={
+  tab:'browse', data:[], byId:{}, desc:{},
+  q:'', sample:LS('sample')||'', size:LS('size')||40, view:LS('view')||'grid', sort:'rel',
+  src:'all', major:null, subs:new Set(), era:null, mood:null, wt:null, wd:null, opt:LS('opt')||{ko:false,pv:false,vf:false,lat:true,com:false},
+  shown:60, favs:LS('favs')||{}, folders:LS('folders')||['K-POP 로고','본문용','레트로','시즌그리팅'], favMode:LS('favMode')||'folder', favFolder:null,
+  cfg:LS('cfg')||{}, queue:LS('queue')||[], kitFams:new Set(LS('kitFams')||[]), adobeOn:!!LS('adobeOn'), akits:[]
+};
+const DEFAULT_API='https://script.google.com/macros/s/AKfycbz5UhKDReNbLSy3m3D--3wY5joT-oePkdGPQkZb9FjnveH9uERAcSBUsc3rGQo_9lvW/exec';
+const DEFAULT_SHEET='https://docs.google.com/spreadsheets/d/1MC7Y8wzcjTmolnnvHZgHC3aFjUOxDjjZtt1Ke877Pqc/edit';
+const DEFAULT_TOKEN='882b1151';
+if(!S.cfg.api && DEFAULT_API) S.cfg.api=DEFAULT_API;
+if(!S.cfg.sheet && DEFAULT_SHEET) S.cfg.sheet=DEFAULT_SHEET;
+if(!S.cfg.token && DEFAULT_TOKEN) S.cfg.token=DEFAULT_TOKEN;
+
+/* ---------- load ---------- */
+async function load(){
+  try{
+    const r=await fetch('fonts.json?v=1792955470'); const j=await r.json();
+    S.data=j.fonts; S.akits=j.akits||[]; S.data.forEach((f,i)=>{f._i=i; S.byId[f.id]=f; if(f.s==='a'&&f.fw){ f._w=f.fw; } if(f.s==='g'){ f._w=(f.wt&&f.wt.length)?f.wt.reduce((a,b)=>Math.abs(b-400)<Math.abs(a-400)?b:a):400; } f._q=(f.n+' '+(f.k||'')+' '+(f.d||'')+' '+(f.fo||'')+' '+(f.tg||[]).join(' ')).toLowerCase();});
+  }catch(e){ $('#out').innerHTML='<div class="empty">폰트 데이터를 불러오지 못했어요.<br>새로고침 해주세요.</div>'; return; }
+  $('#sample').value=S.sample; $('#fS').classList.toggle('has',!!S.sample);
+  $('#size').value=S.size; $('#sizeV').textContent=S.size; document.documentElement.style.setProperty('--pvs',S.size+'px');
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+  loadKits(); updSheetBtn(); renderFilters(); render(); pull();
+}
+/* ---------- font loading ---------- */
+const loaded=new Set(); let gQueue=[], gTimer=null;
+function wantFont(f){
+  if(loaded.has(f.id)) return; loaded.add(f.id);
+  if(f.s==='g'){ gQueue.push(f); clearTimeout(gTimer); gTimer=setTimeout(flushG,40); }
+  else if(f.s==='a' && f.gf && !(S.adobeOn && f.kt!=null)){ gQueue.push({n:f.gf,_w:f._w||400}); clearTimeout(gTimer); gTimer=setTimeout(flushG,40); }
+  else if(f.s==='a' && S.adobeOn && f.kt!=null){ loadAKit(f.kt); if(f.gf){ gQueue.push({n:f.gf,_w:f._w||400}); clearTimeout(gTimer); gTimer=setTimeout(flushG,40); } }
+  else if(f.s==='k' && f.ff){ const st=document.createElement('style'); st.textContent=kCss(f); document.head.appendChild(st); }
+}
+function flushG(){
+  const batch=gQueue.splice(0); for(let i=0;i<batch.length;i+=12){
+    const fams=batch.slice(i,i+12).map(f=>{ const w=f._w||400; return 'family='+encodeURIComponent(f.n).replace(/%20/g,'+')+':wght@'+w; });
+    const l=document.createElement('link'); l.rel='stylesheet'; l.href='https://fonts.googleapis.com/css2?'+fams.join('&')+'&display=swap'; document.head.appendChild(l);
+  }
+}
+function kCss(f){ return (f.ff||[]).map(([u,w,st])=>{ const url=u.startsWith('~')?'https://cdn.jsdelivr.net/gh/projectnoonnu/'+u.slice(1):u; const fmt=/woff2$/.test(url)?'woff2':/woff$/.test(url)?'woff':/otf$/.test(url)?'opentype':'truetype'; return `@font-face{font-family:'${f.cf}';src:url('${url}') format('${fmt}');font-weight:${w};${st?'font-style:'+st+';':''}font-display:swap;}`; }).join('\n'); }
+function famCss(f){
+  if(f.s==='g') return `'${f.n}'`;
+  if(f.s==='k') return `'${f.cf}'`;
+  if(f.s==='a') return (S.adobeOn&&f.kt!=null) ? `'${f.cf||f.id.slice(2)}'${f.gf?`,'${f.gf}'`:''}` : `'${f.gf}'`;
+}
+function canPreview(f){ return f.s!=='a' || !!f.gf || (S.adobeOn && f.kt!=null) || S.kitFams.has(f.id.slice(2)); }
+const akLoaded={}; let akChain=Promise.resolve();
+function loadAKit(i){
+  const id=S.akits[i]; if(!id||akLoaded[id]) return; akLoaded[id]=1;
+  akChain=akChain.then(()=>new Promise(res=>{ const s=document.createElement('script'); s.src='https://use.typekit.net/'+id+'.js'; s.onload=()=>{ try{ Typekit.load({async:true,active:res,inactive:res}); }catch(e){res()} setTimeout(res,4000); }; s.onerror=res; document.head.appendChild(s); }).then(()=>fixKit(i)));
+}
+const tokn=x=>String(x).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).sort().join('-');
+function fixKit(i){
+  const fams=new Set(); document.fonts.forEach(ff=>fams.add(ff.family.replace(/["']/g,'')));
+  const byTok={}; fams.forEach(n=>byTok[tokn(n)]=n);
+  S.data.forEach(f=>{ if(f.s!=='a'||f.kt!==i||fams.has(f.cf)) return; const m=byTok[tokn(f.cf)]||byTok[tokn(f.cf).replace(/(^|-)\d+(-|$)/g,'$1').replace(/^-|-$/g,'')]; if(m){ f.cf=m; document.querySelectorAll(`.card[data-id="${CSS.escape(f.id)}"] .pv:not(.nopv)`).forEach(p=>p.style.fontFamily=`'${m}','Pretendard Variable'`); } });
+}
+function pvText(f){
+  if(S.sample) return S.sample;
+  return (f.sc||[]).includes('ko') ? DEF_KO : DEF_LA;
+}
+function loadKits(){
+  (S.cfg.kits||[]).forEach(k=>{ if(!k) return; if(document.getElementById('kit_'+k)) return; const l=document.createElement('link'); l.id='kit_'+k; l.rel='stylesheet'; l.href='https://use.typekit.net/'+k+'.css'; document.head.appendChild(l); });
+}
+async function refreshKitFams(){
+  const set=new Set();
+  for(const k of (S.cfg.kits||[])){ if(!k) continue; try{ const t=await (await fetch('https://use.typekit.net/'+k+'.css')).text(); [...t.matchAll(/font-family:\s*"([^"]+)"/g)].forEach(m=>set.add(m[1])); }catch(e){} }
+  // map css family names back to slugs
+  const out=new Set(); S.data.forEach(f=>{ if(f.s==='a' && (set.has(f.wn)||set.has(f.id.slice(2)))) out.add(f.id.slice(2)); });
+  S.kitFams=out; SS('kitFams',[...out]); return out.size;
+}
+
+/* ---------- filtering ---------- */
+function baseFilter(f, skip){
+  if(S.src!=='all' && f.s!==S.src) return false;
+  if(skip!=='major' && S.major && f.m!==S.major) return false;
+  if(skip!=='major' && S.subs.size && !(f.sb||[]).some(s=>S.subs.has(s))) return false;
+  if(skip!=='era' && S.era && f.e!==S.era) return false;
+  if(skip!=='mood' && S.mood && !(f.mo||[]).includes(S.mood)) return false;
+  if(skip!=='wt' && S.wt){ if(S.wt==='l'&&!f.wl) return false; if(S.wt==='h'&&!f.wh) return false; if(S.wt==='m'&&!((f.w||1)>=6)) return false; if(S.wt==='v'&&!f.v) return false; }
+  if(skip!=='wd' && S.wd && !String(f.wd||'r').includes(S.wd)) return false;
+  const o=S.opt;
+  if(o.ko && !(f.sc||[]).includes('ko')) return false;
+  if(o.lat && (f.x || !(f.sc||[]).some(x=>x==='la'||x==='ko'))) return false;
+  if(o.vf && !f.v) return false;
+  if(o.pv && !canPreview(f)) return false;
+  if(o.com && f.s==='k' && !(f.lc&&f.lc.p==='o'&&f.lc.v==='o'&&f.lc.b==='o')) return false;
+  if(S.q){ const qs=S.q.toLowerCase().split(/\s+/).filter(Boolean); if(!qs.every(x=>f._q.includes(x))) return false; }
+  return true;
+}
+function sorted(list){
+  const s=S.sort;
+  if(s==='name') return list.sort((a,b)=>a.n.localeCompare(b.n,'ko'));
+  if(s==='new') return list.sort((a,b)=>(b.da||'').localeCompare(a.da||''));
+  if(s==='era') return list.sort((a,b)=>(ERA_IDX[a.e]-ERA_IDX[b.e])||((a.y||9999)-(b.y||9999)));
+  if(s==='pop') return list.sort((a,b)=>(b.pop||0)-(a.pop||0));
+  if(s==='wt') return list.sort((a,b)=>(b.w||0)-(a.w||0));
+  // rel: Korean-first when sample has hangul, previewable first, then popularity/order
+  const hk=/[가-힣]/.test(S.sample);
+  return list.sort((a,b)=>{
+    const pa=canPreview(a)?0:1, pb=canPreview(b)?0:1; if(pa!==pb) return pa-pb;
+    if(hk){ const ka=(a.sc||[]).includes('ko')?0:1, kb=(b.sc||[]).includes('ko')?0:1; if(ka!==kb) return ka-kb; }
+    return (b.r||0)-(a.r||0) || a._i-b._i;
+  });
+}
+
+/* ---------- filter UI ---------- */
+function cnt(fn){ let n=0; for(const f of S.data) if(fn(f)) n++; return n; }
+function renderFilters(){
+  const el=$('#filters');
+  const base=S.data.filter(f=>baseFilter(f,'major'));
+  const mc={}; base.forEach(f=>mc[f.m]=(mc[f.m]||0)+1);
+  let h=`<div class="chipsrow"><span class="lbl">SOURCE</span><div class="seg" id="srcSeg">`+
+    [['all','전체'],['g','Google'],['a','Adobe'],['k','한글 무료']].map(([k,l])=>`<button data-src="${k}" class="${S.src===k?'on':''}">${k!=='all'?`<span class="src-dot s${k}"></span>`:''}${l}</button>`).join('')+
+    `</div><button class="chip" id="optBtn" style="margin-left:6px">${ICON.filter.replace('class="i"','class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px"')}옵션${optCount()?' · '+optCount():''}</button></div>`;
+  h+=`<div class="chipsrow"><span class="lbl">TYPE</span><button class="chip ${!S.major?'on':''}" data-major="">전체</button>`+
+    MAJOR_ORDER.filter(m=>mc[m]).map(m=>`<button class="chip ${S.major===m?'on':''}" data-major="${m}">${MAJOR[m]}<span class="n">${mc[m]}</span></button>`).join('')+`</div>`;
+  if(S.major){
+    const sc={}; base.filter(f=>f.m===S.major).forEach(f=>(f.sb||[]).forEach(s=>sc[s]=(sc[s]||0)+1));
+    const subs=Object.keys(sc).filter(s=>SUB[s]&&sc[s]>=2).sort((a,b)=>sc[b]-sc[a]);
+    if(subs.length) h+=`<div class="chipsrow"><span class="lbl">STYLE</span>`+subs.map(s=>`<button class="chip sub ${S.subs.has(s)?'on':''}" data-sub="${s}">${SUB[s]}<span class="n">${sc[s]}</span></button>`).join('')+`</div>`;
+  }
+  if(S.tab==='browse'){
+    const eb=S.data.filter(f=>baseFilter(f,'era')); const ec={}; eb.forEach(f=>ec[f.e]=(ec[f.e]||0)+1);
+    h+=`<div class="chipsrow"><span class="lbl">ERA</span><button class="chip ${!S.era?'on':''}" data-era="">전체</button>`+ERAS.filter(e=>ec[e[0]]).map(e=>`<button class="chip ${S.era===e[0]?'on':''}" data-era="${e[0]}">${e[1]}<span class="n">${ec[e[0]]}</span></button>`).join('')+`</div>`;
+  }
+  const wb=S.data.filter(f=>baseFilter(f,'wt')); const wc={l:0,h:0,m:0,v:0}; wb.forEach(f=>{ if(f.wl)wc.l++; if(f.wh)wc.h++; if((f.w||1)>=6)wc.m++; if(f.v)wc.v++; });
+  h+=`<div class="chipsrow"><span class="lbl">WEIGHT</span><button class="chip ${!S.wt?'on':''}" data-wt="">전체</button>`+[['l','가는 굵기 있음'],['h','굵은 굵기 있음'],['m','굵기 6개 이상'],['v','가변폰트']].map(([k,l])=>`<button class="chip ${S.wt===k?'on':''}" data-wt="${k}">${l}<span class="n">${wc[k]}</span></button>`).join('')+`</div>`;
+  const db=S.data.filter(f=>baseFilter(f,'wd')); const dc={c:0,r:0,e:0}; db.forEach(f=>{ const w=String(f.wd||'r'); for(const k of 'cre') if(w.includes(k)) dc[k]++; });
+  h+=`<div class="chipsrow"><span class="lbl">WIDTH</span><button class="chip ${!S.wd?'on':''}" data-wd="">전체</button>`+[['c','좁은 (컨덴스드)'],['r','보통'],['e','넓은 (익스텐디드)']].map(([k,l])=>`<button class="chip ${S.wd===k?'on':''}" data-wd="${k}">${l}<span class="n">${dc[k]}</span></button>`).join('')+`</div>`;
+  const mb=S.data.filter(f=>baseFilter(f,'mood')); const moc={}; mb.forEach(f=>(f.mo||[]).forEach(m=>moc[m]=(moc[m]||0)+1));
+  const moods=Object.keys(moc).filter(m=>moc[m]>=3).sort((a,b)=>moc[b]-moc[a]);
+  if(moods.length) h+=`<div class="chipsrow"><span class="lbl">MOOD</span><button class="chip ${!S.mood?'on':''}" data-mood="">전체</button>`+moods.map(m=>`<button class="chip ${S.mood===m?'on':''}" data-mood="${esc(m)}">${esc(m)}<span class="n">${moc[m]}</span></button>`).join('')+`</div>`;
+  el.innerHTML=h;
+}
+function optCount(){ const o=S.opt; return ['ko','pv','vf','com'].filter(k=>o[k]).length + (o.lat?0:1); }
+
+/* ---------- main render ---------- */
+let curList=[];
+function render(keepShown){
+  if(!keepShown) S.shown=60;
+  $('#toolArea').style.display = S.tab==='saved' ? 'none' : '';
+  $('#eraArea').style.display = S.tab==='era' ? '' : 'none';
+  $('#favTop').style.display = S.tab==='saved' ? '' : 'none';
+  $('#favCnt').textContent=Object.keys(S.favs).length;
+  if(S.tab==='saved') return renderSaved();
+  if(S.tab==='era') renderEraArea();
+  curList=sorted(S.data.filter(f=>baseFilter(f)));
+  $('#metaRow').style.display='';
+  $('#count').innerHTML=`<b>${curList.length.toLocaleString()}</b>개 폰트`+(S.era&&S.tab==='era'?` · ${ERAS[ERA_IDX[S.era]][1]}`:'');
+  drawCards(curList.slice(0,S.shown), $('#out'), curList.length>S.shown);
+}
+function cardHTML(f){
+  const fav=S.favs[f.id]; const pv=canPreview(f);
+  const era=ERAS[ERA_IDX[f.e]];
+  const sub=[f.fo||f.d].filter(Boolean).join(' · ');
+  const tags=[`<span class="tg"><span class="src-dot s${f.s}"></span>${SRC[f.s]}</span>`, `<span class="tg">${MAJOR[f.m]||''}</span>`]
+    .concat((f.sb||[]).slice(0,2).filter(s=>SUB[s]).map(s=>`<span class="tg">${SUB[s]}</span>`))
+    .concat([`<span class="tg era">${era?era[1]:''}${f.y&&f.eh!=='style'?' · '+(f.y<1000?'고대':f.y):''}</span>`])
+    .concat(f.w>1?[`<span class="tg mono">${f.w}W</span>`]:[]).concat(f.v?[`<span class="tg mono">VAR</span>`]:[]);
+  const prev = pv ? `<div class="pv" style="font-family:${esc(famCss(f))},'Pretendard Variable';${f._w?'font-weight:'+f._w:''}">${esc(pvText(f))}</div>`
+    : (f.kt!=null ? `<div class="pv nopv"><div class="ph">Adobe 폰트 미리보기가 꺼져 있어요 <button class="btn" data-adobeon="1" style="height:30px;margin-left:6px">켜기</button></div></div>`
+      : `<div class="pv nopv"><div class="ph">미리보기 준비 안 된 Adobe 폰트 · 탭해서 Adobe에서 보기</div></div>`);
+  return `<div class="card" data-id="${esc(f.id)}"><div class="top"><div style="flex:1;min-width:0"><div class="nm">${esc(f.n)}</div><div class="sub2">${esc(sub)}</div></div><button class="star ${fav?'on':''}" data-star="${esc(f.id)}" title="즐겨찾기">${ICON.star}</button></div>${prev}<div class="tags">${tags.join('')}</div>${fav&&fav.m?`<div class="memo">${esc(fav.m)}</div>`:''}</div>`;
+}
+let io=null;
+function drawCards(list, el, hasMore){
+  if(!list.length){ el.innerHTML='<div class="empty">조건에 맞는 폰트가 없어요.<br>필터를 줄여보세요.</div>'; return; }
+  el.innerHTML=`<div class="grid ${S.view==='list'?'list':''}">${list.map(cardHTML).join('')}</div>`+(hasMore?`<div class="more" id="moreS"><button class="btn" id="moreB">더 보기</button></div>`:'');
+  observe(el);
+  const m=$('#moreS'); if(m){ const o=new IntersectionObserver(es=>{ if(es[0].isIntersecting){ o.disconnect(); S.shown+=60; appendMore(); } },{rootMargin:'600px'}); o.observe(m); }
+}
+function appendMore(){
+  const grid=$('#out .grid'); if(!grid) return;
+  const from=grid.children.length; const chunk=curList.slice(from,S.shown);
+  grid.insertAdjacentHTML('beforeend',chunk.map(cardHTML).join(''));
+  observe($('#out'));
+  const m=$('#moreS'); if(curList.length<=S.shown){ m&&m.remove(); } else { const o=new IntersectionObserver(es=>{ if(es[0].isIntersecting){ o.disconnect(); S.shown+=60; appendMore(); } },{rootMargin:'600px'}); o.observe(m); }
+}
+function observe(root){
+  if(!io) io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ const f=S.byId[e.target.dataset.id]; if(f){ wantFont(f); const pv=e.target.querySelector('.pv:not(.nopv)'); if(pv&&f._w) pv.style.fontWeight=f._w; } io.unobserve(e.target);} }),{rootMargin:'300px'});
+  root.querySelectorAll('.card').forEach(c=>io.observe(c));
+}
+function updatePreviews(){
+  document.querySelectorAll('.card .pv:not(.nopv)').forEach(p=>{ const f=S.byId[p.closest('.card').dataset.id]; p.textContent=pvText(f); });
+  const d=$('#dpv'); if(d){ const f=S.byId[d.dataset.id]; d.textContent=pvText(f); document.querySelectorAll('#wts div span').forEach(s=>s.textContent=pvText(f)); }
+}
+
+/* ---------- ERA ---------- */
+function renderEraArea(){
+  const base=S.data.filter(f=>baseFilter(f,'era')); const ec={}; base.forEach(f=>ec[f.e]=(ec[f.e]||0)+1);
+  const mx=Math.max(1,...Object.values(ec));
+  $('#eraArea').innerHTML=`<div class="notice">시대는 서체 양식(올드스타일·디돈·그로테스크·지오메트릭 등)으로 매기고, 유명 리바이벌은 원작 연도로 보강했어요. ‘현대(추정)’는 근거가 없어 디지털 제작 시기로 둔 폰트예요.</div><div class="eras">`+
+    ERAS.map(e=>`<button class="erac ${S.era===e[0]?'on':''}" data-era="${e[0]}"><span class="c">${(ec[e[0]]||0).toLocaleString()}</span><span class="yr">${e[2]}</span><span class="t">${e[1]}</span><span class="st">${e[3]}</span><span class="bar" style="width:${Math.round((ec[e[0]]||0)/mx*100)}%"></span></button>`).join('')+`</div>`;
+}
+
+/* ---------- SAVED ---------- */
+function renderSaved(){
+  $('#metaRow').style.display='none';
+  const favIds=Object.keys(S.favs).filter(id=>S.byId[id]);
+  const fc={}; favIds.forEach(id=>(S.favs[id].f||[]).forEach(x=>fc[x]=(fc[x]||0)+1));
+  const none=favIds.filter(id=>!(S.favs[id].f||[]).length).length;
+  $('#favTop').innerHTML=`<div class="favtop"><div class="seg"><button data-fm="folder" class="${S.favMode==='folder'?'on':''}">폴더별</button><button data-fm="type" class="${S.favMode==='type'?'on':''}">분류별</button><button data-fm="era" class="${S.favMode==='era'?'on':''}">시대별</button></div>
+    <div class="fld" style="flex:1;min-width:180px"><svg class="i" viewBox="0 0 24 24"><path d="M5 19 10.5 5h1L17 19M7.2 14h8.6"/><path d="M19 9v10"/></svg><input id="sample2" placeholder="샘플 텍스트" value="${esc(S.sample)}"></div>
+    <button class="btn" id="newFolder">${ICON.plus}폴더</button></div>
+    <div class="chipsrow"><button class="chip ${!S.favFolder?'on':''}" data-ff="">전체<span class="n">${favIds.length}</span></button>${S.folders.map(x=>`<button class="chip ${S.favFolder===x?'on':''}" data-ff="${esc(x)}">${esc(x)}<span class="n">${fc[x]||0}</span></button>`).join('')}${none?`<button class="chip ${S.favFolder==='__none'?'on':''}" data-ff="__none">미분류<span class="n">${none}</span></button>`:''}</div>`;
+  let ids=favIds; if(S.favFolder==='__none') ids=ids.filter(id=>!(S.favs[id].f||[]).length); else if(S.favFolder) ids=ids.filter(id=>(S.favs[id].f||[]).includes(S.favFolder));
+  const out=$('#out');
+  if(!ids.length){ out.innerHTML=`<div class="empty">아직 즐겨찾기한 폰트가 없어요.<br>BROWSE에서 ☆를 눌러 폴더에 담아두세요.</div>`; return; }
+  const list=ids.map(id=>S.byId[id]);
+  const groups=[];
+  if(S.favMode==='folder'){
+    const fl=S.favFolder? (S.favFolder==='__none'?['__none']:[S.favFolder]) : [...S.folders,'__none'];
+    fl.forEach(x=>{ const g=list.filter(f=>x==='__none'?!(S.favs[f.id].f||[]).length:(S.favs[f.id].f||[]).includes(x)); if(g.length) groups.push([x==='__none'?'미분류':x,g,x]); });
+  } else if(S.favMode==='type'){
+    MAJOR_ORDER.forEach(m=>{ const g=list.filter(f=>f.m===m); if(g.length) groups.push([MAJOR[m],g]); });
+  } else {
+    ERAS.forEach(e=>{ const g=list.filter(f=>f.e===e[0]); if(g.length) groups.push([e[1],g]); });
+  }
+  out.innerHTML=groups.map(([t,g,key])=>{
+    let inner;
+    if(S.favMode==='folder'){ // sub-group by type inside folder
+      inner=MAJOR_ORDER.map(m=>{ const gg=g.filter(f=>f.m===m); return gg.length?`<h4>${MAJOR[m]} · ${gg.length}</h4><div class="grid ${S.view==='list'?'list':''}">${gg.map(cardHTML).join('')}</div>`:''; }).join('');
+    } else inner=`<div class="grid ${S.view==='list'?'list':''}">${g.map(cardHTML).join('')}</div>`;
+    const acts= key&&key!=='__none'?`<span class="act"><button class="ib" data-fup="${esc(key)}" title="위로">${ICON.up}</button><button class="ib" data-fren="${esc(key)}" title="이름 변경">${ICON.edit}</button><button class="ib" data-fdel="${esc(key)}" title="폴더 삭제">${ICON.trash}</button></span>`:'';
+    return `<div class="fsec"><h3>${S.favMode==='folder'?ICON.folder:''}${esc(t)}<span class="n">${g.length}</span>${acts}</h3>${inner}</div>`;
+  }).join('');
+  observe(out);
+}
+
+/* ---------- detail ---------- */
+function linkOf(f){
+  if(f.s==='g') return ['Google Fonts에서 보기','https://fonts.google.com/specimen/'+encodeURIComponent(f.n).replace(/%20/g,'+')];
+  if(f.s==='a') return ['Adobe Fonts에서 보기','https://fonts.adobe.com/fonts/'+f.id.slice(2)];
+  return ['눈누에서 보기','https://noonnu.cc/font_page/'+f.id.slice(2)];
+}
+const LIC_KEYS=[['p','인쇄'],['w','웹사이트'],['k','포장지'],['v','영상'],['e','임베딩'],['b','BI/CI'],['o','OFL']];
+const LIC_V={o:['사용 가능','ok'],c:['조건부','cond'],x:['불가','no'],'?':['확인 필요','cond']};
+async function openDetail(id){
+  const f=S.byId[id]; if(!f) return; wantFont(f);
+  if(f.s==='g' && f.wt && f.wt.length>1){ const l=document.createElement('link'); l.rel='stylesheet'; l.href='https://fonts.googleapis.com/css2?family='+encodeURIComponent(f.n).replace(/%20/g,'+')+':wght@'+f.wt.join(';')+'&display=swap'; document.head.appendChild(l); }
+  const era=ERAS[ERA_IDX[f.e]]; const [lt,lu]=linkOf(f); const pv=canPreview(f);
+  const fav=S.favs[f.id];
+  let wts='';
+  if(pv && f.s==='g' && f.wt && f.wt.length>1) wts=`<div class="wts" id="wts">${f.wt.map(w=>`<div style="font-family:${esc(famCss(f))};font-weight:${w}"><small>${w}</small><span>${esc(pvText(f))}</span></div>`).join('')}</div>`;
+  const lic = f.s==='k' && f.lc ? `<div class="lab">라이선스 요약 (눈누 기준 · 사용 전 원문 확인)</div><div class="lic">${LIC_KEYS.map(([k,l])=>{ const v=k==='o'?(f.lc.o==='o'?['OFL 라이선스','ok']:['OFL 아님','cond']):(LIC_V[f.lc[k]||'?']||LIC_V['?']); return `<div>${l}<b class="${v[1]}">${v[0]}</b></div>`; }).join('')}</div>` : '';
+  const licLine = f.s==='g' ? (f.lc==='OFL'?'SIL Open Font License — 상업적 사용 가능':f.lc==='APACHE2'?'Apache 2.0 — 상업적 사용 가능':f.lc==='UFL'?'Ubuntu Font Licence — 상업적 사용 가능':f.lc) : f.s==='a' ? 'Adobe Fonts 라이선스 — Creative Cloud 구독 중 상업적 사용 가능(활성화 필요)' : '';
+  $('#sheet').className='sheet';
+  $('#sheet').innerHTML=`<div class="shh"><h2>${esc(f.n)}<span class="ttl2">${esc([f.fo,f.d].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(' · '))}</span></h2><button class="star ${fav?'on':''}" data-star="${esc(f.id)}" style="margin:0">${ICON.star}</button><button class="ib" data-close>${ICON.close}</button></div>
+   ${pv?`<div class="dpv" id="dpv" data-id="${esc(f.id)}" style="font-family:${esc(famCss(f))},'Pretendard Variable';${f._w?'font-weight:'+f._w:''}" contenteditable="true" spellcheck="false">${esc(pvText(f))}</div>`:`<div class="pv nopv" style="margin-bottom:12px"><div class="ph">${f.kt!=null?'Adobe 폰트 미리보기가 꺼져 있어요. 설정에서 ‘Adobe 폰트 미리보기’를 켜면 내 텍스트로 볼 수 있어요.':'이 폰트는 웹 프로젝트에 넣을 수 없는 폰트예요. Adobe 페이지에서 확인해주세요.'}</div></div>`}
+   ${wts}
+   <div class="kv">
+     <div>소스</div><div><span class="src-dot s${f.s}"></span>${SRC[f.s]}</div>
+     <div>분류</div><div>${MAJOR[f.m]||''}${(f.sb||[]).filter(s=>SUB[s]).length?' · '+(f.sb||[]).filter(s=>SUB[s]).map(s=>SUB[s]).join(', '):''}</div>
+     <div>시대</div><div>${era?era[1]:''}${f.y?` · ${f.y<1000?'고대 로마':f.y+(f.eh==='style'?'년대 전후':'')}`:''} <span style="color:var(--tx3)">(${EH[f.eh]||''}${f.en?' · '+esc(f.en):''})</span></div>
+     ${f.mo&&f.mo.length?`<div>무드</div><div>${f.mo.map(esc).join(', ')}</div>`:''}
+     <div>스타일</div><div>${f.w||1}개${f.v?' · 가변폰트':''}${f.it?' · 이탤릭 포함':''}</div>
+     <div>지원 문자</div><div>${(f.sc||[]).map(x=>({ko:'한글',la:'라틴',ja:'일본어',zh:'중국어',cy:'키릴',gr:'그리스'}[x]||x)).join(', ')}</div>
+     ${f.da?`<div>등록일</div><div>${fmtDate(f.da)}</div>`:''}
+     ${f.pop?`<div>조회수</div><div>${f.pop.toLocaleString()} (눈누)</div>`:''}
+     ${licLine?`<div>라이선스</div><div>${esc(licLine)}</div>`:''}
+   </div>
+   ${lic}
+   <div class="desc" id="dDesc"></div>
+   ${fav?`<div class="lab">폴더 · 메모</div><div class="memo">${(fav.f||[]).map(esc).join(', ')||'미분류'}${fav.m?' — '+esc(fav.m):''}</div>`:''}
+   <div class="btns"><a class="btn pri" href="${esc(lu)}" target="_blank" rel="noopener">${ICON.ext}${lt}</a>${f.dl?`<a class="btn" href="${esc(f.dl)}" target="_blank" rel="noopener">${ICON.ext}다운로드 페이지</a>`:''}<button class="btn" data-copy="${esc(f.n)}">${ICON.copy}이름 복사</button>${f.ff?`<button class="btn" data-copycss="${esc(f.id)}">${ICON.copy}웹폰트 CSS</button>`:''}</div>`;
+  openOv();
+  const dpv=$('#dpv'); if(dpv) dpv.addEventListener('input',()=>{ S.sample=dpv.textContent; SS('sample',S.sample); $('#sample').value=S.sample; $('#fS').classList.toggle('has',!!S.sample); document.querySelectorAll('#wts div span').forEach(s=>s.textContent=S.sample); });
+  const d=await getDesc(f); if(d) $('#dDesc').textContent=d;
+}
+async function getDesc(f){
+  const src=f.s; if(!S.desc[src]){ try{ S.desc[src]=await (await fetch('desc_'+src+'.json?v=1792955470')).json(); }catch(e){ S.desc[src]={}; } }
+  return S.desc[src][f.id]||'';
+}
+function fmtDate(d){ const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(d||''); if(!m) return d||''; const w='일월화수목금토'[new Date(+m[1],m[2]-1,+m[3]).getDay()]; return `${m[1].slice(2)}.${m[2]}.${m[3]} <span style="color:var(--tx3);font-size:12px">${w}</span>`; }
+
+/* ---------- favorite picker ---------- */
+function openFav(id){
+  const f=S.byId[id]; const fav=S.favs[id]||{f:[],m:''};
+  $('#sheet').className='sheet sm';
+  $('#sheet').innerHTML=`<div class="shh"><h2>${esc(f.n)}<span class="ttl2">폴더에 담기</span></h2><button class="ib" data-close>${ICON.close}</button></div>
+   <div class="flist" id="flist">${S.folders.map(x=>`<label><input type="checkbox" value="${esc(x)}" ${(fav.f||[]).includes(x)?'checked':''}>${ICON.folder}${esc(x)}</label>`).join('')}</div>
+   <div class="row"><input class="inp" id="nf" placeholder="새 폴더 이름"><button class="btn" id="nfB">${ICON.plus}추가</button></div>
+   <div class="lab">메모</div><textarea class="inp" id="fm" placeholder="예: 시즌그리팅 타이틀에 좋음">${esc(fav.m||'')}</textarea>
+   <div class="btns">${S.favs[id]?`<button class="btn" id="favDel">${ICON.trash}즐겨찾기 해제</button>`:''}<span style="flex:1"></span><button class="btn pri" id="favSave">${S.favs[id]?'저장':'즐겨찾기 추가'}</button></div>`;
+  openOv();
+  $('#nfB').onclick=()=>{ const v=$('#nf').value.trim(); if(!v||S.folders.includes(v)) return; S.folders.push(v); saveFolders(); $('#flist').insertAdjacentHTML('beforeend',`<label><input type="checkbox" value="${esc(v)}" checked>${ICON.folder}${esc(v)}</label>`); $('#nf').value=''; };
+  $('#favSave').onclick=()=>{ const fl=[...document.querySelectorAll('#flist input:checked')].map(i=>i.value); setFav(id,{f:fl,m:$('#fm').value.trim(),t:(S.favs[id]&&S.favs[id].t)||new Date().toISOString().slice(0,10)}); closeOv(); toast('즐겨찾기에 담았어요'); };
+  const del=$('#favDel'); if(del) del.onclick=()=>{ setFav(id,null); closeOv(); toast('즐겨찾기 해제'); };
+}
+function setFav(id,v){
+  const f=S.byId[id];
+  if(v){ S.favs[id]=v; enqueue({a:'upsert',id,n:f.n,s:SRC[f.s],c:MAJOR[f.m]||'',e:(ERAS[ERA_IDX[f.e]]||[])[1]||'',f:(v.f||[]).join(', '),m:v.m||'',t:v.t,u:linkOf(f)[1]}); }
+  else { delete S.favs[id]; enqueue({a:'remove',id}); }
+  SS('favs',S.favs); refreshStars(id); $('#favCnt').textContent=Object.keys(S.favs).length;
+  if(S.tab==='saved') renderSaved();
+}
+function refreshStars(id){ document.querySelectorAll(`[data-star="${CSS.escape(id)}"]`).forEach(b=>b.classList.toggle('on',!!S.favs[id])); }
+function saveFolders(){ SS('folders',S.folders); enqueue({a:'folders',list:S.folders}); }
+
+/* ---------- sync (Google Sheet via Apps Script) ---------- */
+function enqueue(op){ S.queue.push(op); SS('queue',S.queue); setPending(); flush(); }
+function setPending(){ $('#bSync').classList.toggle('pending',S.queue.length>0); }
+let flushing=false;
+async function flush(){
+  if(flushing||!S.cfg.api||!S.queue.length) return; flushing=true;
+  try{
+    while(S.queue.length){
+      const batch=S.queue.slice(0,30);
+      const r=await fetch(S.cfg.api,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:S.cfg.token||'',ops:batch})});
+      const j=await r.json(); if(!j.ok) throw new Error(j.error||'sync');
+      S.queue.splice(0,batch.length); SS('queue',S.queue);
+    }
+  }catch(e){ console.warn('sync fail',e); setTimeout(()=>{flushing=false;flush()},15000); setPending(); return; }
+  flushing=false; setPending();
+}
+async function pull(manual){
+  if(!S.cfg.api){ if(manual) toast('설정에서 시트 연결 주소를 넣어주세요'); return; }
+  const b=$('#bSync'); b.classList.add('spin');
+  try{
+    await flush();
+    const j=await (await fetch(S.cfg.api+'?action=all&token='+encodeURIComponent(S.cfg.token||''))).json();
+    if(j.ok){
+      if(!S.queue.length){
+        const favs={}; (j.favs||[]).forEach(r=>{ if(r.id) favs[r.id]={f:String(r.f||'').split(',').map(s=>s.trim()).filter(Boolean),m:r.m||'',t:r.t||''}; });
+        S.favs=favs; SS('favs',favs);
+        if(j.folders&&j.folders.length){ S.folders=j.folders; SS('folders',S.folders); }
+        if(j.kits){ S.cfg.kits=j.kits; SS('cfg',S.cfg); loadKits(); await refreshKitFams(); }
+        if(j.sheet){ S.cfg.sheet=j.sheet; SS('cfg',S.cfg); updSheetBtn(); }
+      }
+      render(true); if(manual) toast('동기화 완료');
+    } else if(manual) toast('동기화 실패: '+(j.error||''));
+  }catch(e){ if(manual) toast('동기화 실패 — 네트워크 확인'); }
+  b.classList.remove('spin');
+}
+function updSheetBtn(){ const a=$('#bSheet'); if(S.cfg.sheet){ a.href=S.cfg.sheet; a.style.display=''; } else a.style.display='none'; }
+
+/* ---------- settings / options ---------- */
+function openOpts(){
+  const o=S.opt;
+  $('#sheet').className='sheet sm';
+  $('#sheet').innerHTML=`<div class="shh"><h2>옵션</h2><button class="ib" data-close>${ICON.close}</button></div>
+  ${[['lat','라틴·한글 지원 폰트만','다른 문자 전용(아랍·인도 등) 폰트 숨김'],['ko','한글 지원만',''],['pv','미리보기 되는 폰트만','키트에 없는 Adobe 폰트 숨김'],['vf','가변폰트만',''],['com','한글 무료: 인쇄·영상·BI/CI 모두 가능만','눈누 라이선스 요약 기준']].map(([k,l,h])=>`<label class="sw"><span>${l}${h?`<br><span class="hint">${h}</span>`:''}</span><input type="checkbox" data-opt="${k}" ${o[k]?'checked':''}></label>`).join('')}`;
+  openOv();
+}
+function openSettings(){
+  const c=S.cfg;
+  $('#sheet').className='sheet sm';
+  $('#sheet').innerHTML=`<div class="shh"><h2>설정</h2><button class="ib" data-close>${ICON.close}</button></div>
+   <div class="lab">즐겨찾기 시트 연결 (Apps Script 웹앱 주소)</div><input class="inp" id="cApi" value="${esc(c.api||'')}" placeholder="https://script.google.com/macros/s/…/exec">
+   <div class="lab">쓰기 키</div><input class="inp" id="cTok" value="${esc(c.token||'')}" placeholder="시트에서 설정한 키" type="password">
+   <label class="sw"><span>Adobe 폰트 미리보기<br><span class="hint">내 Adobe 웹 프로젝트(SPECIMEN)로 Adobe 폰트를 샘플텍스트에 적용 — 이 기기에서만 켜짐</span></span><input type="checkbox" id="cAdobe" ${S.adobeOn?'checked':''}></label>
+   <div class="lab">추가 Adobe 웹 프로젝트 ID (선택)</div><input class="inp" id="cKit" value="${esc((c.kits||[]).join(', '))}" placeholder="예: abc1def">
+
+   <div class="btns"><button class="btn" id="kitR">키트 다시 읽기</button><span style="flex:1"></span><button class="btn pri" id="cSave">저장</button></div>
+   <p class="hint" style="margin-top:16px">데이터 · Google Fonts ${cnt(f=>f.s==='g').toLocaleString()} · Adobe Fonts ${cnt(f=>f.s==='a').toLocaleString()} · 한글 무료(눈누) ${cnt(f=>f.s==='k').toLocaleString()}</p>`;
+  openOv();
+  $('#cSave').onclick=async()=>{ S.adobeOn=$('#cAdobe').checked; SS('adobeOn',S.adobeOn); c.api=$('#cApi').value.trim(); c.token=$('#cTok').value.trim(); c.kits=$('#cKit').value.split(/[,\s]+/).map(s=>s.trim()).filter(Boolean); SS('cfg',c); loadKits(); const n=await refreshKitFams(); enqueue({a:'kits',list:c.kits}); closeOv(); toast('저장 · 키트 폰트 '+n+'개'); render(true); pull(); };
+  $('#kitR').onclick=async()=>{ const n=await refreshKitFams(); toast('키트 폰트 '+n+'개'); render(true); };
+}
+function openOv(){ $('#ov').classList.add('show'); document.body.style.overflow='hidden'; }
+function closeOv(){ $('#ov').classList.remove('show'); document.body.style.overflow=''; }
+let tT; function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>e.classList.remove('show'),1800); }
+
+/* ---------- events ---------- */
+let qT;
+$('#q').addEventListener('input',e=>{ clearTimeout(qT); $('#fQ').classList.toggle('has',!!e.target.value); qT=setTimeout(()=>{ S.q=e.target.value.trim(); renderFilters(); render(); },160); });
+$('#sample').addEventListener('input',e=>{ S.sample=e.target.value; SS('sample',S.sample); $('#fS').classList.toggle('has',!!S.sample); updatePreviews(); });
+$('#size').addEventListener('input',e=>{ S.size=+e.target.value; $('#sizeV').textContent=S.size; document.documentElement.style.setProperty('--pvs',S.size+'px'); SS('size',S.size); });
+$('#sort').addEventListener('change',e=>{ S.sort=e.target.value; render(); });
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button,a,.card,[data-close]'); if(!t) { if(e.target.id==='ov') closeOv(); return; }
+  const d=t.dataset;
+  if(d.clear){ const i=$('#'+d.clear); i.value=''; i.dispatchEvent(new Event('input')); return; }
+  if(d.t){ S.tab=d.t; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b===t)); if(S.tab!=='era'&&S.tab!=='browse'){} renderFilters(); render(); window.scrollTo(0,0); return; }
+  if(d.src!==undefined){ S.src=d.src; S.major=null; S.subs.clear(); renderFilters(); render(); return; }
+  if(d.major!==undefined){ S.major=d.major||null; S.subs.clear(); renderFilters(); render(); return; }
+  if(d.sub){ S.subs.has(d.sub)?S.subs.delete(d.sub):S.subs.add(d.sub); renderFilters(); render(); return; }
+  if(d.era!==undefined){ S.era=(S.tab==='era'&&S.era===d.era)?null:(d.era||null); renderFilters(); render(); return; }
+  if(d.mood!==undefined){ S.mood=d.mood||null; renderFilters(); render(); return; }
+  if(d.wt!==undefined){ S.wt=d.wt||null; renderFilters(); render(); return; }
+  if(d.wd!==undefined){ S.wd=d.wd||null; renderFilters(); render(); return; }
+  if(d.v){ S.view=d.v; SS('view',S.view); document.querySelectorAll('.vbtn').forEach(b=>b.classList.toggle('on',b===t)); render(true); return; }
+  if(d.adobeon){ e.stopPropagation(); S.adobeOn=true; SS('adobeOn',true); loaded.clear(); render(true); toast('Adobe 미리보기 켜짐'); return; }
+  if(d.star){ e.stopPropagation(); openFav(d.star); return; }
+  if(d.close!==undefined){ closeOv(); return; }
+  if(d.copy){ navigator.clipboard?.writeText(d.copy); toast('이름 복사됨'); return; }
+  if(d.copycss){ navigator.clipboard?.writeText(kCss(S.byId[d.copycss])); toast('CSS 복사됨'); return; }
+  if(d.fm){ S.favMode=d.fm; SS('favMode',S.favMode); renderSaved(); return; }
+  if(d.ff!==undefined){ S.favFolder=d.ff||null; renderSaved(); return; }
+  if(d.fren){ const nv=prompt('폴더 이름',d.fren); if(nv&&nv.trim()&&!S.folders.includes(nv.trim())){ const o=d.fren,n=nv.trim(); S.folders=S.folders.map(x=>x===o?n:x); saveFolders(); Object.keys(S.favs).forEach(id=>{ const v=S.favs[id]; if((v.f||[]).includes(o)){ setFav(id,{...v,f:v.f.map(x=>x===o?n:x)}); } }); if(S.favFolder===o) S.favFolder=n; renderSaved(); } return; }
+  if(d.fdel){ if(confirm(`'${d.fdel}' 폴더를 삭제할까요? (폰트는 즐겨찾기에 남아요)`)){ const o=d.fdel; S.folders=S.folders.filter(x=>x!==o); saveFolders(); Object.keys(S.favs).forEach(id=>{ const v=S.favs[id]; if((v.f||[]).includes(o)) setFav(id,{...v,f:v.f.filter(x=>x!==o)}); }); S.favFolder=null; renderSaved(); } return; }
+  if(d.fup){ const i=S.folders.indexOf(d.fup); if(i>0){ [S.folders[i-1],S.folders[i]]=[S.folders[i],S.folders[i-1]]; saveFolders(); renderSaved(); } return; }
+  if(t.id==='newFolder'){ const v=prompt('새 폴더 이름'); if(v&&v.trim()&&!S.folders.includes(v.trim())){ S.folders.push(v.trim()); saveFolders(); renderSaved(); } return; }
+  if(t.id==='optBtn'){ openOpts(); return; }
+  if(t.id==='bSet'){ openSettings(); return; }
+  if(t.id==='bSync'){ pull(true); return; }
+  if(t.id==='moreB'){ S.shown+=60; appendMore(); return; }
+  if(t.classList.contains('card')){ openDetail(d.id); return; }
+});
+document.addEventListener('change',e=>{ const k=e.target.dataset.opt; if(k){ S.opt[k]=e.target.checked; SS('opt',S.opt); renderFilters(); render(); } });
+document.addEventListener('input',e=>{ if(e.target.id==='sample2'){ S.sample=e.target.value; SS('sample',S.sample); $('#sample').value=S.sample; updatePreviews(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeOv(); });
+window.addEventListener('online',flush);
+setPending();
+load();
+</script>
+</body>
+</html>

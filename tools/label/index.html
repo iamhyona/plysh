@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>상품 라벨 생성기</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300;400;500;600;700;800&display=swap');
+:root{
+  --bg:#f2f4f6;--surface:#ffffff;--surface2:#f2f4f6;
+  --border:#e5e8eb;--accent:#3182f6;--danger:#ef4444;
+  --text:#191f28;--text2:#4e5968;--text3:#8b95a1;--blue:#3182f6;
+  --lang-ko:#3182f6;--lang-other:#8b95a1;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:14px;line-height:1.6;color-scheme:light;}
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:56px;flex-shrink:0;}
+.logo{font-size:13px;font-weight:700;letter-spacing:.05em;color:var(--accent);}
+.logo span{color:var(--text2);font-weight:400;}
+.tabs-wrapper{background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none;}
+.tabs-wrapper::-webkit-scrollbar{display:none;}
+.tabs{display:flex;padding:0 12px;min-width:max-content;}
+.tab{padding:0 16px;height:48px;display:flex;align-items:center;cursor:pointer;white-space:nowrap;font-size:13px;color:var(--text3);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--text);border-bottom-color:var(--accent);}
+.content{flex:1;overflow-y:auto;}
+.content-inner{padding:24px 16px 100px;max-width:680px;margin:0 auto;}
+.form-label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;display:block;}
+.form-group{margin-bottom:14px;}
+.form-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:13.5px;font-family:'Pretendard Variable',Pretendard,sans-serif;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--accent);}
+.form-input::placeholder{color:var(--text3);}
+.form-input.sm{padding:9px 11px;font-size:12px;border-radius:8px;}
+textarea.form-input{line-height:1.6;}
+.section-div{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.accent-label{color:var(--accent) !important;opacity:.9;}
+.accent-section{color:var(--accent) !important;opacity:.9;border-bottom-color:rgba(49,130,246,.3) !important;}
+.items-header{display:grid;grid-template-columns:1fr 88px 110px 1fr 32px;gap:6px;margin-bottom:4px;padding:0 2px;}
+.items-header span{font-size:11px;color:var(--text3);letter-spacing:.04em;}
+.item-row{display:grid;grid-template-columns:1fr 88px 110px 1fr 32px;gap:6px;margin-bottom:6px;align-items:center;}
+.del-btn{width:32px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text3);font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-family:inherit;}
+.del-btn:hover{border-color:var(--danger);color:var(--danger);background:rgba(255,95,95,.08);}
+.add-row-btn{width:100%;height:46px;background:transparent;border:1px dashed var(--accent);border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-top:2px;}
+.add-row-btn:hover,.add-row-btn:active{border-style:solid;color:#fff;background:var(--accent);}
+.date-row{display:flex;gap:8px;align-items:center;}
+.today-btn{padding:0 14px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.today-btn:hover{border-color:var(--accent);color:var(--accent);}
+.gen-btn{width:100%;height:46px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:6px;}
+.gen-btn:hover{filter:brightness(1.1);}
+.gen-btn:active{transform:scale(.98);}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none;}
+.result-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:20px;display:none;}
+.lang-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;}
+.lang-tab{padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;color:var(--text3);cursor:pointer;transition:all .15s;font-weight:500;}
+.lang-tab:hover{color:var(--text2);}
+.lang-tab.active{background:rgba(49,130,246,.1);border-color:var(--accent);color:var(--accent);}
+.result-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.pv-row{display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);}
+.pv-row:last-child{border-bottom:none;}
+.pv-key{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:.04em;min-width:68px;padding-top:2px;flex-shrink:0;}
+.pv-val{font-size:13px;color:var(--text2);line-height:1.6;}
+.copy-btn{margin-top:14px;width:100%;height:44px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.copy-btn:hover{filter:brightness(1.1);}
+.copy-btn.copied{background:var(--blue);color:#fff;}
+.lang-select-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
+.lang-sel-btn{padding:7px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:#9c9c9c;cursor:pointer;transition:all .15s;text-align:center;width:100%;}
+.lang-sel-btn:hover{color:var(--text2);}
+.lang-sel-btn.active{background:rgba(49,130,246,.1);border-color:var(--accent);color:var(--accent);}
+@keyframes spin{to{transform:rotate(360deg);}}
+.bulk-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.bulk-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.bulk-card-num{font-size:12px;color:var(--text);font-weight:700;letter-spacing:.03em;}
+.bulk-card-del{width:28px;height:28px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit;}
+.bulk-card-del:hover{border-color:var(--danger);color:var(--danger);background:rgba(255,95,95,.08);}
+.bulk-field{margin-bottom:12px;}
+.bulk-field label{font-size:11px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.bulk-section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.auto-field{position:relative;}
+.auto-field input{background:var(--surface2);border-color:rgba(49,130,246,.2);color:var(--text2);}
+.auto-field input:focus{border-color:var(--accent);}
+.auto-field input::placeholder{color:var(--text3);}
+.translating-indicator{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;border:2px solid rgba(49,130,246,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:none;pointer-events:none;}
+.bulk-sub-grid{display:grid;grid-template-columns:1fr 90px 110px;gap:8px;}
+.bulk-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.action-btn{padding:9px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.action-btn:hover{border-color:var(--accent);color:var(--accent);}
+.action-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+.action-btn.primary:hover{filter:brightness(1.1);}
+.action-btn:disabled{opacity:.35;cursor:not-allowed;}
+.bulk-result{margin-top:20px;display:none;}
+.raw-toggle{font-size:11px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:inherit;margin-top:10px;padding:0;transition:color .2s;display:block;}
+.raw-toggle:hover{color:var(--text2);}
+.raw-text{font-size:12px;color:var(--text3);background:var(--bg);border-radius:6px;padding:10px 12px;margin-top:6px;word-break:break-all;line-height:1.7;display:none;border:1px solid var(--border);}
+.raw-text.open{display:block;}
+.warn-box{background:rgba(255,95,95,.07);border:1px solid rgba(255,95,95,.2);border-radius:10px;padding:12px 14px;font-size:12.5px;color:#ef4444;margin-bottom:14px;display:none;line-height:1.6;}
+.info-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;margin-bottom:12px;}
+.info-pill span{color:var(--accent);}
+.col-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.status-line{font-size:12px;color:var(--text3);margin-top:10px;min-height:18px;}
+.multi-header{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;}
+.copy-all-btn{padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text2);cursor:pointer;transition:all .2s;}
+.copy-all-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-all-btn.copied{border-color:var(--blue);color:var(--blue);}
+.result-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.result-item-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.result-item-name{font-size:13px;font-weight:500;color:var(--text);display:flex;align-items:center;}
+.result-item.lang-ko{border-color:rgba(49,130,246,.25);}
+.result-item.lang-ko .result-item-head{background:rgba(49,130,246,.06);}
+.result-item.lang-ko .result-item-name{color:var(--lang-ko);}
+.result-item.lang-en,.result-item.lang-ja,.result-item.lang-zhCN,.result-item.lang-zhTW{border-color:rgba(156,156,156,.15);opacity:.82;}
+.result-item.lang-en .result-item-head,.result-item.lang-ja .result-item-head,.result-item.lang-zhCN .result-item-head,.result-item.lang-zhTW .result-item-head{background:rgba(156,156,156,.04);}
+.result-item.lang-en .result-item-name,.result-item.lang-ja .result-item-name,.result-item.lang-zhCN .result-item-name,.result-item.lang-zhTW .result-item-name{color:#9c9c9c;}
+.lang-section-header{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin:20px 0 10px;padding-bottom:8px;}
+.lang-section-header.lang-ko{color:var(--lang-ko);border-bottom:1px solid rgba(49,130,246,.3);}
+.lang-section-header.lang-en,.lang-section-header.lang-ja,.lang-section-header.lang-zhCN,.lang-section-header.lang-zhTW{color:#9c9c9c;border-bottom:1px solid rgba(156,156,156,.2);}
+.lang-badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:4px;margin-right:8px;background:rgba(128,128,128,.12);}
+.lang-badge.lang-ko{background:rgba(49,130,246,.12);color:var(--lang-ko);}
+.lang-badge.lang-en,.lang-badge.lang-ja,.lang-badge.lang-zhCN,.lang-badge.lang-zhTW{background:rgba(156,156,156,.1);color:#9c9c9c;}
+.copy-one-btn{padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;color:var(--text3);cursor:pointer;transition:all .15s;flex-shrink:0;}
+.copy-one-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-one-btn.copied{border-color:var(--blue);color:var(--blue);}
+.result-item-preview{padding:14px;}
+.lang-col-map{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;}
+.lang-col-header{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;color:#9c9c9c;}
+.header-edit-btn{padding:5px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text2);cursor:pointer;transition:all .2s;margin-left:auto;white-space:nowrap;flex-shrink:0;}
+.header-edit-btn:hover{border-color:var(--accent);color:var(--accent);}
+.header-edit-btn.active{background:rgba(49,130,246,.1);border-color:var(--accent);color:var(--accent);}
+.global-defaults-panel{display:none;}
+/* 모달 오버레이 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-title{font-size:14px;font-weight:700;color:var(--text);}
+.modal-title span{color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;}
+.modal-close{width:28px;height:28px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text3);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit;}
+.modal-close:hover{border-color:var(--danger);color:var(--danger);}
+.modal-body{padding:20px;flex:1;}
+/* 비밀번호 모달 */
+.pw-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:320px;padding:28px 24px;}
+.pw-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.pw-sub{font-size:12px;color:var(--text3);margin-bottom:18px;}
+.pw-input-row{display:flex;gap:8px;}
+.pw-error{font-size:12px;color:var(--danger);margin-top:8px;min-height:16px;}
+/* defaults 내부 */
+.gd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.def-lang-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
+.def-lang-tab{padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;color:var(--text3);cursor:pointer;transition:all .15s;font-weight:500;}
+.def-lang-tab:hover{color:var(--text2);}
+.def-lang-tab.active{background:rgba(49,130,246,.1);border-color:var(--accent);color:var(--accent);}
+.def-lang-panel{display:none;}
+.def-lang-panel.active{display:block;}
+.bulk-check-all{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text3);user-select:none;}
+.bulk-check-all input{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;}
+.bulk-check-label{color:var(--text3);transition:color .15s;}
+.bulk-check-all:hover .bulk-check-label{color:var(--text2);}
+.bulk-tr-block{overflow:hidden;transition:max-height .3s ease,opacity .3s ease;max-height:0;opacity:0;}
+.bulk-tr-block.open{max-height:400px;opacity:1;}
+.suggest-box{font-size:10.5px;color:var(--accent);margin-top:3px;min-height:14px;cursor:pointer;opacity:.8;}
+.suggest-box:hover{opacity:1;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:100;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(min-width:768px){header{padding:0 32px;height:60px;}.content-inner{padding:32px 24px 80px;}}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">LABEL<span> / 상품 라벨 생성기</span></div>
+    <button class="header-edit-btn" id="global-defaults-btn">⚙ 기본정보</button>
+  </header>
+  <!-- 비밀번호 모달 -->
+  <div class="modal-overlay" id="pw-modal">
+    <div class="pw-modal-box">
+      <div class="pw-title">기본정보 편집</div>
+      <div class="pw-sub">접근하려면 비밀번호를 입력해주세요</div>
+      <div class="pw-input-row">
+        <input type="password" class="form-input" id="pw-input" placeholder="비밀번호" style="letter-spacing:.2em" maxlength="10">
+        <button class="gen-btn" id="pw-submit-btn" style="width:80px;margin:0;flex-shrink:0">확인</button>
+      </div>
+      <div class="pw-error" id="pw-error"></div>
+    </div>
+  </div>
+
+  <!-- 기본정보 편집 모달 -->
+  <div class="modal-overlay" id="defaults-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">기본정보 편집 <span>— 언어별 수정 가능</span></div>
+        <button class="modal-close" id="defaults-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="def-lang-tabs" id="def-lang-tabs">
+          <button class="def-lang-tab active" data-lang="ko">국문</button>
+          <button class="def-lang-tab" data-lang="en">English</button>
+          <button class="def-lang-tab" data-lang="ja">日本語</button>
+          <button class="def-lang-tab" data-lang="zhCN">简体中文</button>
+          <button class="def-lang-tab" data-lang="zhTW">繁體中文</button>
+        </div>
+        <div class="def-lang-panel active" id="def-panel-ko">
+          <div class="gd-grid">
+            <div class="form-group" style="margin:0"><label class="form-label">사용연령</label><input type="text" class="form-input sm" id="def-age-ko" value="만 14세 이상"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">제조국</label><input type="text" class="form-input sm" id="def-country-ko" value="한국"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">제조사</label><input type="text" class="form-input sm" id="def-maker-ko" value="사운드웨이브"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">판매원</label><input type="text" class="form-input sm" id="def-seller-ko" value="사운드웨이브, 서울특별시 마포구 독막로9길 30, 02-381-3758"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">주의사항</label><textarea class="form-input sm" id="def-caution-ko" rows="3" style="resize:vertical">❶ 본 제품은 만 14세 이상 분들을 위한 제품으로, 어린이용이 아닙니다. ❷ 본 제품은 공정거래위원회 고시 소비자 분쟁 해결 기준에 의거 교환 및 보상을 받으실 수 있습니다.</textarea></div>
+          </div>
+        </div>
+        <div class="def-lang-panel" id="def-panel-en">
+          <div class="gd-grid">
+            <div class="form-group" style="margin:0"><label class="form-label">Age</label><input type="text" class="form-input sm" id="def-age-en" value="14 years and older"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Country</label><input type="text" class="form-input sm" id="def-country-en" value="Korea"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Manufacturer</label><input type="text" class="form-input sm" id="def-maker-en" value="Soundwave"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">Distributor</label><input type="text" class="form-input sm" id="def-seller-en" value="Soundwave, 30, Dongmak-ro 9-gil, Mapo-gu, Seoul, Korea 02-381-3758"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">Caution</label><textarea class="form-input sm" id="def-caution-en" rows="3" style="resize:vertical">❶ This product is intended for ages 14 and older and is not a toy. ❷ Exchange and compensation are available in accordance with the Consumer Dispute Resolution Standards of the Korea Fair Trade Commission.</textarea></div>
+          </div>
+        </div>
+        <div class="def-lang-panel" id="def-panel-ja">
+          <div class="gd-grid">
+            <div class="form-group" style="margin:0"><label class="form-label">対象年齢</label><input type="text" class="form-input sm" id="def-age-ja" value="14歳以上"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">製造国</label><input type="text" class="form-input sm" id="def-country-ja" value="韓国"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">製造元</label><input type="text" class="form-input sm" id="def-maker-ja" value="サウンドウェーブ"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">販売元</label><input type="text" class="form-input sm" id="def-seller-ja" value="サウンドウェーブ, ソウル特別市麻浦区独幕路9ギル30, 02-381-3758"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">使用上の注意</label><textarea class="form-input sm" id="def-caution-ja" rows="3" style="resize:vertical">❶ 本製品は14歳以上を対象とした製品で、玩具ではありません。❷ 本製品は公正取引委員会告示の消費者紛争解決基準に基づき、交換・補償を受けることができます。</textarea></div>
+          </div>
+        </div>
+        <div class="def-lang-panel" id="def-panel-zhCN">
+          <div class="gd-grid">
+            <div class="form-group" style="margin:0"><label class="form-label">适用年龄</label><input type="text" class="form-input sm" id="def-age-zhCN" value="14岁及以上"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">生产国</label><input type="text" class="form-input sm" id="def-country-zhCN" value="韩国"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">生产商</label><input type="text" class="form-input sm" id="def-maker-zhCN" value="Soundwave"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">销售商</label><input type="text" class="form-input sm" id="def-seller-zhCN" value="Soundwave, 首尔特别市麻浦区独幕路9街30号, 02-381-3758"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">注意事项</label><textarea class="form-input sm" id="def-caution-zhCN" rows="3" style="resize:vertical">❶ 本产品适用于14岁及以上人群，非儿童玩具。❷ 本产品依据韩国公平贸易委员会消费者纠纷解决标准，可进行退换及赔偿。</textarea></div>
+          </div>
+        </div>
+        <div class="def-lang-panel" id="def-panel-zhTW">
+          <div class="gd-grid">
+            <div class="form-group" style="margin:0"><label class="form-label">適用年齡</label><input type="text" class="form-input sm" id="def-age-zhTW" value="14歲及以上"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">製造國</label><input type="text" class="form-input sm" id="def-country-zhTW" value="韓國"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">製造商</label><input type="text" class="form-input sm" id="def-maker-zhTW" value="Soundwave"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">銷售商</label><input type="text" class="form-input sm" id="def-seller-zhTW" value="Soundwave, 首爾特別市麻浦區獨幕路9街30號, 02-381-3758"></div>
+            <div class="form-group" style="margin:0;grid-column:1/-1"><label class="form-label">注意事項</label><textarea class="form-input sm" id="def-caution-zhTW" rows="3" style="resize:vertical">❶ 本產品適用於14歲及以上人群，非兒童玩具。❷ 本產品依據韓國公平貿易委員會消費者糾紛解決標準，可進行退換及賠償。</textarea></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="gen-btn" id="def-save-btn" style="margin-top:0">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs-wrapper">
+    <div class="tabs">
+      <div class="tab active" data-tab="bulk">직접 입력</div>
+      <div class="tab" data-tab="sheets">문서 불러오기</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="content-inner">
+      <!-- TAB 2 -->
+      <div id="tab-bulk" class="tab-panel active">
+        <div id="bulk-cards"></div>
+        <button class="add-row-btn" id="bulk-add-btn" style="margin-top:20px">＋ 제품 추가</button>
+        <div class="form-group" style="margin-top:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <label class="form-label" style="color:#9c9c9c;margin:0">번역 언어 (다중 선택)</label>
+            <label class="bulk-check-all"><input type="checkbox" id="bulk-select-all-chk"><span class="bulk-check-label">모두 선택</span></label>
+          </div>
+          <div class="lang-select-row" id="bulk-lang-row">
+            <button class="lang-sel-btn active" data-lang="ko">한국어</button>
+            <button class="lang-sel-btn" data-lang="en">영어</button>
+            <button class="lang-sel-btn" data-lang="ja">일본어</button>
+            <button class="lang-sel-btn" data-lang="zhCN">중국어 (간체)</button>
+            <button class="lang-sel-btn" data-lang="zhTW">중국어 (번체)</button>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);margin:24px 0 0"></div><button class="gen-btn" id="bulk-gen-btn" style="margin-top:16px">▶ 라벨 생성</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+          <button class="action-btn" id="bulk-excel-btn" style="justify-content:center;height:44px">↓ CSV 저장</button>
+          <button class="action-btn" id="bulk-copy-all-btn" style="justify-content:center;height:44px">전체 복사</button>
+        </div>
+        <div class="warn-box" id="bulk-warn"><span id="bulk-warn-msg"></span></div>
+        <div class="bulk-result" id="bulk-result"></div>
+      </div>
+
+      <!-- TAB 3 -->
+      <div id="tab-sheets" class="tab-panel">
+        <div class="warn-box" id="s-warn"><span id="s-warn-msg"></span></div>
+        <div class="form-group">
+          <label class="form-label accent-label">구글 스프레드시트 URL 또는 ID</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="s-url" placeholder="https://docs.google.com/spreadsheets/d/... 또는 ID만">
+            <button class="today-btn" id="s-url-apply-btn" style="white-space:nowrap;flex-shrink:0">적용</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:5px" id="s-url-status"></div>
+        </div>
+        <div class="two-col" style="margin-bottom:14px">
+          <div class="form-group" style="margin:0"><label class="form-label accent-label">시트 이름</label><input type="text" class="form-input" id="s-sheet" value="📦 상품정보"></div>
+          <div class="form-group" style="margin:0"><label class="form-label accent-label">헤더 행 수</label><input type="number" class="form-input" id="s-skip" value="3" min="0"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label accent-label">제조연월</label>
+          <div class="date-row">
+            <input type="text" class="form-input" id="s-date" placeholder="예: 2026.06" style="max-width:160px">
+            <button class="today-btn" id="s-today-btn">이번 달</button>
+          </div>
+        </div>
+        <div class="section-div accent-section">열 매핑</div>
+        <div class="col-grid" style="margin-bottom:14px">
+          <div class="form-group" style="margin:0"><label class="form-label">상품명</label><input type="text" class="form-input sm" id="c-name" value="C"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">구성품 품목명</label><input type="text" class="form-input sm" id="c-item" value="D"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">사이즈</label><input type="text" class="form-input sm" id="c-size" value="E"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">종수</label><input type="text" class="form-input sm" id="c-cnt" value="F"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">재질</label><input type="text" class="form-input sm" id="c-mat" value="G"></div>
+        </div>
+        <div class="section-div accent-section">다국어 열 매핑</div>
+        <div class="lang-col-map">
+          <div class="lang-col-header">영문</div>
+          <div class="col-grid" style="margin-bottom:10px">
+            <div class="form-group" style="margin:0"><label class="form-label">상품명</label><input type="text" class="form-input sm" id="c-name-en" value="J"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">구성품명</label><input type="text" class="form-input sm" id="c-item-en" value="K"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">재질명</label><input type="text" class="form-input sm" id="c-mat-en" value="L"></div>
+          </div>
+          <div class="lang-col-header">일문</div>
+          <div class="col-grid" style="margin-bottom:10px">
+            <div class="form-group" style="margin:0"><label class="form-label">상품명</label><input type="text" class="form-input sm" id="c-name-ja" value="M"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">구성품명</label><input type="text" class="form-input sm" id="c-item-ja" value="N"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">재질명</label><input type="text" class="form-input sm" id="c-mat-ja" value="O"></div>
+          </div>
+          <div class="lang-col-header">중국어 간체</div>
+          <div class="col-grid" style="margin-bottom:10px">
+            <div class="form-group" style="margin:0"><label class="form-label">상품명</label><input type="text" class="form-input sm" id="c-name-zhCN" value="P"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">구성품명</label><input type="text" class="form-input sm" id="c-item-zhCN" value="Q"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">재질명</label><input type="text" class="form-input sm" id="c-mat-zhCN" value="R"></div>
+          </div>
+          <div class="lang-col-header">중국어 번체</div>
+          <div class="col-grid" style="margin-bottom:4px">
+            <div class="form-group" style="margin:0"><label class="form-label">상품명</label><input type="text" class="form-input sm" id="c-name-zhTW" value="S"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">구성품명</label><input type="text" class="form-input sm" id="c-item-zhTW" value="T"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">재질명</label><input type="text" class="form-input sm" id="c-mat-zhTW" value="U"></div>
+          </div>
+        </div>
+        <button class="gen-btn" id="fetch-btn">↺ 시트에서 불러와 생성</button>
+        <div class="status-line" id="s-status"></div>
+        <div id="s-results"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWPVpzUVcpA8Q0P4KhYOTZvzyHp3vz9B715guo3yau6B-xoe32P9lgMoOSWv6iZdnJKA/exec';
+
+var LANGS = {
+  ko:{pn:'제품명',sz:'사이즈',mt:'소재',ag:'사용연령',agV:'만 14세 이상',md:'제조연월',cn:'제조국',cnV:'한국',mk:'제조사',mkV:'사운드웨이브',sl:'판매원',slV:'사운드웨이브, 서울특별시 마포구 독막로9길 30, 02-381-3758',ca:'사용 시 주의 사항',caV:'❶ 본 제품은 만 14세 이상 분들을 위한 제품으로, 어린이용이 아닙니다. ❷ 본 제품은 공정거래위원회 고시 소비자 분쟁 해결 기준에 의거 교환 및 보상을 받으실 수 있습니다.'},
+  en:{pn:'Product Name',sz:'Size',mt:'Material',ag:'Age Recommendation',agV:'14 years and older',md:'Manufacturing Date',cn:'Country of Origin',cnV:'Korea',mk:'Manufacturer',mkV:'Soundwave',sl:'Distributor',slV:'Soundwave, 30, Dongmak-ro 9-gil, Mapo-gu, Seoul, Korea 02-381-3758',ca:'Caution',caV:'❶ This product is intended for ages 14 and older and is not a toy. ❷ Exchange and compensation are available in accordance with the Consumer Dispute Resolution Standards of the Korea Fair Trade Commission.'},
+  ja:{pn:'製品名',sz:'サイズ',mt:'素材',ag:'対象年齢',agV:'14歳以上',md:'製造年月',cn:'製造国',cnV:'韓国',mk:'製造元',mkV:'サウンドウェーブ',sl:'販売元',slV:'サウンドウェーブ, ソウル特別市麻浦区独幕路9ギル30, 02-381-3758',ca:'使用上の注意',caV:'❶ 本製品は14歳以上を対象とした製品で、玩具ではありません。❷ 本製品は公正取引委員会告示の消費者紛争解決基準に基づき、交換・補償を受けることができます。'},
+  zhCN:{pn:'产品名称',sz:'尺寸',mt:'材质',ag:'适用年龄',agV:'14岁及以上',md:'生产日期',cn:'生产国',cnV:'韩国',mk:'生产商',mkV:'Soundwave',sl:'销售商',slV:'Soundwave, 首尔特别市麻浦区独幕路9街30号, 02-381-3758',ca:'注意事项',caV:'❶ 本产品适用于14岁及以上人群，非儿童玩具。❷ 本产品依据韩国公平贸易委员会消费者纠纷解决标准，可进行退换及赔偿。'},
+  zhTW:{pn:'產品名稱',sz:'尺寸',mt:'材質',ag:'適用年齡',agV:'14歲及以上',md:'製造日期',cn:'製造國',cnV:'韓國',mk:'製造商',mkV:'Soundwave',sl:'銷售商',slV:'Soundwave, 首爾特別市麻浦區獨幕路9街30號, 02-381-3758',ca:'注意事項',caV:'❶ 本產品適用於14歲及以上人群，非兒童玩具。❷ 本產品依據韓國公平貿易委員會消費者糾紛解決標準，可進行退換及賠償。'}
+};
+var LANG_NAMES = {ko:'국문',en:'영문',ja:'일문',zhCN:'중국어 간체',zhTW:'중국어 번체'};
+var LANG_BADGE_LABEL = {ko:'KO',en:'EN',ja:'JA',zhCN:'ZH-CN',zhTW:'ZH-TW'};
+
+// ── 유틸 ──
+function normalizeSize(s){
+  if(!s) return '';
+  s = s.trim();
+  if(/mm/i.test(s)) return s.replace(/[xXㅌ*\/]/g,'×');
+  // 숫자 사이 구분자: x X ㅌ * / (슬래시)
+  var m = s.match(/^(\d+(?:\.\d+)?)[xXㅌ*\/×](\d+(?:\.\d+)?)$/i);
+  if(m) return m[1]+'×'+m[2]+'mm';
+  return s;
+}
+function autoCorrectSize(input){
+  var val = input.value;
+  var corrected = normalizeSize(val);
+  if(corrected !== val && corrected !== '' && /×/.test(corrected)){
+    input.value = corrected;
+    input.style.borderColor = 'var(--accent)';
+    setTimeout(function(){ input.style.borderColor=''; }, 800);
+  }
+}
+function normalizeCnt(s){
+  if(!s) return '';
+  s = s.trim();
+  // 단순 종: "1whd" "1ro" → "1종"
+  var m1 = s.match(/^(\d+)\s*(?:whd|ro|ㅈㅗㅇ|종)$/i);
+  if(m1) return m1[1]+'종';
+  // 분수형: "1/4" "1of4" "1ㅐㄹ4" "1 of 4" → "4종 중 1종"
+  var m2 = s.match(/^(\d+)\s*(?:\/|of|ㅐㄹ)\s*(\d+)$/i);
+  if(m2) return m2[2]+'종 중 '+m2[1]+'종';
+  // "1ㅐㄹ4" 붙어있는 경우
+  var m3 = s.match(/^(\d+)ㅐㄹ(\d+)$/);
+  if(m3) return m3[2]+'종 중 '+m3[1]+'종';
+  // 이미 맞는 형태
+  return s;
+}
+// 영타 → 한글 직접 매핑 (두벌식 단어 단위)
+var ENG_WORD_MAP = {
+  // 아크릴
+  'dkzmf':'아크릴','dkzm':'아크릴','rkzmf':'아크릴','dkzmffnwl':'아크릴수지',
+  // 종이
+  'whddl':'종이','whddi':'종이','whdi':'종이','whdl':'종이','zhddl':'종이',
+  // 플라스틱
+  'vmfltjr':'플라스틱','emfltjr':'플라스틱','vmfltj':'플라스틱',
+  // 금속
+  'rmsthd':'금속','rmsehd':'금속',
+  // 나무
+  'skok':'나무','sskd':'나무',
+  // 천
+  'cjs':'천','xjs':'천',
+  // 면
+  'alss':'면','dals':'면',
+  // 실리콘
+  'tlfflhs':'실리콘','tlffl':'실리콘','tlfflhsn':'실리콘',
+  // 고무
+  'rndk':'고무','rndl':'고무',
+  // 스티로폼
+  'tjtlfhem':'스티로폼','tjxlfhem':'스티로폼',
+  // 폴리에스터
+  'emfldldntj':'폴리에스터','emflldntj':'폴리에스터',
+  // 합성수지
+  'gkqtjtnwml':'합성수지','gkqtjtmwl':'합성수지',
+  // 알루미늄
+  'dlfnfalstm':'알루미늄','dlfnfdlstm':'알루미늄',
+  // 스테인리스
+  'tjtpdlfsmfltm':'스테인리스','tjtpdlsmfltm':'스테인리스','tjtpdlf':'스테인리스',
+  // 캔버스
+  'zpsdjtm':'캔버스','zpsdj':'캔버스',
+  // 패브릭
+  'vodmf':'패브릭','qodmf':'패브릭',
+  // 비닐
+  'qlds':'비닐','blds':'비닐',
+  // 유리
+  'wnfl':'유리','dnfl':'유리',
+  // 도자기
+  'ehwkrl':'도자기','ehwkd':'도자기',
+  // 나일론
+  'skdlfhs':'나일론',
+  // 폴리우레탄
+  'emflldnfxks':'폴리우레탄',
+  // 스판덱스
+  'tjaeksj':'스판덱스',
+  // 린넨
+  'fldss':'린넨',
+  // 데님
+  'eosla':'데님',
+  // 울
+  'dnf':'울',
+  // 가죽
+  'rkwnd':'가죽','rkwndrl':'가죽',
+  // 인조가죽
+  'dlswhrjwnd':'인조가죽',
+  // 벨벳
+  'qjfqjt':'벨벳',
+  // 쉬폰
+  'tlduehss':'쉬폰',
+  // 오간자
+  'dhrkswk':'오간자'
+};
+
+function engToKo(str){
+  var lower = str.toLowerCase();
+  return ENG_WORD_MAP[lower] || ENG_WORD_MAP[str] || str;
+}
+
+// 재질 교정 사전 (한글 정규형)
+var MAT_DICT = {
+  '아크릴':'아크릴','아크릴수지':'아크릴','아그릴':'아크릴',
+  '종이':'종이','페이퍼':'종이',
+  '플라스틱':'플라스틱','플라스틱수지':'플라스틱',
+  '금속':'금속','메탈':'금속',
+  '나무':'나무','목재':'나무','우드':'나무',
+  '천':'천','직물':'천',
+  '면':'면','코튼':'면',
+  '실리콘':'실리콘',
+  '고무':'고무','러버':'고무',
+  '스티로폼':'스티로폼',
+  '폴리에스터':'폴리에스터',
+  '합성수지':'합성수지',
+  '알루미늄':'알루미늄',
+  '스테인리스':'스테인리스','스텐':'스테인리스','스테인레스':'스테인리스',
+  '캔버스':'캔버스',
+  '패브릭':'패브릭',
+  '비닐':'비닐',
+  '유리':'유리','글라스':'유리',
+  '도자기':'도자기','세라믹':'도자기',
+  'pvc':'PVC','PVC':'PVC',
+  'eva':'EVA','EVA':'EVA',
+  'pp':'PP','PP':'PP',
+  'pet':'PET','PET':'PET',
+  'pe':'PE','PE':'PE'
+};
+
+function normalizeMat(s){
+  if(!s) return '';
+  var trimmed = s.trim();
+  // 이미 한글이면 사전 정규화만
+  var hasKo = /[가-힣]/.test(trimmed);
+  if(hasKo){
+    var dictMatch = MAT_DICT[trimmed]||MAT_DICT[trimmed.toLowerCase()];
+    return dictMatch || trimmed;
+  }
+  // 영타 → 한글 변환 시도
+  var converted = engToKo(trimmed);
+  var dictMatch2 = MAT_DICT[converted]||MAT_DICT[converted.toLowerCase()];
+  if(dictMatch2) return dictMatch2;
+  // 변환 결과가 한글이 포함되면 그대로 반환
+  if(/[가-힣]/.test(converted)) return converted;
+  return trimmed;
+}
+function autoCorrectMat(input, sugDiv){
+  var val = input.value.trim();
+  if(!val) return;
+  var corrected = normalizeMat(val);
+  if(corrected !== val){
+    if(sugDiv){
+      sugDiv.textContent = '"'+corrected+'"으로 교정? 클릭';
+      sugDiv.onclick = function(){ input.value=corrected; sugDiv.textContent=''; input.style.borderColor='var(--accent)'; setTimeout(function(){input.style.borderColor='';},800); };
+    } else {
+      input.value = corrected;
+      input.style.borderColor = 'var(--accent)';
+      setTimeout(function(){ input.style.borderColor=''; }, 800);
+    }
+  }
+}
+function autoCorrectCnt(input){
+  var val = input.value;
+  var corrected = normalizeCnt(val);
+  if(corrected !== val && corrected !== ''){
+    input.value = corrected;
+    input.style.borderColor = 'var(--accent)';
+    setTimeout(function(){ input.style.borderColor=''; }, 800);
+  }
+}
+function parseAndFormatDate(raw){
+  if(!raw||!raw.trim()) return '';
+  var s = raw.trim().replace(/[^0-9]/g,''); // 숫자만
+  if(s.length === 6) { // YYYYMM
+    return s.slice(0,4)+'. '+s.slice(4,6)+'.';
+  }
+  if(s.length === 4) { // YYMM → 20YYMM 시도 or YYYY만
+    if(parseInt(s.slice(0,2)) > 50) return '20'+s.slice(0,2)+'. '+s.slice(2,4)+'.';
+  }
+  // 원래 방식
+  var t = raw.trim().replace(/\.+$/,'');
+  var parts = t.split(/[.\/\-]/).filter(Boolean);
+  if(parts.length>=2) return parts[0]+'. '+parts[1].padStart(2,'0')+'.';
+  return t+'.';
+}
+function formatDate(d){
+  if(!d) return '';
+  return parseAndFormatDate(d);
+}
+function autoCorrectDate(input){
+  var val = input.value.trim();
+  if(!val) return;
+  var s = val.replace(/[^0-9]/g,'');
+  var corrected = val;
+  if(s.length===6){ corrected = s.slice(0,4)+'.'+s.slice(4,6); }
+  else if(/^\d{4}[.\/\-]\d{1,2}$/.test(val)){
+    var parts = val.split(/[.\/\-]/);
+    corrected = parts[0]+'.'+parts[1].padStart(2,'0');
+  }
+  if(corrected !== val){
+    input.value = corrected;
+    input.style.borderColor='var(--accent)';
+    setTimeout(function(){input.style.borderColor='';},800);
+  }
+}
+function eh(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+function colIdx(l){
+  var n=0, s=(l||'').trim().toUpperCase();
+  for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64);
+  return n-1;
+}
+function getDefaults(lang){
+  var l = lang || 'ko';
+  var suffix = '-'+l;
+  function val(id, fallback){ var el=document.getElementById(id); return el ? (el.value.trim()||fallback) : fallback; }
+  return {
+    age:     val('def-age'+suffix,     LANGS[l]?LANGS[l].agV:'만 14세 이상'),
+    country: val('def-country'+suffix, LANGS[l]?LANGS[l].cnV:'한국'),
+    maker:   val('def-maker'+suffix,   LANGS[l]?LANGS[l].mkV:'사운드웨이브'),
+    seller:  val('def-seller'+suffix,  LANGS[l]?LANGS[l].slV:'사운드웨이브, 서울특별시 마포구 독막로9길 30, 02-381-3758'),
+    caution: val('def-caution'+suffix, LANGS[l]?LANGS[l].caV:'❶ 본 제품은 만 14세 이상 분들을 위한 제품으로, 어린이용이 아닙니다. ❷ 본 제품은 공정거래위원회 고시 소비자 분쟁 해결 기준에 의거 교환 및 보상을 받으실 수 있습니다.')
+  };
+}
+
+// ── 번역 캐시 (localStorage 기반) ──
+var trCache = {};
+var TR_CACHE_KEY = 'label_tr_cache';
+try {
+  var _saved = localStorage.getItem(TR_CACHE_KEY);
+  if(_saved) trCache = JSON.parse(_saved);
+} catch(e){}
+function saveTrCache(){
+  try {
+    // 최대 500개만 보관
+    var keys = Object.keys(trCache);
+    if(keys.length > 500){
+      var newCache = {};
+      keys.slice(-400).forEach(function(k){ newCache[k]=trCache[k]; });
+      trCache = newCache;
+    }
+    localStorage.setItem(TR_CACHE_KEY, JSON.stringify(trCache));
+  } catch(e){}
+}
+var LANG_FULL = {en:'English',ja:'Japanese',zhCN:'Simplified Chinese',zhTW:'Traditional Chinese'};
+
+async function translateText(text, lang){
+  if(!text || !text.trim() || lang==='ko') return text;
+  var key = lang+'::'+text;
+  if(trCache[key]) return trCache[key];
+  try {
+    var langName = LANG_FULL[lang] || lang;
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{
+          role: 'user',
+          content: 'Translate the following Korean product label text to ' + langName + '. Return ONLY the translated text, nothing else:\n\n' + text
+        }]
+      })
+    });
+    var data = await res.json();
+    var result = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : text;
+    trCache[key] = result;
+    saveTrCache();
+    return result;
+  } catch(e){
+    console.warn('Translation failed:', e);
+    return text;
+  }
+}
+
+// ── 라벨 빌더 ──
+function buildLabelWithDef(name, items, date, lang, def){
+  var L = LANGS[lang]||LANGS.ko;
+  var sizes = items.map(function(i){
+    var p=[]; if(i.size)p.push(normalizeSize(i.size)); if(i.cnt)p.push(i.cnt);
+    return p.length ? i.item+' ('+p.join('·')+')' : i.item;
+  }).join(', ');
+  var mats = Array.from(new Set(items.map(function(i){return i.mat;}).filter(Boolean))).join(', ');
+  var dd = formatDate(date);
+  var ldef = getDefaults(lang);
+  var ageV = ldef.age||L.agV;
+  var cnV  = ldef.country||L.cnV;
+  var mkV  = ldef.maker||L.mkV;
+  var slV  = ldef.seller||L.slV;
+  var caV  = ldef.caution||L.caV;
+  var mdPart = dd ? L.md+' '+dd+'  ' : '';
+  return L.pn+' '+name+'  '+L.sz+' '+sizes+'  '+L.mt+' '+mats+'  '+L.ag+' '+ageV+'  '+mdPart+L.cn+' '+cnV+'  '+L.mk+' '+mkV+'  '+L.sl+' '+slV+'  '+L.ca+' '+caV;
+}
+function buildPreviewWithDef(name, items, date, lang, def){
+  var L = LANGS[lang]||LANGS.ko;
+  var sizes = items.map(function(i){
+    var p=[]; if(i.size)p.push(normalizeSize(i.size)); if(i.cnt)p.push(i.cnt);
+    return p.length ? i.item+' ('+p.join('·')+')' : i.item;
+  }).join(', ');
+  var mats = Array.from(new Set(items.map(function(i){return i.mat;}).filter(Boolean))).join(', ');
+  var dd = formatDate(date);
+  var ldef = getDefaults(lang);
+  var ageV = ldef.age||L.agV;
+  var cnV  = ldef.country||L.cnV;
+  var mkV  = ldef.maker||L.mkV;
+  var slV  = ldef.seller||L.slV;
+  var caV  = ldef.caution||L.caV;
+  var pvRows=[[L.pn,name],[L.sz,sizes],[L.mt,mats],[L.ag,ageV]]; if(dd)pvRows.push([L.md,dd]); pvRows.push([L.cn,cnV],[L.mk,mkV],[L.sl,slV],[L.ca,caV]);
+  return pvRows
+    .map(function(r){return '<div class="pv-row"><span class="pv-key">'+eh(r[0])+'</span><span class="pv-val">'+eh(r[1])+'</span></div>';}).join('');
+}
+
+// ── 탭 전환 ──
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    var t=tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.tab===t);});
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='tab-'+t);});
+  });
+});
+
+// ── 기본정보 비밀번호 + 모달 ──
+var DEF_PW = '0524';
+function openDefaultsModal(){
+  document.getElementById('defaults-modal').classList.add('open');
+  document.getElementById('global-defaults-btn').classList.add('active');
+}
+function closeDefaultsModal(){
+  document.getElementById('defaults-modal').classList.remove('open');
+  document.getElementById('global-defaults-btn').classList.remove('active');
+}
+function openPwModal(){
+  document.getElementById('pw-modal').classList.add('open');
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-error').textContent='';
+  setTimeout(function(){document.getElementById('pw-input').focus();},100);
+}
+function closePwModal(){
+  document.getElementById('pw-modal').classList.remove('open');
+}
+
+document.getElementById('global-defaults-btn').addEventListener('click',function(){
+  if(document.getElementById('defaults-modal').classList.contains('open')){
+    closeDefaultsModal(); return;
+  }
+  openPwModal();
+});
+
+// 비밀번호 확인
+function checkPw(){
+  var val = document.getElementById('pw-input').value;
+  if(val === DEF_PW){
+    closePwModal();
+    openDefaultsModal();
+  } else {
+    document.getElementById('pw-error').textContent = '비밀번호가 틀렸어요';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+document.getElementById('pw-submit-btn').addEventListener('click', checkPw);
+document.getElementById('pw-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter') checkPw();
+});
+
+// 오버레이 클릭 시 닫기
+document.getElementById('pw-modal').addEventListener('click',function(e){
+  if(e.target===this) closePwModal();
+});
+document.getElementById('defaults-modal').addEventListener('click',function(e){
+  if(e.target===this) closeDefaultsModal();
+});
+
+// 모달 닫기 버튼
+document.getElementById('defaults-modal-close').addEventListener('click', closeDefaultsModal);
+
+// 언어 탭 전환
+document.querySelectorAll('.def-lang-tab').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var lang=this.dataset.lang;
+    document.querySelectorAll('.def-lang-tab').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang);});
+    document.querySelectorAll('.def-lang-panel').forEach(function(p){p.classList.toggle('active',p.id==='def-panel-'+lang);});
+  });
+});
+
+// 저장
+document.getElementById('def-save-btn').addEventListener('click',function(){
+  closeDefaultsModal();
+  showToast('기본정보 저장됨!');
+});
+
+// ══════════════════
+// TAB 2: 전체 직접 입력
+// ══════════════════
+var bulkLangs=['ko'], bic=0;
+
+function getOtherLangs(){ return bulkLangs.filter(function(l){return l!=='ko';}); }
+function getLangLabel(){
+  var ol=getOtherLangs();
+  return ol.length ? ol.map(function(l){return LANG_NAMES[l]||l;}).join('/') : '타언어';
+}
+function updateAutoLabels(){
+  var label=getLangLabel();
+  document.querySelectorAll('.auto-label').forEach(function(el){el.textContent='('+label+')';});
+  var hasOther = getOtherLangs().length > 0;
+  document.querySelectorAll('.bulk-tr-block').forEach(function(el){
+    el.classList.toggle('open', hasOther);
+  });
+}
+
+async function autoTranslateAll(){
+  var ol=getOtherLangs();
+  if(!ol.length) return;
+  var cards=document.querySelectorAll('#bulk-cards .bulk-card');
+  var fields=[{src:'name',tr:'name-tr'},{src:'item',tr:'item-tr'},{src:'mat',tr:'mat-tr'}];
+  for(var i=0;i<cards.length;i++){
+    var card=cards[i];
+    for(var j=0;j<fields.length;j++){
+      var f=fields[j];
+      var srcEl=card.querySelector('[data-role="'+f.src+'"]');
+      var trEl=card.querySelector('[data-role="'+f.tr+'"]');
+      if(srcEl&&trEl&&srcEl.value.trim()){
+        trEl.value='';
+        var results=[];
+        for(var li=0;li<ol.length;li++){ results.push(await translateText(srcEl.value.trim(),ol[li])); }
+        trEl.value=results.join(' / ');
+      }
+    }
+  }
+}
+
+async function autoTranslateField(srcInput,trInput,indicatorEl){
+  var val=srcInput.value.trim();
+  var ol=getOtherLangs();
+  if(!val||!ol.length) return;
+  if(indicatorEl) indicatorEl.style.display='block';
+  trInput.value='';
+  var results=[];
+  for(var li=0;li<ol.length;li++){ results.push(await translateText(val,ol[li])); }
+  trInput.value=results.join(' / ');
+  if(indicatorEl) indicatorEl.style.display='none';
+}
+
+document.querySelectorAll('.lang-sel-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var lang=this.dataset.lang;
+    var idx=bulkLangs.indexOf(lang);
+    if(idx===-1){ bulkLangs.push(lang); this.classList.add('active'); }
+    else {
+      if(bulkLangs.length===1){ showToast('최소 1개 언어를 선택해야 해요'); return; }
+      bulkLangs.splice(idx,1); this.classList.remove('active');
+    }
+    updateAutoLabels();
+    autoTranslateAll();
+  });
+});
+
+document.getElementById('bulk-select-all-chk').addEventListener('change',function(){
+  var allLangs=['ko','en','ja','zhCN','zhTW'];
+  if(this.checked){
+    bulkLangs=allLangs.slice();
+    document.querySelectorAll('.lang-sel-btn').forEach(function(b){b.classList.add('active');});
+  } else {
+    bulkLangs=['ko'];
+    document.querySelectorAll('.lang-sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang==='ko');});
+  }
+  updateAutoLabels();
+  autoTranslateAll();
+});
+
+function addBulkRow(){
+  bic++;
+  var id='bc'+bic;
+  var ll=getLangLabel();
+  var div=document.createElement('div');
+  div.className='bulk-card'; div.id=id;
+  var inner='<div class="bulk-card-header"><span class="bulk-card-num">PRODUCT '+bic+'</span><button class="bulk-card-del" data-target="'+id+'">✕</button></div>';
+  inner+='<div class="bulk-section-label" style="color:var(--accent);border-bottom-color:rgba(49,130,246,.25)">국문</div>';
+  inner+='<div class="bulk-field"><label style="color:#9c9c9c">전체 품목명</label><input type="text" class="form-input sm" data-role="name" placeholder="예: 아크릴 키링"><div class="suggest-box" id="sug-name-'+bic+'"></div></div>';
+  inner+='<div class="bulk-field"><label style="color:#9c9c9c">세부 구성품명</label><input type="text" class="form-input sm" data-role="item" placeholder="예: 포토카드"><div class="suggest-box" id="sug-item-'+bic+'"></div></div>';
+  inner+='<div class="two-col" style="margin-bottom:10px">';
+  inner+='<div class="bulk-field" style="margin:0"><label style="color:#9c9c9c">사이즈</label><div class="date-row"><input type="text" class="form-input sm" data-role="size" placeholder="예: 50x85"><button type="button" class="today-btn" data-role="size-correct" style="height:34px;font-size:11px;padding:0 10px">교정</button></div></div>';
+  inner+='<div class="bulk-field" style="margin:0"><label style="color:#9c9c9c">제조연월</label><div class="date-row"><input type="text" class="form-input sm" data-role="date" placeholder="예: 2026.06"><button type="button" class="today-btn" data-role="today" style="height:34px;font-size:11px;padding:0 10px">이번 달</button></div></div>';
+  inner+='</div>';
+  inner+='<div class="two-col" style="margin-bottom:10px">';
+  inner+='<div class="bulk-field" style="margin:0"><label style="color:#9c9c9c">종수</label><input type="text" class="form-input sm" data-role="cnt" placeholder="예: 1종, 4종 중 1종"></div>';
+  inner+='<div class="bulk-field" style="margin:0"><label style="color:#9c9c9c">재질</label><input type="text" class="form-input sm" data-role="mat" placeholder="예: 종이"></div>';
+  inner+='</div>';
+  var hasOther = getOtherLangs().length > 0;
+  inner+='<div class="bulk-tr-block'+(hasOther?' open':'')+'" id="tr-block-'+bic+'">';
+  inner+='<div class="bulk-section-label" style="margin-top:8px;color:var(--accent);border-bottom-color:rgba(49,130,246,.25)">번역 <span class="auto-label">('+ll+')</span></div>';
+  inner+='<div class="bulk-field auto-field"><label style="color:#9c9c9c">전체 품목명 <span class="auto-label">('+ll+')</span></label><input type="text" class="form-input sm" data-role="name-tr" placeholder="아래 언어 버튼을 누르면 자동 번역"><span class="translating-indicator" id="ti-name-'+bic+'"></span></div>';
+  inner+='<div class="bulk-field auto-field"><label style="color:#9c9c9c">세부 구성품명 <span class="auto-label">('+ll+')</span></label><input type="text" class="form-input sm" data-role="item-tr" placeholder="아래 언어 버튼을 누르면 자동 번역"><span class="translating-indicator" id="ti-item-'+bic+'"></span></div>';
+  inner+='<div class="bulk-field auto-field"><label style="color:#9c9c9c">재질 <span class="auto-label">('+ll+')</span></label><input type="text" class="form-input sm" data-role="mat-tr" placeholder="아래 언어 버튼을 누르면 자동 번역"><span class="translating-indicator" id="ti-mat-'+bic+'"></span></div>';
+  inner+='</div>';
+  div.innerHTML=inner;
+  document.getElementById('bulk-cards').appendChild(div);
+
+  var rowId=bic;
+  var pairs=[
+    {src:'name',tr:'name-tr',ti:'ti-name-'+rowId},
+    {src:'item',tr:'item-tr',ti:'ti-item-'+rowId},
+    {src:'mat', tr:'mat-tr', ti:'ti-mat-'+rowId}
+  ];
+  pairs.forEach(function(p){
+    var srcEl=div.querySelector('[data-role="'+p.src+'"]');
+    var trEl=div.querySelector('[data-role="'+p.tr+'"]');
+    var indEl=document.getElementById(p.ti);
+    srcEl.addEventListener('blur',function(){ autoTranslateField(srcEl,trEl,indEl); });
+  });
+  // 사이즈 실시간 교정
+  var sizeEl=div.querySelector('[data-role="size"]');
+  // 사이즈: input 이벤트 제거, blur + 버튼만 교정
+  sizeEl.addEventListener('blur',function(){ autoCorrectSize(this); });
+  // 종수 실시간 교정
+  var cntEl=div.querySelector('[data-role="cnt"]');
+  cntEl.addEventListener('input',function(){ autoCorrectCnt(this); });
+  cntEl.addEventListener('blur',function(){ autoCorrectCnt(this); });
+  // 재질 한영 오입력 교정
+  var matEl=div.querySelector('[data-role="mat"]');
+  var matSugDiv=document.createElement('div');
+  matSugDiv.className='suggest-box';
+  matEl.parentNode.insertBefore(matSugDiv, matEl.nextSibling);
+  matEl.addEventListener('blur',function(){ autoCorrectMat(matEl, matSugDiv); });
+  // 교정 버튼
+  if(div.querySelector('[data-role="size-correct"]')){
+    div.querySelector('[data-role="size-correct"]').addEventListener('click',function(){
+      autoCorrectSize(sizeEl);
+    });
+  }
+  // 9. 품목명/구성품명 제안
+  var suggestFields=[{role:'name',sugId:'sug-name-'+rowId},{role:'item',sugId:'sug-item-'+rowId}];
+  suggestFields.forEach(function(sf){
+    var el=div.querySelector('[data-role="'+sf.role+'"]');
+    var sugDiv=document.getElementById(sf.sugId);
+    if(!el||!sugDiv) return;
+    el.addEventListener('blur',async function(){
+      var val=this.value.trim();
+      if(!val||val.length<2) return;
+      // 간단한 오탈자 검사: 자주 쓰는 교정
+      var corrections={
+        '키링':'키링','키ㄹ잉':'키링','키링 ':'키링','포토카드':'포토카드','포토 카드':'포토카드',
+        '아크릴':'아크릴','아크릴 ':'아크릴','포스터':'포스터','스티커':'스티커','스티 커':'스티커',
+        '엽서':'엽서','북마크':'북마크','배지':'배지','뱃지':'배지','마그넷':'마그넷',
+        '마그네트':'마그넷','책갈피':'책갈피','메모지':'메모지','볼펜':'볼펜','노트':'노트'
+      };
+      var suggested=corrections[val];
+      if(suggested&&suggested!==val){
+        sugDiv.textContent='혹시 "'+suggested+'"? 클릭하면 교정';
+        sugDiv.onclick=function(){el.value=suggested;sugDiv.textContent='';};
+      } else {
+        // 공백 앞뒤 제거 제안
+        var trimmed=val.replace(/\s+/g,' ').trim();
+        if(trimmed!==val){
+          sugDiv.textContent='"'+trimmed+'"으로 교정? 클릭';
+          sugDiv.onclick=function(){el.value=trimmed;sugDiv.textContent='';};
+        } else { sugDiv.textContent=''; }
+      }
+    });
+  });
+  div.querySelector('.bulk-card-del').addEventListener('click',function(){
+    var el=document.getElementById(this.dataset.target); if(el)el.remove();
+  });
+  var dateEl=div.querySelector('[data-role="date"]');
+  dateEl.addEventListener('blur',function(){ autoCorrectDate(this); });
+  div.querySelector('[data-role="today"]').addEventListener('click',function(){
+    var d=new Date();
+    dateEl.value=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0');
+  });
+}
+document.getElementById('bulk-add-btn').addEventListener('click',addBulkRow);
+addBulkRow();
+
+function getBulkRows(){
+  return Array.from(document.querySelectorAll('#bulk-cards .bulk-card')).map(function(card){
+    return {
+      name:(card.querySelector('[data-role="name"]').value||'').trim(),
+      nameTr:(card.querySelector('[data-role="name-tr"]').value||'').trim(),
+      item:(card.querySelector('[data-role="item"]').value||'').trim(),
+      itemTr:(card.querySelector('[data-role="item-tr"]').value||'').trim(),
+      size:(card.querySelector('[data-role="size"]').value||'').trim(),
+      cnt:(card.querySelector('[data-role="cnt"]').value||'').trim(),
+      mat:(card.querySelector('[data-role="mat"]').value||'').trim(),
+      matTr:(card.querySelector('[data-role="mat-tr"]').value||'').trim(),
+      date:(card.querySelector('[data-role="date"]').value||'').trim()
+    };
+  }).filter(function(r){return r.name||r.item;});
+}
+
+document.getElementById('bulk-gen-btn').addEventListener('click',function(){
+  var rows=getBulkRows();
+  if(!rows.length){showToast('⚠ 데이터를 입력해주세요');return;}
+  var resultEl=document.getElementById('bulk-result');
+  resultEl.innerHTML=''; resultEl.style.display='block';
+  var grouped={}, order=[];
+  rows.forEach(function(r){
+    var key=r.name||'(미입력)';
+    if(!grouped[key]){grouped[key]={nameTr:r.nameTr,date:r.date,items:[]};order.push(key);}
+    if(r.item) grouped[key].items.push({item:r.item,itemTr:r.itemTr,size:r.size,cnt:r.cnt,mat:r.mat,matTr:r.matTr});
+  });
+  function getTrValue(trStr,langIdx){
+    if(!trStr) return '';
+    var parts=trStr.split(' / ');
+    return parts[langIdx]||parts[0]||'';
+  }
+  var allTexts=[], globalIdx=0, def=getDefaults();
+  bulkLangs.forEach(function(lang){
+    var otherLangs=bulkLangs.filter(function(l){return l!=='ko';});
+    var langIdx=otherLangs.indexOf(lang);
+    if(bulkLangs.length>1){
+      var secDiv=document.createElement('div');
+      secDiv.className='lang-section-header lang-'+lang;
+      secDiv.textContent='── '+(LANG_NAMES[lang]||lang)+' ──';
+      resultEl.appendChild(secDiv);
+    }
+    order.forEach(function(name){
+      var g=grouped[name];
+      var idx=globalIdx++;
+      var displayName=lang==='ko'?name:(getTrValue(g.nameTr,langIdx)||name);
+      var trItemsForBuild=g.items.map(function(i){
+        return {item:lang==='ko'?i.item:(getTrValue(i.itemTr,langIdx)||i.item),size:i.size,cnt:i.cnt,mat:lang==='ko'?i.mat:(getTrValue(i.matTr,langIdx)||i.mat)};
+      });
+      var text=buildLabelWithDef(displayName,trItemsForBuild,g.date,lang,def);
+      allTexts.push(text);
+      var div=document.createElement('div');
+      div.className='result-item lang-'+lang;
+      var bid='brc'+idx, rid='brr'+idx;
+      var badge='<span class="lang-badge lang-'+lang+'">'+LANG_BADGE_LABEL[lang]+'</span>';
+      div.innerHTML='<div class="result-item-head"><span class="result-item-name">'+badge+eh(displayName)+'</span><button class="copy-one-btn" id="'+bid+'">복사</button></div>'+
+        '<div class="result-item-preview">'+buildPreviewWithDef(displayName,trItemsForBuild,g.date,lang,def)+
+        '<button class="raw-toggle" id="rt-'+idx+'">▸ 원문 텍스트</button><div class="raw-text" id="rr-'+idx+'">'+eh(text)+'</div></div>';
+      resultEl.appendChild(div);
+      (function(ct,ci2){
+        document.getElementById('brc'+ci2).addEventListener('click',function(){
+          navigator.clipboard.writeText(ct).then(function(){
+            var b=document.getElementById('brc'+ci2);b.textContent='✓복사됨';b.classList.add('copied');
+            setTimeout(function(){b.textContent='복사';b.classList.remove('copied');},2000);showToast('복사됨!');
+          });
+        });
+        document.getElementById('rt-'+ci2).addEventListener('click',function(){
+          var el=document.getElementById('rr-'+ci2);el.classList.toggle('open');
+          this.textContent=el.classList.contains('open')?'▾ 원문 텍스트':'▸ 원문 텍스트';
+        });
+      })(text,idx);
+    });
+  });
+  document.getElementById('bulk-copy-all-btn')._texts=allTexts;
+});
+
+document.getElementById('bulk-copy-all-btn').addEventListener('click',function(){
+  var texts=this._texts;
+  if(!texts||!texts.length){showToast('먼저 라벨을 생성해주세요');return;}
+  navigator.clipboard.writeText(texts.join('\n\n')).then(function(){showToast('전체 복사됨!');});
+});
+
+document.getElementById('bulk-excel-btn').addEventListener('click',function(){
+  var rows=getBulkRows();
+  if(!rows.length){showToast('⚠ 데이터를 입력해주세요');return;}
+  var langName=bulkLangs.map(function(l){return LANG_NAMES[l]||l;}).join('_');
+  var headers=['전체 품목명','전체 품목명('+langName+')','세부 구성품명','세부 구성품명('+langName+')','사이즈','종수','재질','재질('+langName+')'];
+  var csvRows=[headers];
+  rows.forEach(function(r){csvRows.push([r.name,r.nameTr,r.item,r.itemTr,r.size,r.cnt,r.mat,r.matTr]);});
+  var bom='\uFEFF';
+  var csv=bom+csvRows.map(function(row){
+    return row.map(function(cell){
+      var s=String(cell||'').replace(/"/g,'""');
+      return (s.indexOf(',')>-1||s.indexOf('\n')>-1||s.indexOf('"')>-1)?'"'+s+'"':s;
+    }).join(',');
+  }).join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='라벨데이터_'+langName+'.csv';a.click();
+  URL.revokeObjectURL(url);showToast('CSV 저장됨!');
+});
+
+// ══════════════════
+// TAB 3: 문서 불러오기
+// ══════════════════
+var allLabels=[];
+function showWarn(id,msg){
+  var b=document.getElementById(id);
+  b.querySelector('span').textContent=msg;
+  b.style.display=msg?'block':'none';
+}
+function extractSheetId(input){
+  var m=input.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  return m?m[1]:input.trim();
+}
+document.getElementById('s-url-apply-btn').addEventListener('click',function(){
+  var val=document.getElementById('s-url').value.trim();
+  if(!val){showToast('URL 또는 ID를 입력해주세요');return;}
+  var id=extractSheetId(val);
+  window._customSheetId=id;
+  document.getElementById('s-url-status').textContent='✓ ID 적용됨: '+id;
+  document.getElementById('s-url-status').style.color='var(--accent)';
+  showToast('시트 ID 적용됨!');
+});
+document.getElementById('s-date').addEventListener('blur',function(){ autoCorrectDate(this); });
+document.getElementById('s-today-btn').addEventListener('click',function(){
+  var d=new Date();
+  document.getElementById('s-date').value=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0');
+});
+
+document.getElementById('fetch-btn').addEventListener('click',async function(){
+  var sheet=document.getElementById('s-sheet').value.trim();
+  var skip=parseInt(document.getElementById('s-skip').value)||3;
+  var sheetDate=document.getElementById('s-date').value.trim();
+  var ci={
+    name:colIdx(document.getElementById('c-name').value),
+    item:colIdx(document.getElementById('c-item').value),
+    size:colIdx(document.getElementById('c-size').value),
+    cnt:colIdx(document.getElementById('c-cnt').value),
+    mat:colIdx(document.getElementById('c-mat').value),
+    nameEn:colIdx(document.getElementById('c-name-en').value),
+    nameJa:colIdx(document.getElementById('c-name-ja').value),
+    nameZhCN:colIdx(document.getElementById('c-name-zhCN').value),
+    nameZhTW:colIdx(document.getElementById('c-name-zhTW').value),
+    itemEn:colIdx(document.getElementById('c-item-en').value),
+    itemJa:colIdx(document.getElementById('c-item-ja').value),
+    itemZhCN:colIdx(document.getElementById('c-item-zhCN').value),
+    itemZhTW:colIdx(document.getElementById('c-item-zhTW').value),
+    matEn:colIdx(document.getElementById('c-mat-en').value),
+    matJa:colIdx(document.getElementById('c-mat-ja').value),
+    matZhCN:colIdx(document.getElementById('c-mat-zhCN').value),
+    matZhTW:colIdx(document.getElementById('c-mat-zhTW').value)
+  };
+  var status=document.getElementById('s-status');
+  var results=document.getElementById('s-results');
+  status.textContent='불러오는 중...'; results.innerHTML=''; showWarn('s-warn','');
+  try {
+    var sheetId=window._customSheetId||'';
+    var fetchUrl=APPS_SCRIPT_URL+'?sheet='+encodeURIComponent(sheet)+(sheetId?'&sheetId='+encodeURIComponent(sheetId):'');
+    var res=await fetch(fetchUrl);
+    if(!res.ok) throw new Error('서버 오류 ('+res.status+')');
+    var json=await res.json();
+    if(json.error) throw new Error(json.error);
+    var rows=(json.rows||[]).map(function(r){
+      return r.map(function(v){return(v===null||v===undefined)?'':String(v);});
+    }).slice(skip);
+    var grouped={}, order=[];
+    rows.forEach(function(row){
+      var name=(row[ci.name]||'').trim(); if(!name)return;
+      if(!grouped[name]){
+        grouped[name]={
+          date:'',
+          nameEn:(row[ci.nameEn]||'').trim(),
+          nameJa:(row[ci.nameJa]||'').trim(),
+          nameZhCN:(row[ci.nameZhCN]||'').trim(),
+          nameZhTW:(row[ci.nameZhTW]||'').trim(),
+          items:[]
+        };
+        order.push(name);
+      }
+      var item=(row[ci.item]||'').trim();
+      if(item) grouped[name].items.push({
+        item:item,
+        itemEn:(row[ci.itemEn]||'').trim(), itemJa:(row[ci.itemJa]||'').trim(),
+        itemZhCN:(row[ci.itemZhCN]||'').trim(), itemZhTW:(row[ci.itemZhTW]||'').trim(),
+        size:(row[ci.size]||'').trim(), cnt:(row[ci.cnt]||'').trim(),
+        mat:(row[ci.mat]||'').trim(),
+        matEn:(row[ci.matEn]||'').trim(), matJa:(row[ci.matJa]||'').trim(),
+        matZhCN:(row[ci.matZhCN]||'').trim(), matZhTW:(row[ci.matZhTW]||'').trim()
+      });
+    });
+    if(!order.length){status.textContent='데이터 없음 — 열 설정을 확인해주세요.';return;}
+    status.textContent=order.length+'개 제품 라벨 생성 중...';
+    var def=getDefaults(); allLabels=[]; var globalIdx=0;
+    var sheetLangs=['ko','en','ja','zhCN','zhTW'];
+    var nameKeyMap={en:'nameEn',ja:'nameJa',zhCN:'nameZhCN',zhTW:'nameZhTW'};
+    var itemKeyMap={en:'itemEn',ja:'itemJa',zhCN:'itemZhCN',zhTW:'itemZhTW'};
+    var matKeyMap={en:'matEn',ja:'matJa',zhCN:'matZhCN',zhTW:'matZhTW'};
+    var caId='ca'+Date.now();
+    var hdr=document.createElement('div'); hdr.className='multi-header';
+    hdr.innerHTML='<span class="form-label" style="margin:0">'+order.length+'개 제품 × 5개 언어</span><button class="copy-all-btn" id="'+caId+'">전체 복사</button>';
+    results.appendChild(hdr);
+    sheetLangs.forEach(function(lang){
+      var secDiv=document.createElement('div');
+      secDiv.className='lang-section-header lang-'+lang;
+      secDiv.textContent='── '+(LANG_NAMES[lang]||lang)+' ──';
+      results.appendChild(secDiv);
+      order.forEach(function(name){
+        var g=grouped[name]; if(!g.items.length)return;
+        var d=sheetDate||g.date||'';
+        var displayName=lang==='ko'?name:(g[nameKeyMap[lang]]||name);
+        var trItems=g.items.map(function(si){
+          return {item:lang==='ko'?si.item:(si[itemKeyMap[lang]]||si.item),size:si.size,cnt:si.cnt,mat:lang==='ko'?si.mat:(si[matKeyMap[lang]]||si.mat)};
+        });
+        var label=buildLabelWithDef(displayName,trItems,d,lang,def);
+        allLabels.push(label);
+        var idx=globalIdx++;
+        var div=document.createElement('div');
+        div.className='result-item lang-'+lang;
+        var bid='sb'+idx, rid='sr'+idx;
+        var badge='<span class="lang-badge lang-'+lang+'">'+LANG_BADGE_LABEL[lang]+'</span>';
+        var headName=lang==='ko'?eh(name):(displayName!==name?eh(name)+' / '+eh(displayName):eh(name));
+        div.innerHTML='<div class="result-item-head"><span class="result-item-name">'+badge+headName+'</span><button class="copy-one-btn" id="'+bid+'">복사</button></div>'+
+          '<div class="result-item-preview">'+buildPreviewWithDef(displayName,trItems,d,lang,def)+
+          '<button class="raw-toggle" id="rt-btn-'+idx+'">▸ 원문 텍스트</button>'+
+          '<div class="raw-text" id="'+rid+'">'+eh(label)+'</div></div>';
+        results.appendChild(div);
+        (function(cLabel,cBid,cRid,cIdx){
+          document.getElementById(cBid).addEventListener('click',function(){
+            navigator.clipboard.writeText(cLabel).then(function(){
+              var b=document.getElementById(cBid);b.textContent='✓복사됨';b.classList.add('copied');
+              setTimeout(function(){b.textContent='복사';b.classList.remove('copied');},2000);showToast('복사됨!');
+            });
+          });
+          document.getElementById('rt-btn-'+cIdx).addEventListener('click',function(){
+            var el=document.getElementById(cRid);el.classList.toggle('open');
+            this.textContent=el.classList.contains('open')?'▾ 원문 텍스트':'▸ 원문 텍스트';
+            if(el.classList.contains('open')) setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+          });
+        })(label,bid,rid,idx);
+      });
+    });
+    status.textContent=order.length+'개 제품 완료';
+    document.getElementById(caId).addEventListener('click',function(){
+      navigator.clipboard.writeText(allLabels.join('\n\n')).then(function(){
+        var b=document.getElementById(caId);b.textContent='✓ 전체 복사됨';b.classList.add('copied');
+        setTimeout(function(){b.textContent='전체 복사';b.classList.remove('copied');},2500);showToast('전체 복사됨!');
+      });
+    });
+  } catch(e){ status.textContent=''; showWarn('s-warn',e.message); }
+});
+</script>
+</body>
+</html>

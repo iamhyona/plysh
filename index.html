@@ -140,7 +140,17 @@ nav button { flex:none; border:0; background:none; padding:12px 0 10px; font-siz
 nav button.on { color:var(--txt); border-bottom-color:var(--txt); }
 
 main { max-width:560px; margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
-#rvWrap, #imWrap { max-width:1120px; margin:0 auto; } #rvF, #imF { display:block; width:100%; border:0; background:var(--bg); }
+#rvWrap, #imWrap, #tkWrap { max-width:1120px; margin:0 auto; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
+/* TOOLS (2026-11-19) */
+#tkBar { max-width:560px; margin:10px auto 0; padding:0 0 10px; } #tkBar button { background:#fff; } #tkBar button.on { background:var(--txt); color:#fff; } #tkBar .tkall { color:var(--mute); }
+.tkl { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tkc { display:flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left; border:0; background:#fff; border-radius:18px; padding:16px 16px 15px; font:inherit; color:var(--txt); cursor:pointer; min-width:0; }
+.tkc b { font-size:16px; font-weight:700; letter-spacing:-0.02em; line-height:1.3; display:flex; align-items:center; gap:6px; flex-wrap:wrap; } .tkc b em { font-style:normal; font-size:10px; font-weight:800; color:#fff; background:var(--acc); border-radius:999px; padding:2px 6px; letter-spacing:.03em; }
+.tkc small { font-size:11px; font-weight:700; color:var(--faint); letter-spacing:.05em; } .tkc span { font-size:12.5px; color:var(--sub); line-height:1.45; margin-top:4px; }
+.spg { margin:10px 0 12px; } .spv { height:46px; display:flex; align-items:center; padding:0 2px; font-size:16px; font-weight:700; color:var(--sub); }
+.spr { display:grid; gap:6px; margin:0 0 4px; } .spr > div { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:baseline; font-size:14px; } .spr span { font-weight:700; } .spr small { color:var(--mute); font-size:12.5px; } .spr b { font-weight:700; }
+.spsvg { width:100%; height:auto; display:block; margin:0 0 12px; } .spn { font-size:12px; color:var(--mute); line-height:1.6; margin:4px 4px 0; }
+@media (max-width:360px) { .tkl { grid-template-columns:1fr; } }
 .card { background:var(--card); border-radius:20px; padding:22px 20px; margin-bottom:12px; }
 .ct { font-size:17px; font-weight:700; margin:0 0 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .ct small { font-size:13px; font-weight:500; color:var(--mute); }
@@ -875,14 +885,17 @@ details.fday:not([open]) > summary { margin-bottom:0; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="todo">TO DO LIST</button><button data-v="wl">WORK LOG</button><button data-v="pj">PROJECT</button><button data-v="qk">QUICK</button><button data-v="review" type="button">PREFLIGHT</button><button data-v="impose" type="button">IMPOSE</button><button data-v="logo" type="button">LOGO</button><button data-v="exp">EXPENSE</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
+    <button data-v="todo">TO DO LIST</button><button data-v="wl">WORK LOG</button><button data-v="pj">PROJECT</button><button data-v="qk">QUICK</button><button data-v="tools" type="button">TOOLS</button><button data-v="exp">EXPENSE</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
   </nav>
+  <div id="tkBar" class="tabs2 hide"></div>
 </header>
 <main id="main"><div class="ld">불러오는 중…</div></main>
 <!-- 검수 메뉴 (2026-11-18): review/ 페이지를 그대로 띄움. 다른 메뉴 갔다 와도 결과 유지 -->
 <div id="rvWrap" class="hide"><iframe id="rvF" title="PREFLIGHT"></iframe></div>
 <!-- 터잡기 메뉴 (2026-11-19): impose/ 페이지를 그대로 띄움 -->
 <div id="imWrap" class="hide"><iframe id="imF" title="IMPOSE"></iframe></div>
+<!-- TOOLS 메뉴 (2026-11-19): tools/ 폴더 도구들. 도구마다 iframe 하나 -->
+<div id="tkWrap" class="hide"></div>
 <button class="fab" id="fab" aria-label="일정 추가"></button>
 <div class="dimbg" id="dimbg"></div>
 
@@ -1085,7 +1098,7 @@ var KIND = { '디자인': '#3182f6', '리터칭': '#16a34a', '소속사': '#6b76
 var KIND_BG = { '디자인': '#e8f1ff', '리터칭': '#e6f6ec', '소속사': '#f0f2f4', '데드라인': '#fde8ef', '공식': '#fdecec', '업무': '#f1ebfe', '휴가': '#fef3dc' };
 var PROJ_K = ['디자인', '리터칭', '소속사', '데드라인', '공식'], WORK_K = ['업무', '휴가'];
 var PCOL = ['#6f9fe8', '#e08aa6', '#6dba8f', '#e2aa5e', '#a092e0', '#5fb4d4', '#e48f80', '#6cbcb2', '#c08fd8', '#e7a173'];
-var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', y: +TODAY.slice(0, 4), m: +TODAY.slice(5, 7), ws: sunOf(TODAY),
+var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', tk: ls.get('d4:tk') || '', y: +TODAY.slice(0, 4), m: +TODAY.slice(5, 7), ws: sunOf(TODAY),
   off: JSON.parse(ls.get('d4:off') || '{}'), D: null, sel: null };
 S.cv = ls.get('d4:cv') || 'cal';
 if (S.view === 'designer' || S.view === 'team' || S.view === 'project') { S.view = 'month'; S.cv = 'proj'; }
@@ -1106,7 +1119,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261119td2';
+var APP_VER = '20261119tl1';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1583,8 +1596,169 @@ function openGd(g, anchor) {
   var was = !!$('.bs.open'); closeBs();
   setTimeout(function () { openBs('#gd'); $('#gd').style.height = $('#gd').style.maxHeight; }, was ? 230 : 0);
 }
+// TOOLS 메뉴 (2026-11-19): 디자인 작업 도구를 한 메뉴에. 작성 → 계산 → 검수 → 자료 순서
+// v: 앱 안 화면(review·impose·calc·spine·logo) / f: tools/ 폴더 페이지를 iframe 으로
+var TOOLS = [
+  { g: '작성', i: [
+    { k: 'proof', t: '사양서 도우미', e: 'PROOF', s: '지류 사양서 품목·전개도·절수, 팬톤 가이드', f: 'tools/proof/' },
+    { k: 'formly', t: '상품 사양서', e: 'FORMLY', s: '굿즈 상품 사양서 작성, 엑셀 저장·시트 불러오기', f: 'tools/formly/' },
+    { k: 'label', t: '상품 라벨 생성기', s: '상품 라벨 스티커 데이터 만들기', f: 'tools/label/' },
+    { k: 'filename', t: '파일명 생성기', s: '규칙에 맞는 폴더명·파일명 만들어 복사', f: 'tools/filename/' }] },
+  { g: '계산', i: [
+    { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine', nw: 1 },
+    { k: 'calc', t: '판걸이 계산기', s: '완성 크기로 전지 걸이·절수·필요 전지 수', v: 'calc' },
+    { k: 'impose', t: '터잡기 미리보기', e: 'IMPOSE', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose', nw: 1 }] },
+  { g: '검수', i: [
+    { k: 'review', t: '인쇄 파일·사양서 검수', e: 'PREFLIGHT', s: 'PDF·AI 인쇄 전 검수, 사양서 검수', v: 'review' },
+    { k: 'checklist', t: '디자인 사고방지 체크리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
+  { g: '자료', i: [
+    { k: 'logo', t: '로고', e: 'LOGO', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
+    { k: 'fonts', t: '폰트 아카이브', e: 'SPECIMEN', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' }] }
+];
+var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
+var TOOL_SHORT = { proof: '사양서 도우미', formly: '상품 사양서', label: '라벨', filename: '파일명', spine: '책등', calc: '판걸이', impose: 'IMPOSE', review: 'PREFLIGHT', checklist: '체크리스트', logo: 'LOGO', fonts: '폰트' };
+function toolKey() { if (S.view === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === S.view; })[0]; return t ? t.k : ''; }
+function isToolView(v) { return v === 'tools' || v === 'tk' || TOOL_LIST.some(function (x) { return x.v === v; }); }
+function openTool(k) {
+  var t = TOOL_LIST.filter(function (x) { return x.k === k; })[0]; if (!t) return;
+  if (t.f) { S.tk = k; ls.set('d4:tk', k); S.view = 'tk'; } else S.view = t.v;
+  ls.set('d4:view', S.view); window.scrollTo(0, 0); render();
+}
+function toolBar() {
+  var bar = $('#tkBar'), k = toolKey(), on = isToolView(S.view) && S.view !== 'tools';
+  bar.classList.toggle('hide', !on); if (!on) return;
+  bar.innerHTML = '<button type="button" data-tk="" class="tkall">전체</button>' + TOOL_LIST.map(function (x) { return '<button type="button" data-tk="' + x.k + '"' + (x.k === k ? ' class="on"' : '') + '>' + esc(TOOL_SHORT[x.k] || x.t) + '</button>'; }).join('');
+  $$('#tkBar button').forEach(function (b) { b.onclick = function () { if (!b.dataset.tk) { S.view = 'tools'; ls.set('d4:view', 'tools'); window.scrollTo(0, 0); render(); } else openTool(b.dataset.tk); }; });
+  chipVis(bar);
+}
+function renderTools() {
+  $('#main').innerHTML = TOOLS.map(function (gr) {
+    return '<div class="gdg"><h4>' + esc(gr.g) + '</h4><div class="tkl">' + gr.i.map(function (x) {
+      return '<button class="tkc" type="button" data-tool="' + x.k + '"><b>' + esc(x.t) + (x.nw ? '<em>NEW</em>' : '') + '</b>' + (x.e ? '<small>' + esc(x.e) + '</small>' : '') + '<span>' + esc(x.s) + '</span></button>';
+    }).join('') + '</div></div>';
+  }).join('');
+  $$('[data-tool]').forEach(function (b) { b.onclick = function () { openTool(b.dataset.tool); }; });
+}
+// tools/ 페이지: 도구마다 iframe 하나씩 만들어 두고 다른 메뉴 갔다 와도 입력 유지
+function renderTk() {
+  var t = TOOL_LIST.filter(function (x) { return x.k === S.tk && x.f; })[0];
+  if (!t) { S.view = 'tools'; return renderTools(); }
+  $$('#tkWrap iframe').forEach(function (f) { f.classList.toggle('hide', f.dataset.k !== t.k); });
+  var f = $('#tkWrap iframe[data-k="' + t.k + '"]');
+  if (!f) { f = document.createElement('iframe'); f.dataset.k = t.k; f.title = t.t; f.src = t.f + '?v=' + APP_VER; $('#tkWrap').appendChild(f); }
+  rvSize(); window.scrollTo(0, 0);
+}
+// 책등 계산기 (2026-11-19). 종이 두께 = 평량(g) × 계수, PREFLIGHT 사양서 검수(spec.js caliper)와 같은 기준
+var SPN_PAPERS = [
+  { k: 'mo', n: '모조 (백·미색)', f: 0.00125, g: [70, 80, 100, 120, 150] },
+  { k: 'art', n: '아트', f: 0.00087, g: [100, 120, 150, 180, 200, 250, 300] },
+  { k: 'snow', n: '스노우', f: 0.001, g: [100, 120, 150, 180, 200, 250, 300] },
+  { k: 'rd', n: '랑데뷰', f: 0.00125, g: [105, 130, 160, 190, 210, 240] },
+  { k: 'mb', n: '몽블랑', f: 0.00125, g: [100, 130, 160, 190, 210, 240] },
+  { k: 'el', n: '이라이트', f: 0.0015, g: [70, 80] },
+  { k: 'cu', n: '두께 직접 입력', f: 0, g: [] }];
+var SPN_BIND = [['pb', '무선'], ['sew', '사철'], ['hc', '양장'], ['ss', '중철'], ['ring', '링']];
+var SPN_RING = [[6.4, '1/4"'], [7.9, '5/16"'], [9.5, '3/8"'], [11.1, '7/16"'], [12.7, '1/2"'], [14.3, '9/16"'], [15.9, '5/8"'], [19.0, '3/4"'], [22.2, '7/8"'], [25.4, '1"'], [28.6, '1-1/8"'], [31.8, '1-1/4"']];
+function spq() {
+  var d = { b: 'pb', p: 120, ip: 'mo', ig: 100, it: 0.12, cp: 'art', cg: 250, ct: 0.25, bd: 2.5, w: 148, h: 210, fl: 0 };
+  try { var o = JSON.parse(ls.get('d4:spine') || 'null'); if (o) for (var k in o) d[k] = o[k]; } catch (e) {}
+  return d;
+}
+function spPaper(k) { return SPN_PAPERS.filter(function (x) { return x.k === k; })[0] || SPN_PAPERS[0]; }
+function spCal(pk, g, t) { var P = spPaper(pk); return P.f ? g * P.f : (+t || 0); }
+function spName(pk, g, t) { var P = spPaper(pk); return P.f ? P.n.replace(/ \(.+\)/, '') + ' ' + g + 'g' : '장당 ' + t + 'mm'; }
+function f1(v) { return (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, ''); }
+var SPQ = null;
+function renderSpine() {
+  var c = SPQ = spq(), h = '';
+  var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + (unit ? ' (' + unit + ')' : '') + '</label><input type="number" inputmode="decimal" data-sk="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '></div>'; };
+  var paperSel = function (pre, lb) {
+    var P = spPaper(c[pre + 'p']);
+    return '<div class="f"><label>' + lb + '</label><select data-ss="' + pre + 'p">' + SPN_PAPERS.map(function (x) { return '<option value="' + x.k + '"' + (x.k === P.k ? ' selected' : '') + '>' + x.n + '</option>'; }).join('') + '</select></div>' +
+      (P.f ? '<div class="chips spg">' + P.g.map(function (g) { return '<button type="button" data-sg="' + pre + 'g" data-g="' + g + '" class="' + (+c[pre + 'g'] === g ? 'on' : '') + '">' + g + 'g</button>'; }).join('') + '</div>' + '<div class="frow">' + num(pre + 'g', '평량 직접', 'g') + '<div class="f"><label>장당 두께</label><div class="spv">' + (Math.round(spCal(P.k, +c[pre + 'g']) * 1000) / 1000) + 'mm</div></div></div>'
+        : '<div class="frow">' + num(pre + 't', '장당 두께', 'mm', '0.01') + '</div>');
+  };
+  h += '<div class="seg" id="spB">' + SPN_BIND.map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.b === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  h += '<div class="card"><div class="ct">내지</div><div class="frow">' + num('p', '쪽수', 'p') + '</div>' + paperSel('i', '종이') + '</div>';
+  if (c.b === 'hc') h += '<div class="card"><div class="ct">양장 표지</div><div class="f"><label>판지 두께</label></div><div class="chips spg">' + [2, 2.5, 3].map(function (v) { return '<button type="button" data-bd="' + v + '" class="' + (+c.bd === v ? 'on' : '') + '">' + v + 'mm</button>'; }).join('') + '</div></div>';
+  else if (c.b !== 'ring') h += '<div class="card"><div class="ct">표지</div>' + paperSel('c', '종이') + '</div>';
+  h += '<details class="card cset"' + (+c.fl || c.b !== 'ss' ? ' open' : '') + '><summary class="ct">판형<small>표지 펼친 크기 계산</small></summary><div class="chips cpre" style="margin-top:12px">' + PRESETS.slice(0, 7).map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '">' + p[0] + '<small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
+    '<div class="frow">' + num('w', '가로', 'mm') + num('h', '세로', 'mm') + (c.b === 'pb' || c.b === 'sew' ? num('fl', '날개', 'mm') : '') + '</div></details>';
+  h += '<div id="spRes">' + spineOut(c) + '</div>';
+  $('#main').innerHTML = h; bindSpine();
+}
+function spineOut(c) {
+  var p = Math.max(0, Math.round(+c.p || 0)), ic = spCal(c.ip, +c.ig, c.it), cc = spCal(c.cp, +c.cg, c.ct), sh = Math.ceil(p / 2), body = sh * ic, out = '', warn = [], spine = 0, rows = [], copy = '';
+  var bn = SPN_BIND.filter(function (o) { return o[0] === c.b; })[0][1], inN = spName(c.ip, c.ig, c.it), cvN = spName(c.cp, c.cg, c.ct);
+  if (!p || !ic) return '<div class="card"><div class="empty2">쪽수와 종이를 넣으면 계산돼요</div></div>';
+  if (p % 2) warn.push('쪽수가 홀수예요 · 마지막 장 뒷면 포함 ' + (p + 1) + 'p로 계산');
+  rows.push(['내지', sh + '장 × ' + (Math.round(ic * 1000) / 1000) + 'mm', body]);
+  if (c.b === 'pb' || c.b === 'sew') {
+    rows.push(['표지', '2겹 × ' + (Math.round(cc * 1000) / 1000) + 'mm', 2 * cc]);
+    if (c.b === 'sew') { var sig = Math.ceil(p / 16); rows.push(['실 여유', sig + '대 × 0.1mm', sig * 0.1]); }
+    spine = rows.reduce(function (a, r) { return a + r[2]; }, 0);
+    if (spine < 3) warn.push('책등 ' + f1(spine) + 'mm · 3mm 미만은 책등 글자 생략 권장');
+    if (c.b === 'pb' && p < 40) warn.push(p + 'p · 무선은 보통 40p 이상 권장 (얇으면 중철 검토)');
+    if (p % 16) warn.push('16p 대수로 ' + Math.floor(p / 16) + '대 + ' + (p % 16) + 'p · ' + Math.ceil(p / 16) * 16 + 'p면 대수가 딱 맞아요');
+  } else if (c.b === 'hc') {
+    rows.push(['면지', '앞뒤 2장 (모조 120g 기준)', 2 * 120 * 0.00125]);
+    rows.push(['판지', '2 × ' + c.bd + 'mm', 2 * c.bd]);
+    spine = rows.reduce(function (a, r) { return a + r[2]; }, 0);
+    warn.push('양장 둥근등·각등, 싸개 여유는 제본소 기준 확인');
+  } else if (c.b === 'ss') {
+    var lv = Math.ceil(p / 4), fold = lv * ic * 2 + 2 * cc, creep = Math.max(0, lv - 1) * ic;
+    if (p % 4) warn.push('중철은 4의 배수 · ' + p + 'p → ' + Math.ceil(p / 4) * 4 + 'p 또는 ' + Math.floor(p / 4) * 4 + 'p');
+    if (p > 64) warn.push(p + 'p · 중철은 보통 64p 이하 권장 (두꺼우면 무선 검토)');
+    out += '<div class="card cres best"><div class="ct"><span>중철 · 책등 없음</span><small>' + bn + ' ' + p + 'p</small></div>' +
+      '<div class="cst"><div><small>접힌 등 두께</small><b>' + f1(fold) + '<i>mm</i></b></div><div><small>가운데 밀림</small><b>' + f1(creep) + '<i>mm</i></b></div><div><small>종이 접장</small><b>' + lv + '<i>장</i></b></div></div>' +
+      '<div class="cds">가운데 장일수록 바깥으로 밀려나서 재단 후 바깥 여백이 ' + f1(creep) + 'mm 정도 줄어요 · 바깥 쪽 중요 요소는 안전 여백 + ' + f1(creep) + 'mm 권장</div>' +
+      warn.map(function (w) { return '<div class="cwarn">' + esc(w) + '</div>'; }).join('') +
+      '<button class="cpy" data-scpy="' + esc('중철 ' + p + 'p · 내지 ' + inN + ' · 표지 ' + cvN + ' · 책등 없음 (가운데 밀림 약 ' + f1(creep) + 'mm)') + '">사양서용 복사</button></div>';
+    return out + spNote();
+  } else if (c.b === 'ring') {
+    var need = body + 2.5, ring = SPN_RING.filter(function (r) { return r[0] >= need; })[0];
+    out += '<div class="card cres best"><div class="ct"><span>링 제본</span><small>' + p + 'p · ' + sh + '장</small></div>' +
+      '<div class="cst c2"><div><small>추천 링 지름</small><b>' + (ring ? ring[0] + '<i>mm</i>' : '—') + '</b><em>' + (ring ? ring[1] + ' · 종이 묶음 ' + f1(body) + 'mm + 여유 2.5mm' : '1-1/4" 넘음 · 분권 검토') + '</em></div><div><small>종이 묶음</small><b>' + f1(body) + '<i>mm</i></b></div></div>' +
+      '<div class="cds">표지·뒷판(합지) 두께는 빼고 계산 · 넣으면 그만큼 더해서 고르세요 · 1/2" 이하는 3:1, 그 이상은 2:1 피치</div>' +
+      warn.map(function (w) { return '<div class="cwarn">' + esc(w) + '</div>'; }).join('') +
+      (ring ? '<button class="cpy" data-scpy="' + esc('링 제본 ' + p + 'p · 내지 ' + inN + ' · 링 ' + ring[0] + 'mm(' + ring[1] + ') 권장') + '">사양서용 복사</button>' : '') + '</div>';
+    return out + spNote();
+  }
+  var rec = Math.round(spine * 2) / 2;
+  var w = +c.w || 0, hh = +c.h || 0, fl = (c.b === 'pb' || c.b === 'sew') ? +c.fl || 0 : 0, cw = 2 * w + rec + 2 * fl;
+  copy = '책등 ' + rec + 'mm (' + bn + ' · 내지 ' + p + 'p ' + inN + (c.b === 'hc' ? ' · 판지 ' + c.bd + 'mm' : ' · 표지 ' + cvN) + ' 기준, 업체 종이 두께로 확정)';
+  out += '<div class="card cres best"><div class="ct"><span>책등</span><small>' + bn + ' ' + p + 'p</small></div>' +
+    '<div class="cst c2"><div><small>계산값</small><b>' + f1(Math.round(spine * 100) / 100) + '<i>mm</i></b><em>소수 둘째 자리 ' + (Math.round(spine * 100) / 100).toFixed(2) + '</em></div><div><small>사양서 표기</small><b>' + rec + '<i>mm</i></b><em>0.5mm 단위</em></div></div>' +
+    '<div class="spr">' + rows.map(function (r) { return '<div><span>' + r[0] + '</span><small>' + esc(r[1]) + '</small><b>' + (Math.round(r[2] * 100) / 100) + 'mm</b></div>'; }).join('') + '</div>' +
+    warn.map(function (x) { return '<div class="cwarn">' + esc(x) + '</div>'; }).join('') +
+    '<button class="cpy" data-scpy="' + esc(copy) + '">사양서용 복사</button></div>';
+  if (w && hh && c.b !== 'hc') out += '<div class="card"><div class="ct">표지 펼친 크기<small>' + (fl ? '날개 ' + fl + ' + ' : '') + '뒤 ' + w + ' + 책등 ' + rec + ' + 앞 ' + w + (fl ? ' + 날개 ' + fl : '') + '</small></div>' + spSvg(w, hh, rec, fl) +
+    '<div class="cst c2 sm"><div><small>재단 크기</small><b>' + fmtN(cw, 1) + '<i>×</i>' + hh + '<i>mm</i></b></div><div><small>도련 3mm 포함</small><b>' + fmtN(cw + 6, 1) + '<i>×</i>' + (hh + 6) + '</b></div></div>' +
+    '<button class="cpy" data-scpy="' + esc('표지 펼친 크기 ' + fmtN(cw, 1) + '×' + hh + 'mm (' + (fl ? '날개 ' + fl + '×2 + ' : '') + '앞뒤 ' + w + '×2 + 책등 ' + rec + ')') + '">사양서용 복사</button></div>';
+  else if (c.b === 'hc') out += '<div class="card"><div class="ct">양장 표지</div><div class="cds">싸개 크기 = 판지(앞뒤 + 책등 + 홈 간격) + 사방 접어넣기 15mm 정도 · 제본소 기준표로 확정</div></div>';
+  return out + spNote();
+}
+function spNote() { return '<div class="spn">종이 두께는 평량 × 대략 계수예요 (아트 0.87 · 스노우 1.0 · 모조·랑데뷰·몽블랑 1.25 · 이라이트 1.5 µm/g). 같은 평량도 제지사·종이마다 달라서 최종 책등은 인쇄소 두께표나 가제본으로 확정</div>'; }
+function spSvg(w, h, s, fl) {
+  var W = 2 * w + s + 2 * fl, sc = 300 / Math.max(W, h * 1.4), x = 10, y = 10, H = h * sc, parts = [];
+  if (fl) parts.push(['날개', fl]); parts.push(['뒤표지', w], ['책등', s], ['앞표지', w]); if (fl) parts.push(['날개', fl]);
+  var g = '', cx = x;
+  parts.forEach(function (p) { var pw = p[1] * sc; g += '<rect x="' + cx + '" y="' + y + '" width="' + pw + '" height="' + H + '" fill="' + (p[0] === '책등' ? '#191f28' : p[0] === '날개' ? '#e5e8eb' : '#fff') + '" stroke="#b0b8c1" stroke-width="1"/>' + (p[0] !== '책등' ? '<text x="' + (cx + pw / 2) + '" y="' + (y + H / 2) + '" text-anchor="middle" font-size="12" fill="#4e5968">' + p[0] + '</text>' : '') + '<text x="' + (cx + pw / 2) + '" y="' + (y + H + 16) + '" text-anchor="middle" font-size="11" fill="' + (p[0] === '책등' ? '#191f28' : '#8b95a1') + '" font-weight="' + (p[0] === '책등' ? 700 : 500) + '">' + p[1] + '</text>'; cx += pw; });
+  return '<svg class="spsvg" viewBox="0 0 ' + (W * sc + 20) + ' ' + (H + 34) + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + g + '</svg>';
+}
+function bindSpine() {
+  var c = SPQ, upd = function (soft) { try { ls.set('d4:spine', JSON.stringify(c)); } catch (e) {} if (soft) { $('#spRes').innerHTML = spineOut(c); bindRes(); } else { var y0 = window.scrollY; renderSpine(); window.scrollTo(0, y0); } };
+  $$('#spB button').forEach(function (b) { b.onclick = function () { c.b = b.dataset.b; upd(); }; });
+  $$('[data-ss]').forEach(function (s) { s.onchange = function () { var pre = s.dataset.ss.charAt(0), P = spPaper(s.value); c[s.dataset.ss] = s.value; if (P.g.length && P.g.indexOf(+c[pre + 'g']) < 0) c[pre + 'g'] = P.g[Math.min(2, P.g.length - 1)]; upd(); }; });
+  $$('[data-sg]').forEach(function (b) { b.onclick = function () { c[b.dataset.sg] = +b.dataset.g; upd(); }; });
+  $$('[data-bd]').forEach(function (b) { b.onclick = function () { c.bd = +b.dataset.bd; upd(); }; });
+  $$('#main .cpre [data-pw]').forEach(function (b) { b.onclick = function () { c.w = +b.dataset.pw; c.h = +b.dataset.ph; upd(); }; });
+  $$('[data-sk]').forEach(function (i) { i.oninput = function () { c[i.dataset.sk] = i.value === '' ? '' : +i.value; var k = i.dataset.sk; if (k === 'ig' || k === 'cg') { $$('[data-sg="' + k + '"]').forEach(function (b) { b.classList.toggle('on', +b.dataset.g === +i.value); }); var v = i.closest('.frow').querySelector('.spv'); if (v) v.textContent = (Math.round(spCal(c[k.charAt(0) + 'p'], +i.value) * 1000) / 1000) + 'mm'; } upd(true); }; });
+  bindRes();
+  function bindRes() { $$('[data-scpy]').forEach(function (b) { b.onclick = function () { var t = b.dataset.scpy; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('복사했어요 · 사양서에 붙여넣기'); }, function () { prompt('복사해서 쓰세요', t); }); }; }); }
+}
 // 검수 메뉴 (2026-11-18): 인쇄 전 PDF·.ai 검수. 화면 높이에 맞춘 iframe 으로 review/ 를 띄운다
-function rvSize() { var h = document.querySelector('header'); ['#rvF', '#imF'].forEach(function (k) { var f = $(k); if (f) f.style.height = (window.innerHeight - (h ? h.offsetHeight : 0)) + 'px'; }); }
+function rvSize() { var h = document.querySelector('header'); var hh = (window.innerHeight - (h ? h.offsetHeight : 0)) + 'px'; ['#rvF', '#imF'].forEach(function (k) { var f = $(k); if (f) f.style.height = hh; }); $$('#tkWrap iframe').forEach(function (f) { f.style.height = hh; }); }
 function renderReview() {
   var f = $('#rvF'); if (!f.getAttribute('src')) f.setAttribute('src', 'review/?v=' + APP_VER);
   rvSize(); window.scrollTo(0, 0);
@@ -1593,14 +1767,15 @@ function renderImpose() {
   var f = $('#imF'); if (!f.getAttribute('src')) f.setAttribute('src', 'impose/?v=' + APP_VER);
   rvSize(); window.scrollTo(0, 0);
 }
-window.addEventListener('resize', function () { if (S.view === 'review' || S.view === 'impose') rvSize(); });
+window.addEventListener('resize', function () { if (S.view === 'review' || S.view === 'impose' || S.view === 'tk') rvSize(); });
 function renderView() {
-  var rvOn = S.view === 'review', imOn = S.view === 'impose'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#imWrap').classList.toggle('hide', !imOn); $('#main').classList.toggle('hide', rvOn || imOn);
-  $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : S.view)); });
+  var rvOn = S.view === 'review', imOn = S.view === 'impose', tkOn = S.view === 'tk'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#imWrap').classList.toggle('hide', !imOn); $('#tkWrap').classList.toggle('hide', !tkOn); $('#main').classList.toggle('hide', rvOn || imOn || tkOn);
+  toolBar();
+  $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || S.view === 'review' || S.view === 'impose' || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderTools, tk: renderTk, spine: renderSpine })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };

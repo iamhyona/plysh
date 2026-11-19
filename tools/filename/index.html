@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>파일명 생성기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #f2f4f6; --surface: #ffffff; --surface2: #f2f4f6;
+    --border: #e5e8eb; --accent: #3182f6; --danger: #ef4444;
+    --text: #191f28; --text2: #4e5968; --text3: #8b95a1;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; background:var(--bg); color:var(--text); font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:14px; line-height:1.6; color-scheme:light; }
+
+  #app { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
+
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 20px; display:flex; align-items:center; height:56px; flex-shrink:0; }
+  .logo { font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--accent); }
+  .logo span { color:var(--text2); font-weight:400; }
+
+  .tabs-wrapper { background:var(--surface); border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0; scrollbar-width:none; }
+  .tabs-wrapper::-webkit-scrollbar { display:none; }
+  .tabs { display:flex; padding:0 12px; min-width:max-content; }
+  .tab { padding:0 18px; height:48px; display:flex; align-items:center; cursor:pointer; white-space:nowrap; font-size:13px; color:var(--text3); border-bottom:2px solid transparent; transition:color .2s,border-color .2s; }
+  .tab:hover { color:var(--text2); }
+  .tab.active { color:var(--text); border-bottom-color:var(--accent); }
+
+  .content { flex:1; overflow-y:auto; }
+  .content-inner { padding:24px 16px 100px; max-width:640px; margin:0 auto; }
+
+  .form-label { font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; display:block; }
+  .form-group { margin-bottom:14px; }
+  .form-row { display:flex; gap:8px; align-items:stretch; }
+
+  .form-input {
+    flex:1; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; color:var(--text); font-size:13.5px;
+    font-family:'Pretendard Variable',Pretendard,sans-serif; outline:none; transition:border-color .2s; width:100%;
+  }
+  .form-input:focus { border-color:var(--accent); }
+  .form-input::placeholder { color:var(--text3); }
+  select.form-input { cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a5a70' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+
+  .today-btn { padding:0 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:12px; font-family:'Pretendard Variable',Pretendard,sans-serif; cursor:pointer; transition:all .2s; white-space:nowrap; flex-shrink:0; }
+  .today-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* hint under input */
+  .input-hint { font-size:11px; color:var(--text3); margin-top:4px; min-height:16px; transition:color .2s; }
+  .input-hint.converted { color:var(--accent); }
+
+  /* result */
+  .result-box { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-top:20px; }
+  .result-label { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+  .result-text { font-size:15px; font-weight:500; color:var(--accent); word-break:break-all; line-height:1.6; min-height:24px; letter-spacing:.01em; }
+  .result-text.empty { color:var(--text3); font-size:13px; font-weight:400; }
+  .copy-btn { margin-top:14px; width:100%; height:44px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; font-weight:700; font-family:'Pretendard Variable',Pretendard,sans-serif; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .copy-btn:hover { filter:brightness(1.1); }
+  .copy-btn:disabled { opacity:.35; cursor:not-allowed; filter:none; }
+  .copy-btn.copied { background:#3182f6; color:#fff; }
+
+  /* history */
+  .history-section { margin-top:24px; }
+  .history-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .clear-btn { font-size:11px; color:var(--text3); cursor:pointer; background:none; border:none; font-family:'Pretendard Variable',Pretendard,sans-serif; transition:color .2s; }
+  .clear-btn:hover { color:#ff5f5f; }
+  .history-list { display:flex; flex-direction:column; gap:4px; }
+  .history-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:all .15s; }
+  .history-item:hover { border-color:var(--accent); }
+  .history-item:hover .history-copy { opacity:1; }
+  .history-name { flex:1; font-size:12.5px; color:var(--text2); word-break:break-all; }
+  .history-copy { font-size:11px; color:var(--accent); opacity:0; transition:opacity .2s; flex-shrink:0; }
+  .history-tag { font-size:10px; padding:2px 7px; border-radius:4px; background:var(--surface2); color:var(--text3); flex-shrink:0; }
+  .empty-history { font-size:13px; color:var(--text3); text-align:center; padding:20px 0; }
+
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--accent); color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; opacity:0; transition:all .3s; pointer-events:none; white-space:nowrap; z-index:100; }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (min-width:768px) {
+    header { padding:0 32px; height:60px; }
+    .logo { font-size:14px; }
+    .content-inner { padding:32px 24px 80px; }
+  }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">FILENAME<span> / 파일명 생성기</span></div>
+  </header>
+  <div class="tabs-wrapper">
+    <div class="tabs">
+      <div class="tab active" data-tab="file">파일명</div>
+      <div class="tab" data-tab="folder">작업폴더명</div>
+      <div class="tab" data-tab="subdir">하위폴더명</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="content-inner">
+      <div id="tab-content"></div>
+      <div class="result-box">
+        <div class="result-label">생성된 이름</div>
+        <div class="result-text empty" id="result-text">항목을 입력하면 자동으로 생성돼요</div>
+        <button class="copy-btn" id="copy-btn" disabled>복사하기</button>
+      </div>
+      <div class="history-section">
+        <div class="history-header">
+          <span class="form-label" style="margin-bottom:0">최근 복사 기록</span>
+          <button class="clear-btn" id="clear-history">전체 삭제</button>
+        </div>
+        <div class="history-list" id="history-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ── 품목 매핑 (한글 → 공식 영문) ──
+const ITEM_MAP = {
+  // 한글
+  '포토북':'Photobook','포토카드':'Photocard','포스트카드':'Postcard','스티커':'Sticker',
+  '스티커세트':'StickerSet','이미지카드':'ImageCard','아이디카드':'IDCard','아이디보드':'IDBoard',
+  '접지형포스터':'FoldedPoster','미니포스터':'MiniPoster','가사지':'LyricsPaper',
+  '다이지팩':'Digipack','슬리브':'Sleeve','아웃박스':'Outbox','디스크':'DISC',
+  // 영문 aliases (소문자로 정규화해서 매칭)
+  'photobook':'Photobook','photocard':'Photocard','postcard':'Postcard',
+  'sticker':'Sticker','stickerset':'StickerSet','imagecard':'ImageCard',
+  'idcard':'IDCard','idboard':'IDBoard','foldedposter':'FoldedPoster',
+  'miniposter':'MiniPoster','lyricspaper':'LyricsPaper','digipack':'Digipack',
+  'sleeve':'Sleeve','outbox':'Outbox','disc':'DISC','plve':'PLVE',
+  'doubleside':'DoubleSidedPoster','doublesidedposter':'DoubleSidedPoster','양면포스터':'DoubleSidedPoster',
+};
+
+const ITEM_OPTIONS = [
+  'Photobook','LyricsPaper','FoldedPoster','MiniPoster',
+  'IDCard','IDBoard','Photocard','Postcard',
+  'Sticker','StickerSet','PLVE','Digipack','DISC','Sleeve','Outbox'
+];
+
+// ── 아티스트 매핑 (한글 → 영문) ──
+const ARTIST_MAP = {
+  '온앤오프':'ONF','엔플라잉':'N.Flying','아스트로':'ASTRO','에이티즈':'ATEEZ',
+  '스트레이키즈':'StrayKids','방탄소년단':'BTS','엑소':'EXO','샤이니':'SHINee',
+};
+
+// ── 텍스트 변환 유틸 ──
+
+// TitleCase 변환: 띄어쓰기·특수문자 기준으로 단어 분리 후 첫글자 대문자
+function toTitleCase(str) {
+  if (!str) return '';
+  // 숫자+영어 패턴(2nd, 3rd 등) 보존하며 단어 분리
+  return str
+    .replace(/\s+/g, ' ').trim()
+    .split(/[\s\-_]+/)
+    .map(word => {
+      if (!word) return '';
+      // 전부 대문자인 약어(BTS, ONF 등)는 그대로
+      if (/^[A-Z0-9]+$/.test(word) && word.length <= 4) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join('');
+}
+
+// 아티스트명을 타이틀에서 제거 (대소문자 무시)
+function removeArtistFromTitle(title, artist) {
+  if (!artist || !title) return title;
+  // [ONF], ONF:, ONF  등 다양한 패턴 제거
+  const escaped = artist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return title
+    .replace(new RegExp(`^\\[?${escaped}\\]?[:\\s]*`, 'i'), '')
+    .trim();
+}
+
+// 품목 변환: 매핑 우선, 없으면 TitleCase
+function convertItem(raw) {
+  if (!raw) return '';
+  const key = raw.replace(/\s/g,'').toLowerCase();
+  return ITEM_MAP[key] || ITEM_MAP[raw.replace(/\s/g,'')] || toTitleCase(raw);
+}
+
+// 아티스트 변환
+function convertArtist(raw) {
+  if (!raw) return '';
+  return ARTIST_MAP[raw.trim()] || raw.trim();
+}
+
+// 날짜 MMDD
+function getTodayMMDD() {
+  const d = new Date();
+  return String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+}
+
+// ── STATE ──
+let activeTab = 'file';
+let vals = {};
+const HISTORY_KEY = 'filename_history_v3';
+let history = [];
+try { history = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); } catch(e) {}
+function saveHistory() { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch(e) {} }
+
+// ── TAB DEFINITIONS ──
+const TABS = {
+  file: {
+    label:'파일명',
+    desc:'[아티스트]표기명_타이틀_품목_날짜버전(작업자)',
+    fields:['artist','albumType','albumTitle','item','date','version','worker','isSample','isFinal'],
+    required:['artist','albumType','albumTitle','item','date'],
+  },
+  folder: {
+    label:'작업폴더명',
+    desc:'[아티스트]표기명_타이틀',
+    fields:['artist','albumType','albumTitle'],
+    required:['artist'],
+  },
+  subdir: {
+    label:'하위폴더명',
+    desc:'폴더명 규칙에 맞게 자동 교정돼요',
+    fields:['subdirInput'],
+    required:['subdirInput'],
+  },
+};
+
+// ── 하위폴더 매핑 ──
+const SUBDIR_MAP = {
+  'logo':'Logo','logos':'Logo',
+  'photo':'Photo','photos':'Photo','사진':'Photo',
+  'digging':'Digging','ref':'Digging','reference':'Digging','레퍼런스':'Digging',
+  'keynote':'Keynote','키노트':'Keynote',
+  'work':'Working','working':'Working','작업중':'Working','작업':'Working',
+  'pack':'Packaging','packaging':'Packaging','패키지':'Packaging','패키징':'Packaging',
+  'samplepdf':'SamplePDF','sample':'SamplePDF','샘플':'SamplePDF',
+  'finaldata':'FinalData','final data':'FinalData','최종':'FinalData','최종데이터':'FinalData',
+  'finalpdf':'FinalPDF','final pdf':'FinalPDF','최종pdf':'FinalPDF',
+  'finalpackage':'FinalPackage','final package':'FinalPackage','최종패키지':'FinalPackage','패키징최종':'FinalPackage',
+  'doc':'Document','document':'Document','documents':'Document','수급문서':'Document','문서':'Document',
+  'source':'Source','src':'Source','소스':'Source',
+  'cuttingguide':'CuttingGuide','cutting guide':'CuttingGuide','칼선':'CuttingGuide',
+  'share':'Share','공유':'Share',
+};
+
+function convertSubdir(raw) {
+  if (!raw) return '';
+  const key = raw.trim().toLowerCase().replace(/\s+/g,'');
+  // 매핑 우선
+  if (SUBDIR_MAP[key]) return SUBDIR_MAP[key];
+  // 띄어쓰기 포함 원본도 시도
+  const keyWithSpace = raw.trim().toLowerCase();
+  if (SUBDIR_MAP[keyWithSpace]) return SUBDIR_MAP[keyWithSpace];
+  // 없으면 TitleCase
+  return toTitleCase(raw);
+}
+
+// ── FIELD DEFINITIONS ──
+const FIELD_DEF = {
+  artist:     { label:'아티스트명',         placeholder:'예) ONF' },
+  albumType:  { label:'프로젝트 표기명',     placeholder:'예) The 2nd Mini Album' },
+  albumTitle: { label:'프로젝트 타이틀',     placeholder:'예) MY SELF' },
+  item:       { label:'품목',               placeholder:'예) Photobook', isItem:true },
+  date:       { label:'날짜 (MMDD)',        placeholder:'예) 0526', isDate:true },
+  version:    { label:'버전 번호 (선택)',    placeholder:'예) 1' },
+  worker:     { label:'작업자 이름 (선택)',  placeholder:'예) 박현아' },
+  isSample:    { label:'샘플 여부 (선택)',   isToggle:true },
+  isFinal:     { label:'최종 여부 (선택)',   isToggle:true },
+  subdir:      { label:'하위 폴더 (선택)',   placeholder:'예) Working', isSubdir:true },
+  subdirInput: { label:'하위 폴더명',        placeholder:'예) Working, WORK, 작업중', isSubdirInput:true },
+};
+
+// ── REQUIRED FIELD LABELS ──
+const REQUIRED_LABELS = {
+  artist:'아티스트명', albumType:'프로젝트 표기명',
+  albumTitle:'프로젝트 타이틀', item:'품목', date:'날짜',
+};
+
+// ── GENERATE ──
+function generate() {
+  const artist   = convertArtist(vals.artist || '');
+  const type     = toTitleCase(vals.albumType || '');
+  const title    = toTitleCase(removeArtistFromTitle(vals.albumTitle || '', artist));
+  const item     = convertItem(vals.item || '');
+  const date     = vals.date || '';
+  const version  = (vals.version || '').trim();
+  const worker   = (vals.worker || '').trim();
+
+  if (activeTab === 'subdir') {
+    return convertSubdir(vals.subdirInput || '');
+  }
+
+  if (activeTab === 'folder') {
+    if (!artist) return '';
+    let base = `[${artist}]`;
+    if (type && title) base += `${type}_${title}`;
+    else if (type) base += type;
+    else if (title) base += title;
+    return base;
+  }
+
+  if (!artist || !type || !title || !item || !date) return '';
+
+  const datePart = version ? `${date}V${version}` : date;
+  const itemPart = vals.isSample ? `Sample_${item}` : item;
+  const base = `[${artist}]${type}_${title}_${itemPart}_${datePart}`;
+
+  let result = base;
+  if (worker) result += `(${worker})`;
+  if (vals.isFinal) result += `-Final`;
+  return result;
+}
+
+// ── RENDER ──
+function renderTabContent() {
+  const tab = TABS[activeTab];
+  const container = document.getElementById('tab-content');
+  container.innerHTML = '';
+
+  const desc = document.createElement('p');
+  desc.style.cssText = 'font-size:13px;color:var(--text2);margin-bottom:20px;font-family:\'Pretendard Variable\',Pretendard,sans-serif;letter-spacing:.01em;';
+  desc.textContent = tab.desc;
+  container.appendChild(desc);
+
+  tab.fields.forEach(fid => {
+    const def = FIELD_DEF[fid];
+    const group = document.createElement('div');
+    group.className = 'form-group';
+
+    const label = document.createElement('label');
+    label.className = 'form-label';
+    label.textContent = def.label;
+    group.appendChild(label);
+
+    if (def.isSubdir) {
+      const inp = document.createElement('input');
+      inp.className = 'form-input'; inp.id = 'field-' + fid;
+      inp.type = 'text'; inp.placeholder = def.placeholder;
+      inp.value = vals[fid] || '';
+      inp.setAttribute('list', 'subdir-list');
+
+      const datalist = document.createElement('datalist');
+      datalist.id = 'subdir-list';
+      ['Logo','Photo','Digging','Keynote','Working','Packaging','SamplePDF',
+       'FinalData','FinalPDF','FinalPackage','Document','Source','CuttingGuide','Share']
+      .forEach(o => { const opt = document.createElement('option'); opt.value = o; datalist.appendChild(opt); });
+
+      const hint = document.createElement('div');
+      hint.className = 'input-hint';
+
+      const updateSubdirHint = () => {
+        const raw = inp.value;
+        const converted = toTitleCase(raw);
+        // 힌트: 입력값이 변환 결과와 다를 때만 표시
+        if (raw.trim() && converted !== raw.trim()) {
+          hint.textContent = '→ ' + converted;
+          hint.classList.add('converted');
+        } else {
+          hint.textContent = '';
+          hint.classList.remove('converted');
+        }
+        // vals에는 원본 저장 (generate에서 변환)
+        vals[fid] = raw;
+        updateResult();
+      };
+
+      inp.addEventListener('input', updateSubdirHint);
+
+      // blur 시 입력창 자체를 변환값으로 교정
+      inp.addEventListener('blur', () => {
+        const converted = toTitleCase(inp.value);
+        if (converted) {
+          inp.value = converted;
+          vals[fid] = converted;
+        }
+        hint.textContent = '';
+        hint.classList.remove('converted');
+        updateResult();
+      });
+
+      group.appendChild(inp); group.appendChild(datalist); group.appendChild(hint);
+
+    } else if (def.isSubdirInput) {
+      const inp = document.createElement('input');
+      inp.className = 'form-input'; inp.id = 'field-' + fid;
+      inp.type = 'text'; inp.placeholder = def.placeholder;
+      inp.value = vals[fid] || '';
+
+      const hint = document.createElement('div');
+      hint.className = 'input-hint';
+
+      inp.addEventListener('input', () => {
+        const raw = inp.value;
+        const converted = convertSubdir(raw);
+        if (raw.trim() && converted !== raw.trim()) {
+          hint.textContent = '→ ' + converted;
+          hint.classList.add('converted');
+        } else {
+          hint.textContent = ''; hint.classList.remove('converted');
+        }
+        vals[fid] = raw;
+        updateResult();
+      });
+      inp.addEventListener('blur', () => {
+        const converted = convertSubdir(inp.value);
+        if (converted) { inp.value = converted; vals[fid] = converted; }
+        hint.textContent = ''; hint.classList.remove('converted');
+        updateResult();
+      });
+      group.appendChild(inp); group.appendChild(hint);
+
+    } else if (def.isDate) {
+      const row = document.createElement('div');
+      row.className = 'form-row';
+      const inp = document.createElement('input');
+      inp.className = 'form-input'; inp.type='text'; inp.placeholder=def.placeholder; inp.maxLength=4;
+      inp.value = vals[fid] || '';
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.replace(/\D/g,'').slice(0,4);
+        vals[fid] = inp.value; updateResult();
+      });
+      const btn = document.createElement('button');
+      btn.className = 'today-btn'; btn.textContent = '오늘';
+      btn.addEventListener('click', () => { inp.value = vals[fid] = getTodayMMDD(); updateResult(); });
+      row.appendChild(inp); row.appendChild(btn);
+      group.appendChild(row);
+
+    } else if (def.isItem) {
+      // 품목: datalist로 자동완성 + 힌트
+      const inp = document.createElement('input');
+      inp.className = 'form-input'; inp.type='text'; inp.placeholder=def.placeholder;
+      inp.value = vals[fid] || '';
+      inp.setAttribute('list', 'item-list');
+
+      const datalist = document.createElement('datalist');
+      datalist.id = 'item-list';
+      ITEM_OPTIONS.forEach(o => {
+        const opt = document.createElement('option'); opt.value = o; datalist.appendChild(opt);
+      });
+
+      const hint = document.createElement('div');
+      hint.className = 'input-hint';
+      const updateHint = () => {
+        const converted = convertItem(inp.value);
+        if (inp.value && converted !== inp.value.trim()) {
+          hint.textContent = '→ ' + converted;
+          hint.classList.add('converted');
+        } else { hint.textContent = ''; hint.classList.remove('converted'); }
+      };
+      inp.addEventListener('input', () => { vals[fid] = inp.value; updateHint(); updateResult(); });
+      group.appendChild(inp); group.appendChild(datalist); group.appendChild(hint);
+
+    } else if (def.isToggle) {
+      const toggleRow = document.createElement('label');
+      toggleRow.style.cssText = 'display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;transition:border-color .2s;';
+      const chk = document.createElement('input');
+      chk.type='checkbox'; chk.style.cssText='width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;';
+      chk.checked = !!vals[fid];
+      chk.addEventListener('change', () => {
+        vals[fid] = chk.checked;
+        toggleRow.style.borderColor = chk.checked ? 'rgba(49,130,246,.4)' : '';
+        updateResult();
+      });
+      toggleRow.style.borderColor = chk.checked ? 'rgba(49,130,246,.4)' : '';
+      const toggleLabel = document.createElement('span');
+      toggleLabel.style.cssText = 'font-size:13.5px;color:var(--text2);';
+      toggleLabel.textContent = fid === 'isSample' ? '샘플 파일로 표기 (Sample_ 추가)' : '최종 파일로 표기 (-Final 추가)';
+      toggleRow.appendChild(chk); toggleRow.appendChild(toggleLabel);
+      group.appendChild(toggleRow);
+
+    } else {
+      const inp = document.createElement('input');
+      inp.className = 'form-input'; inp.type='text'; inp.placeholder=def.placeholder;
+      inp.value = vals[fid] || '';
+
+      // 힌트 (아티스트명, 표기명, 타이틀 변환 미리보기)
+      const hint = document.createElement('div');
+      hint.className = 'input-hint';
+      const updateHint = () => {
+        let converted = '';
+        if (fid === 'artist') converted = convertArtist(inp.value);
+        else if (fid === 'albumType') converted = toTitleCase(inp.value);
+        else if (fid === 'albumTitle') {
+          const artist = convertArtist(vals.artist || '');
+          converted = toTitleCase(removeArtistFromTitle(inp.value, artist));
+        }
+        if (converted && converted !== inp.value.trim() && inp.value.trim()) {
+          hint.textContent = '→ ' + converted;
+          hint.classList.add('converted');
+        } else { hint.textContent = ''; hint.classList.remove('converted'); }
+      };
+      inp.addEventListener('input', () => {
+        vals[fid] = inp.value; updateHint(); updateResult();
+      });
+      group.appendChild(inp); group.appendChild(hint);
+    }
+
+    container.appendChild(group);
+  });
+
+  updateResult();
+}
+
+function updateResult() {
+  const result = generate();
+  const el  = document.getElementById('result-text');
+  const btn = document.getElementById('copy-btn');
+  if (result) {
+    el.textContent = result; el.classList.remove('empty');
+  } else {
+    el.textContent = '항목을 입력하면 자동으로 생성돼요';
+    el.classList.add('empty');
+  }
+  btn.disabled = false; btn.classList.remove('copied'); btn.textContent = '복사하기';
+}
+
+// ── COPY ──
+document.getElementById('copy-btn').addEventListener('click', () => {
+  // 필수 항목 체크
+  const required = TABS[activeTab].required || [];
+  const missing = required.filter(fid => {
+    if (fid === 'artist') return !convertArtist(vals[fid] || '');
+    return !(vals[fid] || '').trim();
+  });
+  if (missing.length) {
+    const labels = missing.map(fid => REQUIRED_LABELS[fid] || fid).join(', ');
+    alert(`필수 항목을 입력해주세요:\n${labels}`);
+    // 첫 번째 미입력 필드에 포커스
+    const firstEl = document.getElementById('field-' + missing[0]);
+    if (firstEl) { firstEl.focus(); firstEl.style.borderColor = 'var(--danger)'; setTimeout(() => firstEl.style.borderColor = '', 2000); }
+    return;
+  }
+
+  const text = document.getElementById('result-text').textContent;
+  if (!text || document.getElementById('result-text').classList.contains('empty')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ 복사됨!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사하기'; btn.classList.remove('copied'); }, 2000);
+    history.unshift({ text, tab: TABS[activeTab].label, time: Date.now() });
+    if (history.length > 20) history = history.slice(0,20);
+    saveHistory(); renderHistory();
+    showToast('클립보드에 복사됐어요');
+  });
+});
+
+// ── HISTORY ──
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!history.length) { el.innerHTML = '<div class="empty-history">아직 복사한 파일명이 없어요</div>'; return; }
+  el.innerHTML = '';
+  history.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `<span class="history-tag">${item.tab}</span><span class="history-name">${item.text}</span><span class="history-copy">복사</span>`;
+    div.addEventListener('click', () => navigator.clipboard.writeText(item.text).then(() => showToast('복사됐어요')));
+    el.appendChild(div);
+  });
+}
+
+document.getElementById('clear-history').addEventListener('click', () => {
+  if (!history.length) return;
+  if (confirm('기록을 모두 삭제할까요?')) { history = []; saveHistory(); renderHistory(); }
+});
+
+// ── TABS ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    vals = {};
+    renderTabContent();
+  });
+});
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+renderTabContent();
+renderHistory();
+</script>
+</body>
+</html>
