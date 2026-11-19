@@ -875,7 +875,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="todo">TO DO LIST</button><button data-v="wl">WORK LOG</button><button data-v="pj">PROJECT</button><button data-v="month">CALENDAR</button><button data-v="qk">QUICK</button><button data-v="review" type="button">PREFLIGHT</button><button data-v="logo" type="button">LOGO</button><button data-v="exp">EXPENSE</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
+    <button data-v="todo">TO DO LIST</button><button data-v="wl">WORK LOG</button><button data-v="pj">PROJECT</button><button data-v="qk">QUICK</button><button data-v="review" type="button">PREFLIGHT</button><button data-v="logo" type="button">LOGO</button><button data-v="exp">EXPENSE</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
   </nav>
 </header>
 <main id="main"><div class="ld">불러오는 중…</div></main>
@@ -1104,7 +1104,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261119td1';
+var APP_VER = '20261119td2';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1590,7 +1590,7 @@ function renderReview() {
 window.addEventListener('resize', function () { if (S.view === 'review') rvSize(); });
 function renderView() {
   var rvOn = S.view === 'review'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#main').classList.toggle('hide', rvOn);
-  $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' ? 'pj' : S.view)); });
+  $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
   $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || S.view === 'review' || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
@@ -2512,8 +2512,14 @@ function renderCal() {
   S.mm = 'sched'; S.pm = 'sched';   // 제작일정/팀 업무 전환 없앰 (2026-10-19)
   if (S.cv === 'proj') renderProject(); else renderMonth();
   if ($('#pSeg')) $('#pSeg').remove(); if ($('#mSeg')) $('#mSeg').remove();
-  $('#main').insertAdjacentHTML('afterbegin', '<div class="seg" id="cvSeg"><button data-c="cal" class="' + (S.cv !== 'proj' ? 'on' : '') + '">달력</button><button data-c="proj" class="' + (S.cv === 'proj' ? 'on' : '') + '">프로젝트</button></div>');
-  $$('#cvSeg button').forEach(function (b) { b.onclick = function () { S.cv = b.dataset.c; ls.set('d4:cv', S.cv); window.scrollTo(0, 0); render(); }; });
+  pjSeg();
+}
+// PROJECT 메뉴 = 목록 · 달력 · 일정 (CALENDAR 메뉴 합침, 2026-11-19)
+function pjSeg() {
+  var cur = S.view === 'pj' ? 'list' : (S.cv === 'proj' ? 'proj' : 'cal'), old = $('#cvSeg');
+  if (old) old.parentNode.removeChild(old);
+  $('#main').insertAdjacentHTML('afterbegin', '<div class="seg" id="cvSeg">' + [['list', '목록'], ['cal', '달력'], ['proj', '일정']].map(function (x) { return '<button data-c="' + x[0] + '" class="' + (cur === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>');
+  $$('#cvSeg button').forEach(function (b) { b.onclick = function () { var c = b.dataset.c; if (c === 'list') S.view = 'pj'; else { S.view = 'month'; S.cv = c; ls.set('d4:cv', c); } ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 }
 
 // 한 줄
@@ -2772,7 +2778,7 @@ function renderPj() {
   }).join('') : '<div class="empty2">' + (S.SL ? '찾는 프로젝트가 없어요' : '불러오는 중…') + '</div>') + '</div>';
   h += '<p class="srcinfo" style="text-align:center">폴더 아이콘은 프로젝트의 SHARE/Client 폴더로 열려요 (폴더가 없으면 길게 눌러 NAS 링크 지정)' + (S.nas && S.nas.url ? ' · <a href="' + esc(S.nas.url) + '" target="_blank" style="color:inherit">NAS 링크 시트</a>' : '') + '</p>';
   var y0 = window.scrollY, foc = document.activeElement && document.activeElement.id === 'gQ';
-  $('#main').innerHTML = h; window.scrollTo(0, y0);
+  $('#main').innerHTML = h; pjSeg(); window.scrollTo(0, y0);
   var qi = $('#gQ'); if (foc) { qi.focus(); qi.setSelectionRange(qi.value.length, qi.value.length); }
   qi.oninput = function () { S.gq = qi.value; renderPj(); };
   $('#gA').onchange = function () { S.ga = this.value; renderPj(); };
