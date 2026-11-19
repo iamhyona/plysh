@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 31.0.0, SVG Export Plug-In . SVG Version: 9.03 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1254 1254" enable-background="new 0 0 1254 1254" xml:space="preserve">
+<linearGradient id="Background_00000103957731819727867720000017737378414795175835_" gradientUnits="userSpaceOnUse" x1="377.1994" y1="877.3007" x2="377.1994" y2="876.3007" gradientTransform="matrix(1254 0 0 -1254 -472381 1100135)">
+	<stop  offset="0" style="stop-color:#1142BD"/>
+	<stop  offset="0.53" style="stop-color:#123EB2"/>
+	<stop  offset="1" style="stop-color:#0C2D83"/>
+</linearGradient>
+<rect id="Background" fill="url(#Background_00000103957731819727867720000017737378414795175835_)" width="1254" height="1254"/>
+<linearGradient id="P_00000172415195086391318690000014152191486482703502_" gradientUnits="userSpaceOnUse" x1="377.1288" y1="877.1796" x2="376.9319" y2="876.4088" gradientTransform="matrix(891.7759 0 0 -1104.7205 -335571.5 969279.125)">
+	<stop  offset="0" style="stop-color:#FFF0D1"/>
+	<stop  offset="0.62" style="stop-color:#FFEDC8"/>
+	<stop  offset="1" style="stop-color:#C7BAA4"/>
+</linearGradient>
+<path id="P" fill="url(#P_00000172415195086391318690000014152191486482703502_)" d="M314.172,358.295
+	c0-13.703,6.566-20.554,19.698-20.554h189.268l-1.713-136.17c-0.571-18.841,7.137-22.267,23.123-10.277l127.606,126.75
+	l162.719-161.863c21.696-21.125,30.831-15.701,27.405,16.272l-40.252,204.683l193.55-63.375
+	c31.402-9.135,37.111-0.285,17.128,26.549l-114.76,143.021c58.807,31.973,109.05,60.52,150.729,85.642
+	c14.274,10.277,11.99,17.985-6.851,23.123l-162.719,23.98l69.37,144.734c10.277,25.122,4.282,32.544-17.985,22.267L809.18,707.713
+	c-41.679,62.804-103.912,94.491-186.699,95.062h-86.498v266.345c0,13.703-6.851,20.554-20.554,20.554H334.726
+	c-13.132,0-19.698-6.566-19.698-19.698L314.172,358.295z"/>
+<g id="Eyes">
+	<circle fill="#1241B8" cx="570.394" cy="524.927" r="17.431"/>
+	<circle fill="#1241B8" cx="675.064" cy="504.158" r="17.431"/>
+</g>
+<path id="Smile" fill="none" stroke="#123EB2" stroke-width="18" stroke-linecap="round" d="M574.823,585.706
+	c38.129,47.064,112.803,29.808,126.216-29.729"/>
+</svg>
