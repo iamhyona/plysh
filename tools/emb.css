@@ -1,7 +1,7 @@
 /* PLYSH TOOLS 안에서 열린 도구 공통 모양 (2026-11-19)
    - 도구 자체 로고·머리줄·바닥글은 숨김 (PLYSH 위 메뉴와 칩이 대신함) → .emb-hide
    - 도구 안 탭은 PLYSH 세그먼트 모양 → .emb-seg (켜진 칸 .active 또는 .on)
-   - 폭: 화면 꽉(좌우 16px), PC(1024px 이상)는 틀 1120px. 입력 + 결과는 왼쪽 입력 · 오른쪽 결과 (.emb-io 안 .emb-r)
+   - 폭: 화면 꽉(좌우 16px), PC(1024px 이상)는 틀 1024px(양옆 여백 40px 이상). 입력 + 결과는 왼쪽 입력 · 오른쪽 결과 (.emb-io 안 .emb-r)
    - 글꼴 Pretendard, 입력칸 높이 46px · 글자 16px (아이폰 확대 방지), 모서리 12px, 그림자 없음 */
 html.emb .emb-hide { display:none !important; }
 html.emb, html.emb body { font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; }

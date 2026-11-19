@@ -142,12 +142,16 @@ nav button.on { color:var(--txt); border-bottom-color:var(--txt); }
 
 main { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
 #rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 32px); margin:0 auto; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
-/* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw) 안에서 헤더·메뉴·본문·도구가 같은 폭.
+/* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw 1024px, 양옆 여백 40px 이상) 안에서 헤더·메뉴·본문·도구가 같은 폭.
    1024px 이상: 카드 목록 = 여러 열, 입력 + 결과 = 왼쪽 입력 · 오른쪽 결과, 달력·표·검수 = 틀 폭 전체, 아래 시트(팝업) = 560px 가운데 */
 :root { --fw:560px; }
 @media (min-width:1024px) {
-  :root { --fw:1120px; }
-  button.fab { right:max(24px, calc((100vw - var(--fw)) / 2 + 24px)); }
+  /* 가장 작은 PC 모니터(가로 1280px)에서도 양옆 여백이 남는 폭. 큰 모니터에서도 이 폭 그대로, 남는 곳은 여백 */
+  :root { --fw:1024px; }
+  header { padding-left:40px; padding-right:40px; }
+  main { max-width:calc(var(--fw) + 80px); padding-left:40px; padding-right:40px; }
+  #rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 80px); padding:0 24px; }
+  button.fab { right:max(40px, calc((100vw - var(--fw)) / 2)); }
   main[data-v="todo"] { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); column-gap:12px; align-items:start; }
   main[data-v="todo"] > :not(.tdcard) { grid-column:1 / -1; }
   main[data-v="tools"] .tkl { grid-template-columns:repeat(4, minmax(0, 1fr)); }
