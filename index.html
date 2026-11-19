@@ -911,6 +911,141 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .tmsum .tdsh { color:var(--sub); font-size:12px; font-weight:700; text-decoration:none; border-radius:999px; padding:7px 10px; background:var(--chip); }
 .tmsum .tdsh + button { margin-left:6px; }
 .tmsum .tdsh { margin-left:auto; }
+/* 메뉴 구조 (2026-11-19 시안): html[data-nav] = a 왼쪽 메뉴 · b 위 메뉴 3개 + 펼침 · c 즐겨찾기 홈 + 찾기 */
+:root { --pvh:0px; --sw:240px; }
+html[data-nav] #nav, html[data-nav] #tkBar { display:none !important; }
+.nvi { width:16px; height:16px; flex:none; }
+#ncr { max-width:var(--fw); margin:4px auto 0; padding:0 0 8px; font-size:12px; font-weight:600; color:var(--mute); display:none; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#ncr b { color:var(--txt); font-weight:700; font-size:13px; }
+#ncr svg { width:12px; height:12px; flex:none; color:var(--faint); }
+html[data-nav="a"] #ncr, html[data-nav="c"] #ncr { display:flex; }
+/* 메뉴 목록 (A 사이드바 · A/C 전체 메뉴 창 공통) */
+.nl { display:flex; flex-direction:column; gap:1px; }
+.nl .nq { display:flex; align-items:center; gap:7px; background:var(--bg); border-radius:10px; height:38px; padding:0 11px; margin:0 0 6px; color:var(--mute); }
+.nl .nq svg { width:15px; height:15px; flex:none; }
+.nl .nq input { border:0; background:none; outline:0; font:inherit; font-size:14px; flex:1; min-width:0; color:var(--txt); height:100%; padding:0; }
+.nl .nq kbd { font-family:inherit; font-size:11px; color:var(--mute); background:#fff; border-radius:6px; padding:1px 6px; }
+.nl .ngl { font-size:11px; font-weight:700; color:var(--faint); letter-spacing:.04em; padding:14px 10px 5px; }
+.nl .nr { position:relative; }
+.nl .ni { display:flex; align-items:center; gap:10px; width:100%; border:0; background:none; text-align:left; padding:9px 34px 9px 10px; border-radius:10px; font-size:14px; font-weight:600; color:var(--sub); letter-spacing:-0.01em; }
+.nl .ni .nvi { color:var(--mute); }
+.nl .ni small { margin-left:auto; font-size:10.5px; font-weight:700; color:var(--faint); letter-spacing:.03em; }
+.nl .ni:hover { background:var(--bg); }
+.nl .ni.on { background:var(--txt); color:#fff; } .nl .ni.on .nvi, .nl .ni.on small { color:#fff; }
+.nl .ni.sub { padding-left:36px; font-weight:500; font-size:13.5px; }
+.nl .ni.grp { padding-right:10px; }
+.nl .ni.grp .cv { margin-left:auto; width:14px; height:14px; color:var(--faint); transition:transform .15s; }
+.nl .ni.grp.open .cv { transform:rotate(90deg); }
+.nl .nst { position:absolute; right:4px; top:50%; transform:translateY(-50%); width:28px; height:28px; border:0; background:none; border-radius:8px; color:var(--faint); display:flex; align-items:center; justify-content:center; opacity:0; padding:0; }
+.nl .nst svg { width:14px; height:14px; }
+.nl .nst.fv { opacity:1; color:#f5b400; } .nl .nst.fv svg { fill:currentColor; }
+.nl .nr:hover .nst, .nl .nst:focus-visible { opacity:1; }
+.nl .ni.on + .nst { color:rgba(255,255,255,.6); } .nl .ni.on + .nst.fv { color:#f5b400; }
+@media (hover:none) { .nl .nst { opacity:.6; } }
+.nl .nemp { padding:12px 10px; color:var(--mute); font-size:13px; }
+/* 전체 메뉴 창 (왼쪽에서 나옴) */
+#ndr { position:fixed; inset:0; z-index:40; display:none; }
+#ndr.open { display:block; }
+#ndr .dm { position:absolute; inset:0; background:rgba(0,0,0,.35); }
+#ndr .pn { position:absolute; top:0; bottom:0; left:0; width:min(320px, 86vw); background:#fff; padding:calc(14px + env(safe-area-inset-top)) 12px 24px; overflow:auto; overscroll-behavior:contain; }
+#ndr .pnh { display:flex; align-items:center; justify-content:space-between; padding:0 4px 10px 10px; }
+#ndr .pnh b { font-size:16px; font-weight:800; letter-spacing:.06em; }
+.nx { width:34px; height:34px; border:0; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--sub); padding:0; }
+.nx svg { width:16px; height:16px; }
+
+/* ── A: 왼쪽 메뉴 ── */
+#nsd { display:none; }
+#ntb { display:none; }
+@media (min-width:1024px) {
+  html[data-nav="a"] body { padding-left:var(--sw); }
+  html[data-nav="a"] #nsd { display:block; position:fixed; left:0; top:var(--pvh); bottom:0; width:var(--sw); background:#fff; border-right:1px solid var(--line); padding:14px 12px 30px; overflow:auto; z-index:12; scrollbar-width:thin; }
+  html[data-nav="a"] #nsd .sbh { display:flex; align-items:center; padding:6px 10px 14px; }
+  html[data-nav="a"] #nsd .sbh button { border:0; background:none; padding:0; font-size:18px; font-weight:800; letter-spacing:.06em; color:var(--txt); }
+  html[data-nav="a"] button.fab { right:max(40px, calc((100vw - var(--sw) - var(--fw)) / 2)); }
+  html[data-nav="a"] .bs { left:var(--sw); }
+  html[data-nav="a"] #nhb { display:none; }
+}
+@media (max-width:1023px) {
+  html[data-nav="a"] #ntb { display:grid; grid-template-columns:repeat(5, 1fr); position:fixed; left:0; right:0; bottom:0; z-index:20; background:#fff; border-top:1px solid var(--line); padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  html[data-nav="a"] #ntb button { border:0; background:none; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:700; color:var(--faint); padding:4px 0; letter-spacing:-0.01em; }
+  html[data-nav="a"] #ntb svg { width:21px; height:21px; }
+  html[data-nav="a"] #ntb button.on { color:var(--txt); }
+  html[data-nav="a"] main { padding-bottom:calc(150px + env(safe-area-inset-bottom)); }
+  html[data-nav="a"] button.fab { bottom:calc(80px + env(safe-area-inset-bottom)); }
+  html[data-nav="a"] #tkWrap, html[data-nav="a"] #rvWrap, html[data-nav="a"] #imWrap { padding-bottom:64px; }
+}
+/* 머리줄 왼쪽 햄버거 (A 모바일 · C) */
+#nhb { display:none !important; margin-right:8px; }
+html[data-nav="a"] #nhb, html[data-nav="c"] #nhb { display:inline-flex !important; }
+@media (min-width:1024px) { html[data-nav="a"] #nhb { display:none !important; } html[data-nav="a"] .hd .brand { display:none; } html[data-nav="a"] .hd #ncr { flex:1; margin:0; padding:0; font-size:13px; } html[data-nav="a"] .hd #ncr b { font-size:17px; font-weight:800; letter-spacing:-0.02em; } }
+html[data-v-start] #ncr { display:none !important; }
+html[data-nav="a"] .hd .brand, html[data-nav="c"] .hd .brand { margin-right:auto; }
+
+/* ── B: 위 메뉴 3개 + 펼침 ── */
+#nbB { display:none; }
+html[data-nav="b"] #nbB { display:block; max-width:var(--fw); margin:6px auto 0; position:relative; }
+#nbB .bt { display:flex; gap:22px; border-bottom:1px solid var(--line); }
+#nbB .bt button { border:0; background:none; padding:12px 0 10px; font-size:13px; font-weight:700; letter-spacing:.02em; color:var(--faint); border-bottom:2px solid transparent; margin-bottom:-1px; display:flex; align-items:center; gap:4px; }
+#nbB .bt button.on { color:var(--txt); border-bottom-color:var(--txt); }
+#nbB .bt svg { width:13px; height:13px; transition:transform .15s; }
+#nbB .bt button.op svg { transform:rotate(180deg); }
+#nbB .bc { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding:10px 0; margin:0 -16px; padding-left:16px; padding-right:16px; }
+#nbB .bc::-webkit-scrollbar { display:none; }
+#nbB .bc button { flex:none; border:0; background:#fff; border-radius:999px; padding:8px 13px; font-size:13px; font-weight:600; color:var(--sub); }
+#nbB .bc button.on { background:var(--txt); color:#fff; }
+#nbB .bc .bg { background:none; color:var(--faint); font-weight:700; font-size:11.5px; padding:8px 4px 8px 0; letter-spacing:.03em; }
+#nmg { display:none; position:absolute; left:0; right:0; top:46px; z-index:15; background:#fff; border-radius:18px; box-shadow:0 0 0 1px var(--line), 0 12px 32px rgba(0,0,0,.08); padding:16px 16px 12px; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:4px 16px; }
+#nmg.open { display:grid; }
+#nmg h4 { margin:0 0 4px; padding:0 8px; font-size:11px; color:var(--faint); font-weight:700; letter-spacing:.04em; display:flex; align-items:center; gap:6px; }
+#nmg h4 svg { width:13px; height:13px; }
+#nmg button { display:block; width:100%; border:0; background:none; text-align:left; padding:8px; border-radius:10px; font-size:13.5px; font-weight:600; color:var(--txt); letter-spacing:-0.01em; }
+#nmg button span { display:block; font-size:11.5px; color:var(--mute); font-weight:500; margin-top:2px; line-height:1.35; }
+#nmg button:hover { background:var(--bg); }
+#nmg button.on { background:var(--bg); box-shadow:inset 0 0 0 1.5px var(--txt); }
+#nmg .mga { grid-column:1 / -1; border-top:1px solid var(--line); margin-top:8px; padding-top:8px; display:flex; justify-content:flex-end; }
+#nmg .mga button { width:auto; color:var(--mute); font-size:12.5px; }
+@media (max-width:1023px) {
+  #nmg { grid-template-columns:repeat(2, minmax(0, 1fr)); max-height:calc(100vh - 140px); overflow:auto; }
+  #nmg button span { display:none; }
+}
+#nbd { position:fixed; inset:0; z-index:9; display:none; }
+#nbd.open { display:block; }
+
+/* ── C: 즐겨찾기 홈 + 찾기 ── */
+#ncs { display:none; }
+html[data-nav="c"] #ncs { display:flex; align-items:center; gap:8px; flex:1; max-width:440px; margin:0 12px; height:38px; border:0; background:#fff; border-radius:12px; padding:0 12px; color:var(--mute); font-size:13.5px; text-align:left; min-width:0; }
+#ncs svg { width:16px; height:16px; flex:none; }
+#ncs span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#ncs kbd { font-family:inherit; font-size:11px; background:var(--bg); border-radius:6px; padding:2px 7px; }
+@media (max-width:1023px) { #ncs kbd { display:none; } html[data-nav="c"] #ncs { margin:0 8px; } }
+#npl { position:fixed; inset:0; z-index:41; display:none; }
+#npl.open { display:block; }
+#npl .dm { position:absolute; inset:0; background:rgba(0,0,0,.35); }
+#npl .bx { position:absolute; left:50%; top:calc(var(--pvh) + 60px); transform:translateX(-50%); width:min(560px, calc(100vw - 24px)); max-height:calc(100vh - var(--pvh) - 90px); background:#fff; border-radius:18px; padding:10px; display:flex; flex-direction:column; }
+#npl .pq { display:flex; align-items:center; gap:8px; background:var(--bg); border-radius:12px; height:46px; padding:0 14px; flex:none; }
+#npl .pq svg { width:17px; height:17px; color:var(--mute); flex:none; }
+#npl .pq input { border:0; background:none; outline:0; font:inherit; font-size:16px; flex:1; min-width:0; height:100%; padding:0; color:var(--txt); }
+#npl .rs { overflow:auto; margin-top:6px; }
+#npl .ph { font-size:11px; color:var(--faint); font-weight:700; padding:10px 10px 3px; letter-spacing:.04em; }
+#npl .pr { display:flex; align-items:center; gap:10px; width:100%; border:0; background:none; text-align:left; padding:10px; border-radius:10px; font-size:14px; font-weight:600; color:var(--txt); }
+#npl .pr .nvi { color:var(--mute); }
+#npl .pr span { margin-left:auto; font-size:12px; color:var(--mute); font-weight:500; }
+#npl .pr.hl { background:var(--bg); }
+#npl .pf { font-size:11.5px; color:var(--mute); padding:8px 10px 2px; border-top:1px solid var(--line); margin-top:6px; flex:none; }
+.sth { font-size:13px; font-weight:700; color:var(--mute); margin:6px 0 10px; display:flex; justify-content:space-between; align-items:baseline; }
+.sth span { font-size:12px; font-weight:500; color:var(--faint); }
+.stp { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin-bottom:22px; }
+.stp button { border:0; background:#fff; border-radius:16px; padding:14px; text-align:left; display:flex; flex-direction:column; gap:12px; min-height:100px; }
+.stp .ic { width:34px; height:34px; border-radius:11px; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--sub); }
+.stp .ic svg { width:18px; height:18px; }
+.stp b { font-size:14px; letter-spacing:-0.01em; line-height:1.3; }
+.stp .add { background:none; box-shadow:inset 0 0 0 1.5px var(--line); color:var(--mute); align-items:center; justify-content:center; font-size:13px; font-weight:600; }
+.sta { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px; }
+.sta .sg { background:#fff; border-radius:16px; padding:10px 8px; }
+.sta .sg h4 { margin:2px 8px 6px; font-size:11px; color:var(--faint); font-weight:700; letter-spacing:.04em; }
+.sta .sg button { display:block; width:100%; border:0; background:none; text-align:left; padding:8px; border-radius:9px; font-size:13.5px; font-weight:600; color:var(--sub); }
+.sta .sg button:hover { background:var(--bg); }
+@media (min-width:1024px) { .stp { grid-template-columns:repeat(auto-fill, minmax(124px, 1fr)); } }
 </style>
 </head>
 <body>
@@ -1136,8 +1271,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 <div class="toast" id="toast"></div>
 
 <script>
-var $ = function (s) { return document.querySelector(s); };
-var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 // 2026-10-23: 지출결의 목록의 '시트 열기' 아이콘 (전역으로 둬서 어디서든 사용 — 없으면 올리기 후 목록 그리다 오류)
@@ -1168,7 +1303,7 @@ var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', tk: ls.g
 S.cv = ls.get('d4:cv') || 'cal';
 if (S.view === 'designer' || S.view === 'team' || S.view === 'project') { S.view = 'month'; S.cv = 'proj'; }
 if (S.view === 'home' || S.view === 'tl' || S.view === 'spec') S.view = 'pj';
-if (['pj', 'month', 'todo', 'wl', 'spec', 'qk', 'exp'].indexOf(S.view) < 0) S.view = 'pj';
+if (['pj', 'month', 'todo', 'wl', 'spec', 'qk', 'exp', 'start'].indexOf(S.view) < 0) S.view = 'pj';
 
 S.pj = ls.get('d4:pj'); S.mm = ls.get('d4:mm') || 'sched'; S.pm = ls.get('d4:pm') || 'sched'; S.dp = ls.get('d4:dp') || 'd'; S.dn = ls.get('d4:dn') || ''; S.dd = TODAY; S.pf = ls.get('d4:pf') || ''; S.fold = !!ls.get('d4:fold'); S.lp = ls.get('d4:lp') || 'a'; S.ld = TODAY; S.tl = ls.get('d4:tl') || 'date';
 var API = 'https://script.google.com/macros/s/AKfycbzpvNlxuCa95ZxGvg8N4SiPqmsPzyYx_n9ikhmdRlIng7VzWzks_WS6DDyviPXsfoaO/exec';
@@ -1855,15 +1990,166 @@ function renderImpose() {
 window.addEventListener('resize', function () { if (S.view === 'review' || S.view === 'impose' || S.view === 'tk') rvSize(); });
 function renderView() {
   var rvOn = S.view === 'review', imOn = S.view === 'impose', tkOn = S.view === 'tk'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#imWrap').classList.toggle('hide', !imOn); $('#tkWrap').classList.toggle('hide', !tkOn); $('#main').classList.toggle('hide', rvOn || imOn || tkOn);
-  toolBar(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
+  toolBar(); navSync(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = S.view === 'start' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderTools, tk: renderTk, spine: renderSpine })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderTools, tk: renderTk, spine: renderSpine, start: renderStart })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
+// 메뉴 구조 (2026-11-19 시안): a 왼쪽 메뉴 · b 위 메뉴 3개 + 펼침 · c 즐겨찾기 홈 + 찾기
+var NAV = { s: ls.get('d4:nav') || 'a', q: '', open: {}, pi: 0, pq: '' };
+try { NAV.fav = JSON.parse(ls.get('d4:navfav') || 'null'); } catch (e) {}
+if (!Array.isArray(NAV.fav)) NAV.fav = ['todo', 'pj', 'formly', 'review', 'spine', 'exp'];
+var NAV_WORK = [{ k: 'todo', t: 'TO DO LIST', m: '할 일', ic: 'todo' }, { k: 'wl', t: 'WORK LOG', m: '근무', ic: 'wl' }, { k: 'pj', t: 'PROJECT', m: '프로젝트', ic: 'pj' }, { k: 'qk', t: 'QUICK', m: '연락처', ic: 'qk' }, { k: 'exp', t: 'EXPENSE', m: '경비', ic: 'exp' }];
+var NAV_GIC = { '작성': 'doc', '계산': 'calc', '검수': 'chk', '자료': 'lib' };
+var NAV_IC = {
+  todo: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11"/>',
+  wl: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+  pj: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  qk: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  exp: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  calc: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',
+  chk: '<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/>',
+  lib: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/>',
+  tools: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  guide: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/>',
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  cv: '<path d="M9 6l6 6-6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  star: '<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/>'
+};
+function navIc(k) { return '<svg class="nvi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (NAV_IC[k] || NAV_IC.doc) + '</svg>'; }
+function navAll() {
+  var L = NAV_WORK.map(function (w) { return { k: w.k, t: w.t, g: '업무', ic: w.ic, m: w.m }; });
+  TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { L.push({ k: x.k, t: x.t, g: gr.g, ic: NAV_GIC[gr.g], e: x.e, s: x.s }); }); });
+  L.push({ k: 'guide', t: 'GUIDE', g: '안내', ic: 'guide', m: '가이드' });
+  return L;
+}
+function navFind(k) { return navAll().filter(function (x) { return x.k === k; })[0]; }
+function navCur() { var v = S.view; if (v === 'pj' || v === 'month' || v === 'spec') return 'pj'; if (v === 'tools') return 'tools'; if (isToolView(v)) return toolKey(); return v; }
+function navGo(k) {
+  navClose();
+  if (k === 'tools' || k === 'guide' || k === 'start' || NAV_WORK.some(function (w) { return w.k === k; })) { S.view = k; ls.set('d4:view', k); window.scrollTo(0, 0); render(); }
+  else openTool(k);
+}
+function navClose() { ['#ndr', '#npl', '#nmg', '#nbd'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); var bt = $('#nbB .op'); if (bt) bt.classList.remove('op'); }
+function navFav(k) { var i = NAV.fav.indexOf(k); if (i > -1) NAV.fav.splice(i, 1); else NAV.fav.push(k); ls.set('d4:navfav', JSON.stringify(NAV.fav)); navSync(); if (S.view === 'start') renderStart(); }
+// 메뉴 목록 (A 왼쪽 메뉴 · 전체 메뉴 창)
+function navList(q) {
+  var cur = navCur(), qs = String(q || '').trim().toLowerCase();
+  function row(x, sub) { return '<div class="nr"><button type="button" class="ni' + (sub ? ' sub' : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (sub ? '' : navIc(x.ic)) + esc(x.t) + '</button><button type="button" class="nst' + (NAV.fav.indexOf(x.k) > -1 ? ' fv' : '') + '" data-nf="' + x.k + '" aria-label="즐겨찾기">' + navIc('star') + '</button></div>'; }
+  var h = '<label class="nq">' + navIc('search') + '<input type="search" class="nqi" placeholder="메뉴 찾기" value="' + esc(q || '') + '" autocomplete="off"><kbd>⌘K</kbd></label>';
+  if (qs) {
+    var R = navAll().filter(function (x) { return (x.t + ' ' + (x.e || '') + ' ' + (x.m || '') + ' ' + x.g + ' ' + (x.s || '')).toLowerCase().indexOf(qs) > -1; });
+    return h + (R.length ? R.map(function (x) { return row(x); }).join('') : '<div class="nemp">찾는 메뉴가 없어요</div>');
+  }
+  if (NAV.fav.length) h += '<div class="ngl">즐겨찾기</div>' + NAV.fav.map(navFind).filter(Boolean).map(function (x) { return row(x); }).join('');
+  h += '<div class="ngl">업무</div>' + navAll().filter(function (x) { return x.g === '업무'; }).map(function (x) { return row(x); }).join('');
+  h += '<div class="ngl">도구</div>';
+  TOOLS.forEach(function (gr) {
+    var has = gr.i.some(function (x) { return x.k === cur; }), op = NAV.open[gr.g] != null ? NAV.open[gr.g] : has;
+    h += '<button type="button" class="ni grp' + (op ? ' open' : '') + '" data-ngr="' + gr.g + '">' + navIc(NAV_GIC[gr.g]) + gr.g + '<svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + NAV_IC.cv + '</svg></button>';
+    if (op) h += gr.i.map(function (x) { return row({ k: x.k, t: x.t, ic: '', e: x.e }, 1); }).join('');
+  });
+  h += '<div class="ngl">안내</div>' + row(navFind('guide'));
+  return '<div class="nl">' + h + '</div>';
+}
+function navBind(root) {
+  $$('[data-ng]', root).forEach(function (b) { b.onclick = function () { NAV.q = ''; navGo(b.dataset.ng); }; });
+  $$('[data-nf]', root).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); navFav(b.dataset.nf); }; });
+  $$('[data-ngr]', root).forEach(function (b) { b.onclick = function () { var g = b.dataset.ngr, cur = TOOLS.filter(function (x) { return x.g === g; })[0].i.some(function (x) { return x.k === navCur(); }); var op = NAV.open[g] != null ? NAV.open[g] : cur; NAV.open[g] = !op; navSync(); }; });
+  $$('.nqi', root).forEach(function (i) { i.oninput = function () { NAV.q = i.value; var p = i.closest('.navbox'); p.innerHTML = navList(NAV.q); navBind(p); var ni = $('.nqi', p); ni.focus(); ni.setSelectionRange(ni.value.length, ni.value.length); };
+    i.onkeydown = function (e) { if (e.key === 'Enter') { var f = $('[data-ng]', i.closest('.navbox')); if (f) { NAV.q = ''; navGo(f.dataset.ng); } } }; });
+}
+function navCrumb() {
+  var c = navCur(), x = navFind(c), sep = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">' + NAV_IC.cv + '</svg>';
+  if (S.view === 'start') return '<b>홈</b>';
+  if (c === 'tools') return '도구' + sep + '<b>전체 도구</b>';
+  if (!x) return '';
+  return (x.g === '업무' || x.g === '안내' ? x.g : '도구' + sep + x.g) + sep + '<b>' + esc(x.t) + '</b>';
+}
+function navEl(id, tag, where, html) { var e = document.getElementById(id); if (!e) { e = document.createElement(tag || 'div'); e.id = id; where(e); } if (html != null) e.innerHTML = html; return e; }
+function navSync() {
+  document.documentElement.setAttribute('data-nav', NAV.s);
+  var hd = $('header .hd'), hdr = $('header'), cur = navCur();
+  // 공통: 햄버거 · 위치 줄 · 전체 메뉴 창
+  navEl('nhb', 'button', function (e) { e.className = 'ib'; e.type = 'button'; e.setAttribute('aria-label', '전체 메뉴'); hd.insertBefore(e, hd.firstChild); e.onclick = function () { $('#ndr').classList.add('open'); var i = $('#ndr .nqi'); if (i && window.innerWidth >= 1024) i.focus(); }; }, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' + NAV_IC.menu + '</svg>');
+  var cr = navEl('ncr', 'div', function (e) { hdr.appendChild(e); }, navCrumb());
+  var inHd = NAV.s === 'a' && window.innerWidth >= 1024; if (inHd && cr.parentNode !== hd) hd.insertBefore(cr, $('.hr', hd)); else if (!inHd && cr.parentNode !== hdr) hdr.appendChild(cr);
+  document.documentElement.toggleAttribute('data-v-start', S.view === 'start');
+  var dr = navEl('ndr', 'div', function (e) { document.body.appendChild(e); e.innerHTML = '<div class="dm"></div><div class="pn"><div class="pnh"><b>PLYSH</b><button type="button" class="nx" aria-label="닫기">' + navIc('x') + '</button></div><div class="navbox"></div></div>'; $('.dm', e).onclick = navClose; $('.nx', e).onclick = navClose; });
+  var dbx = $('.navbox', dr); dbx.innerHTML = navList(NAV.s === 'a' && window.innerWidth >= 1024 ? '' : NAV.q); navBind(dbx);
+  // A: 왼쪽 메뉴 · 모바일 아래 탭
+  if (NAV.s === 'a') {
+    var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); e.innerHTML = '<div class="sbh"><button type="button">PLYSH</button></div><div class="navbox"></div>'; $('.sbh button', e).onclick = function () { navGo('pj'); }; });
+    var sbx = $('.navbox', sd), foc = document.activeElement && document.activeElement.classList.contains('nqi') && sd.contains(document.activeElement);
+    sbx.innerHTML = navList(NAV.q); navBind(sbx); if (foc) { var ni = $('.nqi', sbx); ni.focus(); ni.setSelectionRange(ni.value.length, ni.value.length); }
+    var T = [['todo', 'todo', '할 일'], ['wl', 'wl', '근무'], ['pj', 'pj', '프로젝트'], ['tools', 'tools', '도구'], ['all', 'menu', '전체']];
+    var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
+    tb.innerHTML = T.map(function (t) { var on = t[0] === 'tools' ? isToolView(S.view) : t[0] === cur; return '<button type="button" data-nt="' + t[0] + '" class="' + (on ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
+    $$('#ntb button').forEach(function (b) { b.onclick = function () { if (b.dataset.nt === 'all') $('#ndr').classList.add('open'); else navGo(b.dataset.nt); }; });
+  }
+  // B: 위 메뉴 3개 + 도구 펼침 + 지금 묶음 칩
+  if (NAV.s === 'b') {
+    var bb = navEl('nbB', 'div', function (e) { var nv = $('#nav'); nv.parentNode.insertBefore(e, nv); });
+    var x = navFind(cur), top = cur === 'guide' ? 'guide' : (x && x.g !== '업무' && x.g !== '안내') || cur === 'tools' ? 'tools' : 'work';
+    var chips = top === 'work' ? NAV_WORK.map(function (w) { return { k: w.k, t: w.t }; }) : top === 'tools' && x ? [{ g: x.g }].concat(TOOLS.filter(function (g) { return g.g === x.g; })[0].i.map(function (i) { return { k: i.k, t: TOOL_SHORT[i.k] || i.t }; })) : [];
+    var mg = '<div id="nmg">' + TOOLS.map(function (gr) { return '<div><h4>' + navIc(NAV_GIC[gr.g]) + gr.g + '</h4>' + gr.i.map(function (i) { return '<button type="button" data-ng="' + i.k + '" class="' + (i.k === cur ? 'on' : '') + '">' + esc(i.t) + '<span>' + esc(i.s) + '</span></button>'; }).join('') + '</div>'; }).join('') + '<div class="mga"><button type="button" data-ng="tools">도구 전체 카드로 보기</button></div></div>';
+    bb.innerHTML = '<div class="bt"><button type="button" data-nb="work" class="' + (top === 'work' ? 'on' : '') + '">업무</button><button type="button" data-nb="tools" class="' + (top === 'tools' ? 'on' : '') + '">도구<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + NAV_IC.down + '</svg></button><button type="button" data-nb="guide" class="' + (top === 'guide' ? 'on' : '') + '">가이드</button></div>' +
+      (chips.length ? '<div class="bc">' + chips.map(function (c) { return c.g ? '<button type="button" class="bg" data-nb="tools">' + esc(c.g) + '</button>' : '<button type="button" data-ng="' + c.k + '" class="' + (c.k === cur ? 'on' : '') + '">' + esc(c.t) + '</button>'; }).join('') + '</div>' : '') + mg;
+    navEl('nbd', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
+    navBind(bb);
+    $$('[data-nb]', bb).forEach(function (b) { b.onclick = function () {
+      var k = b.dataset.nb;
+      if (k === 'tools') { var m = $('#nmg'), o = !m.classList.contains('open'); navClose(); if (o) { m.classList.add('open'); $('#nbd').classList.add('open'); $('#nbB .bt [data-nb="tools"]').classList.add('op'); } }
+      else navGo(k === 'guide' ? 'guide' : (NAV_WORK.some(function (w) { return w.k === cur; }) ? cur : 'pj'));
+    }; });
+    var on = $('#nbB .bc .on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  // C: 찾기 칸 · 찾기 창
+  if (NAV.s === 'c') {
+    navEl('ncs', 'button', function (e) { e.type = 'button'; var br = $('#brand'); br.parentNode.insertBefore(e, br.nextSibling); e.onclick = navPal; }, navIc('search') + '<span>무엇을 할까요? 메뉴 이름으로 찾기</span><kbd>⌘K</kbd>');
+    $('#brand').onclick = function () { navGo('start'); };
+  } else $('#brand').onclick = function () { navGo('pj'); };
+}
+// C 찾기 창
+function navPal() {
+  var p = navEl('npl', 'div', function (e) { document.body.appendChild(e); e.innerHTML = '<div class="dm"></div><div class="bx"><label class="pq">' + navIc('search') + '<input type="search" placeholder="메뉴 이름으로 찾기 (예: 책등, 라벨, 연락처)" autocomplete="off"></label><div class="rs"></div><div class="pf">↑↓ 고르기 · Enter 열기 · Esc 닫기</div></div>'; $('.dm', e).onclick = navClose;
+    var i = $('input', e);
+    i.oninput = function () { NAV.pq = i.value; NAV.pi = 0; navPalRs(); };
+    i.onkeydown = function (ev) { var n = $$('#npl .pr').length; if (ev.key === 'ArrowDown') { NAV.pi = Math.min(n - 1, NAV.pi + 1); navPalRs(); ev.preventDefault(); } else if (ev.key === 'ArrowUp') { NAV.pi = Math.max(0, NAV.pi - 1); navPalRs(); ev.preventDefault(); } else if (ev.key === 'Enter') { var h = $('#npl .pr.hl'); if (h) navGo(h.dataset.ng); } };
+  });
+  NAV.pq = ''; NAV.pi = 0; $('input', p).value = ''; navPalRs(); p.classList.add('open'); setTimeout(function () { $('input', p).focus(); }, 30);
+}
+function navPalRs() {
+  var q = NAV.pq.trim().toLowerCase(), L = navAll().filter(function (x) { return !q || (x.t + ' ' + (x.e || '') + ' ' + (x.m || '') + ' ' + x.g + ' ' + (x.s || '')).toLowerCase().indexOf(q) > -1; });
+  if (!q) L = NAV.fav.map(navFind).filter(Boolean).map(function (x) { return { k: x.k, t: x.t, g: '즐겨찾기', ic: x.ic }; }).concat(L);
+  var gs = [], by = {}; L.forEach(function (x) { if (!by[x.g]) { by[x.g] = []; gs.push(x.g); } by[x.g].push(x); });
+  var n = 0, h = gs.map(function (g) { return '<div class="ph">' + esc(g) + '</div>' + by[g].map(function (x) { return '<button type="button" class="pr' + (n++ === NAV.pi ? ' hl' : '') + '" data-ng="' + x.k + '">' + navIc(x.ic) + esc(x.t) + (x.e ? '<span>' + esc(x.e) + '</span>' : '') + '</button>'; }).join(''); }).join('');
+  var rs = $('#npl .rs'); rs.innerHTML = h || '<div class="ph">찾는 메뉴가 없어요</div>';
+  $$('#npl .pr').forEach(function (b) { b.onclick = function () { navGo(b.dataset.ng); }; });
+  var hl = $('#npl .pr.hl'); if (hl) hl.scrollIntoView({ block: 'nearest' });
+}
+// C 홈: 즐겨찾기 + 전체 메뉴
+function renderStart() {
+  var F = NAV.fav.map(navFind).filter(Boolean);
+  var h = '<div class="sth">즐겨찾기<span>메뉴 옆 ★로 넣고 빼요</span></div><div class="stp">' + F.map(function (x) { return '<button type="button" data-ng="' + x.k + '"><span class="ic">' + navIc(x.ic) + '</span><b>' + esc(x.t) + '</b></button>'; }).join('') + '<button type="button" class="add" id="stAdd">+ 추가</button></div>';
+  var G = [{ g: '업무', i: NAV_WORK }].concat(TOOLS).concat([{ g: '안내', i: [{ k: 'guide', t: 'GUIDE' }] }]);
+  h += '<div class="sth">전체 메뉴</div><div class="sta">' + G.map(function (g) { return '<div class="sg"><h4>' + g.g + '</h4>' + g.i.map(function (x) { return '<button type="button" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join('') + '</div>'; }).join('') + '</div>';
+  $('#main').innerHTML = h;
+  $$('#main [data-ng]').forEach(function (b) { b.onclick = function () { navGo(b.dataset.ng); }; });
+  $('#stAdd').onclick = function () { $('#ndr').classList.add('open'); };
+}
+function navSet(s) { NAV.s = s; ls.set('d4:nav', s); navClose(); if (s !== 'c' && S.view === 'start') S.view = 'pj'; if (s === 'c' && S.view === 'pj') S.view = 'start'; render(); }
+window.navSet = navSet;
+document.addEventListener('keydown', function (e) {
+  if ((e.metaKey || e.ctrlKey) && String(e.key).toLowerCase() === 'k') { e.preventDefault(); if (NAV.s === 'c') navPal(); else if (NAV.s === 'a' && window.innerWidth >= 1024) { var i = $('#nsd .nqi'); if (i) i.focus(); } else { $('#ndr').classList.add('open'); var j = $('#ndr .nqi'); if (j) j.focus(); } }
+  if (e.key === 'Escape') navClose();
+});
+window.addEventListener('resize', function () { if (S.D) navSync(); });
 $('#rfBtn').onclick = function () { load().then(function () { toast('시트에서 새로 불러왔어요'); }); };
 
 function filterBar() {
