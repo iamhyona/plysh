@@ -124,10 +124,11 @@ function infoKV(info) {
   var kv = [], cells = [];
   (info || []).forEach(function (r, ri) { (r || []).forEach(function (c) { if (c && T(c.t)) cells.push({ r: ri, c: c.c, t: T(c.t) }); }); });
   var at = function (r, c) { return cells.filter(function (x) { return x.r === r && x.c === c; })[0]; };
+  var rowLayout = function (r) { var labs = cells.filter(function (x) { return x.r === r && LAB.test(x.t); }); return labs.length >= 2 && labs.every(function (x) { var n = at(r, x.c + 1); return !n || LAB.test(n.t); }); };
   cells.forEach(function (x) {
     if (!LAB.test(x.t)) return;
     var v = at(x.r, x.c + 1); if (v && LAB.test(v.t)) v = null;
-    if (!v) { var dn = at(x.r + 1, x.c); if (dn && !LAB.test(dn.t)) v = dn; } // 라벨 줄 + 값 줄 방식
+    if (!v && rowLayout(x.r)) { var dn = at(x.r + 1, x.c); if (dn && !LAB.test(dn.t)) v = dn; } // 라벨 줄 + 값 줄 방식
     kv.push({ k: x.t, v: v ? v.t : '', r: x.r, c: x.c });
   });
   return { kv: kv, cells: cells };
@@ -384,6 +385,112 @@ function check(d, ctx) {
   return { title: title, name: lab, tab: d.tab, groups: groups.length, rows: groups.reduce(function (s, G) { return s + G.rows.length; }, 0), kv: I.kv, items: out, pass: pass };
 }
 
+// ── PDF 사양서 → 시트와 같은 모양 {head, rows, info} ──
+// items: [{s 글자, x 왼쪽, y 위에서부터(기준선), w 너비, p 쪽}] (pdf.js getTextContent에서 만든 값)
+var MERGE_COL = /^(번호|no\.?|대분류|중분류|구성|포장|배치.*|.*전달\s*사항|비고|기타.*)$/i;
+function fromPdf(items) {
+  var L = (items || []).filter(function (t) { return t && T(t.s); }).map(function (t) { return { s: T(t.s), x: +t.x, y: +t.y, w: +t.w || 0, p: t.p || 1 }; });
+  if (!L.length) return null;
+  L.sort(function (a, b) { return a.p - b.p || a.y - b.y || a.x - b.x; });
+  // 줄 묶기
+  var lines = [];
+  L.forEach(function (t) { var ln = lines[lines.length - 1]; if (ln && ln.p === t.p && Math.abs(ln.y - t.y) <= 1.5) ln.it.push(t); else lines.push({ p: t.p, y: t.y, it: [t] }); });
+  lines.forEach(function (ln) {
+    ln.it.sort(function (a, b) { return a.x - b.x; });
+    var m = []; // 한 칸 안에서 끊겨 나온 글자(간격 2.5pt 미만)는 이어 붙임
+    ln.it.forEach(function (t) { var q = m[m.length - 1]; if (q && t.x - (q.x + q.w) < 2.5 && t.x - (q.x + q.w) > -0.2) { q.s += (t.x - (q.x + q.w) > 0.6 ? ' ' : '') + t.s; q.w = t.x + t.w - q.x; } else m.push({ s: t.s, x: t.x, y: t.y, w: t.w, p: t.p }); });
+    ln.it = m;
+  });
+  // 머리글 줄: 번호(또는 대분류) + 품목 + 칸 5개 이상
+  var hi = -1;
+  for (var i = 0; i < lines.length && hi < 0; i++) {
+    var ts = lines[i].it.map(function (t) { return t.s; });
+    if (ts.length >= 5 && ts.some(function (v) { return /^(번호|no\.?|대분류)$/i.test(v); }) && ts.some(function (v) { return /품목/.test(v); })) hi = i;
+  }
+  if (hi < 0) return null;
+  var H = lines[hi].it.map(function (t) { return { t: t.s, x: t.x, e: t.x + t.w }; });
+  var headTxt = H.map(function (h) { return h.t; }).join('|');
+  var data = [], end = lines.length;
+  for (i = hi + 1; i < lines.length; i++) {
+    var lt = lines[i].it.map(function (t) { return t.s; });
+    if (lt.length >= 5 && lt.some(function (v) { return /^(번호|no\.?|대분류)$/i.test(v); }) && lt.some(function (v) { return /품목/.test(v); }) && lines[i - 1].p === lines[i].p && lines[i - 1].p !== lines[hi].p) {
+      // 위에 기본 정보가 있는 머리글 = 다른 탭(다음 사양서) → 그 쪽 앞까지만
+      end = i; while (end > hi + 1 && lines[end - 1].p === lines[i].p) end--; break;
+    }
+  }
+  for (i = hi + 1; i < end; i++) {
+    if (lines[i].it.map(function (t) { return t.s; }).join('|') === headTxt) continue; // 다음 쪽 맨 위에 반복된 머리글
+    lines[i].it.forEach(function (t) { data.push(t); });
+  }
+  // 칸 경계: 앞 머리글 끝 ~ 이 머리글 시작 사이에서 가장 왼쪽에 시작하는 글자
+  var B = [-1e9];
+  for (i = 1; i < H.length; i++) {
+    var lo = H[i - 1].e - 0.5, hi2 = H[i].x + 0.5, c = data.filter(function (t) { return t.x > lo && t.x <= hi2; }).map(function (t) { return t.x; });
+    B.push(c.length ? Math.min.apply(null, c) - 0.5 : H[i].x - 0.5);
+  }
+  B.push(1e9);
+  function colOf(x) { for (var k = H.length - 1; k >= 0; k--) if (x >= B[k]) return k; return 0; }
+  // 이웃 칸까지 붙어 나온 글자는 빈칸 기준으로 나눔
+  var D = [];
+  data.forEach(function (t) {
+    var k = colOf(t.x);
+    var nextTaken = function (kk, tt) { return data.some(function (o) { return o !== tt && o.p === tt.p && Math.abs(o.y - tt.y) <= 1.5 && o.x >= B[kk + 1] && o.x < B[kk + 2]; }); };
+    while (k < H.length - 1 && t.w && t.x + t.w > B[k + 1] + 8 && / /.test(t.s) && !nextTaken(k, t)) {
+      var cut = Math.round((B[k + 1] - t.x) / t.w * t.s.length), sp = -1, best = 1e9;
+      for (var j = 1; j < t.s.length; j++) if (t.s[j] === ' ' && Math.abs(j - cut) < best) { best = Math.abs(j - cut); sp = j; }
+      if (sp < 0) break;
+      D.push({ s: t.s.slice(0, sp).trim(), x: t.x, y: t.y, p: t.p, k: k });
+      var rest = t.s.slice(sp + 1).trim(), nx = B[k + 1] + 0.5;
+      t = { s: rest, x: nx, y: t.y, p: t.p, w: t.w * rest.length / t.s.length }; k++;
+    }
+    if (t.s) D.push({ s: t.s, x: t.x, y: t.y, p: t.p, k: k });
+  });
+  // 줄 위치: 합치지 않는 칸(크기·종이·장수 등)의 글자 높이로 정함
+  var merge = H.map(function (h) { return MERGE_COL.test(h.t.replace(/\s+/g, ' ')); });
+  var anc = H.map(function (h) { return /장수|쪽수|페이지$|도수|^인쇄$|방식|종이|용지|크기|사이즈|판형/.test(h.t); });
+  if (!anc.some(Boolean)) anc = merge.map(function (m) { return !m; });
+  var Y = [];
+  D.filter(function (t) { return anc[t.k]; }).map(function (t) { return t.p * 100000 + t.y; }).sort(function (a, b) { return a - b; }).forEach(function (y) { if (!Y.length || y - Y[Y.length - 1] > 3) Y.push(y); });
+  if (!Y.length) return null;
+  var rows = Y.map(function () { return H.map(function () { return ''; }); });
+  function nearest(y) { var b = 0; for (var r = 1; r < Y.length; r++) if (Math.abs(Y[r] - y) < Math.abs(Y[b] - y)) b = r; return b; }
+  function put(r, k, s) { rows[r][k] = rows[r][k] ? rows[r][k] + ' ' + s : s; }
+  D.filter(function (t) { return !merge[t.k]; }).forEach(function (t) { put(nearest(t.p * 100000 + t.y), t.k, t.s); });
+  // 합친 칸(가운데 정렬): 번호 칸으로 품목 묶음 범위를 먼저 나누고, 나머지 합친 칸은 그 묶음의 첫 줄에 넣음
+  var mk = H.map(function (h, k) { return merge[k] ? k : -1; }).filter(function (k) { return k >= 0; });
+  var prim = mk.filter(function (k) { return /^(번호|no\.?)$/i.test(H[k].t); })[0]; if (prim == null) prim = mk[0];
+  var spans = [];
+  if (prim != null) {
+    var ptr = 0;
+    D.filter(function (t) { return t.k === prim; }).forEach(function (t) {
+      if (ptr >= Y.length) return;
+      var c = t.p * 100000 + t.y, bi = ptr, bd = 1e9;
+      var top = ptr > 0 && Y[ptr] - Y[ptr - 1] < 40 ? (Y[ptr - 1] + Y[ptr]) / 2 : Y[ptr] - 3.5;
+      for (var b2 = ptr; b2 < Y.length; b2++) {
+        var bot = b2 + 1 < Y.length && Y[b2 + 1] - Y[b2] < 40 ? (Y[b2] + Y[b2 + 1]) / 2 : Y[b2] + 3.5, dd = Math.abs((top + bot) / 2 - c);
+        if (dd < bd) { bd = dd; bi = b2; } else if ((top + bot) / 2 > c + 10) break;
+      }
+      spans.push([ptr, bi]); put(ptr, prim, t.s); ptr = bi + 1;
+    });
+  }
+  mk.forEach(function (k) {
+    if (k === prim) return;
+    D.filter(function (t) { return t.k === k; }).forEach(function (t) {
+      var y = t.p * 100000 + t.y, g = spans.filter(function (sp) { return y >= Y[sp[0]] - 3 && y <= Y[sp[1]] + 3; })[0];
+      put(g ? g[0] : nearest(y), k, t.s);
+    });
+  });
+  // 기본 정보: 머리글 위 줄들. 칸 사이가 멀면 번호를 건너뛰어 '바로 옆 값'으로 보지 않게
+  var info = [];
+  for (i = 0; i < hi; i++) {
+    if (lines[i].p !== lines[hi].p) continue;
+    var cc = 0, prev = null, row = [];
+    lines[i].it.forEach(function (t) { if (prev) cc += (t.x - (prev.x + prev.w) > 30) ? 2 : 1; row.push({ c: cc, t: t.s }); prev = t; });
+    info.push(row);
+  }
+  return { head: H.map(function (h) { return h.t; }), rows: rows, info: info, tab: 'PDF', pages: L[L.length - 1].p };
+}
+
 // ── 결과지 ──
 var LV = { r: ['경고', '#e0263a', '수정함'], o: ['주의', '#ff7300', '확인함'], p: ['조언', '#6546b9', '확인'] };
 function render(R, opt) {
@@ -393,7 +500,7 @@ function render(R, opt) {
   var h = '<div class="spk">';
   h += '<div class="spk-mast"><b>PLYSH PREFLIGHT</b><span>사양서 검수 · ' + stamp + '</span></div>';
   h += '<p class="spk-eye">사양서 검수 결과</p><h1>' + esc(R.title || R.name) + '</h1>';
-  h += '<div class="spk-file">' + esc(R.name) + (R.tab ? ' · 탭 ' + esc(R.tab) : '') + ' · 품목 ' + R.groups + '개 · ' + R.rows + '줄' + (opt.url ? ' · <a href="' + esc(opt.url) + '" target="_blank" rel="noopener">시트 열기</a>' : '') + '</div>';
+  h += '<div class="spk-file">' + esc(R.name) + (R.tab ? (/^PDF/.test(R.tab) ? ' · ' : ' · 탭 ') + esc(R.tab) : '') + ' · 품목 ' + R.groups + '개 · ' + R.rows + '줄' + (opt.url ? ' · <a href="' + esc(opt.url) + '" target="_blank" rel="noopener">시트 열기</a>' : '') + '</div>' + (R.notice ? '<div class="spk-file" style="margin-top:4px">' + esc(R.notice) + '</div>' : '');
   h += '<div class="spk-stat">' + ['r', 'o', 'p'].map(function (k) { return '<span class="' + k + '"><b>' + c[k] + '</b>' + LV[k][0] + '</span>'; }).join('') + '<span class="g"><b>' + R.pass.length + '</b>통과</span></div>';
   if (R.items.length) {
     h += '<h2>요약</h2><table class="spk-sum"><tr><th>#</th><th>단계</th><th>위치</th><th>내용</th></tr>' + R.items.map(function (x, i) {
@@ -427,6 +534,6 @@ var CSS = '.spk{background:#fff;color:#191f28;font-family:"Pretendard Variable",
   '.spk-ok{font-size:15px;font-weight:700;color:#0c8a62}.spk-foot{display:flex;justify-content:space-between;font-size:10px;color:#4e5968;border-top:1px solid #e5e8eb;margin-top:28px;padding-top:8px}' +
   '@media (max-width:560px){.spk{padding:22px 16px}.spk h1{font-size:21px}.spk-sum td:nth-child(3){display:none}.spk-sum th:nth-child(3){display:none}}';
 
-var api = { check: check, render: render, CSS: CSS, _t: { sizes: sizes, dates: dates, setOf: setOf, sheetsPages: sheetsPages, methodColors: methodColors, cols: cols, infoKV: infoKV } };
+var api = { check: check, render: render, fromPdf: fromPdf, CSS: CSS, _t: { sizes: sizes, dates: dates, setOf: setOf, sheetsPages: sheetsPages, methodColors: methodColors, cols: cols, infoKV: infoKV } };
 if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PLYSH_SPECCHECK = api;
 })(typeof window !== 'undefined' ? window : globalThis);

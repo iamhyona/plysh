@@ -82,7 +82,11 @@ function rebuildItems() {
   var it = [];
   if ((MODE === 'plysh' || MODE === 'link') && SPEC.sheet) it = SPEC.sheet.items.slice();
   if (MODE === 'text') it = itemsFromText(SPEC.text);
-  if (MODE === 'file') SPEC.att.forEach(function (a) { if (a.text) it = it.concat(itemsFromText(a.text)); });
+  if (MODE === 'file') SPEC.att.forEach(function (a) {
+    if (a.spec) { var ci = a.spec.head.findIndex(function (h) { return /대분류/.test(h); }), last = '';
+      a.spec.rows.forEach(function (r) { r = r.slice(); if (ci >= 0) { if (r[ci]) last = r[ci]; else r[ci] = last; } var x = itemFromRow(a.spec.head, r); if (x) it.push(x); }); }
+    else if (a.text) it = it.concat(itemsFromText(a.text));
+  });
   SPEC.items = it; showSpecSum(); Q.forEach(autoItem); drawQ();
 }
 function setMode(m) {
@@ -152,26 +156,37 @@ function pickSpec(id, tab, auto) {
 // ── 사양서 검수: 사양서 자체의 빈칸·숫자·날짜·표기 (spec.js) ──
 function specChkState() {
   var b = $('#specChkGo'); if (!b) return;
-  var ok = (MODE === 'plysh' || MODE === 'link') && SPEC.sheet && SPEC.sheet.raw;
+  var sheet = (MODE === 'plysh' || MODE === 'link') && SPEC.sheet && SPEC.sheet.raw, pdf = MODE === 'file' && specPdf();
+  var ok = !!(sheet || pdf), pdfs = MODE === 'file' && SPEC.att.some(function (a) { return /\.pdf$/i.test(a.name); });
   b.disabled = !ok;
-  $('#specChkNote').textContent = ok ? '사양서 자체의 빈칸 · 장수·쪽수 · 날짜 · 표기를 봐요. 인쇄 파일 없이도 돼요.' : (MODE === 'plysh' || MODE === 'link') ? '사양서를 고르면 검수할 수 있어요.' : '구글 시트 사양서만 검수할 수 있어요.';
+  $('#specChkNote').textContent = sheet ? '사양서 자체의 빈칸 · 장수·쪽수 · 날짜 · 표기를 봐요. 인쇄 파일 없이도 돼요.'
+    : pdf ? 'PDF 사양서 표를 읽어서 봐요 (' + pdf.name + '). 표가 잘못 읽힌 곳이 있으면 시트로 검수해 주세요.'
+    : (MODE === 'plysh' || MODE === 'link') ? '사양서를 고르면 검수할 수 있어요.'
+    : MODE === 'file' ? (pdfs ? 'PDF에서 사양서 표(번호 · 품목 머리글)를 찾지 못했어요. 글자가 살아 있는 PDF만 읽을 수 있어요.' : 'PDF 사양서를 첨부하면 검수할 수 있어요. 이미지는 참고용이에요.')
+    : '구글 시트나 PDF 사양서만 검수할 수 있어요.';
 }
-function specArtist() {
-  var m = String(SPEC.sheet && SPEC.sheet.name || '').match(/\[([^\]]+)\]/);
+function specPdf() { return SPEC.att.filter(function (a) { return a.spec; })[0] || null; }
+function specArtist(name) {
+  var m = String(name || SPEC.sheet && SPEC.sheet.name || '').match(/\[([^\]]+)\]/);
   return (m && m[1]) || SELART || '';
 }
 function runSpecChk() {
-  var SC = window.PLYSH_SPECCHECK, sh = SPEC.sheet; if (!SC || !sh || !sh.raw) return;
-  var art = specArtist(), ai = aiFor(art), mem = ai && ai.members ? ai.members.length : 0;
-  var R = SC.check({ head: sh.raw.head, rows: sh.raw.rows, info: sh.raw.info, tab: sh.tab, name: sh.name }, { members: mem, artist: art });
-  var tg = (sh.tabs || []).find(function (t) { return t && t.n === sh.tab; }), url = 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' + (tg && tg.g != null ? '#gid=' + tg.g : '');
+  var SC = window.PLYSH_SPECCHECK; if (!SC) return;
+  var pa = MODE === 'file' ? specPdf() : null, sh = pa ? null : SPEC.sheet;
+  if (!pa && !(sh && sh.raw)) return;
+  var src = pa ? { head: pa.spec.head, rows: pa.spec.rows, info: pa.spec.info, tab: 'PDF ' + pa.spec.pages + 'p', name: pa.name } : { head: sh.raw.head, rows: sh.raw.rows, info: sh.raw.info, tab: sh.tab, name: sh.name };
+  var art = specArtist(src.name + ' ' + ((src.info[0] || [])[0] || {}).t), ai = aiFor(art), mem = ai && ai.members ? ai.members.length : 0;
+  var R = SC.check(src, { members: mem, artist: art });
+  if (pa && !src.head.some(function (h) { return /기타|비고|전달/.test(h); })) R.notice = 'PDF에 비고(전달 사항) 칸이 없어서 비고와 표 대조는 빠졌어요. 비고까지 보려면 시트로 검수해 주세요.';
+  var url = '';
+  if (sh) { var tg = (sh.tabs || []).find(function (t) { return t && t.n === sh.tab; }); url = 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' + (tg && tg.g != null ? '#gid=' + tg.g : ''); }
   var el = $('#specRep');
   el.innerHTML = '<div class="row noprint" style="justify-content:flex-end;margin-bottom:8px"><button type="button" class="ib" id="specRepPdf">PDF 저장</button><button type="button" class="ib" id="specRepX">닫기</button></div>' + SC.render(R, { url: url });
   el.hidden = false; el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#specRepX').onclick = function () { el.hidden = true; el.innerHTML = ''; };
   $('#specRepPdf').onclick = function () {
     document.body.classList.add('spking');
-    var t = document.title; document.title = (art ? '[' + art + ']' : '') + '사양서검수_' + String(sh.tab || '').replace(/\D/g, '').slice(-6);
+    var t = document.title; document.title = (art ? '[' + art + ']' : '') + '사양서검수_' + (sh ? String(sh.tab || '').replace(/\D/g, '').slice(-6) : 'PDF');
     setTimeout(function () { window.print(); document.title = t; document.body.classList.remove('spking'); }, 50);
   };
 }
@@ -197,7 +212,9 @@ async function addSpecFiles(fl) {
   for (var i = 0; i < fl.length; i++) {
     var f = fl[i], a = { name: f.name, text: '', url: '' };
     if (/^image\//.test(f.type)) a.url = URL.createObjectURL(f);
-    else if (/\.pdf$/i.test(f.name)) { try { a.text = await pdfText(f); } catch (e) { a.err = true; } }
+    else if (/\.pdf$/i.test(f.name)) {
+      try { var px = await pdfText(f, true); a.text = px.text; if (window.PLYSH_SPECCHECK) a.spec = window.PLYSH_SPECCHECK.fromPdf(px.items); } catch (e) { a.err = true; }
+    }
     else { try { a.text = await f.text(); } catch (e) {} }
     SPEC.att.push(a);
   }
@@ -208,15 +225,18 @@ function drawAtt() {
   $$('#specAtt button').forEach(function (b) { b.onclick = function () { SPEC.att.splice(+b.dataset.i, 1); drawAtt(); rebuildItems(); }; });
 }
 function loadJs(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
-async function pdfText(f) {
+async function pdfText(f, withItems) {
   if (!window.pdfjsLib) { await loadJs(LIBS.pdfjs); pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; }
-  var d = await pdfjsLib.getDocument({ data: new Uint8Array(await f.arrayBuffer()), isEvalSupported: false }).promise, out = [];
+  var d = await pdfjsLib.getDocument({ data: new Uint8Array(await f.arrayBuffer()), isEvalSupported: false }).promise, out = [], items = [];
   for (var p = 1; p <= Math.min(d.numPages, 10); p++) {
-    var tc = await (await d.getPage(p)).getTextContent(), line = [], y = null;
-    tc.items.forEach(function (t) { var ty = Math.round(t.transform[5]); if (y !== null && Math.abs(ty - y) > 3) { out.push(line.join(' ')); line = []; } y = ty; line.push(t.str); });
+    var pg = await d.getPage(p), vh = pg.getViewport({ scale: 1 }).height, tc = await pg.getTextContent(), line = [], y = null;
+    tc.items.forEach(function (t) {
+      var ty = Math.round(t.transform[5]); if (y !== null && Math.abs(ty - y) > 3) { out.push(line.join(' ')); line = []; } y = ty; line.push(t.str);
+      if (withItems && t.str && t.str.trim()) items.push({ s: t.str, x: t.transform[4], y: vh - t.transform[5], w: t.width, p: p });
+    });
     out.push(line.join(' '));
   }
-  d.destroy(); return out.join('\n');
+  d.destroy(); var txt = out.join('\n'); return withItems ? { text: txt, items: items } : txt;
 }
 
 // ── 파일 목록 ──
