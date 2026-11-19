@@ -2497,18 +2497,20 @@ function renderMonth() {
   h += '</div></div>';
   var r1 = folded ? end : last, me = L.filter(function (e) { return e.d >= first && e.d <= r1; }).slice().sort(function (a, b) { return a.d < b.d ? -1 : a.d > b.d ? 1 : 0; }), md2 = [];
   me.forEach(function (e) { if (md2.indexOf(e.d) < 0) md2.push(e.d); });
-  h += '<div class="sec">제작일정<small>' + me.length + '건</small></div>';
+  // 2026-11-20 실장님: 달력 아래 제작일정 목록은 화면에 안 붙임
+  var calList = '';
+  calList += '<div class="sec">제작일정<small>' + me.length + '건</small></div>';
   // 지난 주 일정은 주별로 접기 (오늘 기준)
   var pastD = cur ? md2.filter(function (d) { return d < tw; }) : [], wks = [];
   pastD.forEach(function (d) { var w = sunOf(d); if (wks.indexOf(w) < 0) wks.push(w); });
   S.dop = S.dop || {};
-  h += wks.map(function (w) {
+  calList += wks.map(function (w) {
     var ds = pastD.filter(function (d) { return sunOf(d) === w; }), n = me.filter(function (e) { return ds.indexOf(e.d) >= 0; }).length, op = !!S.dop['w' + w];
     return '<details class="day fday fwk" data-fd="w' + w + '"' + (op ? ' open' : '') + '><summary class="dh"><b>' + rng(w, addD(w, 6)) + '<small>지난 주 · ' + n + '건</small></b><i class="chev"></i></summary>' +
       ds.map(function (d) { return '<div class="tddh">' + mdw(d) + '</div><div class="list">' + me.filter(function (e) { return e.d === d; }).map(function (e) { return itemHtml(e); }).join('') + '</div>'; }).join('') + '</details>';
   }).join('');
   var restD = md2.filter(function (d) { return pastD.indexOf(d) < 0; });
-  h += restD.length ? restD.map(function (d) { var l = me.filter(function (e) { return e.d === d; }); return foldDay(d, l.length + '건', '<div class="list">' + l.map(function (e) { return itemHtml(e); }).join('') + '</div>'); }).join('')
+  calList += restD.length ? restD.map(function (d) { var l = me.filter(function (e) { return e.d === d; }); return foldDay(d, l.length + '건', '<div class="list">' + l.map(function (e) { return itemHtml(e); }).join('') + '</div>'); }).join('')
     : (wks.length ? '' : '<div class="day"><div class="empty2">이 달 일정이 없어요</div></div>');
   $('#main').innerHTML = h; bindFilter(); bindItems(); bindSeg(); bindFoldDay();
   if ($('#wkF')) $('#wkF').onclick = function () { S.calPast = !S.calPast; var y0 = window.scrollY; render(); window.scrollTo(0, y0); };
