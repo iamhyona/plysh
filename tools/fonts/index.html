@@ -205,9 +205,9 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
     <button class="rbtn" id="bSet" title="설정"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </div>
   <nav class="tabs" id="tabs">
-    <button data-t="browse" class="on">BROWSE</button>
-    <button data-t="era">ERA</button>
-    <button data-t="saved">SAVED<span class="cnt" id="favCnt">0</span></button>
+    <button data-t="browse" class="on">둘러보기</button>
+    <button data-t="era">시대별</button>
+    <button data-t="saved">저장<span class="cnt" id="favCnt">0</span></button>
   </nav>
 </header>
 
@@ -390,10 +390,10 @@ function renderFilters(){
   const el=$('#filters');
   const base=S.data.filter(f=>baseFilter(f,'major'));
   const mc={}; base.forEach(f=>mc[f.m]=(mc[f.m]||0)+1);
-  let h=`<div class="chipsrow"><span class="lbl">SOURCE</span><div class="seg" id="srcSeg">`+
+  let h=`<div class="chipsrow"><span class="lbl">출처</span><div class="seg" id="srcSeg">`+
     [['all','전체'],['g','Google'],['a','Adobe'],['k','한글 무료']].map(([k,l])=>`<button data-src="${k}" class="${S.src===k?'on':''}">${k!=='all'?`<span class="src-dot s${k}"></span>`:''}${l}</button>`).join('')+
     `</div><button class="chip" id="optBtn" style="margin-left:6px">${ICON.filter.replace('class="i"','class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px"')}옵션${optCount()?' · '+optCount():''}</button></div>`;
-  h+=`<div class="chipsrow"><span class="lbl">TYPE</span><button class="chip ${!S.major?'on':''}" data-major="">전체</button>`+
+  h+=`<div class="chipsrow"><span class="lbl">분류</span><button class="chip ${!S.major?'on':''}" data-major="">전체</button>`+
     MAJOR_ORDER.filter(m=>mc[m]).map(m=>`<button class="chip ${S.major===m?'on':''}" data-major="${m}">${MAJOR[m]}<span class="n">${mc[m]}</span></button>`).join('')+`</div>`;
   if(S.major){
     const sc={}; base.filter(f=>f.m===S.major).forEach(f=>(f.sb||[]).forEach(s=>sc[s]=(sc[s]||0)+1));
@@ -402,15 +402,15 @@ function renderFilters(){
   }
   if(S.tab==='browse'){
     const eb=S.data.filter(f=>baseFilter(f,'era')); const ec={}; eb.forEach(f=>ec[f.e]=(ec[f.e]||0)+1);
-    h+=`<div class="chipsrow"><span class="lbl">ERA</span><button class="chip ${!S.era?'on':''}" data-era="">전체</button>`+ERAS.filter(e=>ec[e[0]]).map(e=>`<button class="chip ${S.era===e[0]?'on':''}" data-era="${e[0]}">${e[1]}<span class="n">${ec[e[0]]}</span></button>`).join('')+`</div>`;
+    h+=`<div class="chipsrow"><span class="lbl">시대</span><button class="chip ${!S.era?'on':''}" data-era="">전체</button>`+ERAS.filter(e=>ec[e[0]]).map(e=>`<button class="chip ${S.era===e[0]?'on':''}" data-era="${e[0]}">${e[1]}<span class="n">${ec[e[0]]}</span></button>`).join('')+`</div>`;
   }
   const wb=S.data.filter(f=>baseFilter(f,'wt')); const wc={l:0,h:0,m:0,v:0}; wb.forEach(f=>{ if(f.wl)wc.l++; if(f.wh)wc.h++; if((f.w||1)>=6)wc.m++; if(f.v)wc.v++; });
-  h+=`<div class="chipsrow"><span class="lbl">WEIGHT</span><button class="chip ${!S.wt?'on':''}" data-wt="">전체</button>`+[['l','가는 굵기 있음'],['h','굵은 굵기 있음'],['m','굵기 6개 이상'],['v','가변폰트']].map(([k,l])=>`<button class="chip ${S.wt===k?'on':''}" data-wt="${k}">${l}<span class="n">${wc[k]}</span></button>`).join('')+`</div>`;
+  h+=`<div class="chipsrow"><span class="lbl">굵기</span><button class="chip ${!S.wt?'on':''}" data-wt="">전체</button>`+[['l','가는 굵기 있음'],['h','굵은 굵기 있음'],['m','굵기 6개 이상'],['v','가변폰트']].map(([k,l])=>`<button class="chip ${S.wt===k?'on':''}" data-wt="${k}">${l}<span class="n">${wc[k]}</span></button>`).join('')+`</div>`;
   const db=S.data.filter(f=>baseFilter(f,'wd')); const dc={c:0,r:0,e:0}; db.forEach(f=>{ const w=String(f.wd||'r'); for(const k of 'cre') if(w.includes(k)) dc[k]++; });
-  h+=`<div class="chipsrow"><span class="lbl">WIDTH</span><button class="chip ${!S.wd?'on':''}" data-wd="">전체</button>`+[['c','좁은 (컨덴스드)'],['r','보통'],['e','넓은 (익스텐디드)']].map(([k,l])=>`<button class="chip ${S.wd===k?'on':''}" data-wd="${k}">${l}<span class="n">${dc[k]}</span></button>`).join('')+`</div>`;
+  h+=`<div class="chipsrow"><span class="lbl">너비</span><button class="chip ${!S.wd?'on':''}" data-wd="">전체</button>`+[['c','좁은 (컨덴스드)'],['r','보통'],['e','넓은 (익스텐디드)']].map(([k,l])=>`<button class="chip ${S.wd===k?'on':''}" data-wd="${k}">${l}<span class="n">${dc[k]}</span></button>`).join('')+`</div>`;
   const mb=S.data.filter(f=>baseFilter(f,'mood')); const moc={}; mb.forEach(f=>(f.mo||[]).forEach(m=>moc[m]=(moc[m]||0)+1));
   const moods=Object.keys(moc).filter(m=>moc[m]>=3).sort((a,b)=>moc[b]-moc[a]);
-  if(moods.length) h+=`<div class="chipsrow"><span class="lbl">MOOD</span><button class="chip ${!S.mood?'on':''}" data-mood="">전체</button>`+moods.map(m=>`<button class="chip ${S.mood===m?'on':''}" data-mood="${esc(m)}">${esc(m)}<span class="n">${moc[m]}</span></button>`).join('')+`</div>`;
+  if(moods.length) h+=`<div class="chipsrow"><span class="lbl">분위기</span><button class="chip ${!S.mood?'on':''}" data-mood="">전체</button>`+moods.map(m=>`<button class="chip ${S.mood===m?'on':''}" data-mood="${esc(m)}">${esc(m)}<span class="n">${moc[m]}</span></button>`).join('')+`</div>`;
   el.innerHTML=h;
 }
 function optCount(){ const o=S.opt; return ['ko','pv','vf','com'].filter(k=>o[k]).length + (o.lat?0:1); }

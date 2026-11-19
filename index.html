@@ -172,6 +172,7 @@ main { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:14px 16px calc(1
   .gdbs { max-width:calc(var(--fw) + 80px); }
 }
 /* TOOLS (2026-11-19) */
+html[data-nav] #tkBar { display:none !important; }
 #tkBar { max-width:var(--fw); margin:10px auto 0; padding:0 0 10px; } #tkBar button { background:#fff; } #tkBar button.on { background:var(--txt); color:#fff; } #tkBar .tkall { color:var(--mute); }
 .tkl { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .tkc { display:flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left; border:0; background:#fff; border-radius:18px; padding:16px 16px 15px; font:inherit; color:var(--txt); cursor:pointer; min-width:0; }
@@ -1007,6 +1008,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 /* 페이지 머리 (2026-11-20): 모든 메뉴 화면 같은 구조 = 제목 24px + 한 줄 설명 14px */
 #npg { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:18px 16px 0; }
 #npg.hide { display:none; }
+@media (max-width:1023px) { html[data-navc] #npg.subon { display:none; } }
 #npg h1 { margin:0; font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1.3; color:var(--txt); }
 #npg p { margin:6px 0 0; font-size:14px; font-weight:500; line-height:1.5; color:var(--mute); letter-spacing:-0.01em; }
 #npg p:empty { display:none; }
@@ -1111,10 +1113,14 @@ html[data-nav="t"] #nsub.has { display:flex; }
   #nfm .col { border-top:1px solid var(--line); padding-top:14px; }
   #nfm .col > b { font-size:20px; } #nfm .col > p { min-height:0; margin-bottom:6px; }
   /* 모바일 전체 메뉴 = 오른쪽에서 밀려 나오는 패널, 뒤 화면은 살짝 보이게 (2026-11-20) */
-  #nfm { display:block; left:auto; width:min(84vw, 380px); transform:translateX(100%); visibility:hidden; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; box-shadow:-8px 0 30px rgba(0,0,0,.08); overscroll-behavior:contain; }
+  #nfm { display:block; left:auto; width:min(74vw, 320px); transform:translateX(100%); visibility:hidden; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; box-shadow:-8px 0 30px rgba(0,0,0,.08); overscroll-behavior:contain; }
   #nfm.open { transform:none; visibility:visible; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
   #nfm .top { flex-wrap:wrap; gap:10px; } #nfm .top b { font-size:16px; } #nfm .fq { order:3; flex:1 0 100%; height:40px; }
-  #nfm .cols { padding:14px 16px 40px; }
+  #nfm .cols { padding:10px 20px 48px; gap:6px; }
+  #nfm .top { padding-left:20px; padding-right:16px; }
+  #nfm .col { padding-top:16px; padding-bottom:6px; }
+  #nfm .col > b { font-size:23px !important; margin-bottom:8px; }
+  #nfm .col button.lk { font-size:18px; padding:9px 0; line-height:1.4; }
   #nfb { position:fixed; inset:0; z-index:41; background:rgba(25,31,40,.38); opacity:0; visibility:hidden; transition:opacity .3s, visibility 0s linear .3s; }
   #nfb.open { opacity:1; visibility:visible; transition:opacity .3s, visibility 0s; }
 }
@@ -1420,7 +1426,7 @@ function setData(d) {
   d.events.forEach(function (e) { e.file = FM[e.f]; });
   d.events = d.events.filter(function (e) { return e.file; });
   d.events.sort(function (a, b) { return a.d === b.d ? (a.file.type === b.file.type ? (a.s - b.s) : (a.file.type === 'proj' ? -1 : 1)) : (a.d < b.d ? -1 : 1); });
-  d.todo = d.todo || []; d.wl = d.wl || []; d.rep = (d.rep || []).sort(function (a, b) { return a.d === b.d ? rid(a.r) - rid(b.r) : (a.d < b.d ? -1 : 1); }); d.alias = d.alias || {};
+  d.todo = d.todo || []; if (window.TD_PEND) d.todo.forEach(function (x) { if (x.id in TD_PEND) x.c = TD_PEND[x.id]; }); d.wl = d.wl || []; d.rep = (d.rep || []).sort(function (a, b) { return a.d === b.d ? rid(a.r) - rid(b.r) : (a.d < b.d ? -1 : 1); }); d.alias = d.alias || {};
   d.FM = FM; S.D = d;
 }
 function load() {
@@ -1881,16 +1887,16 @@ var TOOLS = [
     { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
     { k: 'cut', t: '절수 계산기', s: '완성 크기·전개도로 전지 걸이와 절수, 필요 전지 수', f: 'tools/proof/', pv: 'calc' },
     { k: 'die', t: '전개도', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
-    { k: 'impose', t: '터잡기 미리보기', e: 'IMPOSE', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
+    { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
-    { k: 'review', t: '인쇄 파일·사양서 검수', e: 'PREFLIGHT', s: 'PDF·AI 인쇄 전 검수, 사양서 검수', v: 'review' },
+    { k: 'review', t: '프리플라이트', s: 'PDF·AI 인쇄 전 검수, 사양서 검수', v: 'review' },
     { k: 'checklist', t: '디자인 사고방지 체크리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
   { g: '자료', i: [
     { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
     { k: 'pt', t: '팬톤 가이드', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
     { k: 'ref', t: '사양 용어 가이드', s: '용지·후가공·제본 용어와 결·책등 기준', f: 'tools/proof/', pv: 'ref' },
-    { k: 'logo', t: '로고', e: 'LOGO', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
-    { k: 'fonts', t: '폰트 아카이브', e: 'SPECIMEN', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' }] }
+    { k: 'logo', t: '로고', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
+    { k: 'fonts', t: '폰트', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' }] }
 ];
 var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
@@ -2117,19 +2123,21 @@ function tl(k) { return TOOL_LIST.filter(function (x) { return x.k === k; })[0] 
 var SPACES = [
   { k: 'home', t: '홈', d: '이번 주 마감, 오늘 할 일, 최근 프로젝트, 자주 쓰는 도구', home: 'start', ic: 'home', g: [] },
   { k: 'me', t: '개인', d: '할 일, 근태, 지출결의를 한곳에서', home: 'todo', ic: 'todo', g: [
-    { g: '개인', i: [{ k: 'todo', t: '할 일', s: 'TO DO LIST' }, { k: 'wl', t: '근태 작성', s: 'WORK LOG 출퇴근 · 휴가' }, { k: 'exp', t: '지출결의', s: 'EXPENSE 지출결의서 작성 · 목록' }] }] },
+    { g: '개인', i: [{ k: 'todo', t: '할 일', s: '오늘 · 이번 주 할 일과 팀 공지' }, { k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
     { g: '프로젝트', i: [{ k: 'pj', t: '프로젝트', s: '아티스트 · 연도로 찾기' }, { k: 'month', t: '일정', s: '모든 프로젝트 일정 달력' }] }] },
   { k: 'tool', t: '도구', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명', home: 'space:tool', ic: 'tool', g: [
-    { g: '도구', i: [{ k: 'review', t: '프리플라이트', s: 'PREFLIGHT 인쇄 파일 · 사양서 검수', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 },
+    { g: '도구', i: [{ k: 'review', t: '프리플라이트', s: '인쇄 파일 · 사양서 검수', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 },
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
   { k: 'lib', t: '자료실', d: '거래처 연락처, 로고, 폰트, 팬톤, 사양 용어', home: 'space:lib', ic: 'ref', g: [
-    { g: '자료실', i: [{ k: 'qk', t: '퀵', s: 'QUICK 거래처 · 담당자 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
+    { g: '자료실', i: [{ k: 'qk', t: '퀵', s: '거래처 · 담당자 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
   { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 사고방지 체크리스트', home: 'space:design', ic: 'pen', g: [
     { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더 및 파일 가이드라인' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '디자인 사고방지 체크리스트', tool: 1 }] }] },
   { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
     { g: '행정안내', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }] }] }
 ];
+// 2026-11-20: 메뉴 이름은 SPACES(실장님 확정)가 유일한 기준. 칩 · 카드 · 찾기 · 자주 쓰는 도구 모두 이 이름
+SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i.forEach(function (x) { if (typeof x === 'string') return; var t = tl(x.k); if (t.k) t.t = x.t; TOOL_SHORT[x.k] = x.t; }); }); });
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i = g.i.map(function (x) { if (typeof x !== 'string') { if (x.tool && !x.s) x.s = tl(x.k).s; return x; } var t = tl(x); return { k: x, t: t.t, s: t.s, tool: 1 }; }); }); });
 function spItems(sp) { var L = []; sp.g.forEach(function (g) { g.i.forEach(function (x) { L.push(x); }); }); return L; }
 var WS_TOOLS = { doc: 1, filename: 1, review: 1, spine: 1, cut: 1, die: 1, impose: 1 };
@@ -2342,7 +2350,7 @@ function pgInfo() {
 }
 function pgSync() {
   var e = navEl('npg', 'div', function (e) { $('#main').insertAdjacentElement('beforebegin', e); }), i = pgInfo();
-  e.classList.toggle('hide', !i); e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' : '';
+  e.classList.toggle('hide', !i); e.classList.toggle('subon', !!subHtml()); e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' : '';
 }
 function navSync() {
   document.documentElement.setAttribute('data-nav', NAV.s === 'c' ? 'w' : NAV.s);
@@ -3391,7 +3399,7 @@ function renderTodo() {
   var tp = ls.get('d4:tp') || ''; if (tp && T.indexOf(tp) < 0) tp = '';
   var R = tdRows(function (x) { return x.k === '데일리' && x.d >= rg[0] && x.d <= rg[1]; });
   var TPER = [['d', '일'], ['w', '주'], ['m', '월'], ['r', '기간']];
-  var segH = '<div class="aseg" id="tdSeg">' + TPER.map(function (o) { return '<button data-p="' + o[0] + '" class="' + (o[0] === p ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') +
+  var segH = '<div class="aseg sw" id="tdSeg">' + TPER.map(function (o) { return '<button data-p="' + o[0] + '" class="' + (o[0] === p ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') +
     (S.D.tdUrl ? '<a class="tdshi" href="' + esc(S.D.tdUrl) + '" target="_blank" rel="noopener" aria-label="TODO 시트 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></a>' : '') + '</div>';
   var h = p === 'r'
     ? '<div class="hm2 hm2a"><label class="hmt">' + rgTitle(rg[0], rg[1]) + '</label>' + segH + '</div><div class="rgrow">' + rgDw('tdF', rg[0], '시작일') + '<i>~</i>' + rgDw('tdT', rg[1], '종료일') + '</div>'
@@ -3411,7 +3419,8 @@ function renderTodo() {
       (S.tdEdit === n ? tdEditList(L) + '<div class="tdnewp">새 프로젝트 · 할 일 추가</div>' + tdAddRow('데일리', one ? S.tdd : TODAY, n) : '<div class="tdl">' + (one ? list(L) : byDate(L)) + '</div>' + (one ? tdAddRow('데일리', S.tdd, n) : '')) + '</div>';
   });
   var y0 = window.scrollY;
-  $('#main').innerHTML = ntHtml() + h; window.scrollTo(0, y0); bindTd(); bindNt();
+  var ntOn = tdRows(function (x) { return x.k === '공지' && !x.c; }).length;
+  $('#main').innerHTML = (ntOn ? ntHtml() : '') + h; window.scrollTo(0, y0); bindTd(); bindNt();
   $$('#tdSeg button').forEach(function (b) { b.onclick = function () { S.tdp = b.dataset.p; ls.set('d4:tdp', S.tdp); render(); }; });
   if ($('#tdSegD')) $('#tdSegD').onchange = function () { if (this.value) { S.tdd = this.value; render(); } };
   if ($('#tdmP')) { $('#tdmP').onclick = function () { S.tdd = dMove(p, S.tdd, -1); render(); }; $('#tdmN').onclick = function () { S.tdd = dMove(p, S.tdd, 1); render(); }; }
@@ -3447,6 +3456,7 @@ function tdMerge(res) {
   if (!res || !res.months) return false;
   Object.keys(res.months).forEach(function (k) { S.D.todo = S.D.todo.filter(function (x) { return String(x.id).split('|')[0] !== k; }).concat(res.months[k]); });
   S.D.todo = S.D.todo.filter(function (x) { return !x.tmp; });
+  Object.keys(TD_PEND).forEach(function (id) { var y = tdFind(id); if (y) y.c = TD_PEND[id]; });
   S.D.rep = S.D.todo.filter(function (x) { return x.k === '데일리'; }).map(function (x) { return { r: x.id, d: x.d, p: x.p, j: x.j, t: x.t, s: x.c ? '완료' : (tdWait(x) ? '대기' : '진행') }; })
     .sort(function (a, b) { return a.d === b.d ? rid(a.r) - rid(b.r) : (a.d < b.d ? -1 : 1); });
   saveCache(); render(); return true;
@@ -3463,16 +3473,35 @@ function tdRefocus() {
   if (w && (!document.activeElement || document.activeElement === document.body)) w.querySelector('.tdi').focus({ preventScroll: true });
 }
 function tdFind(id) { return (S.D.todo || []).filter(function (x) { return x.id === id; })[0]; }
+// 2026-11-20 체크 반응 개선: 누르면 바로 체크 표시, 저장은 뒤에서.
+// 저장 중에 다른 줄을 눌러도 먼저 온 서버 응답이 화면을 되돌리지 않게 '보내는 중' 상태를 기억해 다시 입힘.
+// 같은 줄을 저장 중에 또 누르면 마지막 상태로 한 번 더 저장. 실패하면 되돌리고 알림.
+var TD_PEND = {}, TD_SEND = {};
+function tdPaint(id, c) {
+  $$('[data-tdrow="' + id + '"]').forEach(function (el) { el.classList.toggle('done', c); });
+  var r = (S.D.rep || []).filter(function (y) { return y.r === id; })[0], x = tdFind(id); if (r && x) r.s = c ? '완료' : (tdWait(x) ? '대기' : '진행');
+}
 function tdToggle(id) {
-  var x = tdFind(id); if (!x || x.tmp || x.busy) return;
-  x.c = !x.c; x.busy = 1;
+  var x = tdFind(id); if (!x || x.tmp) return;
+  x.c = !x.c;
   var nw = new Date(); x.ct = x.c ? nw.getFullYear() + '-' + pad(nw.getMonth() + 1) + '-' + pad(nw.getDate()) + ' ' + pad(nw.getHours()) + ':' + pad(nw.getMinutes()) : '';
-  var paint = function () { $$('[data-tdrow="' + id + '"]').forEach(function (el) { el.classList.toggle('done', x.c); }); var r = (S.D.rep || []).filter(function (y) { return y.r === id; })[0]; if (r) r.s = x.c ? '완료' : (tdWait(x) ? '대기' : '진행'); };
-  paint();
-  call('appTodoEdit', S.pin, { id: x.id, old: { d: x.d, p: x.p, t: x.t }, c: x.c })
-    .then(function (res) { if (!tdMerge(res)) saveCache(); })
-    .catch(function (e) { x.c = !x.c; paint(); toast(errMsg(e)); })
-    .then(function () { delete x.busy; if (S.view === 'todo' || S.view === 'home') render(); });
+  tdPaint(id, x.c); TD_PEND[id] = x.c;
+  if (!TD_SEND[id]) tdSend(id);
+}
+function tdSend(id) {
+  var x = tdFind(id); if (!x) { delete TD_PEND[id]; return; }
+  var want = TD_PEND[id]; TD_SEND[id] = 1;
+  call('appTodoEdit', S.pin, { id: x.id, old: { d: x.d, p: x.p, t: x.t }, c: want })
+    .then(function (res) {
+      delete TD_SEND[id]; if (TD_PEND[id] === want) delete TD_PEND[id];
+      if (!tdMerge(res)) saveCache();
+      if (id in TD_PEND) tdSend(id);
+    })
+    .catch(function (e) {
+      delete TD_SEND[id]; delete TD_PEND[id];
+      var y = tdFind(id); if (y) { y.c = !want; tdPaint(id, y.c); }
+      toast(errMsg(e));
+    });
 }
 // 업무보고(데일리) 체크도 같은 시트를 고치도록
 toggleDone = function (r) {
