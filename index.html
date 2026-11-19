@@ -2077,10 +2077,10 @@ var SPACES = [
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
   { k: 'lib', t: '자료실', d: '거래처 연락처, 로고, 폰트, 팬톤, 사양 용어', home: 'space:lib', ic: 'ref', g: [
     { g: '자료실', i: [{ k: 'qk', t: '퀵', s: 'QUICK 거래처 · 담당자 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
-  { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
-    { g: '행정안내', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }] }] },
   { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 사고방지 체크리스트', home: 'space:design', ic: 'pen', g: [
-    { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더 및 파일 가이드라인' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '디자인 사고방지 체크리스트', tool: 1 }] }] }
+    { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더 및 파일 가이드라인' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '디자인 사고방지 체크리스트', tool: 1 }] }] },
+  { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
+    { g: '행정안내', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }] }] }
 ];
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i = g.i.map(function (x) { if (typeof x !== 'string') { if (x.tool && !x.s) x.s = tl(x.k).s; return x; } var t = tl(x); return { k: x, t: t.t, s: t.s, tool: 1 }; }); }); });
 function spItems(sp) { var L = []; sp.g.forEach(function (g) { g.i.forEach(function (x) { L.push(x); }); }); return L; }
