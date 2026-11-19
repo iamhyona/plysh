@@ -920,7 +920,10 @@ html[data-nav] #nav, html[data-nav] #tkBar { display:none !important; }
 #nfs { display:none; align-items:center; gap:8px; height:38px; border:0; background:#fff; border-radius:12px; padding:0 12px; color:var(--mute); font-size:13.5px; text-align:left; min-width:0; flex:1; max-width:320px; margin-left:auto; margin-right:10px; }
 #nfs svg { width:16px; height:16px; flex:none; } #nfs span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #nfs kbd { font-family:inherit; font-size:11px; background:var(--bg); border-radius:6px; padding:2px 7px; }
-html[data-nav="t"] #nfs { display:flex; }
+html[data-nav="t"] #nfs, html[data-navc] #nfs { display:flex; }
+html[data-navc] #nsd .sfs { display:none; }
+@media (min-width:1024px) { html[data-navc] #nfs { max-width:360px; } }
+@media (max-width:1023px) { html[data-navc] #nfs { display:none; } }
 html[data-nav] .hd .hr { flex:none; }
 /* 공간 탭 (t) */
 #nsp { display:none; gap:4px; margin-left:22px; }
@@ -1006,7 +1009,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #nsd .sbh button { border:0; background:none; padding:0; font-size:18px; font-weight:800; letter-spacing:.06em; color:var(--txt); }
 #nsd .sfs { display:flex; align-items:center; gap:8px; width:100%; height:38px; border:0; background:var(--bg); border-radius:10px; padding:0 11px; color:var(--mute); font-size:13.5px; margin-bottom:12px; }
 #nsd .sfs svg { width:15px; height:15px; } #nsd .sfs kbd { margin-left:auto; font-family:inherit; font-size:11px; background:#fff; border-radius:6px; padding:1px 6px; }
-#nsd .ss { display:flex; align-items:center; gap:10px; width:100%; border:0; background:none; text-align:left; padding:10px; border-radius:10px; font-size:15px; font-weight:700; color:var(--sub); margin-top:2px; }
+#nsd .ss { display:flex; align-items:center; gap:10px; width:100%; border:0; background:none; text-align:left; padding:9px 10px; border-radius:10px; font-size:15px; font-weight:700; color:var(--sub); margin-top:2px; }
+#nsd .ss.on:not(.ex) { background:var(--txt); color:#fff; } #nsd .ss.on:not(.ex) .nvi { color:#fff; }
 #nsd .ss .nvi { width:18px; height:18px; color:var(--mute); }
 #nsd .ss:hover { background:var(--bg); }
 #nsd .ss.on { color:var(--txt); } #nsd .ss.on .nvi { color:var(--txt); }
@@ -1066,7 +1070,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #nfm .top b { font-size:18px; font-weight:800; letter-spacing:.06em; margin-right:auto; }
 #nfm .fq { display:flex; align-items:center; gap:8px; flex:1; max-width:420px; height:42px; border:0; background:var(--bg); border-radius:12px; padding:0 14px; color:var(--mute); font-size:14px; text-align:left; }
 #nfm .fq svg { width:16px; height:16px; }
-#nfm .cols { max-width:calc(var(--fw) + 80px); margin:0 auto; padding:34px 40px 60px; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:28px; }
+#nfm .cols { max-width:calc(var(--fw) + 80px); margin:0 auto; padding:34px 40px 60px; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:34px 28px; }
 #nfm .col > b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.03em; margin-bottom:4px; cursor:pointer; }
 #nfm .col > p { margin:0 0 16px; font-size:12.5px; color:var(--mute); line-height:1.5; min-height:38px; }
 #nfm .col h4 { margin:14px 0 4px; font-size:11.5px; color:var(--faint); font-weight:700; letter-spacing:.04em; }
@@ -2026,19 +2030,20 @@ function renderView() {
   toolBar(); navSync(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, ws: renderWs, refs: renderRefs })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, ws: renderWs, refs: renderRefs, space: function () { renderSpace(S.spk || 'write'); } })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
 // 정보 구조 시안 (2026-11-19 2차) ─ 오늘 · 프로젝트 · 도구 · 자료 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
 // NAV.s: 't' 위 메뉴 + 펼침 판(기본) · 'w' 왼쪽 메뉴
-var NAV = { s: ls.get('d4:nav') === 'w' ? 'w' : 't', pi: 0, pq: '', hv: null };
+var NAV = { s: ['t', 'w', 'c'].indexOf(ls.get('d4:nav')) > -1 ? ls.get('d4:nav') : 'c', pi: 0, pq: '', hv: null };
 try { NAV.fav = JSON.parse(ls.get('d4:navfav') || 'null'); } catch (e) {}
 if (!Array.isArray(NAV.fav)) NAV.fav = ['formly', 'review', 'spine', 'filename', 'cut'];
 try { NAV.rec = JSON.parse(ls.get('d4:wsrec') || '[]'); } catch (e) { NAV.rec = []; }
 var NAV_IC = {
+  home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   today: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   proj: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
@@ -2057,20 +2062,24 @@ function navIc(k) { return '<svg class="nvi" viewBox="0 0 24 24" fill="none" str
 function tl(k) { return TOOL_LIST.filter(function (x) { return x.k === k; })[0] || {}; }
 // 네 공간: 메뉴 하나 = { k(뷰나 도구 키), t, s(설명) }
 var SPACES = [
-  { k: 'today', t: '오늘', d: '내 할 일, 이번 주 마감, 근무와 경비를 한 화면에서', home: 'start', ic: 'today', g: [
-    { g: '오늘', i: [{ k: 'start', t: '한눈에', s: '할 일 · 마감 · 최근 프로젝트' }, { k: 'todo', t: '할 일', s: 'TO DO LIST' }] },
-    { g: '기록', i: [{ k: 'wl', t: '근무', s: 'WORK LOG 출퇴근·휴가' }, { k: 'exp', t: '경비', s: 'EXPENSE 영수증·정산' }] }] },
+  { k: 'home', t: '홈', d: '이번 주 마감, 오늘 할 일, 최근 프로젝트, 자주 쓰는 도구', home: 'start', ic: 'home', g: [] },
+  { k: 'work', t: '업무', d: '할 일, 근무 기록, 거래처 연락처, 지출결의서', home: 'todo', ic: 'todo', g: [
+    { g: '업무', i: [{ k: 'todo', t: 'TO DO LIST', s: '오늘 · 이번 주 할 일' }, { k: 'wl', t: 'WORK LOG', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'qk', t: 'QUICK', s: '거래처 · 담당자 연락처' }, { k: 'exp', t: 'EXPENSE', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
-    { g: '보기', i: [{ k: 'pj', t: '프로젝트 목록', s: '아티스트·연도로 찾기' }, { k: 'month', t: '달력', s: '모든 프로젝트 일정' }] }] },
-  { k: 'tool', t: '도구', d: '사양서 작성, 인쇄 계산, 파일 검수. 프로젝트 안에서도 바로 열려요', home: 'tools', ic: 'tool', g: [
-    { g: '작성', i: ['doc', 'formly', 'filename'] }, { g: '계산', i: ['spine', 'cut', 'die', 'impose'] }, { g: '검수', i: ['review', 'checklist'] }] },
-  { k: 'ref', t: '자료', d: '연락처, 로고, 폰트, 인쇄 기준처럼 찾아보는 것들', home: 'refs', ic: 'ref', g: [
-    { g: '찾아보기', i: [{ k: 'qk', t: '연락처', s: 'QUICK 거래처·담당자' }, 'logo', 'fonts'] }, { g: '인쇄 기준', i: ['items', 'pt', 'ref'] }, { g: '안내', i: [{ k: 'guide', t: '가이드', s: 'GUIDE 업무 규칙 문서' }] }] }
+    { g: '보기', i: [{ k: 'pj', t: '프로젝트 목록', s: '아티스트 · 연도로 찾기' }, { k: 'month', t: '달력', s: '모든 프로젝트 일정' }] }] },
+  { k: 'write', t: '작성', d: '사양서와 라벨 문구, 파일명을 규칙대로 만들어요', home: 'space:write', ic: 'doc', g: [
+    { g: '작성', i: ['doc', 'formly', 'filename'] }] },
+  { k: 'print', t: '인쇄', d: '책등 · 절수 · 전개도 계산과 지류 · 팬톤 · 용어 기준', home: 'space:print', ic: 'calc', g: [
+    { g: '계산', i: ['spine', 'cut', 'die', 'impose'] }, { g: '인쇄 기준', i: ['items', 'pt', 'ref'] }] },
+  { k: 'check', t: '검수', d: '인쇄 파일 · 사양서 검수와 컨펌 전 자가 점검', home: 'space:check', ic: 'chk', g: [
+    { g: '검수', i: ['review', 'checklist'] }] },
+  { k: 'ref', t: '자료', d: '로고, 폰트, 업무 가이드 문서', home: 'space:ref', ic: 'ref', g: [
+    { g: '자료', i: ['logo', 'fonts', { k: 'guide', t: 'GUIDE', s: '업무 규칙 · 가이드 문서' }] }] }
 ];
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i = g.i.map(function (x) { if (typeof x !== 'string') return x; var t = tl(x); return { k: x, t: t.t, s: t.s, tool: 1 }; }); }); });
 function spItems(sp) { var L = []; sp.g.forEach(function (g) { g.i.forEach(function (x) { L.push(x); }); }); return L; }
 var WS_TOOLS = { doc: 1, filename: 1, review: 1, spine: 1, cut: 1, die: 1, impose: 1 };
-function navCur() { var v = S.view; if (v === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === v; })[0]; return t ? t.k : v; }
+function navCur() { var v = S.view; if (v === 'space') return 'space:' + S.spk; if (v === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === v; })[0]; return t ? t.k : v; }
 function inWs() { if (!S.ws) return false; var c = navCur(); return S.view === 'ws' || (S.view === 'spec' && S.sp && S.sp === S.ws.sp) || !!WS_TOOLS[c]; }
 function spOf() {
   if (inWs()) return 'proj';
@@ -2081,6 +2090,8 @@ function spOf() {
 function navGo(k) {
   navClose(); S.ws = null;
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
+  if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
+  if (k === 'tools') { S.spk = 'write'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   S.view = k; if (k !== 'refs' && k !== 'start') ls.set('d4:view', k); window.scrollTo(0, 0); render();
 }
 function navClose() { ['#npl', '#nmg', '#nbd', '#nfm'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
@@ -2145,7 +2156,7 @@ function renderStart() {
     '<div class="wsc"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
-    '<div class="wsc"><h3>자주 쓰는 도구<button type="button" data-ng="tools">도구 전체</button></h3><div class="wsq">' + NAV.fav.map(function (k) { var t = tl(k); return t.k ? '<button type="button" data-ng="' + k + '">' + navIc(TOOLS.filter(function (g) { return g.i.indexOf(t) > -1; })[0].g === '계산' ? 'calc' : t.k === 'review' || t.k === 'checklist' ? 'chk' : 'doc') + esc(TOOL_SHORT[k] || t.t) + '</button>' : ''; }).join('') + '</div></div></div>';
+    '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + NAV.fav.map(function (k) { var t = tl(k); return t.k ? '<button type="button" data-ng="' + k + '">' + navIc(TOOLS.filter(function (g) { return g.i.indexOf(t) > -1; })[0].g === '계산' ? 'calc' : t.k === 'review' || t.k === 'checklist' ? 'chk' : 'doc') + esc(TOOL_SHORT[k] || t.t) + '</button>' : ''; }).join('') + '</div></div></div>';
   $('#main').innerHTML = h; bindGo($('#main'));
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
@@ -2156,7 +2167,7 @@ function renderSpace(k) {
   $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return '<h4>' + esc(g.g) + '</h4><div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') + '</div>';
   bindGo($('#main'));
 }
-function renderToolsHome() { renderSpace('tool'); }
+function renderToolsHome() { renderSpace('write'); }
 function renderRefs() { renderSpace('ref'); }
 
 /* ── 머리줄 · 펼침 판 · 전체 메뉴 · 왼쪽 메뉴 ── */
@@ -2169,6 +2180,7 @@ function megaHtml(sp) {
 function megaOpen(k) {
   if (window.innerWidth < 1024) return;
   var sp = SPACES.filter(function (s) { return s.k === k; })[0], m = $('#nmg'), top = $('header').getBoundingClientRect().bottom;
+  if (!sp.g.length) return navClose();
   m.style.top = top + 'px'; $('#nbd').style.top = top + 'px';
   m.innerHTML = megaHtml(sp); bindGo(m); m.classList.add('open'); $('#nbd').classList.add('open'); NAV.hv = k;
   $$('#nsp button').forEach(function (b) { b.classList.toggle('hv', b.dataset.sp === k); });
@@ -2184,7 +2196,7 @@ function sideHtml() {
   var cur = navCur(), sk = spOf();
   return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
     SPACES.map(function (sp) {
-      var on = sp.k === sk, h = '<button type="button" class="ss' + (on ? ' on' : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + '</button>';
+      var on = sp.k === sk, h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + '</button>';
       if (!on) return h;
       h += '<div class="sx">';
       if (sp.k === 'proj') {
@@ -2196,18 +2208,19 @@ function sideHtml() {
 }
 function subHtml() {
   var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur();
-  if (sk === 'proj') return '';
+  if (sk === 'proj' || !sp.g.length) return '';
   return sp.g.map(function (g) { return (sp.g.length > 1 ? '<i>' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" data-ng="' + x.k + '" class="' + (x.k === cur ? 'on' : '') + '">' + esc(TOOL_SHORT[x.k] || x.t) + '</button>'; }).join(''); }).join('');
 }
 function crumbHtml() {
   var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur(), it = spItems(sp).filter(function (x) { return x.k === cur; })[0];
   var sep = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">' + NAV_IC.cv + '</svg>';
   if (inWs()) return sp.t + sep + '<b>' + esc(S.ws.name) + '</b>';
-  if (cur === sp.home && cur !== 'pj') return '<b>' + esc(sp.t) + '</b>';
+  if ((cur === sp.home || S.view === 'space') && cur !== 'pj') return '<b>' + esc(sp.t) + '</b>';
   return esc(sp.t) + sep + '<b>' + esc(it ? it.t : cur === 'spec' ? '사양서' : sp.t) + '</b>';
 }
 function navSync() {
-  document.documentElement.setAttribute('data-nav', NAV.s);
+  document.documentElement.setAttribute('data-nav', NAV.s === 'c' ? 'w' : NAV.s);
+  document.documentElement.toggleAttribute('data-navc', NAV.s === 'c');
   var hd = $('header .hd'), hdr = $('header'), sk = spOf();
   navEl('nsp', 'div', function (e) { $('#brand').insertAdjacentElement('afterend', e); });
   $('#nsp').innerHTML = SPACES.map(function (sp) { return '<button type="button" data-sp="' + sp.k + '" class="' + (sp.k === sk ? 'on' : '') + '">' + esc(sp.t) + '</button>'; }).join('');
@@ -2220,7 +2233,7 @@ function navSync() {
   var cr = navEl('ncr', 'div', function (e) { $('#brand').insertAdjacentElement('afterend', e); }); cr.innerHTML = crumbHtml();
   navEl('nfs', 'button', function (e) { e.type = 'button'; hd.insertBefore(e, $('.hr', hd)); e.onclick = function () { navPal(); }; }, navIc('search') + '<span>프로젝트 · 도구 · 연락처 찾기</span><kbd>⌘K</kbd>');
   navEl('nhm', 'button', function (e) { e.type = 'button'; e.className = 'ib'; e.setAttribute('aria-label', '전체 메뉴'); $('.hr', hd).appendChild(e); e.onclick = fullMenu; }, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' + NAV_IC.menu + '</svg>');
-  $('#nhm').style.display = NAV.s === 'w' && window.innerWidth >= 1024 ? 'none' : '';
+  $('#nhm').style.display = NAV.s !== 't' && window.innerWidth >= 1024 ? 'none' : '';
   var ws = navEl('nws', 'div', function (e) { hdr.appendChild(e); });
   ws.classList.toggle('on', inWs()); ws.innerHTML = inWs() ? wsBar() : '';
   bindGo(ws); $$('[data-wt]', ws).forEach(function (b) { b.onclick = function () { wsTab(b.dataset.wt); }; });
@@ -2230,13 +2243,13 @@ function navSync() {
   navEl('nmg', 'div', function (e) { document.body.appendChild(e); e.onmouseleave = function () { navClose(); }; });
   navEl('nbd', 'div', function (e) { document.body.appendChild(e); e.onmouseenter = navClose; e.onclick = navClose; });
   hdr.onmouseleave = function (ev) { if (NAV.hv && !(ev.relatedTarget && $('#nmg').contains(ev.relatedTarget))) navClose(); };
-  if (NAV.s === 'w') {
+  if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
     sd.innerHTML = sideHtml(); bindGo(sd); $('.sfs', sd).onclick = function () { navPal(); };
-    var T = [['today', 'today', '오늘'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['ref', 'ref', '자료'], ['all', 'menu', '전체']];
+    var T = [['home', 'home', '홈'], ['work', 'todo', '업무'], ['proj', 'proj', '프로젝트'], ['find', 'search', '찾기'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
-    $$('#ntb button').forEach(function (b) { b.onclick = function () { if (b.dataset.nt === 'all') return fullMenu(); navGo(SPACES.filter(function (s) { return s.k === b.dataset.nt; })[0].home); }; });
+    $$('#ntb button').forEach(function (b) { b.onclick = function () { if (b.dataset.nt === 'all') return fullMenu(); if (b.dataset.nt === 'find') return navPal(); navGo(SPACES.filter(function (s) { return s.k === b.dataset.nt; })[0].home); }; });
   }
   $('#brand').onclick = function () { navGo('start'); };
 }
