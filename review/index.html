@@ -197,6 +197,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   #sheet .s-err { color:#dc2626; font-weight:800; } #sheet .s-warn { color:#b45309; font-weight:800; } #sheet .s-ok { color:#16a34a; font-weight:800; } #sheet .s-na { color:#8b95a1; }
   #sheet .thumbs { display:flex; flex-wrap:wrap; gap:6px; } #sheet .thumbs { margin-top:6px; } #sheet .thumbs figure { margin:0; width:31%; break-inside:avoid; } #sheet .thumbs img { width:100%; border:1px solid #d1d6db; } #sheet figcaption { font-size:10px; color:#4e5968; }
 }
+@media print { body.spking .wrap > *:not(#specRep), body.spking #sheet, body.spking .ov { display:none !important; } body.spking #specRep .spk { padding:0; border-radius:0; } }
 @media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
 </style>
 </head>
@@ -250,7 +251,10 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
     <div class="sm" data-m="file" hidden><button type="button" class="ib" id="specAttB" style="margin-top:10px">파일·이미지 고르기</button><input type="file" id="specFile" accept=".pdf,.txt,.csv,image/*" multiple hidden><div id="specAtt" class="row" style="margin-top:8px"></div></div>
     <div id="specSum" class="note"></div>
     <div id="specView"></div>
+    <div class="row" style="margin-top:12px"><button type="button" class="ib" id="specChkGo" disabled>이 사양서 검수</button><span class="small mute" id="specChkNote"></span></div>
   </div>
+
+  <div id="specRep" hidden></div>
 
   <div class="card noprint" id="setCard">
     <h3 class="sh">검수 기준 확인</h3>
@@ -290,6 +294,7 @@ var LIBS = {
 <script src="korean-lunar-calendar.min.js"></script>
 <script src="text.js?v=20261119a"></script>
 <script src="app.js?v=20261119a"></script>
-<script src="batch.js?v=20261119a"></script>
+<script src="spec.js?v=20261119s"></script>
+<script src="batch.js?v=20261119s"></script>
 </body>
 </html>
