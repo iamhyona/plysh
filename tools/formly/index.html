@@ -292,7 +292,7 @@ html.emb .lang-pill { height:34px; font-size:13px; flex:none; padding:0 14px; }
 .lbtbl .lbtx { color:var(--text2); line-height:1.5; word-break:keep-all; }
 .lblangs { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 12px; }
 .lblangs label { display:inline-flex; align-items:center; gap:5px; height:32px; padding:0 12px; border-radius:999px; background:var(--surface2); font-size:13px; cursor:pointer; }
-@media (min-width:1024px) { html.emb .lbwrap { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; align-items:start; } html.emb .lbwrap .lbcard { margin-top:0; } }
+@media (min-width:760px) { html.emb .lbwrap { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; align-items:start; } html.emb .lbwrap .lbcard { margin-top:0; } }
 </style>
 </head>
 <body>
@@ -2410,11 +2410,11 @@ function tabFields(p){
     +renderLabelInfoSection(p);
 }
 function tabFieldsIO(p){
-  if(!document.documentElement.classList.contains('emb')||window.innerWidth<1024) return tabFields(p);
+  if(!document.documentElement.classList.contains('emb')||window.innerWidth<760) return tabFields(p);
   return '<div class="fxio"><div class="fxio-l">'+tabFields(p)+'</div><div class="fxio-r"><div class="lbcard" id="fxLive">'+fxLiveBody(p)+'</div></div></div>';
 }
-window.addEventListener('resize',function(){var w=window.innerWidth>=1024;if(w!==window._fxW){window._fxW=w;if(S.tab==='fields')renderContent();}});
-window._fxW=window.innerWidth>=1024;
+window.addEventListener('resize',function(){var w=window.innerWidth>=760;if(w!==window._fxW){window._fxW=w;if(S.tab==='fields')renderContent();}});
+window._fxW=window.innerWidth>=760;
 
 function _da(fid){
   return ' id="fc_'+fid+'" draggable="true"'

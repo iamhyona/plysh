@@ -1003,14 +1003,36 @@ html[data-nav="t"] #nsub.has { display:flex; }
   html[data-nav="w"] #ncr { display:flex; }
 }
 #ncr { display:none; flex:1; min-width:0; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--mute); white-space:nowrap; overflow:hidden; }
-#ncr b { color:var(--txt); font-size:18px; font-weight:800; letter-spacing:-0.02em; overflow:hidden; text-overflow:ellipsis; }
+#ncr b { color:var(--sub); font-size:13px; font-weight:700; overflow:hidden; text-overflow:ellipsis; }
+/* 페이지 머리 (2026-11-20): 모든 메뉴 화면 같은 구조 = 제목 24px + 한 줄 설명 14px */
+#npg { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:18px 16px 0; }
+#npg.hide { display:none; }
+#npg h1 { margin:0; font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1.3; color:var(--txt); }
+#npg p { margin:6px 0 0; font-size:14px; font-weight:500; line-height:1.5; color:var(--mute); letter-spacing:-0.01em; }
+#npg p:empty { display:none; }
+@media (min-width:1024px) { #npg { max-width:calc(var(--fw) + 80px); padding:26px 40px 2px; } }
 #ncr svg { width:12px; height:12px; flex:none; color:var(--faint); }
 #nsd .sbh { display:flex; align-items:center; padding:4px 10px 14px; }
 #nsd .sbh button { border:0; background:none; padding:0; font-size:18px; font-weight:800; letter-spacing:.06em; color:var(--txt); }
 #nsd .sfs { display:flex; align-items:center; gap:8px; width:100%; height:38px; border:0; background:var(--bg); border-radius:10px; padding:0 11px; color:var(--mute); font-size:13.5px; margin-bottom:12px; }
 #nsd .sfs svg { width:15px; height:15px; } #nsd .sfs kbd { margin-left:auto; font-family:inherit; font-size:11px; background:#fff; border-radius:6px; padding:1px 6px; }
 #nsd .ss { display:flex; align-items:center; gap:10px; width:100%; border:0; background:none; text-align:left; padding:9px 10px; border-radius:10px; font-size:15px; font-weight:700; color:var(--sub); margin-top:2px; }
-.gdin { background:#fff; border-radius:16px; overflow:hidden; } .gdin iframe { display:block; width:100%; min-height:70vh; border:0; }
+.gdin { background:#fff; border-radius:16px; overflow:hidden; min-width:0; } .gdin iframe { display:block; width:100%; min-height:70vh; border:0; }
+.gdl { display:grid; grid-template-columns:minmax(0, 1fr); gap:12px; align-items:start; }
+.gdtoc { display:none; }
+.gdl.has .gdtoc { display:flex; gap:6px; position:sticky; z-index:5; order:-1; overflow-x:auto; scrollbar-width:none; background:var(--bg); padding:8px 0; margin:0 -4px; }
+.gdtoc::-webkit-scrollbar { display:none; }
+.gdtoc .tt { display:none; }
+.gdtoc a { flex:none; display:block; border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 13px; font-size:13px; font-weight:600; line-height:1.35; color:var(--sub); cursor:pointer; white-space:nowrap; }
+.gdtoc a.on { background:var(--txt); border-color:var(--txt); color:#fff; }
+@media (min-width:1024px) {
+  .gdl.has { grid-template-columns:minmax(0, 1fr) 184px; gap:20px; }
+  .gdl.has .gdtoc { order:0; display:block; padding:4px 0; margin:0; max-height:calc(100vh - 120px); overflow:auto; background:none; }
+  .gdtoc .tt { display:block; font-size:12px; font-weight:700; color:var(--mute); margin:2px 12px 8px; }
+  .gdtoc a { border:0; background:none; border-radius:10px; padding:8px 12px; font-size:13.5px; white-space:normal; }
+  .gdtoc a:hover { background:rgba(0,0,0,.04); }
+  .gdtoc a.on { background:#fff; color:var(--txt); }
+}
 .gdbk { display:inline-flex; align-items:center; gap:4px; border:0; background:#fff; border-radius:999px; padding:7px 12px 7px 8px; font-size:12.5px; font-weight:600; color:var(--sub); margin-bottom:10px; }
 #nsd .ss.on:not(.ex) { background:var(--txt); color:#fff; } #nsd .ss.on:not(.ex) .nvi { color:#fff; }
 #nsd .ss .nvi { width:18px; height:18px; color:var(--mute); }
@@ -1358,7 +1380,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261119tl2';
+var APP_VER = '20261120nv1';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1894,7 +1916,7 @@ function renderTk() {
   var f = $('#tkWrap iframe[data-f="' + t.f + '"]');
   if (!f) {
     f = document.createElement('iframe'); f.dataset.f = t.f; f.title = t.t;
-    f.onload = function () { f._ok = 1; tkGo(f); };
+    f.onload = function () { f._ok = 1; embTidy(f); tkGo(f); };
     f.src = t.f + '?v=' + APP_VER + (t.pv ? '#' + t.pv : ''); $('#tkWrap').appendChild(f);
   }
   f._pv = t.pv || ''; if (f._ok) tkGo(f);
@@ -2017,19 +2039,32 @@ function bindSpine() {
   function bindRes() { $$('[data-scpy]').forEach(function (b) { b.onclick = function () { var t = b.dataset.scpy; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('복사했어요 · 사양서에 붙여넣기'); }, function () { prompt('복사해서 쓰세요', t); }); }; }); }
 }
 // 검수 메뉴 (2026-11-18): 인쇄 전 PDF·.ai 검수. 화면 높이에 맞춘 iframe 으로 review/ 를 띄운다
-function rvSize() { var h = document.querySelector('header'); var hh = (window.innerHeight - (h ? h.offsetHeight : 0)) + 'px'; ['#rvF', '#imF'].forEach(function (k) { var f = $(k); if (f) f.style.height = hh; }); $$('#tkWrap iframe').forEach(function (f) { f.style.height = hh; }); }
+function rvSize() { var h = document.querySelector('header'); var pg = document.getElementById('npg'), hh = (window.innerHeight - (h ? h.offsetHeight : 0) - (pg && !pg.classList.contains('hide') ? pg.offsetHeight : 0)) + 'px'; ['#rvF', '#imF'].forEach(function (k) { var f = $(k); if (f) f.style.height = hh; }); $$('#tkWrap iframe').forEach(function (f) { f.style.height = hh; }); }
+var EMB_TIDY = '/* PLYSH 안에서 열림: 제목은 PLYSH 페이지 머리가 맡음 */'
+  + '.wrap > h2.noprint:first-child, .wrap > div.noprint:first-child > h2, .wrap > div.noprint:first-child > .lead { display:none !important; }'
+  + '.phd:not(:has(.bk)) { display:none !important; } .hbar > .logo { display:none !important; }'
+  + 'html, body { font-family:"Pretendard Variable", Pretendard, -apple-system, sans-serif; }';
+var GD_TIDY = '.toc, header .eyebrow, header h1, header .lede { display:none !important; } header { padding-bottom:20px !important; gap:6px !important; }'
+  + '[data-toc].has-toc { display:block !important; max-width:none !important; }'
+  + '.wrap { max-width:none !important; padding:24px 36px 56px !important; }'
+  + 'body, p, li, .lede, ul.rules li, .check li { font-size:15px !important; line-height:1.65 !important; }'
+  + 'h1 { font-size:24px !important; } h2 { font-size:20px !important; letter-spacing:-0.03em !important; } h2 .n { font-size:13px !important; line-height:inherit !important; } h3 { font-size:16.5px !important; margin-top:20px !important; }'
+  + 'section { padding-block:28px !important; } table, td, th { font-size:14px !important; } .meta { font-size:13px !important; }'
+  + '.steps > div { font-size:14px !important; } .steps > div b { font-size:15.5px !important; } .warn, .gate { font-size:14.5px !important; } .chip b { font-size:20px !important; } .flow span.s { font-size:13.5px !important; }'
+  + '@media (max-width:640px) { .wrap { padding:18px 18px 40px !important; } }';
+function embTidy(f, css) { try { var d = f.contentDocument; if (!d || d.getElementById('plyTidy')) return; var st = d.createElement('style'); st.id = 'plyTidy'; st.textContent = css || EMB_TIDY; (d.head || d.documentElement).appendChild(st); } catch (e) {} }
 function renderReview() {
-  var f = $('#rvF'); if (!f.getAttribute('src')) f.setAttribute('src', 'review/?v=' + APP_VER);
+  var f = $('#rvF'); if (!f.getAttribute('src')) { f.onload = function () { embTidy(f); }; f.setAttribute('src', 'review/?v=' + APP_VER); }
   rvSize(); window.scrollTo(0, 0);
 }
 function renderImpose() {
-  var f = $('#imF'); if (!f.getAttribute('src')) f.setAttribute('src', 'impose/?v=' + APP_VER);
+  var f = $('#imF'); if (!f.getAttribute('src')) { f.onload = function () { embTidy(f); }; f.setAttribute('src', 'impose/?v=' + APP_VER); }
   rvSize(); window.scrollTo(0, 0);
 }
 window.addEventListener('resize', function () { if (S.view === 'review' || S.view === 'impose' || S.view === 'tk') rvSize(); });
 function renderView() {
   var rvOn = S.view === 'review', imOn = S.view === 'impose', tkOn = S.view === 'tk'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#imWrap').classList.toggle('hide', !imOn); $('#tkWrap').classList.toggle('hide', !tkOn); $('#main').classList.toggle('hide', rvOn || imOn || tkOn);
-  toolBar(); navSync(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
+  toolBar(); navSync(); pgSync(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
   $('#fab').style.display = S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
@@ -2174,7 +2209,7 @@ function renderStart() {
 /* ── 도구 · 자료 공간 첫 화면 ── */
 function renderSpace(k) {
   var sp = SPACES.filter(function (s) { return s.k === k; })[0];
-  $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return '<h4>' + esc(g.g) + '</h4><div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') + '</div>';
+  $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return (g.g === sp.t ? '' : '<h4>' + esc(g.g) + '</h4>') + '<div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') + '</div>';
   bindGo($('#main'));
 }
 function renderToolsHome() { renderSpace('tool'); }
@@ -2182,12 +2217,41 @@ function renderToolsHome() { renderSpace('tool'); }
 function renderGdoc() {
   var f = S.gdf || 'folder-file.html', doc = GUIDES.filter(function (g) { return g.f === f; })[0];
   var back = S.view === 'gdoc' && navCur().indexOf('gl:') === 0 ? '<button type="button" class="gdbk" data-ng="' + navCur() + '">' + navIc('back') + '목록으로</button>' : '';
-  $('#main').innerHTML = back + '<div class="gdin"><iframe id="gdIn" title="' + esc(doc ? doc.t : '안내') + '"></iframe></div>';
+  S.gdLede = '';
+  $('#main').innerHTML = back + '<div class="gdl" id="gdL"><div class="gdin"><iframe id="gdIn" title="' + esc(doc ? doc.t : '안내') + '"></iframe></div><nav class="gdtoc" id="gdToc" aria-label="목차"></nav></div>';
   bindGo($('#main'));
   var fr = $('#gdIn');
-  fr.onload = function () { try { var d = fr.contentDocument; d.documentElement.setAttribute('data-theme', 'light'); var bk = d.querySelector('.back'); if (bk) bk.style.display = 'none'; var fit = function () { fr.style.height = (d.documentElement.scrollHeight + 4) + 'px'; }; fit(); setTimeout(fit, 400); setTimeout(fit, 1200); } catch (e) { fr.style.height = '80vh'; } };
+  fr.onload = function () {
+    try {
+      var d = fr.contentDocument; d.documentElement.setAttribute('data-theme', 'light'); var bk = d.querySelector('.back'); if (bk) bk.style.display = 'none';
+      embTidy(fr, GD_TIDY);
+      var ld = d.querySelector('header .lede'); S.gdLede = ld ? ld.textContent.trim() : ''; var pp = $('#npg p'); if (pp) pp.textContent = S.gdLede;
+      var fit = function () { fr.style.height = (d.documentElement.scrollHeight + 4) + 'px'; }; fit(); setTimeout(fit, 400); setTimeout(fit, 1200);
+      setTimeout(function () { gdToc(fr); }, 80);
+    } catch (e) { fr.style.height = '80vh'; }
+  };
   fr.setAttribute('src', 'guide/' + f + (f.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now());
 }
+function gdTop() { var h = $('header'); return h ? h.getBoundingClientRect().bottom : 0; }
+function gdToc(fr) {
+  var nav = $('#gdToc'), d = fr.contentDocument; if (!nav || !d) return;
+  var L = [].slice.call(d.querySelectorAll('.toc a.h2')).map(function (a) { return { id: a.getAttribute('href').slice(1), t: a.textContent.trim() }; });
+  if (L.length < 2) return;
+  nav.innerHTML = '<div class="tt">목차</div>' + L.map(function (x, i) { return '<a data-gi="' + i + '">' + esc(x.t) + '</a>'; }).join('');
+  nav.style.top = (gdTop() + (window.innerWidth >= 1024 ? 16 : 0)) + 'px';
+  $('#gdL').classList.add('has');
+  NAV.gdL = L; NAV.gdFr = fr;
+  $$('a', nav).forEach(function (a) { a.onclick = function () { var el = d.getElementById(L[+a.dataset.gi].id); if (!el) return; var off = window.innerWidth >= 1024 ? 16 : nav.offsetHeight + 8; window.scrollTo({ top: fr.getBoundingClientRect().top + window.scrollY + el.getBoundingClientRect().top - gdTop() - off, behavior: 'smooth' }); }; });
+  gdSpy();
+}
+function gdSpy() {
+  var nav = document.getElementById('gdToc'); if (!nav || !NAV.gdL || !nav.childElementCount) return;
+  var fr = NAV.gdFr, d; try { d = fr.contentDocument; } catch (e) { return; } if (!d) return;
+  var ft = fr.getBoundingClientRect().top, lim = gdTop() + 140, cur = 0;
+  NAV.gdL.forEach(function (x, i) { var el = d.getElementById(x.id); if (el && ft + el.getBoundingClientRect().top < lim) cur = i; });
+  $$('a', nav).forEach(function (a, i) { var on = i === cur; if (on !== a.classList.contains('on')) { a.classList.toggle('on', on); if (on && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: a.offsetLeft - 16, behavior: 'smooth' }); } });
+}
+window.addEventListener('scroll', function () { if (S.view === 'gdoc') gdSpy(); }, { passive: true });
 function renderGlist() {
   var gr = GUIDE_GROUPS[S.gl] || GUIDE_GROUPS[1];
   $('#main').innerHTML = '<div class="spg"><div class="tkl">' + gr.i.filter(function (d) { return d.f !== 'folder-file.html'; }).map(function (d) { return '<button class="tkc" type="button" data-ng="gd:' + esc(d.f) + '"><b>' + esc(d.t) + '</b><span>' + esc((d.s || []).slice(0, 4).map(function (x) { return x[0]; }).join(' · ')) + '</span></button>'; }).join('') + '</div></div>';
@@ -2240,8 +2304,29 @@ function crumbHtml() {
   var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur(), it = spItems(sp).filter(function (x) { return x.k === cur; })[0];
   var sep = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">' + NAV_IC.cv + '</svg>';
   if (inWs()) return sp.t + sep + '<b>' + esc(S.ws.name) + '</b>';
-  if ((cur === sp.home || S.view === 'space') && cur !== 'pj') return '<b>' + esc(sp.t) + '</b>';
+  if (S.view === 'space' || S.view === 'start') return '<b>' + esc(sp.t) + '</b>';
   return esc(sp.t) + sep + '<b>' + esc(it ? it.t : cur === 'spec' ? '사양서' : sp.t) + '</b>';
+}
+var PG_DESC = {
+  todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', spec: '프로젝트 사양서',
+  review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
+  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '46전 788×1091 · 국전 636×939 · 결(종목/횡목) 반영', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
+  impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
+  qk: '거래처 · 담당자 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '용지 · 후가공 · 제본 용어와 결 · 책등 기준',
+  checklist: '컨펌 요청 전 단계별 자가 점검' };
+function pgInfo() {
+  var v = S.view; if (v === 'start' || inWs()) return null;
+  var sp = SPACES.filter(function (x) { return x.k === spOf(); })[0], cur = navCur();
+  if (!sp) return null;
+  if (v === 'space') return { t: sp.t, d: sp.d };
+  if (v === 'gdoc') { var doc = GUIDES.filter(function (g) { return g.f === S.gdf; })[0]; return { t: doc ? doc.t : '안내', d: S.gdLede || '' }; }
+  var it = spItems(sp).filter(function (x) { return x.k === cur; })[0];
+  if (v === 'glist') return { t: it ? it.t : '', d: it ? it.s : '' };
+  return { t: it ? it.t : cur === 'spec' ? '사양서' : sp.t, d: PG_DESC[cur] || (it && it.s ? it.s.replace(/^[A-Z][A-Z .]*[A-Z]\s+/, '') : '') };
+}
+function pgSync() {
+  var e = navEl('npg', 'div', function (e) { $('#main').insertAdjacentElement('beforebegin', e); }), i = pgInfo();
+  e.classList.toggle('hide', !i); e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' : '';
 }
 function navSync() {
   document.documentElement.setAttribute('data-nav', NAV.s === 'c' ? 'w' : NAV.s);

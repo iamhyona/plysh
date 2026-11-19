@@ -148,12 +148,19 @@ html.emb header { position:absolute; top:0; right:0; left:auto; background:none;
 html.emb .brand, html.emb .hdt, html.emb nav { display:none; }
 html.emb main { max-width:none; padding-top:6px; }
 html.emb .phd { padding-right:44px; }
-@media (min-width:1024px) {
+@media (min-width:760px) {
   html.emb main.io { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:16px; align-items:start; }
   html.emb main.io > * { grid-column:1; }
   html.emb .tg { grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
   html.emb main.io > .io-r { grid-column:2; grid-row:1 / span 40; position:sticky; top:12px; }
 }
+/* 탭 버튼 통일 (2026-11-20): 모든 .seg = 회색 바탕 + 흰 켜진 칸, 높이 40 · 작은 탭 36 */
+.seg { display:flex !important; width:100%; background:#e5e8eb !important; border-radius:12px; padding:3px; gap:2px; margin:0 0 12px; }
+.seg button { flex:1; display:flex; align-items:center; justify-content:center; min-height:40px; border:0; background:none; border-radius:9px; padding:0 14px; font-size:14px; font-weight:700; line-height:1.3; letter-spacing:-0.01em; color:#8b95a1; box-shadow:none; }
+.seg button.on { background:#fff !important; color:#191f28 !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.seg.sm { display:inline-flex !important; width:fit-content; max-width:100%; overflow-x:auto; scrollbar-width:none; }
+.seg.sm button { flex:none; min-height:36px; font-size:13px; padding:0 14px; }
+.pkbar .seg { background:#e5e8eb !important; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
