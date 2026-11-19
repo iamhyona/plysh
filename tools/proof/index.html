@@ -143,7 +143,19 @@ nav { overflow-x:auto; scrollbar-width:none; } nav::-webkit-scrollbar { display:
 #cB,#cT,#cM{display:flex;margin:0 0 8px}
 #cB{width:100%}#cB button{flex:1;font-weight:700;font-size:15px}
 #cT,#cM{width:fit-content}
+/* PLYSH TOOLS 안에서 열릴 때 (2026-11-19): 메뉴는 PLYSH 위 칩이 맡고, 여기 로고·탭은 숨김. 시트·폴더 버튼만 오른쪽 위에 남김 */
+html.emb header { position:absolute; top:0; right:0; left:auto; background:none; padding:16px 16px 0; z-index:5; }
+html.emb .brand, html.emb .hdt, html.emb nav { display:none; }
+html.emb main { max-width:none; padding-top:6px; }
+html.emb .phd { padding-right:44px; }
+@media (min-width:1024px) {
+  html.emb main.io { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:16px; align-items:start; }
+  html.emb main.io > * { grid-column:1; }
+  html.emb .tg { grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
+  html.emb main.io > .io-r { grid-column:2; grid-row:1 / span 40; position:sticky; top:12px; }
+}
 </style>
+<script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
 <body>
 <header>
@@ -347,7 +359,7 @@ function renderCalc() {
   }
   h += '<details class="card cset"><summary class="ct">여유 설정<small>도련 ' + c.bl + ' · 물림 ' + c.gr + ' · 여백 ' + c.sd + 'mm</small></summary><div class="frow" style="margin-top:12px">' + num('bl', '도련(사방)', 'mm') + num('gr', '물림', 'mm') + num('sd', '여백', 'mm') + '</div>' +
     (c.t === 'book' ? '<div class="frow">' + num('ex', '여분', '%') + '</div>' : '') + '<div class="legend" style="justify-content:flex-start">인쇄소마다 물림·여백이 달라요 · 결(종목/횡목) 방향은 인쇄소와 확인</div></details>';
-  h += '<div id="cRes">' + calcOut(c) + '</div>';
+  h += '<div id="cRes" class="io-r">' + calcOut(c) + '</div>';
   $('#main').innerHTML = h; bindCalc();
 }
 function dieVals(c, dd) { c.dvs = c.dvs || {}; var v = c.dvs[dd.id]; if (!v) { v = c.dvs[dd.id] = JSON.parse(JSON.stringify(dd.in)); } return v; }
@@ -780,7 +792,7 @@ function sbOf(v) {
 }
 
 /* ── 상태 ── */
-var S = { view: ls.get('pr:view') || 'doc', id: ls.get('pr:id') || '', add: false };
+var S = { view: (/^#(doc|list|die|calc|pt|ref)$/.test(location.hash) && location.hash.slice(1)) || ls.get('pr:view') || 'doc', id: ls.get('pr:id') || '', add: false };
 function tpl(id) { return T.filter(function (t) { return t.id === id; })[0]; }
 function stateOf(t) {
   var my = {}; try { my = JSON.parse(ls.get('pr:my:' + t.id) || '{}'); } catch (e) {}
@@ -793,8 +805,11 @@ var CUR = null;
 function render() {
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'one' ? 'list' : S.view)); });
   ({ doc: renderDoc, list: renderList, one: renderOne, ref: renderRef, calc: renderCalc, die: renderDie, pt: renderPt })[S.view]();
+  $('#main').classList.toggle('io', S.view === 'calc' || S.view === 'die');
 }
-function go(v) { S.view = v; ls.set('pr:view', v); window.scrollTo(0, 0); render(); }
+function go(v) { S.view = v; ls.set('pr:view', v); window.scrollTo(0, 0); render(); try { if (window.parent !== window && window.parent.plyshSync) window.parent.plyshSync('tools/proof/', v === 'one' ? 'list' : v); } catch (e) {} }
+// PLYSH TOOLS 칩에서 부름: 보던 화면이 같으면 그대로 (품목 상세 'one' 은 지류 품목 칩에서 다시 누르면 목록으로)
+window.plyshGo = function (v) { if (S.view !== v) go(v); };
 
 /* ── 대표 품목 ── */
 function renderList() {
@@ -1136,7 +1151,7 @@ function renderDie() {
   h += '<div class="chips" style="margin:0 0 12px">' + DIE.map(function (x) { return '<button data-die="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div>';
   h += '<div class="card"><div class="ct">' + d.n + '<small>' + d.d + '</small></div><div class="ig">' + Object.keys(DS.v).map(function (k) {
     var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + ' <i>' + L[1] + '</i></label><input type="number" inputmode="decimal" step="any" data-dv="' + k + '" value="' + DS.v[k] + '"></div>';
-  }).join('') + '</div></div><div id="dieOut"></div>';
+  }).join('') + '</div></div><div id="dieOut" class="io-r"></div>';
   $('#main').innerHTML = h; dieOut();
   $$('[data-die]').forEach(function (b) { b.onclick = function () { DS.id = b.dataset.die; DS.v = null; ls.set('pr:die', JSON.stringify(DS)); renderDie(); }; });
   $$('[data-dv]').forEach(function (i) { i.oninput = function () { DS.v[i.dataset.dv] = i.value === '' ? 0 : +i.value; ls.set('pr:die', JSON.stringify(DS)); dieOut(); }; });

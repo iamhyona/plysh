@@ -29,7 +29,7 @@ button { cursor:pointer; }
 
 /* 상단 */
 header { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(10px + env(safe-area-inset-top)) 16px 0; }
-.hd { display:flex; align-items:center; justify-content:space-between; height:44px; max-width:560px; margin:0 auto; }
+.hd { display:flex; align-items:center; justify-content:space-between; height:44px; max-width:var(--fw); margin:0 auto; }
 .brand { border:0; background:none; padding:0; font-size:17px; font-weight:800; letter-spacing:.06em; }
 .mode { display:flex; max-width:560px; margin:8px auto 0; background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; }
 .mode button { flex:1; border:0; background:none; border-radius:10px; padding:8px 0; font-size:12px; font-weight:800; letter-spacing:.06em; color:var(--mute); }
@@ -135,15 +135,29 @@ header { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(
 .hdt { font-size:13px; font-weight:600; color:var(--mute); }
 .ib { width:38px; height:38px; border:0; border-radius:50%; background:#fff; display:inline-flex; align-items:center; justify-content:center; color:var(--sub); padding:0; flex:none; }
 .ib svg { width:19px; height:19px; }
-nav { display:flex; justify-content:flex-start; gap:20px; max-width:560px; margin:6px auto 0; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; touch-action:pan-x; overscroll-behavior-x:contain; }
+nav { display:flex; justify-content:flex-start; gap:20px; max-width:var(--fw); margin:6px auto 0; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; touch-action:pan-x; overscroll-behavior-x:contain; }
 nav::-webkit-scrollbar { display:none; }
 nav button { flex:none; border:0; background:none; padding:12px 0 10px; font-size:12px; font-weight:700; letter-spacing:.03em; color:var(--faint); border-bottom:2px solid transparent; margin-bottom:-1px; }
 nav button.on { color:var(--txt); border-bottom-color:var(--txt); }
 
-main { max-width:560px; margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
-#rvWrap, #imWrap, #tkWrap { max-width:1120px; margin:0 auto; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
+main { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
+#rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 32px); margin:0 auto; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
+/* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw) 안에서 헤더·메뉴·본문·도구가 같은 폭.
+   1024px 이상: 카드 목록 = 여러 열, 입력 + 결과 = 왼쪽 입력 · 오른쪽 결과, 달력·표·검수 = 틀 폭 전체, 아래 시트(팝업) = 560px 가운데 */
+:root { --fw:560px; }
+@media (min-width:1024px) {
+  :root { --fw:1120px; }
+  button.fab { right:max(24px, calc((100vw - var(--fw)) / 2 + 24px)); }
+  main[data-v="todo"] { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); column-gap:12px; align-items:start; }
+  main[data-v="todo"] > :not(.tdcard) { grid-column:1 / -1; }
+  main[data-v="tools"] .tkl { grid-template-columns:repeat(4, minmax(0, 1fr)); }
+  main.io { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:16px; align-items:start; }
+  main.io > * { grid-column:1; }
+  main.io > .io-r { grid-column:2; grid-row:1 / span 40; position:sticky; top:150px; }
+  main[data-v="exp"] { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:16px; align-items:start; }
+}
 /* TOOLS (2026-11-19) */
-#tkBar { max-width:560px; margin:10px auto 0; padding:0 0 10px; } #tkBar button { background:#fff; } #tkBar button.on { background:var(--txt); color:#fff; } #tkBar .tkall { color:var(--mute); }
+#tkBar { max-width:var(--fw); margin:10px auto 0; padding:0 0 10px; } #tkBar button { background:#fff; } #tkBar button.on { background:var(--txt); color:#fff; } #tkBar .tkall { color:var(--mute); }
 .tkl { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .tkc { display:flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left; border:0; background:#fff; border-radius:18px; padding:16px 16px 15px; font:inherit; color:var(--txt); cursor:pointer; min-width:0; }
 .tkc b { font-size:16px; font-weight:700; letter-spacing:-0.02em; line-height:1.3; display:flex; align-items:center; gap:6px; flex-wrap:wrap; } .tkc b em { font-style:normal; font-size:10px; font-weight:800; color:#fff; background:var(--acc); border-radius:999px; padding:2px 6px; letter-spacing:.03em; }
@@ -1633,29 +1647,36 @@ function openGd(g, anchor) {
   setTimeout(function () { openBs('#gd'); $('#gd').style.height = $('#gd').style.maxHeight; }, was ? 230 : 0);
 }
 // TOOLS 메뉴 (2026-11-19): 디자인 작업 도구를 한 메뉴에. 작성 → 계산 → 검수 → 자료 순서
-// v: 앱 안 화면(review·impose·calc·spine·logo) / f: tools/ 폴더 페이지를 iframe 으로
+// v: 앱 안 화면(review·impose·spine·logo) / f: tools/ 폴더 페이지를 iframe 으로, pv: 그 페이지 안 화면 (PROOF 기능을 메뉴 하나씩으로 나눔)
+// 2026-11-19 정돈: 사양서 도우미(PROOF) 기능을 각각 메뉴로, 상품 라벨 생성기 → 상품 사양서 '라벨'로 합침, 판걸이 계산기 → 절수 계산기(전개도 앉히기 포함)로 합침
 var TOOLS = [
   { g: '작성', i: [
-    { k: 'proof', t: '사양서 도우미', e: 'PROOF', s: '지류 사양서 품목·전개도·절수, 팬톤 가이드', f: 'tools/proof/' },
-    { k: 'formly', t: '상품 사양서', e: 'FORMLY', s: '굿즈 상품 사양서 작성, 엑셀 저장·시트 불러오기', f: 'tools/formly/' },
-    { k: 'label', t: '상품 라벨 생성기', s: '상품 라벨 스티커 데이터 만들기', f: 'tools/label/' },
-    { k: 'filename', t: '파일명 생성기', s: '규칙에 맞는 폴더명·파일명 만들어 복사', f: 'tools/filename/' }] },
+    { k: 'doc', t: '지류 사양서', s: '품목을 모아 MASTER 양식 순서로 사양서 만들기', f: 'tools/proof/', pv: 'doc' },
+    { k: 'formly', t: '상품 사양서 · 라벨', s: '굿즈 상품 사양서와 라벨 문구, 엑셀·시트로 저장', f: 'tools/formly/', nw: 1 },
+    { k: 'filename', t: '파일명 생성기', s: '규칙에 맞는 파일명·작업폴더명·하위폴더명 복사', f: 'tools/filename/' }] },
   { g: '계산', i: [
-    { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine', nw: 1 },
-    { k: 'calc', t: '판걸이 계산기', s: '완성 크기로 전지 걸이·절수·필요 전지 수', v: 'calc' },
-    { k: 'impose', t: '터잡기 미리보기', e: 'IMPOSE', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose', nw: 1 }] },
+    { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
+    { k: 'cut', t: '절수 계산기', s: '완성 크기·전개도로 전지 걸이와 절수, 필요 전지 수', f: 'tools/proof/', pv: 'calc' },
+    { k: 'die', t: '전개도', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
+    { k: 'impose', t: '터잡기 미리보기', e: 'IMPOSE', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
     { k: 'review', t: '인쇄 파일·사양서 검수', e: 'PREFLIGHT', s: 'PDF·AI 인쇄 전 검수, 사양서 검수', v: 'review' },
     { k: 'checklist', t: '디자인 사고방지 체크리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
   { g: '자료', i: [
+    { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
+    { k: 'pt', t: '팬톤 가이드', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
+    { k: 'ref', t: '사양 용어 가이드', s: '용지·후가공·제본 용어와 결·책등 기준', f: 'tools/proof/', pv: 'ref' },
     { k: 'logo', t: '로고', e: 'LOGO', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
     { k: 'fonts', t: '폰트 아카이브', e: 'SPECIMEN', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' }] }
 ];
+var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
-var TOOL_SHORT = { proof: '사양서 도우미', formly: '상품 사양서', label: '라벨', filename: '파일명', spine: '책등', calc: '판걸이', impose: 'IMPOSE', review: 'PREFLIGHT', checklist: '체크리스트', logo: 'LOGO', fonts: '폰트' };
+var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '절수', die: '전개도', impose: '터잡기', review: 'PREFLIGHT', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어', logo: '로고', fonts: '폰트' };
+if (TOOL_OLD[S.tk]) S.tk = TOOL_OLD[S.tk]; if (S.view === 'calc') S.view = 'tk', S.tk = 'cut';
 function toolKey() { if (S.view === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === S.view; })[0]; return t ? t.k : ''; }
 function isToolView(v) { return v === 'tools' || v === 'tk' || TOOL_LIST.some(function (x) { return x.v === v; }); }
 function openTool(k) {
+  k = TOOL_OLD[k] || k;
   var t = TOOL_LIST.filter(function (x) { return x.k === k; })[0]; if (!t) return;
   if (t.f) { S.tk = k; ls.set('d4:tk', k); S.view = 'tk'; } else S.view = t.v;
   ls.set('d4:view', S.view); window.scrollTo(0, 0); render();
@@ -1675,15 +1696,28 @@ function renderTools() {
   }).join('');
   $$('[data-tool]').forEach(function (b) { b.onclick = function () { openTool(b.dataset.tool); }; });
 }
-// tools/ 페이지: 도구마다 iframe 하나씩 만들어 두고 다른 메뉴 갔다 와도 입력 유지
+// tools/ 페이지: 파일마다 iframe 하나씩 만들어 두고 다른 메뉴 갔다 와도 입력 유지.
+// PROOF 처럼 한 파일 안 여러 화면은 iframe 하나를 같이 쓰고 plyshGo(pv)로 화면만 바꿈
 function renderTk() {
   var t = TOOL_LIST.filter(function (x) { return x.k === S.tk && x.f; })[0];
   if (!t) { S.view = 'tools'; return renderTools(); }
-  $$('#tkWrap iframe').forEach(function (f) { f.classList.toggle('hide', f.dataset.k !== t.k); });
-  var f = $('#tkWrap iframe[data-k="' + t.k + '"]');
-  if (!f) { f = document.createElement('iframe'); f.dataset.k = t.k; f.title = t.t; f.src = t.f + '?v=' + APP_VER; $('#tkWrap').appendChild(f); }
+  $$('#tkWrap iframe').forEach(function (f) { f.classList.toggle('hide', f.dataset.f !== t.f); });
+  var f = $('#tkWrap iframe[data-f="' + t.f + '"]');
+  if (!f) {
+    f = document.createElement('iframe'); f.dataset.f = t.f; f.title = t.t;
+    f.onload = function () { f._ok = 1; tkGo(f); };
+    f.src = t.f + '?v=' + APP_VER + (t.pv ? '#' + t.pv : ''); $('#tkWrap').appendChild(f);
+  }
+  f._pv = t.pv || ''; if (f._ok) tkGo(f);
   rvSize(); window.scrollTo(0, 0);
 }
+function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) f.contentWindow.plyshGo(f._pv); } catch (e) {} }
+// 도구 안에서 화면을 옮기면(예: 지류 품목 → 사양서에 담기) 위 칩도 같이 바뀜
+window.plyshSync = function (file, pv) {
+  var t = TOOL_LIST.filter(function (x) { return x.f === file && x.pv === pv; })[0];
+  if (!t || S.view !== 'tk' || S.tk === t.k) return;
+  S.tk = t.k; ls.set('d4:tk', t.k); var f = $('#tkWrap iframe[data-f="' + file + '"]'); if (f) f._pv = pv; toolBar();
+};
 // 책등 계산기 (2026-11-19). 종이 두께 = 평량(g) × 계수, PREFLIGHT 사양서 검수(spec.js caliper)와 같은 기준
 var SPN_PAPERS = [
   { k: 'mo', n: '모조 (백·미색)', f: 0.00125, g: [70, 80, 100, 120, 150] },
@@ -1720,7 +1754,7 @@ function renderSpine() {
   else if (c.b !== 'ring') h += '<div class="card"><div class="ct">표지</div>' + paperSel('c', '종이') + '</div>';
   h += '<details class="card cset"' + (+c.fl || c.b !== 'ss' ? ' open' : '') + '><summary class="ct">판형<small>표지 펼친 크기 계산</small></summary><div class="chips cpre" style="margin-top:12px">' + PRESETS.slice(0, 7).map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '">' + p[0] + '<small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
     '<div class="frow">' + num('w', '가로', 'mm') + num('h', '세로', 'mm') + (c.b === 'pb' || c.b === 'sew' ? num('fl', '날개', 'mm') : '') + '</div></details>';
-  h += '<div id="spRes">' + spineOut(c) + '</div>';
+  h += '<div id="spRes" class="io-r">' + spineOut(c) + '</div>';
   $('#main').innerHTML = h; bindSpine();
 }
 function spineOut(c) {
@@ -1806,7 +1840,7 @@ function renderImpose() {
 window.addEventListener('resize', function () { if (S.view === 'review' || S.view === 'impose' || S.view === 'tk') rvSize(); });
 function renderView() {
   var rvOn = S.view === 'review', imOn = S.view === 'impose', tkOn = S.view === 'tk'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#imWrap').classList.toggle('hide', !imOn); $('#tkWrap').classList.toggle('hide', !tkOn); $('#main').classList.toggle('hide', rvOn || imOn || tkOn);
-  toolBar();
+  toolBar(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
   $('#fab').style.display = S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
