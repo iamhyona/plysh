@@ -1094,6 +1094,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #nfm .top b { font-size:18px; font-weight:800; letter-spacing:.06em; margin-right:auto; }
 #nfm .fq { display:flex; align-items:center; gap:8px; flex:1; max-width:420px; height:42px; border:0; background:var(--bg); border-radius:12px; padding:0 14px; color:var(--mute); font-size:14px; text-align:left; }
 #nfm .fq svg { width:16px; height:16px; }
+#nfm .nx { width:44px !important; height:44px !important; flex:none; background:var(--txt) !important; color:#fff; cursor:pointer; }
+#nfm .nx svg { width:20px; height:20px; stroke-width:2.6; }
 #nfm .cols { max-width:calc(var(--fw) + 80px); margin:0 auto; padding:34px 40px 60px; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:34px 28px; }
 #nfm .col > b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.03em; margin-bottom:4px; cursor:pointer; }
 #nfm .col > p { margin:0 0 16px; font-size:12.5px; color:var(--mute); line-height:1.5; min-height:38px; }
@@ -1108,7 +1110,15 @@ html[data-nav="t"] #nsub.has { display:flex; }
   #nfm .cols { grid-template-columns:1fr; padding:20px 16px 40px; gap:10px; }
   #nfm .col { border-top:1px solid var(--line); padding-top:14px; }
   #nfm .col > b { font-size:20px; } #nfm .col > p { min-height:0; margin-bottom:6px; }
+  /* 모바일 전체 메뉴 = 오른쪽에서 밀려 나오는 패널, 뒤 화면은 살짝 보이게 (2026-11-20) */
+  #nfm { display:block; left:auto; width:min(84vw, 380px); transform:translateX(100%); visibility:hidden; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; box-shadow:-8px 0 30px rgba(0,0,0,.08); overscroll-behavior:contain; }
+  #nfm.open { transform:none; visibility:visible; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+  #nfm .top { flex-wrap:wrap; gap:10px; } #nfm .top b { font-size:16px; } #nfm .fq { order:3; flex:1 0 100%; height:40px; }
+  #nfm .cols { padding:14px 16px 40px; }
+  #nfb { position:fixed; inset:0; z-index:41; background:rgba(25,31,40,.38); opacity:0; visibility:hidden; transition:opacity .3s, visibility 0s linear .3s; }
+  #nfb.open { opacity:1; visibility:visible; transition:opacity .3s, visibility 0s; }
 }
+@media (min-width:1024px) { #nfb { display:none; } }
 </style>
 </head>
 <body>
@@ -2142,7 +2152,7 @@ function navGo(k) {
   if (k === 'tools') { S.spk = 'tool'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   S.view = k; if (k !== 'refs' && k !== 'start') ls.set('d4:view', k); window.scrollTo(0, 0); render();
 }
-function navClose() { ['#npl', '#nmg', '#nbd', '#nfm'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
+function navClose() { document.documentElement.style.overflow = ''; ['#npl', '#nmg', '#nbd', '#nfm', '#nfb'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
 function navEl(id, tag, where, html) { var e = document.getElementById(id); if (!e) { e = document.createElement(tag || 'div'); e.id = id; where(e); } if (html != null) e.innerHTML = html; return e; }
 function lk(x, cur) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (x.s ? '<span>' + esc(x.s) + '</span>' : '') + '</button>'; }
 function bindGo(root) { $$('[data-ng]', root).forEach(function (b) { b.onclick = function () { navGo(b.dataset.ng); }; }); $$('[data-wsr]', root).forEach(function (b) { b.onclick = function () { var r = NAV.rec[+b.dataset.wsr]; if (r) wsOpen(r); }; }); }
@@ -2282,7 +2292,10 @@ function fullMenu() {
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
     '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + sp.g.map(function (g) { return g.i.map(function (x) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); }).join('') + '</div>'; }).join('') + '</div>';
   bindGo(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
-  f.classList.add('open');
+  var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
+  if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
+  document.documentElement.style.overflow = 'hidden';
+  requestAnimationFrame(function () { requestAnimationFrame(function () { f.classList.add('open'); bd.classList.add('open'); }); });
 }
 function sideHtml() {
   var cur = navCur(), sk = spOf();
