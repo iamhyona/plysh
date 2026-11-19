@@ -11,6 +11,8 @@ html.emb .emb-seg::-webkit-scrollbar { display:none; }
 html.emb .emb-seg > * { flex:none; display:flex; align-items:center; height:auto; border:0 !important; background:none; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; letter-spacing:-0.01em; color:#8b95a1; cursor:pointer; white-space:nowrap; }
 html.emb .emb-seg > .active, html.emb .emb-seg > .on { background:#fff; color:#191f28; }
 html.emb .emb-in { max-width:none !important; margin:0 auto; }
+/* PLYSH UI 기준 (2026-11-20): 주 버튼 = 검정, 보조 버튼 = 흰 바탕 회색 글씨(테두리 없음), 위험 = 빨간 글씨, 켜진 칩 = 검정, 파랑은 강조 · 링크 · 선택 표시에만 */
+html.emb { --accent:#3182f6; --danger:#ef4444; --text:#191f28; --text2:#4e5968; --text3:#8b95a1; --border:#e5e8eb; --bg:#f2f4f6; }
 @media (min-width:760px) {
   html.emb .emb-io { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:16px; align-items:start; }
   html.emb .emb-io > * { grid-column:1; }

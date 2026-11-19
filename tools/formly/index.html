@@ -280,7 +280,20 @@ html.emb .form-input, html.emb .date-display { font-size:15px; }
 html.emb .form-input.sm { font-size:15px; padding:8px 11px; }
 html.emb .field-lbl-input, html.emb .field-lbl { font-size:13px; }
 html.emb .lang-pills { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
-html.emb .lang-pill { height:34px; font-size:13px; flex:none; padding:0 14px; }
+html.emb .lang-pill { height:36px; font-size:13.5px; font-weight:600; flex:none; padding:0 14px; border:0 !important; background:#fff; color:var(--text2); border-radius:999px; }
+html.emb .lang-pill.active { background:var(--text) !important; color:#fff !important; }
+html.emb .preset-btn { height:40px; border:0 !important; border-radius:12px; background:#fff; color:var(--text2) !important; font-size:13.5px; font-weight:600; }
+html.emb .preset-btn[onclick^="saveFieldsSnapshot"] { background:var(--text) !important; color:#fff !important; }
+html.emb .preset-btn[onclick^="resetCurrentProduct"] { color:var(--danger) !important; }
+html.emb .action-btn { border:0 !important; border-radius:10px; background:#fff; font-size:13px; font-weight:600; }
+html.emb .copy-btn { height:46px; border-radius:12px; background:var(--text); font-size:15px; }
+html.emb .copy-btn.secondary { background:#fff; color:var(--text2); border:0; }
+html.emb .sect-hdr { color:var(--text); font-size:16px; font-weight:700; border-bottom:0; padding:0; margin:24px 0 10px; letter-spacing:-0.02em; }
+html.emb .field-card { border:0 !important; border-radius:14px; }
+html.emb .fxact button { height:40px; border-radius:12px; font-size:13.5px; }
+html.emb .fxchips .fxadd { color:var(--text2); font-weight:700; }
+html.emb .lbcard { border:0; border-radius:20px; }
+html.emb .lbcard h3 { font-size:17px; }
 .fxio { display:grid; grid-template-columns:minmax(0, 1.15fr) minmax(0, 1fr); gap:16px; align-items:start; }
 .fxio-r { position:sticky; top:12px; } .fxio-r .lbcard { margin-top:0; max-height:calc(100vh - 24px); overflow:auto; }
 .lbcard { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-top:14px; }
