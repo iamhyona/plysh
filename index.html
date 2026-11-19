@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>PLYSH</title>
@@ -253,6 +254,22 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 .btn { border:0; background:var(--txt); color:#fff; border-radius:14px; padding:15px 0; width:200px; font-weight:700; font-size:16px; }
 .toast { position:fixed; left:50%; bottom:calc(100px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:rgba(25,31,40,.92); color:#fff; padding:12px 18px; border-radius:14px; font-size:14px; display:none; z-index:60; white-space:nowrap; }
 .busy { opacity:.5; pointer-events:none; }
+/* 구글 로그인 + 기기 승인 (2026-11-19) */
+.lgLogo { width:84px; height:84px; border-radius:22px; margin-bottom:18px; }
+#gBtn { min-height:44px; margin-bottom:22px; display:flex; justify-content:center; } #gBtn.hide { display:none; }
+#lgWait { display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:22px; } #lgWait.hide { display:none; }
+#lgWait b { font-size:15px; } #lgWait span { color:var(--mute); font-size:14px; }
+.btn2 { border:1px solid #e5e8eb; background:#fff; border-radius:12px; padding:11px 22px; font-weight:700; font-size:14px; color:var(--txt); }
+.lnk { border:0; background:none; color:var(--mute); font-size:13px; text-decoration:underline; padding:6px; }
+.lgFoot { position:absolute; left:0; right:0; bottom:calc(24px + env(safe-area-inset-bottom)); color:#b0b8c1; font-size:12px; } .lgFoot a { color:inherit; }
+#dvBtn { position:relative; }
+.dvN { position:absolute; top:0; right:0; min-width:16px; height:16px; border-radius:8px; background:#f04452; color:#fff; font-size:10px; font-style:normal; font-weight:700; display:none; align-items:center; justify-content:center; padding:0 4px; } .dvN.on { display:flex; }
+.dvg { font-size:13px; font-weight:700; color:var(--mute); margin:18px 0 4px; }
+.dvr { display:flex; align-items:center; gap:8px; padding:12px 0; border-top:1px solid #f2f4f6; } .dvg + .dvr { border-top:0; }
+.dvr .t { flex:1; min-width:0; } .dvr .t b { display:block; font-size:15px; } .dvr .t small { display:block; color:var(--mute); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dvr button { border:0; border-radius:10px; padding:8px 12px; font-weight:700; font-size:13px; background:#f2f4f6; color:var(--txt); flex:none; } .dvr button.ok { background:var(--txt); color:#fff; }
+.dvme { font-size:11px; color:#3182f6; font-weight:700; margin-left:6px; }
+.dvpin { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px; border-radius:14px; background:#f9fafb; margin-top:18px; font-size:14px; }
 /* ───── SCHEDULE ───── */
 .tabs2 { display:flex; gap:6px; overflow-x:auto; margin:0 -16px 12px; padding:0 16px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .tabs2::-webkit-scrollbar { display:none; }
@@ -874,11 +891,21 @@ details.fday:not([open]) > summary { margin-bottom:0; }
   <button class="btn" id="pinBtn">확인</button>
 </div>
 
+<div class="full hide" id="lgScr">
+  <img class="lgLogo" src="favicon.svg?v=2" alt="">
+  <h1>PLYSH</h1>
+  <p id="lgMsg"></p>
+  <div id="gBtn"></div>
+  <div id="lgWait" class="hide"><b id="lgWho"></b><span>승인되면 자동으로 열려요.</span><button class="btn2" id="lgRe">다시 확인</button><button class="lnk" id="lgOut">다른 계정으로 로그인</button></div>
+  <small class="lgFoot">한 번 승인된 기기는 다음부터 바로 열려요 · <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></small>
+</div>
+
 <header>
   <div class="hd">
     <button class="brand" id="brand">PLYSH</button>
     <div class="hr">
       <button class="ib" style="display:none" id="rpBtn" aria-label="업무보고"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg></button>
+      <button class="ib" style="display:none" id="dvBtn" aria-label="접속 승인" title="접속 승인"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg><em class="dvN"></em></button>
       <button class="ib" id="rfBtn" aria-label="동기화" title="시트와 동기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M16 3l4 4-4 4"/><path d="M20 17H4M8 13l-4 4 4 4"/></svg></button>
       <a class="ib" id="drvBtn" href="https://drive.google.com/drive/folders/11nRHl1v00YxiSLaQyQy07cUN8hq8rbY8" target="_blank" rel="noopener" aria-label="구글 드라이브 폴더"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></a>
       <button class="ib" style="display:none" id="setBtn" aria-label="시트"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></button>
@@ -942,6 +969,12 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 </div>
 
 <!-- 시트 목록 -->
+<div class="bs" id="dv">
+  <h3>접속 승인</h3>
+  <div id="dvB"></div>
+  <p class="mnote">승인한 기기는 다음부터 로그인 없이 바로 열려요. 팀원이 바뀌면 그 사람의 기기를 지워 주세요.</p>
+</div>
+
 <div class="bs" id="st">
   <h3>연결된 시트</h3>
   <div id="stB"></div>
@@ -1119,7 +1152,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261119tl1';
+var APP_VER = '20261119lg2';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -1136,7 +1169,7 @@ window.addEventListener('pageshow', function (e) { if (e.persisted) checkUpdate(
 window.addEventListener('focus', checkUpdate);
 setInterval(function () { if (!document.hidden) checkUpdate(); }, 300000);
 checkUpdate();
-function errMsg(e) { return (e && e.message ? e.message : String(e)).replace(/^(Exception|Error):\s*/, ''); }
+function errMsg(e) { return (e && e.message ? e.message : String(e)).replace(/^(Exception|Error):\s*/, '').replace(/^(LOGIN|WAIT):\s*/, ''); }
 function toast(t) { var el = $('#toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(function () { el.style.display = 'none'; }, 2200); }
 
 /* ───── 데이터 ───── */
@@ -1156,7 +1189,7 @@ function load() {
     S.at = Date.now(); ls.set('d4:data', JSON.stringify({ files: d.files, events: d.events, hol: d.hol, rep: d.rep, alias: d.alias, repUrl: d.repUrl, todo: d.todo || [], tdUrl: d.tdUrl || '', wl: d.wl || [], evDone: d.evDone || [], at: d.at }));
     setData(d); render();
   }).catch(function (e) {
-    if (/PIN/.test(errMsg(e))) { S.pin = ''; ls.set('d4:pin', ''); return showPin(); }
+    if (authErr(e)) return;
     toast(errMsg(e));
   }).then(function () { $('#rfBtn').classList.remove('spin'); });
 }
@@ -3319,7 +3352,103 @@ $('#pinBtn').onclick = function () {
 };
 $('#pinIn').onkeydown = function (e) { if (e.key === 'Enter') $('#pinBtn').click(); };
 
-if (S.pin) { var c0 = cached(); if (c0) { setData(c0); render(); } load(); } else showPin();
+/* ───── 구글 로그인 + 기기 승인 (2026-11-19) ─────
+ * 처음 한 번 구글 로그인 → 실장님 승인 → 그 뒤로는 기기에 저장된 토큰으로 바로 열림 */
+var GCID = '796915285398-n9gvmtacfb6schg9je2bknmlkgt4jkao.apps.googleusercontent.com';
+S.tok = ls.get('d4:tok') || '';
+S.pin = S.tok;
+function devLabel() {
+  var u = navigator.userAgent;
+  var os = /iPhone/.test(u) ? 'iPhone' : /iPad/.test(u) ? 'iPad' : /Android/.test(u) ? 'Android' : /Mac/.test(u) ? 'Mac' : /Windows/.test(u) ? 'Windows' : '기타';
+  var br = /Edg\//.test(u) ? 'Edge' : /Whale/.test(u) ? 'Whale' : /CriOS|Chrome\//.test(u) ? 'Chrome' : /Firefox|FxiOS/.test(u) ? 'Firefox' : /Safari/.test(u) ? 'Safari' : '브라우저';
+  var home = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  return os + ' · ' + br + (home ? ' (홈 화면)' : '');
+}
+var gsiP = null;
+function gsiLoad() {
+  return gsiP || (gsiP = new Promise(function (ok, no) {
+    var s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
+    s.onload = ok; s.onerror = function () { gsiP = null; no(new Error('구글 로그인을 불러오지 못했어요')); };
+    document.head.appendChild(s);
+  }));
+}
+function showLogin(wait) {
+  $('#pinScr').classList.add('hide'); $('#lgScr').classList.remove('hide');
+  $('#lgWait').classList.toggle('hide', !wait); $('#gBtn').classList.toggle('hide', !!wait);
+  $('#lgMsg').innerHTML = wait ? '실장님께 승인 요청을 보냈어요.' : '디자인4팀 전용 공간이에요.<br>구글 계정으로 로그인하면 실장님 승인 후 들어올 수 있어요.';
+  clearInterval(showLogin.t);
+  if (wait) { $('#lgWho').textContent = ls.get('d4:who') || ''; showLogin.t = setInterval(lgCheck, 15000); return; }
+  gsiLoad().then(function () {
+    google.accounts.id.initialize({ client_id: GCID, callback: lgDone, ux_mode: 'popup', auto_select: false });
+    $('#gBtn').innerHTML = '';
+    google.accounts.id.renderButton($('#gBtn'), { theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: 'ko', width: 240 });
+  }).catch(function (e) { toast(errMsg(e)); });
+}
+function lgDone(r) {
+  $('#gBtn').classList.add('busy');
+  call('appLogin', r.credential, devLabel()).then(function (o) {
+    S.tok = o.tok; S.pin = o.tok; ls.set('d4:tok', o.tok); ls.set('d4:who', (o.n ? o.n + ' · ' : '') + o.e);
+    if (o.st === 'ok') lgEnter(); else showLogin(true);
+  }).catch(function (e) { toast(errMsg(e)); }).then(function () { $('#gBtn').classList.remove('busy'); });
+}
+function lgCheck(manual) {
+  if (!S.tok) return showLogin(false);
+  return call('appMe', S.tok).then(function (o) { if (o.st === 'ok') lgEnter(); else if (manual === true) toast('아직 승인 전이에요'); })
+    .catch(function (e) { if (/^LOGIN/.test(String(e && e.message))) lgOut(); });
+}
+function lgEnter() { clearInterval(showLogin.t); ls.set('d4:ok', '1'); $('#lgScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">시트에서 불러오는 중…</div>'; load(); dvBadge(); }
+function lgOut() { S.tok = ''; S.pin = ''; ls.set('d4:tok', ''); ls.set('d4:ok', ''); ls.set('d4:who', ''); ls.set('d4:data', ''); showLogin(false); }
+function authErr(e) {
+  var m = String(e && e.message || e);
+  if (/^LOGIN|PIN/.test(m)) { lgOut(); return true; }
+  if (/^WAIT/.test(m)) { ls.set('d4:ok', ''); showLogin(true); return true; }
+  return false;
+}
+$('#lgRe').onclick = function () { lgCheck(true); };
+$('#lgOut').onclick = lgOut;
+
+// 관리자(실장님)만: 접속 승인
+function dvBadge() {
+  if (!S.tok) return;
+  call('appMe', S.tok).then(function (o) {
+    ls.set('d4:ok', o.st === 'ok' ? '1' : '');
+    $('#dvBtn').style.display = o.admin ? '' : 'none';
+    var n = $('#dvBtn .dvN'); n.textContent = o.pend || ''; n.classList.toggle('on', o.pend > 0);
+  }).catch(function () {});
+}
+function dvAgo(t) { if (!t) return ''; var m = Math.round((Date.now() - t) / 60000); return m < 1 ? '방금' : m < 60 ? m + '분 전' : m < 1440 ? Math.round(m / 60) + '시간 전' : Math.round(m / 1440) + '일 전'; }
+function dvDraw(r) {
+  var W = r.list.filter(function (x) { return x.st === 'wait'; }), O = r.list.filter(function (x) { return x.st === 'ok'; });
+  function row(x) {
+    var me = x.id === r.me, btn = x.st === 'wait'
+      ? '<button data-dv="del" data-id="' + x.id + '">거절</button><button class="ok" data-dv="ok" data-id="' + x.id + '">승인</button>'
+      : (me ? '' : '<button data-dv="del" data-id="' + x.id + '">삭제</button>');
+    return '<div class="dvr"><div class="t"><b>' + esc(x.n || x.e) + (me ? '<span class="dvme">지금 이 기기</span>' : '') + '</b><small>' + esc(x.e) + '</small><small>' + esc(x.ua || '') + ' · ' + (x.st === 'wait' ? '요청 ' + dvAgo(x.at) : '최근 접속 ' + dvAgo(x.seen)) + '</small></div>' + btn + '</div>';
+  }
+  var h = '<div class="dvg">승인 대기 ' + W.length + '</div>' + (W.length ? W.map(row).join('') : '<p class="mnote" style="margin:6px 0 0">새 요청이 없어요</p>');
+  h += '<div class="dvg">승인된 기기 ' + O.length + '</div>' + O.map(row).join('');
+  h += '<div class="dvpin"><span>예전 팀 PIN 접속 · <b>' + (r.pinOff ? '막힘' : '허용 중') + '</b></span><button class="btn2" id="dvPin">' + (r.pinOff ? '다시 허용' : '막기') + '</button></div>';
+  $('#dvB').innerHTML = h;
+  $$('#dvB [data-dv]').forEach(function (b) {
+    b.onclick = function () {
+      b.classList.add('busy');
+      call('appDevSet', S.tok, b.dataset.id, b.dataset.dv).then(function (r2) { dvDraw(r2); dvBadge(); toast(b.dataset.dv === 'ok' ? '승인했어요' : '지웠어요'); })
+        .catch(function (e) { toast(errMsg(e)); b.classList.remove('busy'); });
+    };
+  });
+  $('#dvPin').onclick = function () {
+    var b = $('#dvPin'); b.classList.add('busy');
+    call('appPinOff', S.tok, !r.pinOff).then(function (r2) { dvDraw(r2); toast(r2.pinOff ? '팀 PIN 접속을 막았어요' : '팀 PIN 접속을 다시 열었어요'); })
+      .catch(function (e) { toast(errMsg(e)); b.classList.remove('busy'); });
+  };
+}
+$('#dvBtn').onclick = function () {
+  $('#dvB').innerHTML = '<div class="ld">불러오는 중…</div>'; openBs('#dv');
+  call('appDevList', S.tok).then(dvDraw).catch(function (e) { toast(errMsg(e)); });
+};
+setInterval(function () { if (S.tok && !document.hidden) dvBadge(); }, 300000);
+
+if (S.tok) { var c0 = cached(); if (c0) { setData(c0); render(); } load(); dvBadge(); } else showLogin(false);
 
 /* ───── QUICK (2026-10-19): 퀵 연락처 시트 '연락처' 탭 · 쇼핑백 라벨 인쇄 ───── */
 var QKK = ['소속사', '거래처', '인쇄소', '장소'];
