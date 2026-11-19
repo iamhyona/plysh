@@ -258,6 +258,7 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 .lgLogo { width:84px; height:84px; border-radius:22px; margin-bottom:18px; }
 #gBtn { min-height:44px; margin-bottom:22px; display:flex; justify-content:center; } #gBtn.hide { display:none; }
 #lgWait { display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:22px; } #lgWait.hide { display:none; }
+#lgErr { color:#f04452; font-size:13px; margin:-12px 0 14px; } #lgErr.hide, #lgPin.hide { display:none; } #lgPin { margin-bottom:12px; }
 #lgWait b { font-size:15px; } #lgWait span { color:var(--mute); font-size:14px; }
 .btn2 { border:1px solid #e5e8eb; background:#fff; border-radius:12px; padding:11px 22px; font-weight:700; font-size:14px; color:var(--txt); }
 .lnk { border:0; background:none; color:var(--mute); font-size:13px; text-decoration:underline; padding:6px; }
@@ -896,6 +897,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
   <h1>PLYSH</h1>
   <p id="lgMsg"></p>
   <div id="gBtn"></div>
+  <p id="lgErr" class="hide"></p>
+  <button class="lnk" id="lgPin">팀 PIN으로 들어가기</button>
   <div id="lgWait" class="hide"><b id="lgWho"></b><span>승인되면 자동으로 열려요.</span><button class="btn2" id="lgRe">다시 확인</button><button class="lnk" id="lgOut">다른 계정으로 로그인</button></div>
   <small class="lgFoot">한 번 승인된 기기는 다음부터 바로 열려요 · <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></small>
 </div>
@@ -1152,7 +1155,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261119sp1';
+var APP_VER = '20261119lg3';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3335,7 +3338,7 @@ sure($('#wlDel'), function () {
 
 var pinMode = 'enter';
 function showPin() {
-  $('#pinScr').classList.remove('hide'); $('#pinIn').value = '';
+  $('#lgScr').classList.add('hide'); $('#pinScr').classList.remove('hide'); $('#pinIn').value = '';
   call('appHasPin').then(function (has) {
     pinMode = has ? 'enter' : 'set';
     $('#pinMsg').textContent = has ? '팀 PIN 4자리를 입력해 주세요' : '처음이에요. 팀이 함께 쓸 PIN 4자리를 정해 주세요';
@@ -3347,7 +3350,7 @@ $('#pinBtn').onclick = function () {
   if (!/^\d{4}$/.test(p)) return toast('숫자 4자리로 입력해 주세요');
   var b = $('#pinBtn'); b.classList.add('busy');
   (pinMode === 'set' ? call('appSetPin', p) : call('appCheck', p)).then(function () {
-    S.pin = p; ls.set('d4:pin', p); $('#pinScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">시트에서 불러오는 중…</div>'; load();
+    S.pin = p; ls.set('d4:pin', p); ls.set('d4:ok', '1'); $('#pinScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">시트에서 불러오는 중…</div>'; load();
   }).catch(function (e) { toast(errMsg(e)); }).then(function () { b.classList.remove('busy'); });
 };
 $('#pinIn').onkeydown = function (e) { if (e.key === 'Enter') $('#pinBtn').click(); };
@@ -3374,7 +3377,7 @@ function gsiLoad() {
 }
 function showLogin(wait) {
   $('#pinScr').classList.add('hide'); $('#lgScr').classList.remove('hide');
-  $('#lgWait').classList.toggle('hide', !wait); $('#gBtn').classList.toggle('hide', !!wait);
+  $('#lgWait').classList.toggle('hide', !wait); $('#gBtn').classList.toggle('hide', !!wait); $('#lgPin').classList.toggle('hide', !!wait); $('#lgErr').classList.add('hide');
   $('#lgMsg').innerHTML = wait ? '실장님께 승인 요청을 보냈어요.' : '디자인4팀 전용 공간이에요.<br>구글 계정으로 로그인하면 실장님 승인 후 들어올 수 있어요.';
   clearInterval(showLogin.t);
   if (wait) { $('#lgWho').textContent = ls.get('d4:who') || ''; showLogin.t = setInterval(lgCheck, 15000); return; }
@@ -3382,14 +3385,14 @@ function showLogin(wait) {
     google.accounts.id.initialize({ client_id: GCID, callback: lgDone, ux_mode: 'popup', auto_select: false });
     $('#gBtn').innerHTML = '';
     google.accounts.id.renderButton($('#gBtn'), { theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: 'ko', width: 240 });
-  }).catch(function (e) { toast(errMsg(e)); });
+  }).catch(function (e) { lgErr(errMsg(e)); });
 }
 function lgDone(r) {
   $('#gBtn').classList.add('busy');
   call('appLogin', r.credential, devLabel()).then(function (o) {
     S.tok = o.tok; S.pin = o.tok; ls.set('d4:tok', o.tok); ls.set('d4:who', (o.n ? o.n + ' · ' : '') + o.e);
     if (o.st === 'ok') lgEnter(); else showLogin(true);
-  }).catch(function (e) { toast(errMsg(e)); }).then(function () { $('#gBtn').classList.remove('busy'); });
+  }).catch(function (e) { lgErr('로그인이 안 됐어요: ' + errMsg(e)); }).then(function () { $('#gBtn').classList.remove('busy'); });
 }
 function lgCheck(manual) {
   if (!S.tok) return showLogin(false);
@@ -3404,6 +3407,8 @@ function authErr(e) {
   if (/^WAIT/.test(m)) { ls.set('d4:ok', ''); showLogin(true); return true; }
   return false;
 }
+function lgErr(m) { var x = $('#lgErr'); x.textContent = m; x.classList.remove('hide'); toast(m); }
+$('#lgPin').onclick = showPin;
 $('#lgRe').onclick = function () { lgCheck(true); };
 $('#lgOut').onclick = lgOut;
 
