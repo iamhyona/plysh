@@ -9,13 +9,15 @@ function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
 
 // ── 검수 기준 ──
 var DEF = { ppi: 250, bleed: 3, safe: 3, minText: 4, smallText: 12, small4c: 7, tacWarn: 300, tacErr: 320, hair: 0.1, thin4c: 0.3, blackArea: 900, whiteText: 10, glue: 3, gutterSaddle: 5 };
-var SET_LABEL = { ppi: '이미지 최소 해상도 (ppi)', bleed: '도련 (mm)', safe: '재단선 안쪽 안전 여백 (mm)', minText: '이 크기 이하 글자는 조언 (pt)', smallText: 'K100+오버프린트 필요한 작은 글자 (pt 미만)', small4c: '4도 혼합 금지 글자 (pt 미만)', tacWarn: '잉크 총량 확인 (%)', tacErr: '잉크 총량 오류 (%)', hair: '너무 얇은 선 (pt 이하)', thin4c: '4도 혼합 얇은 선 (pt 미만)', blackArea: '리치블랙 권장 면적 (mm²)', whiteText: '흰 글자 주의 크기 (pt 미만)', glue: '포토북 풀칠 영역 (mm)', gutterSaddle: '중철 접지 안쪽 여백 (mm)' };
+var SET_LABEL = { ppi: '이미지 최소 해상도', bleed: '도련', safe: '재단선 안쪽 안전 여백', minText: '이 크기 이하 글자는 조언', smallText: 'K100 텍스트(오버프린트확인)', small4c: '4도 혼합 금지 글자', tacWarn: '잉크 총량 확인', tacErr: '잉크 총량 오류', hair: '너무 얇은 선', thin4c: '4도 혼합 얇은 선', blackArea: '리치블랙 권장 면적', whiteText: '흰 글자 주의 크기', glue: '포토북 풀칠 영역', gutterSaddle: '중철 접지 안쪽 여백' };
+// 단위는 입력칸 안 오른쪽에 (2026-11-20 실장님: 라벨에 단위 넣지 않기)
+var SET_UNIT = { ppi: 'ppi', bleed: 'mm', safe: 'mm', minText: 'pt', smallText: 'pt 미만', small4c: 'pt 미만', tacWarn: '%', tacErr: '%', hair: 'pt 이하', thin4c: 'pt 미만', blackArea: 'mm²', whiteText: 'pt 미만', glue: 'mm', gutterSaddle: 'mm' };
 var SET = {}; (function () { var s = {}; try { s = JSON.parse(ls.get('rv:set') || '{}'); } catch (e) {} if (s.minText == 6) delete s.minText; for (var k in DEF) SET[k] = s[k] != null ? +s[k] : DEF[k]; })();
 var PAPERS = [['', '종이 (두께)'], ['0.10', '모조 80g · 0.10mm'], ['0.12', '모조 100g · 0.12mm'], ['0.15', '모조 120g · 0.15mm'], ['0.10', '아트 120g · 0.10mm'], ['0.13', '아트 150g · 0.13mm'], ['0.12', '스노우 120g · 0.12mm'], ['0.15', '스노우 150g · 0.15mm'], ['0.20', '스노우 200g · 0.20mm'], ['0.17', '랑데뷰 130g · 0.17mm'], ['0.21', '랑데뷰 160g · 0.21mm'], ['0.17', '몽블랑 130g · 0.17mm'], ['0.21', '몽블랑 160g · 0.21mm'], ['0.25', '포토 용지 250g · 0.25mm'], ['x', '직접 입력']];
 var OPT = { kind: ls.get('rv:kind') || 'id', prod: ls.get('rv:prod') || 'print' };
 
 function setupUI() {
-  $('#setG').innerHTML = Object.keys(DEF).map(function (k) { return '<label>' + SET_LABEL[k] + '<input class="inp" type="number" step="any" data-k="' + k + '" value="' + SET[k] + '"></label>'; }).join('');
+  $('#setG').innerHTML = Object.keys(DEF).map(function (k) { return '<label>' + SET_LABEL[k] + '<span class="ifx"><input class="inp" type="number" step="any" data-k="' + k + '" value="' + SET[k] + '"><em>' + (SET_UNIT[k] || '') + '</em></span></label>'; }).join('');
   $$('#setG input').forEach(function (i) { i.onchange = function () { SET[i.dataset.k] = +i.value; ls.set('rv:set', JSON.stringify(SET)); }; });
   $('#setReset').onclick = function () { for (var k in DEF) SET[k] = DEF[k]; ls.set('rv:set', '{}'); $$('#setG input').forEach(function (i) { i.value = SET[i.dataset.k]; }); };
   document.addEventListener('dragover', function (e) { e.preventDefault(); }); document.addEventListener('drop', function (e) { e.preventDefault(); });

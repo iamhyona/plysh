@@ -132,6 +132,8 @@ details.more .row .u:first-child { width:130px !important; }
 .ogrid > .og:last-child:nth-child(odd) { grid-column:1 / -1; }
 .og > .fl:first-child { margin-top:0 !important; }
 .onote { margin:12px 4px 0 !important; padding:0 !important; border:0 !important; }
+/* 단위는 입력칸 안 오른쪽에 (2026-11-20) */
+.ifx { position:relative; flex:none; width:120px; display:block; } .ifx .inp { width:100% !important; height:46px !important; padding-right:44px !important; } .ifx em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:14px; font-weight:600; color:#8b95a1; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -171,7 +173,7 @@ details.more .row .u:first-child { width:130px !important; }
         <div class="seg" id="sSheet">
           <button data-v="kj" class="on">국전</button><button data-v="kh">국반절</button><button data-v="k4">국4절</button><button data-v="sj">46전</button><button data-v="sh">46반절</button><button data-v="s4">46 4절</button><button data-v="cu">직접 입력</button>
         </div>
-        <div class="row" style="margin-top:8px"><input class="inp" id="shW" inputmode="decimal"><span class="u">×</span><input class="inp" id="shH" inputmode="decimal"><span class="u">mm</span></div>
+        <div class="row" style="margin-top:8px"><span class="ifx"><input class="inp" id="shW" inputmode="decimal"><em>mm</em></span><span class="u">×</span><span class="ifx"><input class="inp" id="shH" inputmode="decimal"><em>mm</em></span></div>
       </div>
       <div class="card og">
         <div class="fl" id="sigL">1대 페이지 수</div>
@@ -179,12 +181,12 @@ details.more .row .u:first-child { width:130px !important; }
       </div>
       <div class="card og">
         <div class="fl">완성 크기 (재단 크기)</div>
-        <div class="row"><input class="inp" id="pgW" inputmode="decimal"><span class="u">×</span><input class="inp" id="pgH" inputmode="decimal"><span class="u">mm</span><span class="u" id="pgFrom"></span></div>
+        <div class="row"><span class="ifx"><input class="inp" id="pgW" inputmode="decimal"><em>mm</em></span><span class="u">×</span><span class="ifx"><input class="inp" id="pgH" inputmode="decimal"><em>mm</em></span><span class="u" id="pgFrom"></span></div>
         <details class="more">
           <summary>여백 설정</summary>
-          <div class="row" style="margin-top:10px"><span class="u" style="width:120px">페이지 사이 간격</span><input class="inp" id="gap" value="6" inputmode="decimal"><span class="u">mm</span></div>
-          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">물림 (아래쪽)</span><input class="inp" id="grip" value="12" inputmode="decimal"><span class="u">mm</span></div>
-          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">나머지 가장자리</span><input class="inp" id="edge" value="6" inputmode="decimal"><span class="u">mm</span></div>
+          <div class="row" style="margin-top:10px"><span class="u" style="width:120px">페이지 사이 간격</span><span class="ifx"><input class="inp" id="gap" value="6" inputmode="decimal"><em>mm</em></span></div>
+          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">물림 (아래쪽)</span><span class="ifx"><input class="inp" id="grip" value="12" inputmode="decimal"><em>mm</em></span></div>
+          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">나머지 가장자리</span><span class="ifx"><input class="inp" id="edge" value="6" inputmode="decimal"><em>mm</em></span></div>
         </details>
       </div>
     </div>

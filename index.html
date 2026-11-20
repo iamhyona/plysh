@@ -141,7 +141,10 @@ nav button { flex:none; border:0; background:none; padding:12px 0 10px; font-siz
 nav button.on { color:var(--txt); border-bottom-color:var(--txt); }
 
 main { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
-#rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 32px); margin:0 auto; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
+#rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 32px); margin:0 auto; }
+/* 도구 안 팝업이 열린 동안: 도구 화면을 브라우저 전체로 (2026-11-20) */
+iframe.fmon { position:fixed !important; inset:0 !important; top:0 !important; left:0 !important; width:100vw !important; height:100vh !important; height:100dvh !important; max-width:none !important; z-index:2000 !important; border-radius:0 !important; }
+html.fmlock, html.fmlock body { overflow:hidden; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
 /* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw 1024px, 양옆 여백 40px 이상) 안에서 헤더·메뉴·본문·도구가 같은 폭.
    1024px 이상: 카드 목록 = 여러 열, 입력 + 결과 = 왼쪽 입력 · 오른쪽 결과, 달력·표·검수 = 틀 폭 전체, 아래 시트(팝업) = 560px 가운데 */
 :root { --fw:560px; }
@@ -227,6 +230,7 @@ html.lock { overflow:hidden; }
 .f { flex:1; min-width:0; } .f label { display:block; font-size:12px; color:var(--mute); margin:0 0 5px 2px; font-weight:600; }
 .f input { width:100%; border:0; background:var(--chip); border-radius:12px; padding:12px; outline:0; font-size:16px; height:46px; min-width:0; max-width:100%; display:block; -webkit-appearance:none; appearance:none; }
 .f input[type=date] { color:var(--txt); text-align:left; line-height:22px; }
+.ifx { position:relative; display:block; } .ifx input { padding-right:52px !important; } .ifx em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:14px; font-weight:600; color:#8b95a1; pointer-events:none; white-space:nowrap; }
 .f input::-webkit-date-and-time-value { text-align:left; margin:0; min-height:22px; }
 .f input::-webkit-datetime-edit { padding:0; }
 .chips { display:flex; flex-wrap:wrap; gap:6px; }
@@ -1528,7 +1532,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm3';
+var APP_VER = '20261120hm4';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2100,7 +2104,8 @@ function f1(v) { return (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '')
 var SPQ = null;
 function renderSpine() {
   var c = SPQ = spq(), h = '';
-  var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + (unit ? ' (' + unit + ')' : '') + '</label><input type="number" inputmode="decimal" data-sk="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '></div>'; };
+  // 단위는 입력칸 안 오른쪽에 (2026-11-20 실장님: 라벨에 단위 넣지 않기)
+  var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + '</label><span class="ifx"><input type="number" inputmode="decimal" data-sk="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '>' + (unit ? '<em>' + unit + '</em>' : '') + '</span></div>'; };
   var paperSel = function (pre, lb) {
     var P = spPaper(c[pre + 'p']);
     return '<div class="f"><label>' + lb + '</label><select data-ss="' + pre + 'p">' + SPN_PAPERS.map(function (x) { return '<option value="' + x.k + '"' + (x.k === P.k ? ' selected' : '') + '>' + x.n + '</option>'; }).join('') + '</select></div>' +
@@ -2225,6 +2230,7 @@ function fsTick() {
   if (FS.f && FS.f !== f) { FS.f.style.position = ''; FS.f.style.top = ''; if (FS.w) { FS.w.style.height = ''; FS.w.style.paddingBottom = ''; } FS.h = 0; }
   FS.f = f; FS.w = w; if (!f || !w || w.classList.contains('hide')) return;
   var d; try { d = f.contentDocument; } catch (e) { return; } if (!d || !d.documentElement) return;
+  fmWatch(f, d); if (f.classList.contains('fmon')) return;
   if (!d.getElementById('plyOne')) { var st = d.createElement('style'); st.id = 'plyOne'; st.textContent = 'html { overflow:hidden !important; scrollbar-width:none !important; } html::-webkit-scrollbar { display:none !important; }'; (d.head || d.documentElement).appendChild(st);
     d.defaultView.addEventListener('scroll', function () { if (FS.lock) return; var r = FS.w.getBoundingClientRect(), y = d.defaultView.scrollY; var want = window.scrollY + r.top - fsTop() + y; if (Math.abs(fsInner() - y) > 1) { FS.lock = 1; window.scrollTo(0, Math.max(0, want)); FS.lock = 0; } }, { passive: true }); }
   var ch = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0), fh = f.offsetHeight;
@@ -2237,9 +2243,39 @@ function fsTick() {
   fsSync();
 }
 function fsInner() { if (!FS.w) return 0; var cs = getComputedStyle(FS.w); return Math.max(0, fsTop() - FS.w.getBoundingClientRect().top - parseFloat(cs.paddingTop)); }
-function fsSync() { var f = FS.f; if (!f || FS.lock) return; try { var win = f.contentWindow, y = fsInner(); if (Math.abs(win.scrollY - y) > 1) { FS.lock = 1; win.scrollTo(0, y); FS.lock = 0; } } catch (e) {} }
+function fsSync() { var f = FS.f; if (!f || FS.lock || f.classList.contains('fmon')) return; try { var win = f.contentWindow, y = fsInner(); if (Math.abs(win.scrollY - y) > 1) { FS.lock = 1; win.scrollTo(0, y); FS.lock = 0; } } catch (e) {} }
 window.addEventListener('scroll', fsSync, { passive: true });
 setInterval(fsTick, 400);
+/* 도구 안 팝업 (2026-11-20 실장님 "팝업은 화면 가운데, 어둡게는 화면 전체"):
+   도구(iframe) 안에서 팝업·시트가 열리면 그동안 도구 화면을 브라우저 화면 전체로 넓힌다 → 팝업이 화면 정가운데, 어두운 막이 화면 전체.
+   팝업 찾기: 도구 화면 네 귀퉁이에 화면을 거의 다 덮는 position:fixed 막이 있거나 <dialog open> 이 있으면 열린 것으로 본다. */
+function fmOpen(d) {
+  try {
+    if (d.querySelector('dialog[open]')) return true;
+    var w = d.defaultView, vw = w.innerWidth, vh = w.innerHeight;
+    return [[3, 3], [vw - 3, 3], [3, vh - 3], [vw - 3, vh - 3]].filter(function (pt) {
+      var e = d.elementFromPoint(pt[0], pt[1]);
+      while (e && e !== d.body && e !== d.documentElement) { var cs = w.getComputedStyle(e); if (cs.position === 'fixed' && cs.visibility !== 'hidden' && +cs.opacity > 0.05) { var r = e.getBoundingClientRect(); if (r.width >= vw * 0.9 && r.height >= vh * 0.9) return true; } e = e.parentElement; }
+      return false;
+    }).length >= 3;
+  } catch (x) { return false; }
+}
+function fmCheck(f) {
+  var d; try { d = f.contentDocument; } catch (x) { return; } if (!d || !f.offsetParent && !f.classList.contains('fmon')) return;
+  var on = fmOpen(d), was = f.classList.contains('fmon');
+  if (on === was) return;
+  var win = d.defaultView;
+  if (on) { var r = f.getBoundingClientRect(); f._fmY = win.scrollY; f._fmT = r.top; f.classList.add('fmon'); document.documentElement.classList.add('fmlock'); try { win.scrollTo(0, Math.max(0, f._fmY - r.top)); } catch (x) {} }
+  else { f.classList.remove('fmon'); document.documentElement.classList.remove('fmlock'); try { win.scrollTo(0, f._fmY || 0); } catch (x) {} if (FS.f === f) { FS.h = 0; fsTick(); } }
+}
+function fmWatch(f, d) {
+  if (d._fmw) return; d._fmw = 1; var t = 0;
+  var go = function () { if (t) return; t = requestAnimationFrame(function () { t = 0; fmCheck(f); }); };
+  new MutationObserver(go).observe(d.documentElement, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'style', 'hidden', 'open'] });
+  d.addEventListener('transitionend', go, true); d.addEventListener('click', function () { setTimeout(go, 0); setTimeout(go, 320); }, true);
+}
+setInterval(function () { $$('iframe').forEach(function (f) { if (f.classList.contains('fmon')) fmCheck(f); }); }, 500);
+
 
 function renderView() {
   var rvOn = S.view === 'review', imOn = S.view === 'impose', tkOn = S.view === 'tk'; $('#rvWrap').classList.toggle('hide', !rvOn); $('#imWrap').classList.toggle('hide', !imOn); $('#tkWrap').classList.toggle('hide', !tkOn); $('#main').classList.toggle('hide', rvOn || imOn || tkOn);

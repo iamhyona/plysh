@@ -257,7 +257,32 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .dit button span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .dit button.add { padding:0 18px !important; }
 .dit button.dld { margin-left:auto; background:none !important; box-shadow:inset 0 0 0 1.5px #d1d6db; color:#4e5968 !important; } .dit button.dld.on { background:#191f28 !important; box-shadow:none; color:#fff !important; }
-.dlp { margin-top:-4px; }
+/* 단위는 입력칸 안 오른쪽에 (2026-11-20) */ .ifx { position:relative; display:block; } .ifx input { padding-right:52px !important; } .ifx em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:14px; font-weight:600; color:#8b95a1; pointer-events:none; white-space:nowrap; }
+/* 용어 (2026-11-20 실장님 "모바일 기준 같고 정리가 안 돼 보여"):
+   종이는 카드 하나에 줄로 · 참고는 옅게 · PC는 왼쪽 분류 목록 + 오른쪽 내용, 종이 줄은 왼쪽 설명 / 오른쪽 평량표 */
+.pcard { padding:4px 20px !important; }
+.pcard > div { border-top:1px solid #e5e8eb; padding:20px 0; } .pcard > div:first-child { border-top:0; padding-top:0; }
+.pblk .pbd { margin:6px 0 0; }
+.pblk .tip { background:none !important; padding:0 !important; margin-top:6px !important; font-size:13px !important; color:#8b95a1 !important; }
+.pblk .tip:before { content:'참고 · ' !important; color:#8b95a1 !important; font-weight:600 !important; }
+.pbR { margin-top:12px; }
+.ptb { min-width:0 !important; } .ptb th, .ptb td { padding:6px 4px; } .ptb th:first-child, .ptb td.rl { padding-left:0; padding-right:10px; }
+.pblk .tip, .glc .gl .tip { background:none !important; padding:0 !important; margin-top:6px !important; font-size:13px !important; color:#8b95a1 !important; }
+.glc .gl .tip:before { content:'참고 · ' !important; color:#8b95a1 !important; font-weight:600 !important; }
+@media (min-width:900px) {
+  .rfx { display:grid; grid-template-columns:168px minmax(0, 1fr); gap:24px; align-items:start; }
+  .rnav { position:sticky; top:16px; }
+  .rnav .rtab { flex-direction:column; width:100%; background:#fff !important; border-radius:16px; padding:8px !important; gap:2px !important; margin:0 !important; overflow:visible; }
+  .rnav .rtab button { justify-content:flex-start; text-align:left; min-height:40px; padding:0 14px !important; border-radius:10px !important; color:#4e5968 !important; box-shadow:none !important; }
+  .rnav .rtab button:hover { background:#f2f4f6 !important; }
+  .rnav .rtab button.on { background:#191f28 !important; color:#fff !important; }
+  .pblk { display:grid; grid-template-columns:220px minmax(0, 1fr); gap:24px; align-items:start; }
+  .pbR .ptb { width:100%; }
+  .pbR { margin-top:0; }
+  .glc { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); column-gap:32px; }
+  .glc .gl:nth-child(2) { border-top:0; padding-top:2px; }
+}
+#pk .pkb.pkb-s { height:auto !important; max-height:min(80vh, 640px); } .pks { padding:0 2px 2px; overflow:auto; } .pkn { margin:0 0 14px; font-size:14px; color:#8b95a1; line-height:1.5; } #pk .pkb-s .dtg button { background:#fff; }
 
 /* 절수: 선택 한 줄 + 크기/절수는 카드 제목 옆 (2026-11-20) */
 .ct.ctm { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -450,7 +475,7 @@ function renderCalc() {
   if (isDie) {
     var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd);
     h += '<div class="chips" style="margin:0 0 12px">' + DIE.map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div>';
-    h += '<div class="card"><div class="ct">' + dd.n + '<small>' + dd.d + '</small></div><div class="ig">' + Object.keys(dv).map(function (k) { var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + ' <i>' + L[1] + '</i></label><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '"></div>'; }).join('') + '</div>' +
+    h += '<div class="card"><div class="ct">' + dd.n + '<small>' + dd.d + '</small></div><div class="ig">' + Object.keys(dv).map(function (k) { var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (L[1] ? '<em>' + L[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
       '<div class="frow" style="margin-top:10px">' + num('q', '수량', '개') + num('ex', '여분', '%') + '</div><div class="seg" id="cG">' + [['', '결 상관없음'], ['v', '세로결'], ['h', '가로결']].map(function (o) { return '<button data-g="' + o[0] + '" class="' + ((c.gn || '') === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>' +
       '<div class="nt">전개도 모양 그대로 전지에 앉혀서 계산해요 · 한 장 안에서는 결 방향을 섞지 않고, 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div></div>';
   } else if (c.m === 'size') {
@@ -943,7 +968,7 @@ function renderOne() {
   var v = CUR.v, h = '<div class="phd"><button class="bk" id="back" aria-label="목록">‹</button><b>' + esc(t.n) + '</b></div>';
   h += '<div class="card"><div class="ct">입력</div><div class="ig">' + Object.keys(v).map(function (k) {
     var L = IN_LABEL[k] || [k, ''];
-    return '<div class="f"><label>' + L[0] + (L[1] ? ' <i>' + L[1] + '</i>' : '') + '</label><input type="number" inputmode="decimal" step="any" data-v="' + k + '" value="' + v[k] + '"></div>';
+    return '<div class="f"><label>' + L[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-v="' + k + '" value="' + v[k] + '">' + (L[1] ? '<em>' + L[1] + '</em>' : '') + '</span></div>';
   }).join('') + '</div>' + (false ? '<div class="f" style="margin-top:10px"><label>본문 용지 <i>책등 계산용</i></label>' + pickBtn('data-inner', 'paper', v.inner || '백색 모조지 / 120g') + '</div>' : '') +
     (t.note ? '<div class="nt">' + esc(t.note) + '</div>' : '') + '</div>';
   h += '<div id="out">' + outHtml(t) + '</div>';
@@ -1066,8 +1091,7 @@ function renderDoc() {
   var sel = dSel(d);
   h += '<div class="dsw"><div class="dsl">';
   h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="nt" style="margin:10px 0 0 118px">만든 날 ' + d.date + ' · 이 기기에 저장돼요</div></div>';
-  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><button class="add dld" id="dLoad" aria-expanded="false">구성 불러오기</button></div>' +
-    '<div class="card dlp" id="dLp" hidden><div class="ct">자주 쓰는 구성 불러오기</div><div class="nt" style="margin:0 0 12px">고르면 품목이 이 사양서에 더해져요. 비어 있는 품목은 바뀌어요</div><div class="dtg">' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<button class="tc" data-tpl="' + t.k + '"><b>' + esc(t.t) + '</b><span>' + esc(t.s) + '</span></button>'; }).join('') + '</div></div>';
+  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><button class="add dld" id="dLoad">구성 불러오기</button></div>';
   {
     var n = d.rows.indexOf(sel);
     h += '<div class="card"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '>↑</button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '>↓</button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div>';
@@ -1092,13 +1116,20 @@ function bindDoc() {
   var d = curDoc();
   $$('[data-doc]').forEach(function (b) { b.onclick = function () { ls.set('pr:doc', b.dataset.doc); renderDoc(); }; });
   $('#dNew').onclick = function () { newDoc(); renderDoc(); setTimeout(function () { var n = $('#dName'); if (n) { n.focus(); n.select(); } }, 50); };
-  $$('[data-tpl]').forEach(function (b) { b.onclick = function () {
-    var t = DOC_TPL.filter(function (x) { return x.k === b.dataset.tpl; })[0], dd = curDoc() || newDoc();
+  $$('[data-tpl]').forEach(function (b) { b.onclick = function () { tplLoad(b.dataset.tpl); }; });
+  function tplLoad(k) {
+    var t = DOC_TPL.filter(function (x) { return x.k === k; })[0], dd = curDoc() || newDoc();
     dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'size', 'pg', 'paper', 'print', 'cut', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
     t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
-    saveDocs(); renderDoc(); toast(t.t + ' 기본 구성을 넣었어요');
-  }; });
-  var lb = $('#dLoad'); if (lb) lb.onclick = function () { var p = $('#dLp'), o = p.hidden; p.hidden = !o; lb.classList.toggle('on', o); lb.setAttribute('aria-expanded', o ? 'true' : 'false'); };
+    saveDocs(); renderDoc(); toast(t.t + ' 구성을 불러왔어요');
+  }
+  var lb = $('#dLoad'); if (lb) lb.onclick = function () { // 구성 불러오기 = 팝업 (2026-11-20 실장님)
+    var el = $('#pk'), close = function () { el.style.display = 'none'; el.innerHTML = ''; document.body.style.overflow = ''; };
+    el.innerHTML = '<div class="pkb pkb-s"><div class="pkh"><b>자주 쓰는 구성 불러오기</b><button id="pkX" aria-label="닫기">×</button></div><div class="pks"><p class="pkn">고르면 품목이 이 사양서에 더해져요. 비어 있는 품목은 바뀌어요</p><div class="dtg">' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<button class="tc" data-tpl="' + t.k + '"><b>' + esc(t.t) + '</b><span>' + esc(t.s) + '</span></button>'; }).join('') + '</div></div></div>';
+    el.style.display = 'flex'; document.body.style.overflow = 'hidden';
+    $('#pkX').onclick = close; el.onclick = function (e) { if (e.target === el) close(); };
+    $$('#pk [data-tpl]').forEach(function (b) { b.onclick = function () { close(); tplLoad(b.dataset.tpl); }; });
+  };
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
@@ -1131,9 +1162,9 @@ function paperBlock(name, rs) {
   var cell = function (r) { return r ? '<td data-cp="' + esc(r[0]) + '">' + (r[4] ? r[4] + (/추정/.test(r[7]) ? '<i>~</i>' : '') : '●') + '</td>' : '<td class="x">–</td>'; };
   var find = function (v, g) { return rs.filter(function (r) { return String(r[2] || '') === v && (+r[3] || 0) === g; })[0]; };
   var sameW = vars.every(function (v) { return gs.every(function (g) { return !!find(v, g) === !!find(vars[0], g); }); });
-  var h = '<div class="pblk"><div class="pbh"><b>' + esc(name) + '</b>' + (r0[5] ? '<em>' + esc(r0[5]) + '</em>' : '<em class="gen">일반 · 업체 선택</em>') + (vars.length > 1 ? '<small>' + vars.length + '종</small>' : '') + '</div>';
+  var h = '<div class="pbh"><b>' + esc(name) + '</b>' + (r0[5] ? '<em>' + esc(r0[5]) + '</em>' : '<em class="gen">일반 · 업체 선택</em>') + (vars.length > 1 ? '<small>' + vars.length + '종</small>' : '') + '</div>';
   var ds = uniq(rs.map(function (r) { return r[6]; }).filter(Boolean)); if (ds.length) h += '<p class="pbd">' + esc(ds[0]) + '</p>';
-  h += '<div class="ptw"><table class="ptb"><tr><th>평량</th>' + gs.map(function (g) { return '<th>' + (g ? g + '<i>g</i>' : '규격') + '</th>'; }).join('') + '</tr>';
+  var L = h; h = '<div class="ptw"><table class="ptb"><tr><th>평량</th>' + gs.map(function (g) { return '<th>' + (g ? g + '<i>g</i>' : '규격') + '</th>'; }).join('') + '</tr>';
   if (vars.length > 6) {
     h += (sameW ? '<tr><td class="rl">두께㎛</td>' + gs.map(function (g) { return cell(find(vars[0], g)); }).join('') + '</tr>' : '<tr><td class="rl">색마다 다름</td>' + gs.map(function (g) { return '<td>' + vars.filter(function (v) { return find(v, g); }).length + '색</td>'; }).join('') + '</tr>') + '</table></div>';
     var chip = function (v) { var rv = rs.filter(function (r) { return String(r[2] || '') === v; }), rr = find(v, gs[gs.length - 1]) || rv[0]; return '<span data-cp="' + esc(rr[0]) + '">' + dotOf(v, name) + esc(v) + (sameW ? '' : '<small>' + rv.map(function (r) { return r[3]; }).join('·') + '</small>') + '</span>'; };
@@ -1142,8 +1173,8 @@ function paperBlock(name, rs) {
     h += vars.map(function (v) { return '<tr><td class="rl">' + (v ? dotOf(v, name) + esc(v) : '두께㎛') + '</td>' + gs.map(function (g) { return cell(find(v, g)); }).join('') + '</tr>'; }).join('') + '</table></div>';
   }
   var tips = uniq(rs.map(function (r) { return String(r[7] || '').replace(/\s*·?\s*두께[^·]*추정(값)?/g, '').replace(/^두께는.*$/, '').trim(); }).filter(Boolean));
-  if (tips.length) h += '<div class="tip">' + esc(tips.join(' · ')) + '</div>';
-  return h + '</div>';
+  if (tips.length) L += '<div class="tip">' + esc(tips.join(' · ')) + '</div>';
+  return '<div class="pblk"><div class="pbL">' + L + '</div><div class="pbR">' + h + '</div></div>';
 }
 function glossEntry(n, r, showTab) {
   var v = String(r[0]), h = '<div class="gl"><div class="glt"><b data-cp="' + esc(v) + '">' + esc(v) + '</b>';
@@ -1167,7 +1198,7 @@ function renderRef() {
     var hits = [].concat.apply([], Object.keys(CAT.T).map(function (n) { return rowsOf(n).filter(function (r) { return r.join(' ').toLowerCase().indexOf(q) >= 0; }).map(function (r) { return [n, r]; }); }));
     h += '<div class="card">' + hits.slice(0, 120).map(function (x) { return glossEntry(x[0], x[1], true); }).join('') + (hits.length ? '' : '<div class="empty2">찾는 용어가 없어요</div>') + '</div><div class="nt c">' + hits.length + '개 · 굵은 이름을 누르면 표준 표기가 복사돼요</div>';
   } else {
-    h += '<div class="chips rtab">' + groups.map(function (g) { return '<button data-ref="' + g + '"' + (g === k ? ' class="on"' : '') + '>' + g + '</button>'; }).join('') + '</div>';
+    h += '<div class="rfx"><aside class="rnav"><div class="chips rtab">' + groups.map(function (g) { return '<button data-ref="' + g + '"' + (g === k ? ' class="on"' : '') + '>' + g + '</button>'; }).join('') + '</div></aside><div class="rbody">';
     var grp = function (rows, gi) { var o = {}, order = []; rows.forEach(function (r) { var key = r[gi]; if (!o[key]) { o[key] = []; order.push(key); } o[key].push(r); }); return order.map(function (g) { return [g, o[g]]; }); };
     if (k === '결·책등') {
       h += '<div class="card"><div class="ct">종이 결</div><p class="tx"><b>종목(T목)</b> = 결이 전지의 긴 변과 같은 방향 · <b>횡목(Y목)</b> = 짧은 변과 같은 방향.<br><br>· <b>책 내지·표지</b>: 결이 책등과 같은 방향(세로결)이어야 잘 펴지고 물결이 안 생겨요.<br>· <b>접는 선·오시</b>: 결과 같은 방향으로 접어야 덜 터져요.<br>· 실제 재고 결은 인쇄소에 꼭 확인하세요.</p></div>';
@@ -1181,13 +1212,14 @@ function renderRef() {
       var rows = rowsOf(st);
       if (k === '용지') {
         var G = grp(rows, 1);
-        h += G.map(function (g, i) { return '<div class="card" id="pb' + i + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('');
+        h += '<div class="card pcard">' + G.map(function (g, i) { return '<div id="pb' + i + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('') + '</div>';
         h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용 · ~는 추정) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
       } else {
-        h += '<div class="card">' + rows.map(function (r) { return glossEntry(st, r); }).join('') + (rows.length ? '' : '<div class="empty2">비어 있어요 · 시트의 ‘' + esc(st) + '’ 탭에 행을 추가하세요</div>') + '</div>';
+        h += '<div class="card glc">' + rows.map(function (r) { return glossEntry(st, r); }).join('') + (rows.length ? '' : '<div class="empty2">비어 있어요 · 시트의 ‘' + esc(st) + '’ 탭에 행을 추가하세요</div>') + '</div>';
         h += '<div class="nt c">굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요</div>';
       }
     }
+    h += '</div></div>';
   }
   $('#main').innerHTML = h;
   var rq = $('#rQ'); rq.oninput = function () { S.rq = this.value; var p = this.selectionStart; renderRef(); var i = $('#rQ'); i.focus(); i.setSelectionRange(p, p); };
@@ -1432,7 +1464,7 @@ function renderDie() {
     return '<div class="dgr"><span class="dgl">' + gk + '</span><div class="chips">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-die="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>';
   }).join('') + '</div>';
   h += '<div class="card"><div class="ct">' + d.n + '<small>' + d.d + '</small></div><div class="ig">' + Object.keys(DS.v).map(function (k) {
-    var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + ' <i>' + L[1] + '</i></label><input type="number" inputmode="decimal" step="any" data-dv="' + k + '" value="' + DS.v[k] + '"></div>';
+    var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-dv="' + k + '" value="' + DS.v[k] + '">' + (L[1] ? '<em>' + L[1] + '</em>' : '') + '</span></div>';
   }).join('') + '</div></div><div id="dieOut" class="io-r"></div>';
   $('#main').innerHTML = h; dieOut();
   $$('[data-die]').forEach(function (b) { b.onclick = function () { DS.id = b.dataset.die; DS.v = null; ls.set('pr:die', JSON.stringify(DS)); renderDie(); }; });

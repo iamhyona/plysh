@@ -331,17 +331,17 @@ function drawInfo() {
   if (!CUR) { el.innerHTML = ''; return; }
   var ai = aiFor(CUR);
   if (ai) {
-    var g = '<div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:15px">' + esc(ai.name) + ' 기본 정보</b>' + (AINFO_URL ? '<a class="ib" href="' + esc(AINFO_URL) + '" target="_blank" rel="noopener">시트에서 고치기</a>' : '') + '</div><div class="ai">';
-    g += INFO_KEYS.map(function (k) { return '<div>' + esc(k) + '<b>' + (ai.info[k] ? esc(ai.info[k]) : '<span class="mute" style="font-weight:600">—</span>') + '</b></div>'; }).join('') + '</div>';
+    var g = '<div class="aih"><b>' + esc(ai.name) + ' 기본 정보</b>' + (AINFO_URL ? '<a class="aib" href="' + esc(AINFO_URL) + '" target="_blank" rel="noopener">시트에서 고치기</a>' : '') + '</div><dl class="ai">';
+    g += INFO_KEYS.map(function (k) { return '<div><dt>' + esc(k) + '</dt><dd>' + (ai.info[k] ? esc(ai.info[k]) : '<span class="mute">—</span>') + '</dd></div>'; }).join('') + '</dl>';
     var solo = ai.members.length === 1 && aiKey(ai.members[0].ko) === aiKey(ai.info['국문명'] || ai.name);
-    if (ai.members.length) g += '<div class="aim">' + (solo ? '<span class="mute">생일</span> ' : '<span class="mute">멤버 ' + ai.members.length + '명</span> ') + ai.members.map(function (m) { var b = m.bd.split('-'); return '<span>' + (solo ? '' : esc(m.ko) + (m.en ? ' <i>' + esc(m.en) + '</i> ' : ' ')) + (b.length === 2 ? +b[0] + '/' + +b[1] : esc(m.bd)) + '</span>'; }).join('') + '</div>';
-    if (ai.note) g += '<div class="note" style="margin-top:8px">확인 필요: ' + esc(ai.note) + '</div>';
+    if (ai.members.length) g += '<div class="aimh">' + (solo ? '생일' : '멤버 ' + ai.members.length + '명') + '</div><div class="aim">' + ai.members.map(function (m) { var b = m.bd.split('-'), bd = b.length === 2 ? +b[0] + '월 ' + +b[1] + '일' : esc(m.bd); return '<div>' + (solo ? '<b>' + bd + '</b>' : '<b>' + esc(m.ko) + '</b>' + (m.en ? '<i>' + esc(m.en) + '</i>' : '') + '<small>생일 ' + bd + '</small>') + '</div>'; }).join('') + '</div>';
+    if (ai.note) g += '<div class="note" style="margin-top:16px">확인 필요: ' + esc(ai.note) + '</div>';
     el.innerHTML = g; return;
   }
   var info = RV2.parseRules(RULES[CUR] || '').info || {}, has = INFO_KEYS.some(function (k) { return info[k]; });
-  var h = '<div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:15px">' + esc(CUR) + ' 기본 정보</b><button type="button" class="ib" id="infoEd">' + (INFO_EDIT ? '입력 끝' : has ? '정보 고치기' : '정보 넣기') + '</button></div><div class="ai">';
-  h += INFO_KEYS.map(function (k) { return '<div>' + esc(k) + (INFO_EDIT ? '<input class="inp" data-k="' + esc(k) + '" value="' + esc(info[k] || '') + '" placeholder="' + (k === '데뷔일' ? '예: 2017-08-02' : '') + '">' : '<b>' + (info[k] ? esc(info[k]) : '<span class="mute" style="font-weight:600">—</span>') + '</b>') + '</div>'; }).join('') + '</div>';
-  if (!has && !INFO_EDIT) h += '<div class="note" style="margin-top:8px">아직 넣은 정보가 없어요. 한 번 넣으면 팀 시트에 저장돼서 다음부터 바로 보여요. 영문명·팬덤명은 파일 속 표기 검사에도 써요.</div>';
+  var h = '<div class="aih"><b>' + esc(CUR) + ' 기본 정보</b><button type="button" class="aib" id="infoEd">' + (INFO_EDIT ? '입력 끝' : has ? '정보 고치기' : '정보 넣기') + '</button></div><dl class="ai">';
+  h += INFO_KEYS.map(function (k) { return '<div><dt>' + esc(k) + '</dt>' + (INFO_EDIT ? '<dd><input class="inp" data-k="' + esc(k) + '" value="' + esc(info[k] || '') + '" placeholder="' + (k === '데뷔일' ? '예: 2017-08-02' : '') + '"></dd>' : '<dd>' + (info[k] ? esc(info[k]) : '<span class="mute">—</span>') + '</dd>') + '</div>'; }).join('') + '</dl>';
+  if (!has && !INFO_EDIT) h += '<div class="note" style="margin-top:16px">아직 넣은 정보가 없어요. 한 번 넣으면 팀 시트에 저장돼서 다음부터 바로 보여요. 영문명·팬덤명은 파일 속 표기 검사에도 써요.</div>';
   el.innerHTML = h;
   $('#infoEd').onclick = function () { INFO_EDIT = !INFO_EDIT; drawInfo(); };
   $$('#artInfo input[data-k]').forEach(function (i) { i.onchange = function () { setInfo(i.dataset.k, i.value.trim()); }; });
