@@ -2513,6 +2513,7 @@ function pgSync() {
   var e = navEl('npg', 'div', function (e) { $('#main').insertAdjacentElement('beforebegin', e); }), i = pgInfo();
   e.classList.toggle('hide', !i); e.classList.toggle('subon', !!subHtml());
   var a = null; try { var f = S.view === 'tk' && $('#tkWrap iframe:not(.hide)'), l = f && f.contentDocument && f.contentDocument.getElementById('lnk'); if (l && l.getAttribute('href')) a = l; } catch (x) {}
+  if (!a && S.view === 'qk' && S.qk && S.qk.url) a = { href: S.qk.url, title: '연락처 시트 열기' }; // 퀵: 시트 열기는 머리 오른쪽 아이콘 (2026-11-20)
   e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' + (a ? '<a class="pga" href="' + esc(a.href) + '" target="_blank" rel="noopener" title="' + esc(a.title || '시트 · 폴더 열기') + '" aria-label="시트 · 폴더 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>' : '') : '';
 }
 function navSync() {
@@ -4271,7 +4272,6 @@ function renderQk() {
   var h = '<label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="qkQ" type="search" placeholder="업체 · 담당자 · 주소 검색" value="' + esc(q) + '"></label>';
   h += '<div class="tabs2" id="qkK"><button data-k="" class="' + (k ? '' : 'on') + '">전체</button>' + QKK.map(function (x) { return '<button data-k="' + x + '" class="' + (k === x ? 'on' : '') + '">' + x + '</button>'; }).join('') + '</div>';
   h += '<div id="qkL"></div>';
-  if (D.url) h += '<p class="srcinfo"><a href="' + esc(D.url) + '" target="_blank" style="color:inherit">연락처 시트 열기</a></p>';
   $('#main').innerHTML = h;
   qkList();
   $('#qkQ').oninput = function () { S.qkq = this.value; qkList(); };
