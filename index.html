@@ -1193,6 +1193,20 @@ html[data-nav] #cvSeg { display:none !important; }
 .bsx svg { width:18px; height:18px; stroke-width:2.6; }
 #nfm .nx { width:40px !important; height:40px !important; }
 #nfm .nx svg { width:18px; height:18px; }
+
+/* 달력 데스크탑 크기 (2026-11-20 실장님): 휴대폰 기준 작은 글자를 PC에서 크게 */
+@media (min-width:1024px) {
+  .mcal { padding:24px 24px 18px !important; }
+  .mcal .wd div { font-size:13px; padding:0 0 10px 8px; letter-spacing:.02em; }
+  .mcal .grid > button { min-height:132px; padding:8px 6px 8px; gap:4px; }
+  .mcal .dn { font-size:15px; padding:2px 4px 4px; gap:6px; }
+  .mcal .dn small { font-size:11px; }
+  .mcal .td .dn b { border-radius:11px; padding:1px 7px; }
+  .mcal .ev { font-size:13px !important; line-height:1.5; padding:1px 4px !important; border-radius:6px; }
+  .mcal .ev i { width:7px; height:7px; margin-right:5px; vertical-align:1px; }
+  .mcal .grid > button:hover { background:#f9fafb; }
+  .tmv .mcal .grid > button, .wlcal .grid > button { min-height:104px; }
+}
 </style>
 </head>
 <body>
@@ -2166,8 +2180,8 @@ $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); wind
 // 정보 구조 시안 (2026-11-19 2차) ─ 오늘 · 프로젝트 · 도구 · 자료 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
 // NAV.s: 't' 위 메뉴 + 펼침 판(기본) · 'w' 왼쪽 메뉴
 var NAV = { s: ['t', 'w', 'c'].indexOf(ls.get('d4:nav')) > -1 ? ls.get('d4:nav') : 'c', pi: 0, pq: '', hv: null };
-try { NAV.fav = JSON.parse(ls.get('d4:navfav') || 'null'); } catch (e) {}
-if (!Array.isArray(NAV.fav)) NAV.fav = ['formly', 'review', 'spine', 'filename', 'cut'];
+// 2026-11-20 실장님 지정: 홈 자주 쓰는 도구 = 퀵 · 프리플라이트 · 로고 · 책등 계산기
+NAV.fav = ['qk', 'review', 'logo', 'spine'];
 try { NAV.rec = JSON.parse(ls.get('d4:wsrec') || '[]'); } catch (e) { NAV.rec = []; }
 var NAV_IC = {
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -2294,7 +2308,7 @@ function renderStart() {
     '<div class="wsc"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
-    '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + NAV.fav.map(function (k) { var t = tl(k); return t.k ? '<button type="button" data-ng="' + k + '">' + navIc(TOOLS.filter(function (g) { return g.i.indexOf(t) > -1; })[0].g === '계산' ? 'calc' : t.k === 'review' || t.k === 'checklist' ? 'chk' : 'doc') + esc(TOOL_SHORT[k] || t.t) + '</button>' : ''; }).join('') + '</div></div></div>';
+    '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + NAV.fav.map(function (k) { if (k === 'qk') return '<button type="button" data-ng="qk">' + navIc('qk') + '퀵</button>'; var t = tl(k); return t.k ? '<button type="button" data-ng="' + k + '">' + navIc(TOOLS.filter(function (g) { return g.i.indexOf(t) > -1; })[0].g === '계산' ? 'calc' : t.k === 'review' || t.k === 'checklist' ? 'chk' : 'doc') + esc(TOOL_SHORT[k] || t.t) + '</button>' : ''; }).join('') + '</div></div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div>' + ntHtml()); bindGo($('#main')); bindNt();
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });

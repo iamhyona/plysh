@@ -193,6 +193,27 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
   .szw input[type=range]{width:64px}
   .chipsrow .lbl{width:36px}
 }
+
+/* 이미지로 폰트 찾기 (2026-11-20) */
+.ffind { display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 16px; margin:12px 0 0; border:0; border-radius:12px; background:#fff; color:#191f28; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.ffind .i { width:18px; height:18px; }
+.fdrop { position:relative; display:grid; justify-items:center; gap:6px; text-align:center; padding:28px 16px; border-radius:16px; background:#f2f4f6; margin-bottom:12px; }
+.fdrop.on { box-shadow:inset 0 0 0 1.5px #4e5968; }
+.fdrop b { font-size:16px; font-weight:800; color:#191f28; } .fdrop span { font-size:13px; color:#8b95a1; }
+.fpick { margin-top:8px; display:inline-flex; align-items:center; height:40px; padding:0 18px; border-radius:12px; background:#fff; color:#191f28; font-size:14px; font-weight:700; cursor:pointer; }
+.fdrop img { display:none; max-width:100%; max-height:240px; border-radius:10px; margin-top:10px; background:#fff; }
+.fdrop.has img { display:block; }
+.fbig { width:100%; height:52px; border:0; border-radius:14px; background:#191f28; color:#fff; font:inherit; font-size:16px; font-weight:700; cursor:pointer; }
+.fbig:disabled { opacity:.35; cursor:default; }
+.flab { font-size:14px; font-weight:700; color:#4e5968; margin:20px 0 10px; }
+.fext { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.fext a, .fext button { display:flex; align-items:center; justify-content:space-between; gap:8px; height:46px; padding:0 14px; border:0; border-radius:12px; background:#f2f4f6; color:#191f28; font:inherit; font-size:14px; font-weight:700; text-decoration:none; cursor:pointer; }
+.fext button:disabled { opacity:.4; cursor:default; }
+.fext small { font-size:12px; font-weight:600; color:#8b95a1; }
+.fwait { margin-top:12px; padding:12px 14px; border-radius:12px; background:#f2f4f6; color:#4e5968; font-size:13px; line-height:1.55; }
+.fhit { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #f2f4f6; }
+.fhit b { display:block; font-size:15px; } .fhit span { font-size:13px; color:#8b95a1; }
+.fgo { flex:none; height:36px; padding:0 14px; border:0; border-radius:999px; background:#e8f3ff; color:#3182f6; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -218,6 +239,7 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
       <div class="fld sample" id="fS"><svg class="i" viewBox="0 0 24 24"><path d="M5 19 10.5 5h1L17 19M7.2 14h8.6"/><path d="M19 9v10"/></svg><input id="sample" placeholder="샘플 텍스트 입력 — 전체 미리보기에 적용" autocomplete="off"><button class="x" data-clear="sample"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
       <div class="szw"><svg class="i" viewBox="0 0 24 24" style="color:var(--tx3)"><path d="M4 18 8 7h1l4 11M5.4 14.5h6.2"/><path d="M15 18l2.6-6.5h.8L21 18M15.9 16h4.2"/></svg><input type="range" id="size" min="16" max="120" value="40"><span id="sizeV">40</span></div>
     </div>
+    <button class="ffind" id="bFind" type="button"><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m20.5 16-5-5-8 8"/></svg>이미지로 폰트 찾기</button>
     <div id="filters"></div>
   </section>
   <section id="eraArea" style="display:none"></section>
@@ -692,6 +714,65 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeOv(); });
 window.addEventListener('online',flush);
 setPending();
 load();
+
+/* ---------- 이미지로 폰트 찾기 (2026-11-20) ---------- */
+const FIND_API='https://script.google.com/macros/s/AKfycbwFtL_qIuUMOxdD5wzj6Eltc67OTIScR4yJjMZWxLyPzn8K7Y5JhOBTDlf4wp9Av6lqSQ/exec';
+const FIND={b64:'',blob:null};
+function openFind(){
+  $('#sheet').className='sheet';
+  $('#sheet').innerHTML=`<div class="shh"><h2>이미지로 폰트 찾기</h2><button class="ib" data-close>${ICON.close}</button></div>
+  <div class="fdrop" id="fdrop"><b>캡처한 이미지를 붙여 넣으세요</b><span>⌘V(Ctrl+V)로 붙여 넣거나 끌어다 놓기 · 글자 부분만 크게 자를수록 정확해요</span>
+    <label class="fpick">사진 고르기<input type="file" id="fFile" accept="image/*" hidden></label><img id="fImg" alt=""></div>
+  <button class="fbig" id="fAI" type="button" disabled>AI로 찾기</button>
+  <div id="fRes"></div>
+  <div class="flab">다른 곳에서 찾기</div>
+  <div class="fext">
+    <button type="button" id="fCopy" disabled>이미지 복사</button>
+    <a href="https://www.myfonts.com/pages/whatthefont" target="_blank" rel="noopener">WhatTheFont<small>영문</small></a>
+    <a href="https://www.fontsquirrel.com/matcherator" target="_blank" rel="noopener">Font Matcherator<small>영문</small></a>
+    <a href="https://lens.google.com/" target="_blank" rel="noopener">Google 렌즈<small>한글 · 영문</small></a>
+  </div>
+  <p class="hint">이미지 복사를 누른 뒤 열리는 사이트에 붙여 넣으면 돼요.</p>`;
+  openOv();
+  if(FIND.b64) showFindImg();
+  $('#fFile').onchange=function(){ if(this.files[0]) takeFindImg(this.files[0]); this.value=''; };
+  const dz=$('#fdrop');
+  dz.ondragover=e=>{ e.preventDefault(); dz.classList.add('on'); };
+  dz.ondragleave=()=>dz.classList.remove('on');
+  dz.ondrop=e=>{ e.preventDefault(); dz.classList.remove('on'); const f=e.dataTransfer.files[0]; if(f&&/^image/.test(f.type)) takeFindImg(f); };
+  $('#fAI').onclick=findAI;
+  $('#fCopy').onclick=async()=>{ try{ await navigator.clipboard.write([new ClipboardItem({'image/png':await toPng(FIND.blob)})]); toast('이미지를 복사했어요'); }catch(e){ toast('복사가 안 되는 브라우저예요 · 사진을 직접 올려 주세요'); } };
+}
+function takeFindImg(file){
+  const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=()=>{ const k=Math.min(1,1400/Math.max(img.width,img.height)), cv=document.createElement('canvas'); cv.width=img.width*k; cv.height=img.height*k;
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height); URL.revokeObjectURL(url); FIND.b64=cv.toDataURL('image/jpeg',0.9).split(',')[1]; cv.toBlob(b=>{ FIND.blob=b; showFindImg(); },'image/png'); };
+  img.src=url;
+}
+function showFindImg(){ const i=$('#fImg'); if(!i) return; i.src='data:image/jpeg;base64,'+FIND.b64; $('#fdrop').classList.add('has'); $('#fAI').disabled=false; $('#fCopy').disabled=false; $('#fRes').innerHTML=''; }
+function toPng(b){ return Promise.resolve(b); }
+async function findAI(){
+  let pin=localStorage.getItem('pr:pin'); if(!pin){ pin=prompt('루틴 앱 PIN 4자리'); if(!pin) return; }
+  const box=$('#fRes'); box.innerHTML='<div class="fwait">이미지 보는 중…</div>';
+  try{
+    const r=await fetch(FIND_API,{method:'POST',body:JSON.stringify({api:'appFontFind',args:[pin,FIND.b64,'image/jpeg']})}); const o=await r.json();
+    if(!o||!o.ok) throw new Error((o&&o.error)||'서버 오류');
+    localStorage.setItem('pr:pin',pin);
+    const L=(o.data&&o.data.fonts)||[];
+    if(!L.length){ box.innerHTML='<div class="fwait">비슷한 폰트를 못 찾았어요 · 글자 부분만 크게 잘라 다시 올려 주세요</div>'; return; }
+    box.innerHTML='<div class="flab">비슷한 폰트</div>'+L.map(x=>{
+      const nm=String(x.name||''), key=nm.toLowerCase().replace(/\s+/g,''), hit=S.data.find(f=>String(f.n||'').toLowerCase().replace(/\s+/g,'')===key) || S.data.find(f=>String(f.n||'').toLowerCase().replace(/\s+/g,'').indexOf(key)===0);
+      return `<div class="fhit"><div><b>${esc(nm)}</b><span>${esc(x.why||'')}</span></div>${hit?`<button type="button" class="fgo" data-fid="${esc(hit.id)}">아카이브에서 보기</button>`:`<button type="button" class="fgo" data-fq="${esc(nm)}">검색</button>`}</div>`;
+    }).join('');
+    box.querySelectorAll('[data-fid]').forEach(b=>b.onclick=()=>openDetail(b.dataset.fid));
+    box.querySelectorAll('[data-fq]').forEach(b=>b.onclick=()=>{ closeOv(); const q=$('#q'); q.value=b.dataset.fq; q.dispatchEvent(new Event('input')); });
+  }catch(e){
+    if(/PIN/.test(e.message)) localStorage.removeItem('pr:pin');
+    box.innerHTML='<div class="fwait">'+(/appFontFind|unknown|없는|not/i.test(e.message)?'AI 찾기는 서버에 폰트 찾기 코드를 붙여 넣으면 켜져요 · 지금은 아래 다른 곳에서 찾기를 써 주세요':esc(e.message))+'</div>';
+  }
+}
+$('#bFind').onclick=openFind;
+document.addEventListener('paste',e=>{ const it=[...(e.clipboardData||{}).items||[]].find(x=>/^image/.test(x.type)); if(!it) return; e.preventDefault(); if(!$('#ov').classList.contains('show')||!$('#fdrop')) openFind(); takeFindImg(it.getAsFile()); });
 </script>
 </body>
 </html>
