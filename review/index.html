@@ -92,6 +92,16 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 @media (min-width:800px) { .vw { height:calc(100% - 32px); border-radius:20px; overflow:hidden; } }
 .vh { display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff; border-bottom:1px solid var(--line); }
 .vh b { flex:1; font-size:15px; }
+/* 검수 기록 (2026-11-20) */
+#hist .hl { display:grid; gap:8px; margin-top:14px; }
+#hist .hi { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:6px 12px; align-items:center; padding:12px 14px; border:1px solid #e5e8eb; border-radius:14px; background:#fff; }
+#hist .hm b { display:block; font-size:14px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#hist .hm small { display:block; font-size:12.5px; color:#8b95a1; margin-top:3px; line-height:1.45; }
+#hist .hs { font-size:12px; font-weight:700; padding:3px 9px; border-radius:999px; background:#f2f4f6; color:#4e5968; justify-self:end; }
+#hist .hs.ok { background:#e8f8ee; color:#12a150; } #hist .hs.cr { background:#fdecee; color:#e5303e; } #hist .hs.st { background:#fff3e6; color:#e06a00; }
+#hist .hb { grid-column:1 / -1; display:flex; gap:6px; flex-wrap:wrap; }
+#hist .hb .ib { height:34px; font-size:13px; font-weight:700; } #hist .hb .ib.ghost { background:none; color:#8b95a1; }
+@media (min-width:900px) { #hist .hl { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
 .ib { border:0; background:var(--chip); border-radius:10px; min-width:36px; height:36px; font-weight:800; padding:0 10px; }
 .vb { flex:1; display:flex; min-height:0; }
 .vc { flex:1; overflow:auto; position:relative; padding:12px; }
@@ -315,6 +325,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   </div>
 
   <div class="card noprint" id="results" hidden></div>
+  <div class="card noprint" id="hist" hidden></div>
   <div class="card" id="chk"></div>
   <div id="rep" hidden></div>
 </div>
@@ -340,6 +351,6 @@ var LIBS = {
 <script src="text.js?v=20261120d"></script>
 <script src="app.js?v=20261120e"></script>
 <script src="spec.js?v=20261120c"></script>
-<script src="batch.js?v=20261120f"></script>
+<script src="batch.js?v=20261120h"></script>
 </body>
 </html>
