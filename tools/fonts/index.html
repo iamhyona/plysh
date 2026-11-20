@@ -221,9 +221,9 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
 #toolArea{order:1} #fside{order:2} .fmain>*:not(#toolArea){order:3}
 #fside .fsh{display:none}
 @media (min-width:900px){
-  .fwrap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;align-items:start}
-  .fmain{display:block;min-width:0;order:1}
-  #fside{order:0}
+  .fwrap{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:32px;align-items:start}
+  .fmain{display:block;min-width:0;order:0}
+  #fside{order:1;padding-left:24px !important;border-left:1px solid #e5e8eb}
   #fside{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;scrollbar-width:none;padding:4px 0 24px}
   #fside::-webkit-scrollbar{display:none}
   #fside .fsh{display:block;font-size:16px;font-weight:800;color:#191f28;margin:8px 0 18px}

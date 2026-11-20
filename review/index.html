@@ -221,6 +221,13 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 .nst:empty { display:none; }
 .nst { margin-top:10px; padding:10px 14px; border-radius:12px; background:#f2f4f6; font-size:13px; font-weight:600; line-height:1.5; }
 @media (max-width:560px) { .ninfo { grid-template-columns:1fr; gap:2px; } .ninfo dd { margin-bottom:10px; } }
+
+/* 아티스트 카드 정리 (2026-11-20) */
+.shx { display:flex; align-items:center; justify-content:space-between; }
+.shx .lk { border:0; background:none; padding:6px 0; font:inherit; font-size:14px; font-weight:600; color:#4e5968; cursor:pointer; }
+#artChips:empty { display:none; }
+#rulesEd { margin-top:20px; padding-top:20px; border-top:1px solid #f2f4f6; }
+.rlab { font-size:13px; font-weight:600; color:#4e5968; margin:0 0 8px; }
 </style>
 </head>
 <body>
@@ -239,21 +246,23 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   </div>
 
   <div class="card noprint" id="rulesBox">
-    <h3 class="sh">아티스트명 선택 <span class="mute" id="rulesCnt" style="font-size:13px;font-weight:600"></span></h3>
-    <p class="note" style="margin:0 0 12px">멤버 이름·표기·생일이 맞게 쓰였는지 볼 때 쓰는 규칙이에요. <b>모든 아티스트</b> 규칙은 어느 파일에나 쓰이고, 아티스트를 고르면 그 아티스트 규칙이 더해져요.</p>
-    <div class="row">
-      <input class="inp" id="artQ" list="artL" placeholder="아티스트 검색 또는 선택" style="width:260px" autocomplete="off">
-    </div>
+    <h3 class="sh shx">아티스트<button type="button" class="lk" id="rulesOpen">표기 규칙</button></h3>
+    <input class="inp" id="artQ" list="artL" placeholder="아티스트 검색 또는 선택" style="width:260px;max-width:100%" autocomplete="off">
     <datalist id="artL"></datalist>
-    <div class="seg" id="artChips" style="margin-top:8px"></div>
+    <div class="seg" id="artChips" style="margin-top:12px"></div>
     <div id="artInfo"></div>
-    <div id="rulesSt" class="nst"></div>
-    <div class="row" style="margin-top:10px"><button type="button" class="ib" id="rulesOpen">규칙 입력</button><span class="small sub" id="rulesSum"></span></div>
-    <dl class="ninfo" id="rulesHow" hidden>
-      <dt>쓰는 법</dt><dd><span class="nfmt">한 줄에 하나씩</span><code>[멤버] 한글 / 영문 = 틀린 표기들</code><code>[표기] 정식 표기 = 틀린 표기들</code><code>[생일·기념일] 월/일 내용</code></dd>
-      <dt>저장</dt><dd>PLYSH 시트에 저장돼 팀이 같이 써요</dd>
-    </dl>
-    <textarea id="rulesTa" class="inp ta" style="min-height:150px" hidden></textarea>
+    <div id="rulesEd" hidden>
+      <div class="rlab">어떤 규칙을 고칠까요</div>
+      <div class="seg" id="rulesWho"></div>
+      <textarea id="rulesTa" class="inp ta" style="height:180px;min-height:180px;margin-top:12px"></textarea>
+      <dl class="ninfo" id="rulesHow">
+        <dt>쓰는 법</dt><dd><span class="nfmt">한 줄에 하나씩</span><code>[멤버] 한글 / 영문 = 틀린 표기들</code><code>[표기] 정식 표기 = 틀린 표기들</code><code>[생일·기념일] 월/일 내용</code></dd>
+        <dt>모든 아티스트</dt><dd>어느 파일에나 쓰는 규칙</dd>
+        <dt>저장</dt><dd>PLYSH 시트에 저장돼 팀이 같이 써요</dd>
+      </dl>
+      <div id="rulesSt" class="nst"></div>
+    </div>
+    <span id="rulesCnt" hidden></span>
   </div>
 
   <div class="card noprint" id="titleCard">

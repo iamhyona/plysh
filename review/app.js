@@ -457,6 +457,41 @@ function pageChecks(P) {
     if (o.w0 === 0) h0.push(b); else if (o.w <= SET.hair + 1e-4) hair.push({ b: b, w: o.w });
     else if (o.w < SET.thin4c && k.inkN > 1) t4.push({ b: b, w: o.w });
   });
+  // 흑백처럼 보이는 페이지 (2026-11-20 실장님): 회색을 만든 CMYK 값이 한쪽으로 치우쳤는지, 빠진 판이 있는지, 전체 농도가 너무 낮은지 — 감리 때 맞추기 어려움
+  (function () {
+    var px = P.px; if (!px || !px.data) return;
+    var d = px.data, n = 0, col = 0, darkL = 255, step = 4 * Math.max(1, Math.round(Math.sqrt(d.length / 4 / 60000)));
+    for (var i = 0; i < d.length; i += step) {
+      var r = d[i], g = d[i + 1], b2 = d[i + 2], mx = Math.max(r, g, b2), mn = Math.min(r, g, b2);
+      if (mn > 244) continue; n++;
+      if (mx - mn > 22) col++;
+      var L = 0.299 * r + 0.587 * g + 0.114 * b2; if (L < darkL) darkL = L;
+    }
+    if (n < 300 || col / n > 0.03) return;
+    var objs = P.fills.concat(P.strokes, P.texts).filter(function (o) { var k = o.ink, bb = o.vis || o.box; return k && bb && !PRV.empty(bb) && overlaps(bb, P.crop) && !k.rgb && !k.spots && !k.reg && !k.white && !k.pattern && k.tac > 0.5; });
+    var imgs = P.images.filter(function (im) { return im.vis && !PRV.empty(PRV.isect(im.vis, P.crop)) && !im.mask; });
+    var cmykImg = imgs.filter(function (im) { var k = im.cs && (im.cs.k === 'idx' && im.cs.base ? im.cs.base.k : im.cs.k); return k === 'cmyk'; });
+    if (!objs.length && !imgs.length) return;
+    var used = { c: 0, m: 0, y: 0, k: 0 }, skew = [], noK = [], kOnly = 0, cmyGray = 0, maxT = 0;
+    objs.forEach(function (o) {
+      var k = o.ink; ['c', 'm', 'y', 'k'].forEach(function (ch) { if (k[ch] > 0.02) used[ch]++; });
+      if (k.tac > maxT) maxT = k.tac;
+      var mx = Math.max(k.c, k.m, k.y), mn = Math.min(k.c, k.m, k.y);
+      if (mx < 0.02) kOnly++; else cmyGray++;
+      if (mx >= 0.1 && mx - mn >= 0.2) skew.push(o);
+      if (k.k < 0.02 && mx >= 0.15) noK.push(o);
+    });
+    var bx = function (L) { return L.slice(0, 30).map(function (o) { return o.vis || o.box; }); };
+    var sample = function (L) { var u = []; L.forEach(function (o) { var t = inkTxt(o.ink); if (u.indexOf(t) < 0) u.push(t); }); return u.slice(0, 3).join(', '); };
+    if (skew.length) add('warn', 'print', 'grayskew', '흑백 디자인인데 회색이 한 색으로 치우쳐 있어요', skew.length + '곳 · ' + sample(skew), '권장 K 단독 회색, 또는 C·M·Y를 고르게 (예 C40 M30 Y30). 한쪽이 많으면 감리 때 색이 끼어 보여요', bx(skew));
+    if (noK.length) add('warn', 'print', 'graynok', '흑백 디자인인데 K판 없이 CMY로만 만든 회색', noK.length + '곳 · ' + sample(noK), '권장 K를 기본으로 한 회색. CMY만으로는 인쇄 농도가 흔들리고 감리 때 맞추기 어려워요', bx(noK));
+    var cmyU = ['c', 'm', 'y'].filter(function (ch) { return used[ch]; }), miss = ['c', 'm', 'y'].filter(function (ch) { return !used[ch]; });
+    if (cmyU.length && miss.length) add('warn', 'print', 'grayplate', '흑백 디자인에 빠진 판이 있어요: ' + miss.map(function (c) { return c.toUpperCase(); }).join(' · '), '쓰인 판 ' + ['c', 'm', 'y', 'k'].filter(function (ch) { return used[ch]; }).map(function (c) { return c.toUpperCase(); }).join(' · '), '권장 K 단독으로 정리하거나 C·M·Y를 모두 넣어 균형 맞추기. 일부 판만 있으면 회색에 색이 껴요');
+    if (kOnly && cmyGray && !skew.length && !noK.length) add('info', 'print', 'graymix', '회색 만드는 방식이 섞여 있어요', 'K 단독 ' + kOnly + '곳 · CMY 섞은 회색 ' + cmyGray + '곳', '권장 한 가지 방식으로 통일. 같은 회색도 퍼센티지가 달라 감리 때 맞추기 어려워요');
+    var darkPct = Math.round((1 - darkL / 255) * 100);
+    if (darkPct < 55 && (maxT < 70 || !objs.length)) add('info', 'print', 'graylow', '흑백 디자인 전체 농도가 낮아요', '가장 진한 곳 약 ' + darkPct + '% · 벡터 최대 잉크 ' + Math.round(maxT) + '%', '권장 가장 진한 곳 K70 이상. 농도가 낮으면 감리 때 올리고 내릴 여지가 적어요');
+    if (cmykImg.length) add('info', 'print', 'grayimg', '흑백으로 보이는 사진이 CMYK 이미지예요', cmykImg.length + '개', '권장 포토샵 정보 패널로 어두운 곳·중간 회색의 CMYK 값 확인. 한 색이 많거나 K가 없으면 그레이스케일(K)로 바꿀지 인쇄소와 확인', cmykImg.map(function (im) { return im.vis; }));
+  })();
   if (tacE.length) add('err', 'print', 'tac', '잉크 총량이 ' + SET.tacErr + '%를 넘어요', tacE.slice(0, 3).map(function (t) { return inkTxt(t.k) + ' = ' + Math.round(t.k.tac) + '%'; }).join(', '), '리치블랙은 C30 M20 Y20 K100(170%)으로, 진한 색은 총량 ' + SET.tacWarn + '% 안으로 줄여 주세요.', tacE.map(function (t) { return t.b; }));
   if (tacB.length) add('warn', 'print', 'tac2', '잉크 총량이 ' + SET.tacWarn + '%를 넘어요', tacB.slice(0, 3).map(function (t) { return inkTxt(t.k) + ' = ' + Math.round(t.k.tac) + '%'; }).join(', '), '종이·인쇄소 기준을 확인하고 필요하면 줄여 주세요.', tacB.map(function (t) { return t.b; }));
   if (kBig.length) add('warn', 'print', 'richblack', '넓은 검정 면이 K100 단독이에요', kBig.length + '곳 · 넓은 면은 K100만 쓰면 회색빛으로 얼룩져 보여요.', '리치블랙 C30 M20 Y20 K100으로 바꿔 주세요 (작은 글자·얇은 선은 K100 유지).', kBig);

@@ -1012,6 +1012,16 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wfl a, .wfl button { display:flex; align-items:center; gap:10px; border:0; background:var(--bg); border-radius:12px; padding:11px 12px; font-size:13.5px; font-weight:600; color:var(--txt); text-decoration:none; text-align:left; }
 .wfl .nvi { color:var(--mute); }
 @media (max-width:1023px) { .wsg { grid-template-columns:1fr; } }
+/* 홈 위 줄: 팀 공지 | 자주 쓰는 도구 반반 (2026-11-20) */
+.wsg.wtop { margin-bottom:12px; align-items:stretch; }
+.wsg.wtop > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
+.wsg.wtop .nth { margin:-6px 0 4px; } .wsg.wtop .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
+@media (max-width:1023px) { .wsg.wtop { grid-template-columns:1fr; } }
+/* 일·주·월·기간 고르기 (2026-11-20 실장님: 원이 타원으로 찌그러짐) → 어디서나 회색 트랙 세그먼트, 글자 폭과 상관없이 같은 너비 */
+.aseg, .aseg.sw { background:#e5e8eb !important; border-radius:12px; padding:3px; gap:2px; }
+.aseg button, .aseg.sw button { min-width:48px; height:34px; min-height:34px !important; padding:0 12px !important; border-radius:9px !important; background:none !important; color:#8b95a1 !important; font-size:13px; font-weight:700; box-shadow:none; }
+.aseg button.on, .aseg.sw button.on { background:#fff !important; color:#191f28 !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+@media (max-width:520px) { .aseg button, .aseg.sw button { min-width:40px; padding:0 8px !important; } }
 /* 홈 (2026-11-20 실장님): 제목 아래 간격 = 오늘 할 일 정도, PC에서 나란한 박스 높이 같게 */
 .wsc h3 + .wpc, .wsc h3 + .wsq { margin-top:6px; }
 @media (min-width:1024px) {
@@ -1494,7 +1504,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120nv1';
+var APP_VER = '20261120hm1';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2193,7 +2203,7 @@ $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.da
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
 // 정보 구조 시안 (2026-11-19 2차) ─ 오늘 · 프로젝트 · 도구 · 자료 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
 // NAV.s: 't' 위 메뉴 + 펼침 판(기본) · 'w' 왼쪽 메뉴
-var NAV = { s: ['t', 'w', 'c'].indexOf(ls.get('d4:nav')) > -1 ? ls.get('d4:nav') : 'c', pi: 0, pq: '', hv: null };
+var NAV = { s: 'c', pi: 0, pq: '', hv: null };
 // 2026-11-20 실장님 지정: 홈 자주 쓰는 도구 = 퀵 · 프리플라이트 · 로고 · 책등 계산기
 NAV.fav = ['qk', 'review', 'logo', 'spine'];
 try { NAV.rec = JSON.parse(ls.get('d4:wsrec') || '[]'); } catch (e) { NAV.rec = []; }
@@ -2322,8 +2332,9 @@ function renderStart() {
     '<div class="wsc"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
-    '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + NAV.fav.map(function (k) { if (k === 'qk') return '<button type="button" data-ng="qk">' + navIc('qk') + '퀵</button>'; var t = tl(k); return t.k ? '<button type="button" data-ng="' + k + '">' + navIc(TOOLS.filter(function (g) { return g.i.indexOf(t) > -1; })[0].g === '계산' ? 'calc' : t.k === 'review' || t.k === 'checklist' ? 'chk' : 'doc') + esc(TOOL_SHORT[k] || t.t) + '</button>' : ''; }).join('') + '</div></div></div>';
-  $('#main').innerHTML = h.replace('</small></div>', '</small></div>' + ntHtml()); bindGo($('#main')); bindNt();
+    '<div class="wsc"><h3>프로그램 기본 셋팅<button type="button" data-ng="gl:1">전체</button></h3><div class="wsq">' + [['illustrator', '일러스트 셋팅'], ['photoshop', '포토샵 셋팅'], ['indesign', '인디자인 셋팅'], ['bridge', '브릿지 셋팅']].map(function (g) { return '<button type="button" data-ng="gd:g.html?id=' + g[0] + '">' + navIc('doc') + g[1] + '</button>'; }).join('') + '</div></div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵'], ['review', 'chk', '프리플라이트']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop">' + ntHtml() + toolsCard + '</div>'); bindGo($('#main')); bindNt();
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
 }

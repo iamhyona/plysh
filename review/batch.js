@@ -327,7 +327,8 @@ function loadArtistInfo() {
 
 function drawInfo() {
   var el = $('#artInfo'); if (!el) return;
-  if (CUR === '공통') { el.innerHTML = ''; return; }
+  var CUR = SELART; // 기본 정보는 고른 아티스트 기준 (고치는 규칙과 따로)
+  if (!CUR) { el.innerHTML = ''; return; }
   var ai = aiFor(CUR);
   if (ai) {
     var g = '<div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:15px">' + esc(ai.name) + ' 기본 정보</b>' + (AINFO_URL ? '<a class="ib" href="' + esc(AINFO_URL) + '" target="_blank" rel="noopener">시트에서 고치기</a>' : '') + '</div><div class="ai">';
@@ -346,6 +347,7 @@ function drawInfo() {
   $$('#artInfo input[data-k]').forEach(function (i) { i.onchange = function () { setInfo(i.dataset.k, i.value.trim()); }; });
 }
 function setInfo(k, v) {
+  if (SELART && CUR !== SELART) setCur(SELART);
   var rows = RV2.rulesToRows(RULES[CUR] || ''), found = false;
   rows = rows.filter(function (r) { if (/정보/.test(r[0]) && r[1] === k) { if (found || !v) return false; found = true; r[2] = v; } return true; });
   if (!found && v) rows.unshift(['기본 정보', k, v]);
@@ -371,13 +373,20 @@ function cnt() {
   var r = RV2.parseRules($('#rulesTa').value), n = r.members.length + r.terms.length + r.days.length;
   $('#rulesCnt').textContent = '';
   drawInfo();
+  drawWho();
   var sm = $('#rulesSum'); if (!sm) return;
   sm.innerHTML = n ? '<b>' + esc(anm(CUR)) + '</b> 규칙: ' + esc(r.members.map(function (m) { return m.forms.join('/'); }).slice(0, 6).join(', ') + (r.members.length > 6 ? ' 외' : '')) + (r.terms.length ? ' · 표기 ' + r.terms.length + '개' : '') + (r.days.length ? ' · 날짜 ' + r.days.length + '개' : '') : '<b>' + esc(anm(CUR)) + '</b> 규칙이 아직 없어요.';
 }
+function drawWho() {
+  var el = $('#rulesWho'); if (!el) return;
+  var L = ['공통'].concat(SELART ? [SELART] : []);
+  el.innerHTML = L.map(function (a) { return '<button type="button" data-a="' + esc(a) + '" class="' + (a === CUR ? 'on' : '') + '">' + esc(anm(a)) + '</button>'; }).join('');
+  $$('#rulesWho button').forEach(function (b) { b.onclick = function () { setCur(b.dataset.a); }; });
+}
 function drawArtChips() {
-  var fileA = Q.map(function (q) { return q.artist; }).filter(Boolean), list = ['공통'];
-  fileA.concat(Object.keys(RULES)).forEach(function (a) { if (a && list.indexOf(a) < 0) list.push(a); });
-  $('#artChips').innerHTML = list.map(function (a) { var n = (RULES[a] || '').trim() ? RV2.parseRules(RULES[a]) : null, c = n ? n.members.length + n.terms.length + n.days.length : 0; return '<button type="button" data-a="' + esc(a) + '" class="' + (a === CUR ? 'on' : '') + '">' + esc(anm(a)) + (fileA.indexOf(a) >= 0 ? ' ·파일' : '') + ' <span class="mute">' + c + '</span></button>'; }).join('');
+  var fileA = Q.map(function (q) { return q.artist; }).filter(Boolean), list = [];
+  fileA.concat(Object.keys(RULES)).forEach(function (a) { if (a && a !== '공통' && list.indexOf(a) < 0) list.push(a); });
+  $('#artChips').innerHTML = list.map(function (a) { var n = (RULES[a] || '').trim() ? RV2.parseRules(RULES[a]) : null, c = n ? n.members.length + n.terms.length + n.days.length : 0; return '<button type="button" data-a="' + esc(a) + '" class="' + (a === SELART ? 'on' : '') + '">' + esc(anm(a)) + (fileA.indexOf(a) >= 0 ? ' ·파일' : '') + ' <span class="mute">' + c + '</span></button>'; }).join('');
   $$('#artChips button').forEach(function (b) { b.onclick = function () { if (b.dataset.a === '공통') setCur('공통'); else pickArtist(b.dataset.a); }; });
 }
 var SELART = '';
@@ -403,7 +412,7 @@ function save(a) {
 }
 function setupRules() {
   var ta = $('#rulesTa'); ta.placeholder = '한 줄에 하나씩 적어 주세요.\n[멤버]\n한글 이름 / 영문 이름 = 틀린 표기, 틀린 표기\n\n[표기]\n정식 표기 = 틀린 표기\n\n[생일·기념일]\n월/일 내용'; ta.value = RULES[CUR] || '';
-  $('#rulesOpen').onclick = function () { ta.hidden = !ta.hidden; $('#rulesHow').hidden = ta.hidden; this.textContent = ta.hidden ? '규칙 입력' : '입력 닫기'; if (!ta.hidden) ta.focus(); };
+  $('#rulesOpen').onclick = function () { var ed = $('#rulesEd'); ed.hidden = !ed.hidden; this.textContent = ed.hidden ? '표기 규칙' : '닫기'; drawWho(); if (!ed.hidden) ta.focus(); };
   ta.oninput = function () { RULES[CUR] = ta.value; cacheRules(); cnt(); drawArtChips(); if (A) { say('입력 중…'); var a = CUR; clearTimeout(timer); timer = setTimeout(function () { timer = null; save(a); }, 1500); } };
   ta.onblur = function () { flush(); };
   $('#artQ').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); pickArtist(this.value); } };
@@ -537,6 +546,7 @@ var CHECK = [
   ['색 · 잉크', [
     ['쓰인 별색 · 의도치 않은 별색', ['spot', 'reg'], PDFONLY],
     ['잉크 총량 (TAC)', ['tac', 'tac2'], PDFONLY],
+    ['흑백 디자인: CMYK 치우침 · 빠진 판 · 농도', ['grayskew', 'graynok', 'grayplate', 'graymix', 'graylow', 'grayimg'], PDFONLY],
     ['리치블랙 C30 M20 Y20 K100', ['richblack', 'richblack2'], PDFONLY],
     ['K100 글자 오버프린트', ['smallk', 'kop'], PDFONLY],
     ['별색·단색 위 선 오버프린트', ['strokeop'], PDFONLY],

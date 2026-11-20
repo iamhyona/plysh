@@ -280,7 +280,7 @@ html.emb .form-input, html.emb .date-display { font-size:15px; }
 html.emb .form-input.sm { font-size:15px; padding:8px 11px; }
 html.emb .field-lbl-input, html.emb .field-lbl { font-size:13px; }
 html.emb .lang-pills { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
-html.emb .lang-pill { height:36px; font-size:13.5px; font-weight:600; flex:none; padding:0 14px; border:0 !important; background:#fff; color:var(--text2); border-radius:999px; }
+html.emb .lang-pill { height:36px; font-size:13.5px; font-weight:600; flex:none; padding:0 16px; border:0 !important; background:#fff; color:var(--text2); border-radius:999px; }
 html.emb .lang-pill.active { background:var(--text) !important; color:#fff !important; }
 html.emb .preset-btn { height:40px; border:0 !important; border-radius:12px; background:#fff; color:var(--text2) !important; font-size:13.5px; font-weight:600; }
 html.emb .preset-btn[onclick^="saveFieldsSnapshot"] { background:var(--text) !important; color:#fff !important; }
@@ -375,6 +375,36 @@ html.emb .fx-top .fx-lang .lang-pill { height:34px !important; min-height:34px !
 html.emb .fx-top .fx-lang .lang-pill.active { background:#fff !important; color:#191f28 !important; box-shadow:0 1px 3px rgba(0,0,0,.08) !important; }
 html.emb #fxBar .fxr + .fxr { margin-top:14px; }
 @media (max-width:640px) { .fx-langw { flex-wrap:wrap; gap:8px; } }
+
+/* 입력 언어가 미리보기 칸을 넘지 않게 (2026-11-20) */
+.fx-langw { min-width:0; max-width:100%; flex-wrap:wrap; row-gap:8px; }
+html.emb .fx-top .fx-lang { flex:0 1 auto !important; min-width:0; overflow-x:auto !important; scrollbar-width:none; }
+html.emb .fx-top .fx-lang .lang-pill { flex:none !important; white-space:nowrap; }
+html.emb .fx-top { min-width:0; max-width:100%; }
+
+/* 입력 언어를 섹션 제목 옆 작은 선택으로 (2026-11-20 실장님: 위가 혼란) */
+.fx-lsel { display:none; }
+html.emb .fx-top { display:none !important; }
+html.emb .sect-hdr.fx-sh { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px !important; }
+html.emb .fx-lsel { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#4e5968; }
+html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-radius:10px; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center; -webkit-appearance:none; appearance:none; font:inherit; font-size:14px; font-weight:700; color:#191f28; cursor:pointer; }
+
+/* 상품 포장 정보: 작은 체크박스 대신 고르기 칩 (2026-11-20 실장님: 간격이 좁아 안 읽힘) */
+.pk-card { padding:24px !important; }
+.pk-g + .pk-g { margin-top:28px; }
+.pk-lb { font-size:13px; font-weight:600; color:#4e5968; margin:0 0 12px; }
+.pk-grid { display:flex; flex-wrap:wrap; gap:8px; }
+.pk-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 16px; }
+@media (max-width:520px) { .pk-2 { grid-template-columns:1fr; } }
+.pk-ck { position:relative; display:inline-flex; align-items:center; height:40px; padding:0 16px; border-radius:12px; background:#f2f4f6; color:#4e5968; font-size:14px; font-weight:600; cursor:pointer; user-select:none; }
+.pk-ck input { position:absolute; opacity:0; pointer-events:none; width:0; height:0; }
+.pk-ck:has(input:checked) { background:#191f28; color:#fff; }
+.pk-ck:has(input:focus-visible) { box-shadow:0 0 0 2px #3182f6; }
+.pk-note { margin-top:12px; padding:12px 14px; background:#f9fafb; border-radius:12px; font-size:13px; line-height:1.6; color:#191f28; }
+.pk-note > span { display:inline-block; min-width:88px; font-weight:600; color:#4e5968; margin-right:8px; }
+.pk-note.pk-col > span { display:block; margin:0 0 6px; }
+.pk-hint { margin-top:12px; font-size:13px; color:#8b95a1; }
+.fxadd { height:40px !important; padding:0 16px !important; border:0 !important; border-radius:999px !important; background:none !important; box-shadow:inset 0 0 0 1.5px #d1d6db !important; color:#4e5968 !important; font-weight:600 !important; }
 </style>
 </head>
 <body>
@@ -2493,7 +2523,7 @@ function tabFields(p){
     +'<div class="fx-langw"><span class="fx-ll">입력 언어</span><div class="lang-pills fx-lang">'+langPills+'</div></div>'
     +'</div>'
     +'<div class="fx-hide" style="height:1px;background:var(--border);margin-bottom:12px"></div>'
-    +'<div class="sect-hdr">상품 기본 정보</div><div class="fxsec">'
+    +'<div class="sect-hdr fx-sh"><span>상품 기본 정보</span><label class="fx-lsel">입력 언어<select onchange="switchEditLang(this.value)">'+LANGS.map(function(l){return '<option value="'+l.code+'"'+(l.code===lang?' selected':'')+'>'+l.label+'</option>';}).join('')+'</select></label></div><div class="fxsec">'
     +p.fields.map(function(f){return renderFieldCard(f);}).join('')
     +'<button class="add-row-btn" onclick="openFieldPicker()">+ 상품 정보 항목 추가</button></div>'
     +renderExtraInfoSection(p)
@@ -3149,25 +3179,20 @@ function renderPackagingSection(p){
   var ei=p.extraInfo||{};
   var pkgChks=_PKG_OPTS.map(function(v){
     var chk=(ei.packaging||[]).indexOf(v)>=0?' checked':'';
-    return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 6px 3px 0;font-size:13px;cursor:pointer">'
-      +'<input type="checkbox"'+chk+' onchange="togglePackaging(\''+eh(v)+'\')" style="width:14px;height:14px">'+eh(v)+'</label>';
+    return '<label class="pk-ck">'
+      +'<input type="checkbox"'+chk+' onchange="togglePackaging(\''+eh(v)+'\')">'+eh(v)+'</label>';
   }).join('');
   var recChks=_RECYCLE_OPTS.map(function(v){
     var chk=(ei.recycling||[]).indexOf(v)>=0?' checked':'';
-    return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 6px 3px 0;font-size:13px;cursor:pointer">'
-      +'<input type="checkbox"'+chk+' onchange="toggleRecycling(\''+eh(v)+'\')" style="width:14px;height:14px">'+eh(v)+'</label>';
+    return '<label class="pk-ck">'
+      +'<input type="checkbox"'+chk+' onchange="toggleRecycling(\''+eh(v)+'\')">'+eh(v)+'</label>';
   }).join('');
   return '<div class="sect-hdr" style="margin-top:18px">상품 포장 정보</div>'
-    +'<div class="field-card" style="padding:14px 16px">'
-    +'<div style="margin-bottom:10px;display:flex;align-items:center;gap:10px">'
-    +'<span style="font-size:12px;color:var(--text3);white-space:nowrap;min-width:72px">증지 사용여부</span>'
-    +'<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:13px">'
-    +'<input type="checkbox"'+(ei.hasJungji?' checked':'')+' onchange="setExtraInfo(\'hasJungji\',this.checked)" style="width:14px;height:14px"> 유</label>'
-    +'</div>'
-    +'<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--text3);margin-bottom:6px">포장 방식</div>'
-    +'<div style="display:flex;flex-wrap:wrap">'+pkgChks+'</div></div>'
-    +'<div><div style="font-size:12px;color:var(--text3);margin-bottom:6px">재활용정보</div>'
-    +'<div style="display:flex;flex-wrap:wrap">'+recChks+'</div></div>'
+    +'<div class="field-card pk-card">'
+    +'<div class="pk-g"><div class="pk-lb">증지</div><div class="pk-grid">'
+    +'<label class="pk-ck"><input type="checkbox"'+(ei.hasJungji?' checked':'')+' onchange="setExtraInfo(\'hasJungji\',this.checked)">증지 사용</label></div></div>'
+    +'<div class="pk-g"><div class="pk-lb">포장 방식</div><div class="pk-grid">'+pkgChks+'</div></div>'
+    +'<div class="pk-g"><div class="pk-lb">재활용 정보</div><div class="pk-grid">'+recChks+'</div></div>'
     +'</div>';
 }
 
@@ -3196,24 +3221,24 @@ function renderExtraInfoSection(p){
   }).join('');
   var pkgChks=_PKG_OPTS.map(function(v){
     var chk=(ei.packaging||[]).indexOf(v)>=0?' checked':'';
-    return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 6px 3px 0;font-size:13px;cursor:pointer">'
-      +'<input type="checkbox"'+chk+' onchange="togglePackaging(\''+eh(v)+'\')" style="width:14px;height:14px">'+eh(v)+'</label>';
+    return '<label class="pk-ck">'
+      +'<input type="checkbox"'+chk+' onchange="togglePackaging(\''+eh(v)+'\')">'+eh(v)+'</label>';
   }).join('');
   return '<div class="sect-hdr" style="margin-top:18px">상품 추가 정보</div>'
-    +'<div class="field-card" style="padding:14px 16px">'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 18px">'
+    +'<div class="field-card pk-card">'
+    +'<div class="pk-2">'
 
-    +'<div><div style="font-size:12px;color:var(--text3);margin-bottom:4px">상품 카테고리</div>'
+    +'<div><div class="pk-lb" style="margin-bottom:8px">상품 카테고리</div>'
     +'<div class="sel-wrap"><select class="form-input sm" style="width:100%" onchange="setExtraInfo(\'category\',this.value)">'
     +'<option value="">-- 선택 --</option>'+catOpts+'</select></div></div>'
 
-    +'<div><div style="font-size:12px;color:var(--text3);margin-bottom:4px">제작수량</div>'
+    +'<div><div class="pk-lb" style="margin-bottom:8px">제작수량</div>'
     +'<input class="form-input sm" type="number" min="0" style="width:100%" value="'+eh(ei.qty||'')+'" placeholder="수량 입력" oninput="setExtraInfo(\'qty\',this.value)"></div>'
 
-    +'<div><div style="font-size:12px;color:var(--text3);margin-bottom:4px">입고처</div>'
+    +'<div><div class="pk-lb" style="margin-bottom:8px">입고처</div>'
     +'<input class="form-input sm" style="width:100%" value="'+eh(ei.receivedFrom||'')+'" placeholder="입고처 입력" oninput="setExtraInfo(\'receivedFrom\',this.value)"></div>'
 
-    +'<div><div style="font-size:12px;color:var(--text3);margin-bottom:4px">입고일</div>'
+    +'<div><div class="pk-lb" style="margin-bottom:8px">입고일</div>'
     +'<input class="form-input sm" type="date" style="width:100%" value="'+eh(ei.receivedDate||'')+'" onchange="setExtraInfo(\'receivedDate\',this.value)"></div>'
 
     +'</div>'
@@ -3228,54 +3253,38 @@ function renderLabelInfoSection(p){
     var originVal='';
     var of=p.fields.find(function(f){return f.defKey==='origin';});
     if(of) originVal=of.values.ko||'';
-    originHtml='<div style="margin-top:8px;padding:8px 12px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--text2)">'
-      +'📌 제조국 자동 연동: <strong>'+eh(originVal||'(제조국 미입력)')+'</strong></div>';
+    originHtml='<div class="pk-note"><span>원산지라벨</span>제조국 칸과 연결: <strong>'+eh(originVal||'(제조국 미입력)')+'</strong></div>';
   }
   var neckHtml='';
   if(li.neckLabel){
-    neckHtml='<div style="margin-top:8px;padding:8px 12px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--text2)">'
-      +'📋 넥라벨에 포함될 정보: 품명, 소재, 제조국, 수입사, 판매원, 사용연령, 제조연월</div>';
+    neckHtml='<div class="pk-note"><span>넥라벨</span>들어가는 정보: 품명, 소재, 제조국, 수입사, 판매원, 사용연령, 제조연월</div>';
   }
   var careHtml='';
   if(li.careLabel){
     var syms=li.careSymbols||[];
     var symChks=_CARE_SYMBOLS.map(function(s){
       var chk=syms.indexOf(s.id)>=0?' checked':'';
-      return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 6px 3px 0;font-size:12px;cursor:pointer;white-space:nowrap">'
-        +'<input type="checkbox"'+chk+' onchange="toggleCareSymbol(\''+s.id+'\')" style="width:13px;height:13px">'
+      return '<label class="pk-ck">'
+        +'<input type="checkbox"'+chk+' onchange="toggleCareSymbol(\''+s.id+'\')">'
         +eh(s.label)+'</label>';
     }).join('');
     var notices=syms.map(function(id){return _CARE_NOTICE[id]||'';}).filter(Boolean);
     var noticeHtml=notices.length
-      ?'<div style="margin-top:10px;padding:8px 12px;background:rgba(49,130,246,.08);border:1px solid rgba(49,130,246,.25);border-radius:6px;font-size:12px;color:var(--text2);line-height:1.7">'
-        +'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📝 생성될 주의사항 안내문</div>'
+      ?'<div class="pk-note pk-col"><span>만들어질 주의사항</span>'
         +notices.map(function(n,i){return (i+1)+'. '+n;}).join('<br>')+'</div>'
-      :'<div style="margin-top:8px;font-size:12px;color:var(--text3)">세탁기호를 선택하면 주의사항 안내문이 생성됩니다.</div>';
-    careHtml='<div style="margin-top:8px">'
-      +'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">세탁기호 선택</div>'
-      +'<div style="display:flex;flex-wrap:wrap">'+symChks+'</div>'
+      :'<div class="pk-hint">세탁기호를 고르면 주의사항 문구가 만들어져요</div>';
+    careHtml='<div class="pk-g">'
+      +'<div class="pk-lb">세탁기호</div>'
+      +'<div class="pk-grid">'+symChks+'</div>'
       +noticeHtml+'</div>';
   }
 
-  function chkRow(key,label,extra){
-    return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">'
-      +'<span style="font-size:13px;color:var(--text2);min-width:90px;padding-top:2px">'+label+'</span>'
-      +'<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:13px">'
-      +'<input type="checkbox"'+(li[key]?' checked':'')+' onchange="setLabelInfo(\''+key+'\',this.checked)" style="width:14px;height:14px"> 유</label>'
-      +(extra||'')
-      +'</div>';
-  }
-
+  function tg(key,label){ return '<label class="pk-ck"><input type="checkbox"'+(li[key]?' checked':'')+' onchange="setLabelInfo(\''+key+'\',this.checked)">'+label+'</label>'; }
   return '<div class="sect-hdr" style="margin-top:18px">상품 라벨 정보</div>'
-    +'<div class="field-card" style="padding:14px 16px">'
-    +chkRow('originLabel','원산지라벨',originHtml)
-    +chkRow('neckLabel','넥라벨',neckHtml)
-    +'<div style="display:flex;align-items:flex-start;gap:10px">'
-    +'<span style="font-size:13px;color:var(--text2);min-width:90px;padding-top:2px">케어라벨</span>'
-    +'<div style="flex:1"><label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:13px">'
-    +'<input type="checkbox"'+(li.careLabel?' checked':'')+' onchange="setLabelInfo(\'careLabel\',this.checked)" style="width:14px;height:14px"> 유</label>'
-    +careHtml+'</div>'
-    +'</div>'
+    +'<div class="field-card pk-card">'
+    +'<div class="pk-g"><div class="pk-lb">붙이는 라벨</div><div class="pk-grid">'+tg('originLabel','원산지라벨')+tg('neckLabel','넥라벨')+tg('careLabel','케어라벨')+'</div>'
+    +originHtml+neckHtml+'</div>'
+    +careHtml
     +'</div>';
 }
 
