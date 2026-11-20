@@ -688,7 +688,7 @@ function drawChecklist(r) {
 }
 
 // ── 결과지 (2026-11-19 새 양식: 요약 → 상세 → 확인 후 통과 → 검사 항목 · 웹 체크 + PDF 저장) ──
-var LV = { err: 'r', warn: 'a', adv: 'o' }, LVN = { r: ['경고', '수정함'], a: ['주의', '확인함'], o: ['조언', '확인'] };
+var LV = { err: 'r', warn: 'a', adv: 'o' }, LVN = { t: ['오탈자', '수정함'], r: ['경고', '수정함'], a: ['주의', '확인함'], o: ['조언', '확인'] };
 var TITLE_FIX = { smallk: 'K100 글자 오버프린트 꺼짐', kop: 'K100 선 오버프린트 꺼짐', thin4c: '4색 얇은 선', small4c: '작은 글자 4색', nocopy: '리걸 문구 없음', copyok: '리걸 문구', copyyear: '리걸 연도 다름', tiny: '작은 글자' };
 var ENDS = [[/꺼져 있어요/g, '꺼짐'], [/켜져 있어요/g, '켜짐'], [/남아 있어요/g, '남음'], [/섞여 있어요/g, '섞임'], [/찾지 못했어요/g, '없음'], [/못 ?했어요/g, '못 함'], [/읽히지 않아요/g, '안 읽힘'], [/있어요/g, '있음'], [/없어요/g, '없음'], [/달라요/g, '다름'], [/커요/g, '큼'], [/작아요/g, '작음'], [/어두워요/g, '어두움'], [/밝아요/g, '밝음'], [/나가요/g, '나감'], [/걸려요/g, '걸림'], [/끊겨요/g, '끊김'], [/맞아요/g, '맞음'], [/이상해요/g, '이상'], [/가리켜요/g, '가리킴'], [/넘어요/g, '넘음'], [/바뀌어요/g, '바뀜'], [/나와요/g, '나옴'], [/들어갔어요/g, '들어감'], [/쓰였어요/g, '쓰임'], [/아니에요/g, '아님'], [/보여요/g, '보임'], [/틀려요/g, '틀림'], [/실패했어요/g, '실패'], [/검사했어요/g, '검사'], [/여야 해요/g, '여야 함'], [/생겨요/g, '생김'], [/사라져요/g, '사라짐'], [/빠져요/g, '빠짐'], [/돼요/g, '됨'], [/권장해요/g, '권장'], [/어려워요/g, '어려움'], [/괜찮아요/g, '괜찮음'], [/해요/g, '함'], [/(이)?에요/g, ''], [/예요/g, ''], [/수 있음/g, '수 있음']];
 var WORDS = [[/판권\s*·\s*저작권/g, '리걸'], [/판권/g, '리걸'], [/(\d+)\s*쪽/g, '$1p'], [/쪽수/g, '페이지 수'], [/작업지시서/g, '사양서'], [/4도\s*혼합/g, '4색'], [/중복\s*인쇄/g, '오버프린트']];
@@ -728,11 +728,14 @@ function extraIssues(r) { // 결과지 전용 리마인드 (품목 성격에 따
 }
 var SHEET_CHECK_EXTRA = [['아웃박스', [['FSC · 소이잉크 표기', ['boxfsc']], ['증지 위치 가이드', ['boxsticker']], ['증지 크기', ['boxsize']]], function (r) { return BOXRE.test((r.prodName || '') + ' ' + r.file); }],
   ['멤버 · 구성', [['멤버 배치 순서 (정합 순서)', ['memorder']]], function (r) { return SETRE.test((r.prodName || '') + ' ' + r.file); }]];
+// 오탈자·표기 항목은 단계와 상관없이 '오탈자'로 맨 위에 (2026-11-20 실장님: 오탈자 / 경고 / 주의 / 조언)
+var TYPO_CODES = ['typoko', 'typoen', 'repword', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix'];
+function lvOf(x) { return LV[x.sev] ? (TYPO_CODES.indexOf(x.code) > -1 ? 't' : LV[x.sev]) : ''; }
 function groupsOf(r) {
   var G = {}, order = [];
   r.issues.forEach(function (x) { if (x.hidden || !LV[x.sev]) return; var k = x.code + '|' + x.title; if (!G[k]) { G[k] = []; order.push(k); } G[k].push(x); });
-  var lv = { r: 0, a: 1, o: 2 };
-  return order.map(function (k) { return { k: k, L: G[k], x: G[k][0], lv: LV[G[k][0].sev] }; }).sort(function (a, b) { return lv[a.lv] - lv[b.lv]; });
+  var lv = { t: 0, r: 1, a: 2, o: 3 };
+  return order.map(function (k) { return { k: k, L: G[k], x: G[k][0], lv: lvOf(G[k][0]) }; }).sort(function (a, b) { return lv[a.lv] - lv[b.lv]; });
 }
 function specMeta(r) {
   var o = SPEC.items.find(function (x) { return x.raw === r.spec; }), f = r.isImg ? '이미지 ' + r.n + '개' : 'PDF ' + (r.bookPages || r.n) + 'p';
@@ -743,9 +746,9 @@ function specMeta(r) {
 }
 function sheetFile(r, no, tot, pid) {
   extraIssues(r);
-  var GS = groupsOf(r), n = { r: 0, a: 0, o: 0 }, num = {};
+  var GS = groupsOf(r), n = { t: 0, r: 0, a: 0, o: 0 }, num = {};
   GS.forEach(function (g, i) { g.n = i + 1; n[g.lv]++; g.L.forEach(function (x) { num[x.code] = num[x.code] || []; if (num[x.code].indexOf(g.n) < 0) num[x.code].push(g.n); }); });
-  var stats = '<span class="r"><b>' + n.r + '</b>경고</span><span class="a"><b>' + n.a + '</b>주의</span>' + (n.o ? '<span class="o"><b>' + n.o + '</b>조언</span>' : '');
+  var stats = (n.t ? '<span class="t"><b>' + n.t + '</b>오탈자</span>' : '') + '<span class="r"><b>' + n.r + '</b>경고</span><span class="a"><b>' + n.a + '</b>주의</span>' + (n.o ? '<span class="o"><b>' + n.o + '</b>조언</span>' : '');
   var h = '<section class="sheet" id="p' + no + '"><header class="mast"><span class="brand">PLYSH · 검수</span><span>' + esc([r.artist, r.title].filter(Boolean).join(' ')) + '</span></header>' +
     '<div class="fhead"><div><p class="fno">품목 ' + no + ' / ' + tot + '</p><h2>' + esc(r.prodName || r.file) + '</h2><p class="file">' + esc(r.file) + '</p></div><div class="stat">' + stats + '</div></div><div class="meta2">' + specMeta(r) + '</div>';
   if (GS.length) {
@@ -775,7 +778,7 @@ function sheetFile(r, no, tot, pid) {
     cat[1].forEach(function (it) {
       var e = evalItem(r, it); if (e.st === 'na' || e.st === 'man') return;
       var refs = []; it[1].forEach(function (c) { (num[c] || []).forEach(function (k) { if (refs.indexOf(k) < 0) refs.push(k); }); }); refs.sort(function (a, b) { return a - b; });
-      var lv = ''; e.L.forEach(function (x) { var l = LV[x.sev]; if (l && (!lv || 'rao'.indexOf(l) < 'rao'.indexOf(lv))) lv = l; });
+      var lv = ''; e.L.forEach(function (x) { var l = lvOf(x); if (l && (!lv || 'trao'.indexOf(l) < 'trao'.indexOf(lv))) lv = l; });
       var st = refs.length ? lv : e.st === 'info' ? 'i' : 'ok'; if (st !== 'ok' && st !== 'i') bad++;
       var em = refs.length ? '<em>' + refs.map(function (k) { var g = GS[k - 1]; return '<a class="rf ' + g.lv + '" href="#' + pid + '-' + k + '">' + k + '</a>'; }).join('') + '</em>' : st === 'i' && e.L[0] ? '<em>' + esc(tStmt(e.L[0].title).slice(0, 24)) + '</em>' : '';
       rows.push('<li class="' + st + '"><i></i>' + esc(it[0]) + em + '</li>');
@@ -823,21 +826,22 @@ async function printSheet(Rs) {
 async function sheetDoc(Rs) {
   for (var ri = 0; ri < Rs.length; ri++) { var rr = Rs[ri]; extraIssues(rr); var GG = groupsOf(rr); for (var gi = 0; gi < GG.length; gi++) { var L0 = firstPerPage(GG[gi].L, 4); for (var li = 0; li < L0.length; li++) await crop(rr, L0[li]); } }
   var d = new Date(), date = d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2) + ' ' + (d.getHours() < 12 ? '오전 ' : '오후 ') + ((d.getHours() + 11) % 12 + 1) + ':' + ('0' + d.getMinutes()).slice(-2);
-  var tot = Rs.length, pages = Rs.map(function (r, i) { return sheetFile(r, String(i + 1).padStart(2, '0'), tot, 'f' + (i + 1)); }), T = { r: 0, a: 0, o: 0 };
-  pages.forEach(function (p) { T.r += p.n.r; T.a += p.n.a; T.o += p.n.o; });
+  var tot = Rs.length, pages = Rs.map(function (r, i) { return sheetFile(r, String(i + 1).padStart(2, '0'), tot, 'f' + (i + 1)); }), T = { t: 0, r: 0, a: 0, o: 0 };
+  pages.forEach(function (p) { T.t += p.n.t; T.r += p.n.r; T.a += p.n.a; T.o += p.n.o; });
   var art = Rs.map(function (r) { return r.artist; }).filter(Boolean)[0] || '', ai = aiFor(art), en = ai && ai.info['영문명'] || '', title = Rs[0].title || titleOf();
   var sh = SPEC.sheet, surl = sh ? 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' : '';
   var noCopy = Rs.filter(function (r) { return r.issues.some(function (x) { return !x.hidden && x.code === 'nocopy'; }); }).length;
   var cov = '<section class="sheet cover"><header class="mast"><span class="brand">PLYSH · 검수</span><span>검수 결과지</span></header>' +
     '<div class="title"><h1 class="artist">' + esc(art || '검수') + (en && en !== art ? ' <span>' + esc(en) + '</span>' : '') + '</h1>' + (title ? '<p class="proj">' + esc(title) + '</p>' : '') + '<p class="lede">검수일 ' + date + '</p></div>' +
-    '<div class="facts"><a class="f" href="#items" data-col=""><span>파일</span><b class="big">' + tot + '개</b></a>' + (sh ? '<a class="f" href="' + esc(surl) + '" target="_blank" rel="noopener"><span>사양서 <svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M7 17L17 7M8 7h9v9"/></svg></span><b>' + esc(sh.name) + '</b></a>' : '') +
+    '<div class="facts"><a class="f" href="#items" data-col=""><span>파일</span><b class="big">' + tot + '개</b></a>' + (sh ? '<a class="f fs" href="' + esc(surl) + '" target="_blank" rel="noopener"><span>사양서 <svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M7 17L17 7M8 7h9v9"/></svg></span><b>' + esc(sh.name) + '</b></a>' : '') +
+    '<a class="f ft" href="#items" data-col="t"><span>오탈자 <svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M7 17L17 7M8 7h9v9"/></svg></span><b class="t">' + T.t + '건</b></a>' +
     '<a class="f fr" href="#items" data-col="r"><span>경고 <svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M7 17L17 7M8 7h9v9"/></svg></span><b class="r">' + T.r + '건</b></a><a class="f fa" href="#items" data-col="a"><span>주의 <svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M7 17L17 7M8 7h9v9"/></svg></span><b class="a">' + T.a + '건</b></a><a class="f fo" href="#items" data-col="o"><span>조언 <svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M7 17L17 7M8 7h9v9"/></svg></span><b class="o">' + T.o + '건</b></a></div>';
   if (noCopy > 1) cov += '<h2 class="sec">모든 파일 공통</h2><ol class="common one"><li><b>리걸 문구 없는 품목 ' + noCopy + '개 · 필요 여부 확인</b><p>Ⓟ&amp;Ⓒ 표기 있으면 통과 처리</p></li></ol>';
   cov += spotTable(Rs);
-  cov += '<h2 class="sec">품목별 결과 <small>숫자 = 항목 수 (페이지 수 아님)</small></h2><div class="tw" id="items"><table class="items"><tr><th>번호</th><th>품목</th><th class="r">경고</th><th class="r">주의</th><th class="r">조언</th><th>주요 항목</th></tr>' + Rs.map(function (r, i) {
+  cov += '<h2 class="sec">품목별 결과 <small>숫자 = 항목 수 (페이지 수 아님)</small></h2><div class="tw" id="items"><table class="items"><tr><th>번호</th><th>품목</th><th class="r">오탈자</th><th class="r">경고</th><th class="r">주의</th><th class="r">조언</th><th>주요 항목</th></tr>' + Rs.map(function (r, i) {
     var no = String(i + 1).padStart(2, '0'), n = pages[i].n, G = groupsOf(r).slice(0, 2).map(function (g) { return TITLE_FIX[g.x.code] || tStmt(g.x.title); });
     var z = function (v, c) { return '<td class="nm ' + c + (v ? '' : ' z') + '">' + v + '</td>'; };
-    return '<tr><td class="ix">' + no + '</td><td><a href="#p' + no + '"><b>' + esc(r.prodName || r.file) + '</b></a><small>' + esc(r.file.replace(/\.[a-z0-9]+$/i, '')) + '</small></td>' + z(n.r, 'r') + z(n.a, 'a') + z(n.o, 'o') + '<td>' + esc(G.join(' · ')) + '</td></tr>';
+    return '<tr><td class="ix">' + no + '</td><td><a href="#p' + no + '"><b>' + esc(r.prodName || r.file) + '</b></a><small>' + esc(r.file.replace(/\.[a-z0-9]+$/i, '')) + '</small></td>' + z(n.t, 't') + z(n.r, 'r') + z(n.a, 'a') + z(n.o, 'o') + '<td>' + esc(G.join(' · ')) + '</td></tr>';
   }).join('') + '</table></div><footer class="foot"><span>' + esc([art, title].filter(Boolean).join(' ') + ' · 검수 결과') + '</span><span>1</span></footer></section>';
   var key = 'rv-sheet:' + [art, title, Rs.map(function (r) { return r.file; }).join('|')].join('#');
   var base = location.href.replace(/[^\/]*([?#].*)?$/, '');
@@ -848,7 +852,7 @@ async function sheetDoc(Rs) {
     cov + pages.map(function (p) { return p.html; }).join('') + '<script>' + SHEET_JS + '<\/script></body></html>';
   return doc;
 }
-var SHEET_V = '20261119a';
+var SHEET_V = '20261120t';
 function strip(s) { return String(s || '').replace(/<[^>]+>/g, '').replace(/\*\*/g, ''); }
 
 
