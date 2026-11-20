@@ -1488,7 +1488,7 @@ var DS = (function () { var o = {}; try { o = JSON.parse(ls.get('pr:die') || '{}
 function dieState() { DS.id = DS.id || 'mailer'; var d = DIE.filter(function (x) { return x.id === DS.id; })[0] || DIE[0]; DS.v = DS.v && DS.vid === d.id ? DS.v : JSON.parse(JSON.stringify(d.in)); DS.vid = d.id; return d; }
 function renderDie() {
   var d = dieState();
-  var h = '<div class="phd"><b>전개도</b><small>형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일</small></div>';
+  var h = '<div class="phd"><b>전개도 생성기</b><small>형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일</small></div>';
   h += '<div class="card"><div class="ct">사진으로 형태 추정<small>AI</small></div><div class="nt" style="margin:0 0 10px">비슷한 박스·책 사진을 올리면 형태와 대략 크기를 골라 줘요 (루틴 PIN 필요)</div><label class="cpy" style="display:block;text-align:center;margin:0">사진 고르기<input type="file" accept="image/*" id="dieImg" hidden></label><div id="dieAi" class="nt"></div></div>';
   h += '<div class="card dgrp">' + ['단상자', '패키지', '쇼핑백', '봉투', '책'].map(function (gk) {
     return '<div class="dgr"><span class="dgl">' + gk + '</span><div class="chips">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-die="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>';

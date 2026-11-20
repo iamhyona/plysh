@@ -725,12 +725,19 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .qkc { background:#fff; border-radius:18px; padding:16px 16px 8px; margin-bottom:10px; }
 /* LOGO (2026-11-18): 로고 미리보기·검색·.ai 다운로드 */
 .lgtop { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
-.lgtop .qkq { flex:1; margin:0; }
+.lgtop .qkq { flex:1 1 0; min-width:0; width:auto; margin:0; }
 /* 검색창 + 분류 칩: PC는 한 줄 (검색 왼쪽, 칩 오른쪽), 모바일은 두 줄 (2026-11-20 실장님) */
 @media (min-width:900px) {
   .srow { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
-  .srow > .qkq, .srow > .lgtop { flex:0 1 420px; min-width:260px; margin:0; }
-  .srow > .tabs2 { flex:1 1 auto; min-width:0; margin:0; padding:0; justify-content:flex-end; }
+  .srow > .qkq, .srow > .lgtop { flex:0 1 340px; min-width:240px; margin:0; }
+  /* 칩이 넘치면 잘리지 않고 다음 줄로 (2026-11-20 실장님: 로고 '전체' 잘림) */
+  .srow > .tabs2 { flex:1 1 0; min-width:0; margin:0; padding:0; justify-content:flex-end; flex-wrap:wrap; overflow:visible; row-gap:8px; }
+}
+/* PC 좁은 폭(900~1279px): 칩은 검색창 아래 줄로, 왼쪽 정렬 (잘림·두 줄 오른쪽 몰림 방지) */
+@media (min-width:900px) and (max-width:1279px) {
+  .srow { flex-wrap:wrap; row-gap:12px; }
+  .srow > .qkq, .srow > .lgtop { flex:0 1 480px; }
+  .srow > .tabs2 { flex:1 1 100%; justify-content:flex-start; }
 }
 .lgvw { display:flex; background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; flex:none; }
 .lgvw button { border:0; background:none; border-radius:9px; width:38px; height:40px; display:grid; place-items:center; color:var(--mute); }
@@ -1101,6 +1108,10 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .s3 button.on { color:var(--txt); font-weight:700; } .s3 button.on:before { background:var(--txt); }
 .s3 button small { margin-left:auto; font-size:11.5px; font-weight:600; color:var(--faint); }
 #nfm .s3 { padding-left:12px; }
+.s3 button.pt { color:var(--sub); font-weight:600; } .s3 button.pt.op { color:var(--txt); font-weight:700; } .s3 button.pt:before { display:none; }
+.s3 button.pt .cv { margin-left:auto; margin-right:4px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(-45deg); opacity:.55; }
+.s3 button.pt.op .cv { transform:rotate(45deg); margin-top:-3px; }
+.s3 button.s4 { padding-left:24px; min-height:32px; font-size:13.5px; } .s3 button.s4:before { left:12px; }
 html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid-template-columns:minmax(0, 1fr) !important; }
 /* ── W: 왼쪽 메뉴 ── */
 #nsd, #ntb { display:none; }
@@ -1573,7 +1584,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm16';
+var APP_VER = '20261120hm21';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2000,13 +2011,13 @@ function render() {
 }
 // LOGO 메뉴 (2026-11-18): 소속사·아티스트·인쇄·세탁·분리배출 로고 미리보기 + 한글/영어 검색 + .ai 다운로드
 var LG = { list: null, tab: ls.get('d4:lgtab') || 'all', vw: ls.get('d4:lgvw') || 'grid', q: '' };
-var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['actor', '배우 소속사'], ['artist', '아티스트'], ['distributor', '유통사'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
+var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['distributor', '유통사'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
 var LG_SUB = { Laundry: { Wash: '물세탁', Bleach: '표백', TumbleDry: '텀블건조', Dry: '자연건조', Iron: '다림질', DryClean: '드라이클리닝', WetClean: '웻클리닝' } };
 function lgNorm(t) { return String(t || '').toLowerCase().replace(/[\s_\-().·]/g, ''); }
 function renderLogo() {
   if (!LG.list) {
     $('#main').innerHTML = '<div class="ld">로고 불러오는 중…</div>';
-    fetch('logo/logos.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (d) { LG.list = d; if (S.view === 'logo') renderLogo(); }, function () { $('#main').innerHTML = '<div class="ld">로고 목록을 불러오지 못했어요</div>'; });
+    fetch('logo/logos.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (d) { d.forEach(function (x) { if (x.c === 'actor') x.c = 'agency'; }); LG.list = d; if (LG.tab === 'actor') LG.tab = 'agency'; if (S.view === 'logo') renderLogo(); }, function () { $('#main').innerHTML = '<div class="ld">로고 목록을 불러오지 못했어요</div>'; });
     return;
   }
   var ic = { grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>', list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>' };
@@ -2075,15 +2086,15 @@ function openGd(g, anchor) {
 var TOOLS = [
   { g: '작성', i: [
     { k: 'doc', t: '지류 사양서', s: '품목을 모아 MASTER 양식 순서로 사양서 만들기', f: 'tools/proof/', pv: 'doc' },
-    { k: 'formly', t: '상품 사양서 · 라벨', s: '굿즈 상품 사양서와 라벨 문구, 엑셀·시트로 저장', f: 'tools/formly/', nw: 1 },
-    { k: 'filename', t: '파일명 생성기', s: '규칙에 맞는 파일명·작업폴더명·하위폴더명 복사', f: 'tools/filename/' }] },
+    { k: 'formly', t: '상품 라벨 생성기', s: '굿즈 상품 사양서와 라벨 문구, 엑셀·시트로 저장', f: 'tools/formly/', nw: 1 },
+    { k: 'filename', t: '폴더·파일명 생성기', s: '규칙에 맞는 파일명·작업폴더명·하위폴더명 복사', f: 'tools/filename/' }] },
   { g: '계산', i: [
     { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
     { k: 'cut', t: '절수 계산기', s: '완성 크기·전개도로 전지 걸이와 절수, 필요 전지 수', f: 'tools/proof/', pv: 'calc' },
-    { k: 'die', t: '전개도', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
+    { k: 'die', t: '전개도 생성기', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
     { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
-    { k: 'review', t: '검수', s: 'PDF·AI 인쇄 파일 · 사양서', v: 'review' },
+    { k: 'review', t: '검수기', s: 'PDF·AI 인쇄 파일 · 사양서', v: 'review' },
     { k: 'checklist', t: '자가점검리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
   { g: '자료', i: [
     { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
@@ -2389,6 +2400,7 @@ var NAV_IC = {
   today: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   proj: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+  shape: '<path d="M7 3.5l4 7H3z"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><circle cx="12" cy="17" r="3.8"/>',
   ref: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/>',
   doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
   calc: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',
@@ -2411,10 +2423,10 @@ var SPACES = [
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 달력으로' }, { k: 'sched', t: '일정', s: '프로젝트별 일정표' }] }] },
   { k: 'tool', t: '도우미', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명, 로고 · 폰트 · 용어사전 · 팬톤', home: 'space:tool', ic: 'tool', g: [
-    { g: '도우미', i: [{ k: 'review', t: '검수', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
-      { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 },
-      { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
-  { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'pen', g: [
+    { g: '도우미', i: [{ k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
+      { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도 생성기', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '폴더·파일명 생성기', tool: 1 },
+      { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }] }] },
+  { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '행정', d: '사무실 이용, 행정 업무, 업무 시스템 안내, 퀵 배차', home: 'space:admin', ic: 'office', g: [
     { g: '행정', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }, { k: 'qk', t: '퀵 배차', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }] }] }
@@ -2468,7 +2480,7 @@ function wsBar() {
   var w = S.ws, c = navCur(), E = wsEvents(), nx = E.filter(function (e) { return e.d >= TODAY; })[0];
   var dd = nx ? Math.round((P(nx.d) - P(TODAY)) / 864e5) : null;
   var tab = S.view === 'ws' ? 'ws' : (S.view === 'spec' || c === 'doc') ? 'spec' : c === 'review' ? 'review' : c === 'filename' ? 'filename' : 'calc';
-  var T = [['ws', '일정 · 할 일'], ['spec', '사양서'], ['review', '검수'], ['spine', '계산'], ['filename', '파일명']];
+  var T = [['ws', '일정 · 할 일'], ['spec', '사양서'], ['review', '검수기'], ['spine', '계산'], ['filename', '파일명']];
   return '<div class="wh"><button type="button" class="wb" data-ng="pj" aria-label="프로젝트 목록">' + navIc('back') + '</button><div class="wt"><b>' + wsName(w.name).replace(/^<b>|<\/b>$/g, '') + '</b><small>' +
     (nx ? '다음 · ' + esc(nx.t) + ' ' + dot(nx.d) + ' <em>' + (dd === 0 ? '오늘' : 'D-' + dd) + '</em>' : '남은 일정 없음') + ' · 일정 ' + E.length + '건</small></div>' +
     '<div class="wl">' + (w.url ? '<a href="' + esc(w.url) + '" target="_blank" rel="noopener">' + navIc('sheet') + '<span>일정 시트</span></a>' : '') + '<a href="https://drive.google.com/drive/folders/11nRHl1v00YxiSLaQyQy07cUN8hq8rbY8" target="_blank" rel="noopener">' + navIc('proj') + '<span>폴더</span></a></div></div>' +
@@ -2562,7 +2574,7 @@ function renderStart() {
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
-  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['review', 'chk', '검수'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['review', 'chk', '검수기'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
@@ -2603,7 +2615,8 @@ function gdToc(fr) {
   nav.innerHTML = '<div class="tt">목차</div>' + L.map(function (x, i) { return '<a data-gi="' + i + '">' + esc(x.t) + '</a>'; }).join('');
   nav.style.top = (gdTop() + (window.innerWidth >= 1024 ? 16 : 0)) + 'px';
   $('#gdL').classList.add('has');
-  NAV.gdL = L; NAV.gdFr = fr;
+  NAV.gdL = L; NAV.gdFr = fr; NAV.gdF = S.gdf || 'folder-file.html'; SUB.sig = '';
+  if (NAV.gdPend) { var pi = L.map(function (x) { return x.id; }).indexOf(NAV.gdPend); NAV.gdPend = null; if (pi > -1) setTimeout(function () { var a = $$('#gdToc a')[pi]; if (a) a.onclick(); }, 200); }
   $$('a', nav).forEach(function (a) { a.onclick = function () { var el = d.getElementById(L[+a.dataset.gi].id); if (!el) return; var off = window.innerWidth >= 1024 ? 16 : nav.offsetHeight + 8; window.scrollTo({ top: fr.getBoundingClientRect().top + window.scrollY + el.getBoundingClientRect().top - gdTop() - off, behavior: 'smooth' }); }; });
   gdSpy();
 }
@@ -2644,15 +2657,25 @@ function subFrame(tk) { var t = TOOL_LIST.filter(function (x) { return x.k === t
 function subItems() {
   var L = [];
   try {
-    if (S.view === 'gdoc' && NAV.gdL && NAV.gdFr) {
-      var nav = $('#gdToc'), on = nav ? [].indexOf.call($$('a', nav), $('a.on', nav)) : -1;
-      NAV.gdL.forEach(function (x, i) { L.push({ t: x.t, on: i === on, go: function () { var a = $$('#gdToc a')[i]; if (a) a.onclick(); } }); });
+    if (S.view === 'gdoc') {
+      // 소메뉴는 문서 원본에서 미리 읽은 목차로 바로 그린다 (화면 로딩을 기다리면 이전 문서 목차가 잠깐 보였음)
+      var gf = S.gdf || 'folder-file.html', G = GDSEC[gf]; if (!G) { gdSecLoad(gf); return L; }
+      var live = !!(NAV.gdFr && NAV.gdFr === $('#gdIn') && NAV.gdF === gf), nav = $('#gdToc'), on = live && nav ? [].indexOf.call($$('a', nav), $('a.on', nav)) : -1;
+      if (on < 0) on = 0;
+      G.forEach(function (x, i) { L.push({ t: x.t, on: i === on, go: function () { var a = NAV.gdFr === $('#gdIn') && NAV.gdF === gf && $$('#gdToc a')[i]; if (a) a.onclick(); else NAV.gdPend = x.id; } }); });
     } else if (S.view === 'tk' && S.tk === 'ref') {
       var f = subFrame(S.tk), d = f && f.contentDocument; if (!d) return L;
       if (S.tk === 'ref') {
+        // 용어사전 > 인쇄 / 디자인 > 세부 분류. 지금 보고 있는 파트만 펼침 (2026-11-20 실장님)
+        var PT = [], cur = null;
         $$('.rnav .rtab > *', d).forEach(function (e) {
-          if (e.classList.contains('rph')) L.push({ h: e.textContent.trim() });
-          else if (e.tagName === 'BUTTON' && !e.classList.contains('rdm')) { var sm = e.querySelector('small'); L.push({ t: (sm ? e.firstChild.textContent : e.textContent).trim(), n: sm ? sm.textContent : '', on: e.classList.contains('on'), go: function () { e.click(); } }); }
+          if (e.classList.contains('rph')) { cur = { t: e.textContent.trim(), k: [] }; PT.push(cur); }
+          else if (cur && e.tagName === 'BUTTON' && !e.classList.contains('rdm')) { var sm = e.querySelector('small'); cur.k.push({ t: (sm ? e.firstChild.textContent : e.textContent).trim(), n: sm ? sm.textContent : '', on: e.classList.contains('on'), lv: 1, go: function () { e.click(); } }); }
+        });
+        PT.forEach(function (pt) {
+          var on = pt.k.some(function (x) { return x.on; });
+          L.push({ t: pt.t, part: 1, on: on, open: on, go: function () { if (on) return; var b = pt.t === '디자인' ? d.querySelector('.rnav .rdm') : null; if (b) b.click(); else if (pt.k[0]) pt.k[0].go(); } });
+          if (on) L = L.concat(pt.k);
         });
         if (L.length && !L.some(function (x) { return x.on; }) && d.querySelector('.rnav .rdm.on')) { /* 디자인 첫 칸 */ }
       } else {
@@ -2662,7 +2685,27 @@ function subItems() {
   } catch (e) {}
   return L;
 }
-var SUB = { sig: '' };
+var SUB = { sig: '' }, GDSEC = {}, GDW = null, GDQ = {};
+function gdSecParse(html) {
+  var d = new DOMParser().parseFromString(html, 'text/html'), B = [].slice.call(d.querySelectorAll('[data-toc]')), out = [];
+  if (!B.length) B = [d.body];
+  B.some(function (b) {
+    var S2 = [].slice.call(b.children).filter(function (e) { return e.tagName === 'SECTION' && e.querySelector('h2'); });
+    if (S2.length < 2) return false;
+    out = S2.map(function (e, i) { var h = e.querySelector('h2').cloneNode(true), n = h.querySelector('.n'); if (n) n.remove(); return { id: e.id || 's' + (i + 1), t: h.textContent.trim() }; });
+    return true;
+  });
+  return out;
+}
+function gdSecLoad(f) {
+  if (GDSEC[f]) return; if (GDQ[f]) return; GDQ[f] = 1;
+  var m = f.match(/^g\.html\?id=(\w+)/), P;
+  if (m) P = (GDW ? Promise.resolve(GDW) : fetch('guide/gdata.js?v=' + APP_VER).then(function (r) { return r.text(); }).then(function (t) { var w = {}; new Function('window', t)(w); GDW = w.GD || {}; return GDW; }))
+    .then(function (G) { return G[m[1]] ? gdSecParse('<div data-toc>' + G[m[1]].h + '</div>') : []; });
+  else P = fetch('guide/' + f.split('#')[0]).then(function (r) { return r.text(); }).then(gdSecParse);
+  P.then(function (L) { GDSEC[f] = L; SUB.sig = ''; subTick(); }, function () { GDSEC[f] = []; });
+}
+setTimeout(function () { SPACES.forEach(function (sp) { (sp.g || []).forEach(function (g) { (g.i || []).forEach(function (x) { if (/^gd:/.test(x.k)) gdSecLoad(x.k.slice(3)); }); }); }); }, 800);
 function subHide(on) { // PC에서 화면 안 색인 숨기기
   [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }']].forEach(function (x) {
     var f = subFrame(x[0]), d; try { d = f && f.contentDocument; } catch (e) { d = null; } if (!d || !d.head) return;
@@ -2674,7 +2717,7 @@ function subPaint(box, cur, cls) {
   if (!box) return; $$('.s3', box).forEach(function (e) { e.remove(); });
   var L = subItems(), on = $(cls + '.on', box); if (!L.length || !on) return;
   var w = document.createElement('div'); w.className = 's3';
-  w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '"' + (x.on ? ' class="on"' : '') + '>' + esc(x.t) + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
+  w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '" class="' + (x.part ? 'pt' + (x.open ? ' op' : '') : x.lv ? 's4' + (x.on ? ' on' : '') : (x.on ? 'on' : '')) + '">' + esc(x.t) + (x.part ? '<i class="cv"></i>' : '') + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
   on.parentNode.insertBefore(w, on.nextSibling);
   $$('[data-s3]', w).forEach(function (b) { b.onclick = function () { var x = L[+b.dataset.s3]; if (x && x.go) x.go(); if (box.id === 'nfm') navClose(); setTimeout(subTick, 60); }; });
 }

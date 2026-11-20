@@ -532,6 +532,8 @@ var CHECK = [
     ['도련 3mm', ['bleedbox', 'bleedfill'], PRINTISH],
     ['안전 여백 3mm (얼굴 · 글자)', ['safe', 'safeface', 'diesafe'], PRINTISH],
     ['칼선 · 후가공 판 (별색 + 오버프린트)', ['dieinfo', 'finop', 'finlayer', 'spotfin'], PDFONLY],
+    ['박·형압 선 0.5pt · 글자 7pt · 판 이름 영문', ['finthin', 'fintext', 'finname'], PDFONLY],
+    ['숨겨진 레이어', ['offlayer'], PDFONLY],
     ['펼침면 가운데 기준선 남김', ['centerguide'], PDFONLY],
     ['주석 · 메모 · 파일 구조', ['annot', 'parse', 'trunc', 'p2err'], PDFONLY],
     ['이미지 포함(링크 아님)', ['embed'], PDFONLY]
@@ -550,12 +552,16 @@ var CHECK = [
     ['리치블랙 C30 M20 Y20 K100', ['richblack', 'richblack2'], PDFONLY],
     ['K100 글자 오버프린트', ['smallk', 'kop'], PDFONLY],
     ['별색·단색 위 선 오버프린트', ['strokeop'], PDFONLY],
-    ['흰색 오버프린트 (사라짐)', ['whiteop', 'whiteopt'], PDFONLY]
+    ['흰색 오버프린트 (사라짐)', ['whiteop', 'whiteopt'], PDFONLY],
+    ['K100 아닌 색 오버프린트 (색 변화)', ['opcolor'], PDFONLY],
+    ['옅은 농도 (5% · 10% 이하)', ['lite5', 'lite10'], PDFONLY]
   ]],
   ['글자 · 선', [
     ['너무 작은 글자 (' + RV.SET.minText + 'pt 이하)', ['tiny'], PDFONLY],
     ['작은 글자 4색', ['small4c'], PDFONLY],
-    ['얇은 선 · 4색 얇은 선', ['hair', 'hair0', 'thin4c'], PDFONLY],
+    ['얇은 선 0.15pt · 4색 얇은 선', ['hair', 'hair0', 'thin4c'], PDFONLY],
+    ['역상(흰) 선 0.3pt', ['whitethin'], PDFONLY],
+    ['뒤집힌 글자', ['mirror'], PDFONLY],
     ['어두운 바탕 흰 글자 (뭉침)', ['whitetext'], PDFONLY],
     ['아웃라인 · 서체 포함', ['outline', 'fontembed'], PDFONLY]
   ]],
@@ -581,6 +587,9 @@ var CHECK = [
     ['팀 표기 규칙 (멤버·소속사·타이틀·품목명)', ['rule', 'rulecase', 'case'], isText],
     ['한글 · 영문 섞임', ['koen', 'koen2'], isText],
     ['반복 문구 일관성', ['repeat'], isText],
+    ['표기법 (CREDIT, PHOTOCARD 등 17개)', ['stdterm'], isText],
+    ['수량 표기 (EA · PCS · SET) 통일', ['qtyunit'], isText],
+    ['치수 소수점 자릿수 통일', ['decmix'], isText],
     ['페이지 번호 · 목차', ['pagenum', 'toc', 'toc2', 'tocorder'], function (r) { return isText(r) && isBook(r); }],
     ['리걸 표기', ['nocopy', 'copyyear', 'copyok'], isText],
     ['바코드 · ISBN · QR', ['bcfail', 'bcok', 'bcload', 'isbnsum', 'isbnbar'], PDFONLY],
