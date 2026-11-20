@@ -256,6 +256,8 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .dit button { max-width:340px; padding:0 18px 0 8px !important; overflow:visible; }
 .dit button span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .dit button.add { padding:0 18px !important; }
+.dit button.dld { margin-left:auto; background:none !important; box-shadow:inset 0 0 0 1.5px #d1d6db; color:#4e5968 !important; } .dit button.dld.on { background:#191f28 !important; box-shadow:none; color:#fff !important; }
+.dlp { margin-top:-4px; }
 
 /* 절수: 선택 한 줄 + 크기/절수는 카드 제목 옆 (2026-11-20) */
 .ct.ctm { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -1000,7 +1002,7 @@ var DOCS = (function () { try { return JSON.parse(ls.get('pr:docs') || '[]'); } 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function saveDocs() { ls.set('pr:docs', JSON.stringify(DOCS)); }
 function curDoc() { var id = ls.get('pr:doc'); return DOCS.filter(function (d) { return d.id === id; })[0] || DOCS[0] || null; }
-function newDoc(name) { var d = { id: uid(), name: name || '[아티스트]프로젝트_사양서', date: new Date().toISOString().slice(0, 10), rows: [] }; DOCS.unshift(d); ls.set('pr:doc', d.id); saveDocs(); return d; }
+function newDoc(name) { var d = { id: uid(), name: name || '[아티스트]프로젝트_사양서', date: new Date().toISOString().slice(0, 10), rows: [docRow('')] }; DOCS.unshift(d); ls.set('pr:doc', d.id); saveDocs(); return d; }
 function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*g|[\d.]+\s*(?:T|㎛|μm))\s*(\(.*\))?\s*$/); return m ? [(m[1] + (m[3] ? ' ' + m[3] : '')).trim(), m[2].replace(/\s/g, '')] : [p || '', '']; }
 function rowTsv(r, i) {
   var pp = splitPaper(r.paper);
@@ -1059,13 +1061,14 @@ function dFieldHtml(r, f) {
 function renderDoc() {
   var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 이 기기에 저장돼요</small></div>';
   h += '<div class="chips" style="margin:0 0 12px">' + DOCS.map(function (x) { return '<button data-doc="' + x.id + '"' + (d && x.id === d.id ? ' class="on"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '<button id="dNew">+ 새 사양서</button></div>';
-  if (!d) { $('#main').innerHTML = h + docTplHtml(); bindDoc(); return; }
+  if (!d) { d = newDoc(); h = h.replace('<button id="dNew">', '<button data-doc="' + d.id + '" class="on">' + esc(d.name) + '</button><button id="dNew">'); }
+  if (!d.rows.length) { d.rows.push(docRow('')); saveDocs(); }
   var sel = dSel(d);
   h += '<div class="dsw"><div class="dsl">';
   h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="nt" style="margin:10px 0 0 118px">만든 날 ' + d.date + ' · 이 기기에 저장돼요</div></div>';
-  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button></div>';
-  if (!sel) h += docTplHtml();
-  else {
+  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><button class="add dld" id="dLoad" aria-expanded="false">구성 불러오기</button></div>' +
+    '<div class="card dlp" id="dLp" hidden><div class="ct">자주 쓰는 구성 불러오기</div><div class="nt" style="margin:0 0 12px">고르면 품목이 이 사양서에 더해져요. 비어 있는 품목은 바뀌어요</div><div class="dtg">' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<button class="tc" data-tpl="' + t.k + '"><b>' + esc(t.t) + '</b><span>' + esc(t.s) + '</span></button>'; }).join('') + '</div></div>';
+  {
     var n = d.rows.indexOf(sel);
     h += '<div class="card"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '>↑</button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '>↓</button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div>';
     h += DSEC.map(function (sc) {
@@ -1091,9 +1094,11 @@ function bindDoc() {
   $('#dNew').onclick = function () { newDoc(); renderDoc(); setTimeout(function () { var n = $('#dName'); if (n) { n.focus(); n.select(); } }, 50); };
   $$('[data-tpl]').forEach(function (b) { b.onclick = function () {
     var t = DOC_TPL.filter(function (x) { return x.k === b.dataset.tpl; })[0], dd = curDoc() || newDoc();
+    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'size', 'pg', 'paper', 'print', 'cut', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
     t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
     saveDocs(); renderDoc(); toast(t.t + ' 기본 구성을 넣었어요');
   }; });
+  var lb = $('#dLoad'); if (lb) lb.onclick = function () { var p = $('#dLp'), o = p.hidden; p.hidden = !o; lb.classList.toggle('on', o); lb.setAttribute('aria-expanded', o ? 'true' : 'false'); };
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
