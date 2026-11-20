@@ -1147,11 +1147,12 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 .gdin { background:#fff; border-radius:16px; overflow:hidden; min-width:0; } .gdin iframe { display:block; width:100%; min-height:70vh; border:0; }
 .gdl { display:grid; grid-template-columns:minmax(0, 1fr); gap:12px; align-items:start; }
 .gdtoc { display:none; }
-.gdl.has .gdtoc { display:flex; gap:6px; position:sticky; z-index:5; order:-1; overflow-x:auto; scrollbar-width:none; background:var(--bg); padding:8px 0; margin:0 -4px; }
+/* 모바일 소메뉴(문서 목차) = 중메뉴 칩과 다르게 밑줄 글자 탭 (2026-11-20 실장님) */
+.gdl.has .gdtoc { display:flex; gap:20px; position:sticky; z-index:5; order:-1; overflow-x:auto; scrollbar-width:none; background:var(--bg); padding:6px 0 0; margin:0 0 12px; box-shadow:inset 0 -1px 0 var(--line); }
 .gdtoc::-webkit-scrollbar { display:none; }
 .gdtoc .tt { display:none; }
-.gdtoc a { flex:none; display:block; border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 13px; font-size:13px; font-weight:600; line-height:1.35; color:var(--sub); cursor:pointer; white-space:nowrap; }
-.gdtoc a.on { background:var(--txt); border-color:var(--txt); color:#fff; }
+.gdtoc a { flex:none; display:block; border:0; background:none; border-radius:0; padding:6px 0 10px; font-size:14px; font-weight:500; line-height:1.35; color:var(--mute); cursor:pointer; white-space:nowrap; }
+.gdtoc a.on { color:var(--txt); font-weight:700; box-shadow:inset 0 -2px 0 var(--txt); }
 @media (min-width:1024px) {
   .gdl.has { grid-template-columns:minmax(0, 1fr) 184px; gap:20px; }
   .gdl.has .gdtoc { order:0; display:block; padding:4px 0; margin:0; max-height:calc(100vh - 120px); overflow:auto; background:none; }
@@ -1159,7 +1160,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
   .gdtoc .tt { display:block; font-size:12px; font-weight:700; color:var(--mute); margin:2px 12px 8px; }
   .gdtoc a { border:0; background:none; border-radius:10px; padding:8px 12px; font-size:13.5px; white-space:normal; }
   .gdtoc a:hover { background:rgba(0,0,0,.04); }
-  .gdtoc a.on { background:#fff; color:var(--txt); }
+  .gdtoc a.on { background:#fff; color:var(--txt); box-shadow:none; }
 }
 .gdbk { display:inline-flex; align-items:center; gap:4px; border:0; background:#fff; border-radius:999px; padding:7px 12px 7px 8px; font-size:12.5px; font-weight:600; color:var(--sub); margin-bottom:10px; }
 #nsd .ss.on:not(.ex) { background:var(--txt); color:#fff; } #nsd .ss.on:not(.ex) .nvi { color:#fff; }
@@ -1174,6 +1175,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 #nsd .sx { padding-bottom:6px; }
 @media (max-width:1023px) {
   html[data-nav="w"] #nsub.has { display:flex; }
+  html[data-nav="w"] #nhm { display:none !important; } /* 모바일: 전체 메뉴는 아래 탭바 "전체" 하나만 (2026-11-20 실장님) */
   html[data-nav="w"] #ntb { display:grid; grid-template-columns:repeat(5, 1fr); position:fixed; left:0; right:0; bottom:0; z-index:20; background:#fff; border-top:1px solid var(--line); padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
   html[data-nav="w"] #ntb button { border:0; background:none; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:700; color:var(--faint); padding:4px 0; }
   html[data-nav="w"] #ntb svg { width:21px; height:21px; }
@@ -1584,7 +1586,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm22';
+var APP_VER = '20261120hm24';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
