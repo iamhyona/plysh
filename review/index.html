@@ -214,6 +214,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 .ninfo { display:grid; grid-template-columns:96px 1fr; gap:10px 16px; margin:16px 0 0; padding:16px 18px; background:#f9fafb; border-radius:14px; font-size:13.5px; line-height:1.6; }
 .ninfo dt { font-weight:700; color:#4e5968; }
 .ninfo dd { margin:0; color:#191f28; min-width:0; }
+.ninfo[hidden] { display:none; }
 .ninfo dd b { font-weight:700; }
 .ninfo .nfmt { display:block; color:#8b95a1; margin-bottom:4px; }
 .ninfo code { display:block; font-family:inherit; font-size:13px; color:#4e5968; background:#fff; border-radius:8px; padding:4px 10px; margin-top:4px; width:fit-content; max-width:100%; }
@@ -239,22 +240,19 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 
   <div class="card noprint" id="rulesBox">
     <h3 class="sh">아티스트명 선택 <span class="mute" id="rulesCnt" style="font-size:13px;font-weight:600"></span></h3>
+    <p class="note" style="margin:0 0 12px">멤버 이름·표기·생일이 맞게 쓰였는지 볼 때 쓰는 규칙이에요. <b>모든 아티스트</b> 규칙은 어느 파일에나 쓰이고, 아티스트를 고르면 그 아티스트 규칙이 더해져요.</p>
     <div class="row">
       <input class="inp" id="artQ" list="artL" placeholder="아티스트 검색 또는 선택" style="width:260px" autocomplete="off">
-      <button type="button" class="ib" id="artCommon">공통 규칙 고치기</button>
     </div>
     <datalist id="artL"></datalist>
     <div class="seg" id="artChips" style="margin-top:8px"></div>
     <div id="artInfo"></div>
-    <dl class="ninfo">
-      <dt>지금 보는 규칙</dt><dd><b id="artCur">공통</b> 표기 규칙 · 생일·기념일</dd>
-      <dt>검수 기준</dt><dd><b>공통 + 파일의 아티스트</b> 규칙을 같이 써요</dd>
-      <dt>적용</dt><dd>고른 아티스트는 아티스트가 비어 있는 파일에 들어가요</dd>
+    <div id="rulesSt" class="nst"></div>
+    <div class="row" style="margin-top:10px"><button type="button" class="ib" id="rulesOpen">규칙 입력</button><span class="small sub" id="rulesSum"></span></div>
+    <dl class="ninfo" id="rulesHow" hidden>
       <dt>쓰는 법</dt><dd><span class="nfmt">한 줄에 하나씩</span><code>[멤버] 한글 / 영문 = 틀린 표기들</code><code>[표기] 정식 표기 = 틀린 표기들</code><code>[생일·기념일] 월/일 내용</code></dd>
       <dt>저장</dt><dd>PLYSH 시트에 저장돼 팀이 같이 써요</dd>
     </dl>
-    <div id="rulesSt" class="nst"></div>
-    <div class="row" style="margin-top:10px"><button type="button" class="ib" id="rulesOpen">직접 입력</button><span class="small sub" id="rulesSum"></span></div>
     <textarea id="rulesTa" class="inp ta" style="min-height:150px" hidden></textarea>
   </div>
 

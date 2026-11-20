@@ -1191,14 +1191,14 @@ var DIE = [
   { gr: '책', id: 'hard', n: '하드커버 싸개', d: '양장 표지 · 보드 3장 + 홈', in: { w: 148, h: 210, sp: 15, bd: 2, jt: 10, wr: 20 } },
   { gr: '책', id: 'cover', n: '무선 책 표지', d: '앞·뒤 + 책등 (+ 날개)', in: { w: 148, h: 210, sp: 10, fl: 0, bl: 3 } },
   { id: 'bag', gr: '쇼핑백', n: '쇼핑백', d: '앞 · 옆(가운데 접힘) · 뒤 · 옆 + 풀칠 · 윗단 접어넣기 · 바닥 날개', in: { L: 260, D: 100, H: 330, g: 20, tp: 40, hd: 1 } },
-  { id: 'envS', geo: 'env', gr: '봉투', n: '소봉투 (일반형)', d: '완성 105×220 · 짧은 변 입구 · 뒷면 가운데 접착 · 뚜껑 20', in: { w: 105, h: 220, mg: 0, sv: 10, lid: 20 } },
-  { id: 'envSJ', geo: 'envj', gr: '봉투', n: '소봉투 (자켓형)', d: '완성 220×105 · 긴 변 입구 · 좌우 접착 · 뚜껑 40', in: { w: 220, h: 105, mg: 0, fl: 15, lid: 40 } },
-  { id: 'env', gr: '봉투', n: '대봉투 (일반형)', d: '완성 245×330 · A4 서류 · 짧은 변 입구 · 뒷면 가운데 접착 · 뚜껑 34', in: { w: 245, h: 330, mg: 0, sv: 10, lid: 34 } },
-  { id: 'envLJ', geo: 'envj', gr: '봉투', n: '대봉투 (자켓형)', d: '완성 330×245 · A4 서류 · 긴 변 입구 · 좌우 접착', in: { w: 330, h: 245, mg: 0, fl: 20, lid: 45 } },
-  { id: 'envCD', geo: 'envj', gr: '봉투', n: 'CD자켓 봉투', d: '완성 125×125 · CD 한 장', in: { w: 125, h: 125, mg: 0, fl: 12, lid: 30 } },
-  { id: 'envPC', geo: 'env', gr: '봉투', n: '포토카드봉투 (뚜껑형)', d: '완성 62×92 · 포토카드 55×85 기준', in: { w: 62, h: 92, mg: 0, sv: 8, lid: 22 } },
+  { id: 'envS', geo: 'env', gr: '봉투', n: '소봉투 (일반형)', d: '완성 220×105 · 짧은 변 입구 · 위아래 날개 가운데 겹쳐 붙임 · 뚜껑 20', in: { w: 220, h: 105, mg: 0, sv: 12, lid: 20 } },
+  { id: 'envSJ', geo: 'envj', gr: '봉투', n: '소봉투 (자켓형)', d: '완성 220×105 · 긴 변 입구 · 위아래 옆날개 · 뚜껑 42', in: { w: 105, h: 220, mg: 0, fl: 18, lid: 42 } },
+  { id: 'env', gr: '봉투', n: '대봉투 (일반형)', d: '완성 330×245 · A4 서류 · 짧은 변 입구 · 위아래 날개 가운데 겹쳐 붙임 · 뚜껑 34', in: { w: 330, h: 245, mg: 0, sv: 14, lid: 34 } },
+  { id: 'envLJ', geo: 'envj', gr: '봉투', n: '대봉투 (자켓형)', d: '완성 330×245 · A4 서류 · 긴 변 입구 · 좌우 접착', in: { w: 245, h: 330, mg: 0, fl: 22, lid: 50 } },
+  { id: 'envCD', geo: 'envj', gr: '봉투', n: 'CD자켓 봉투', d: '완성 125×125 · CD 한 장', in: { w: 125, h: 125, mg: 0, fl: 14, lid: 32 } },
+  { id: 'envPC', geo: 'env', gr: '봉투', n: '포토카드봉투 (뚜껑형)', d: '완성 62×92 · 포토카드 55×85 기준', in: { w: 92, h: 62, mg: 0, sv: 8, lid: 18 } },
   { id: 'envPN', geo: 'envn', gr: '봉투', n: '포토카드봉투 (뚜껑없는)', d: '완성 62×92 · 입구 손잡이 홈', in: { w: 62, h: 92, mg: 0, fl: 10, nt: 8 } },
-  { id: 'envPS', geo: 'envj', gr: '봉투', n: '엽서 봉투', d: '완성 160×110 · 엽서 100×148 기준 · 긴 변 입구', in: { w: 160, h: 110, mg: 0, fl: 12, lid: 40 } }
+  { id: 'envPS', geo: 'envj', gr: '봉투', n: '엽서 봉투', d: '완성 160×110 · 엽서 100×148 기준 · 긴 변 입구', in: { w: 110, h: 160, mg: 0, fl: 15, lid: 40 } }
 ];
 var DIE_LB = { X: ['정면 가로', 'mm'], Y: ['높이', 'mm'], D: ['폭(옆면)', 'mm'], g: ['풀칠날개', 'mm'], L: ['가로(L)', 'mm'], W: ['세로(W)', 'mm'], H: ['높이(H)', 'mm'], t: ['꽂이날개', 'mm'],
   bd: ['보드 두께', 'mm'], wr: ['접어넣기', 'mm'], w: ['가로', 'mm'], h: ['세로', 'mm'], sp: ['책등', 'mm'], jt: ['홈', 'mm'], fl: ['날개', 'mm'], bl: ['도련', 'mm'], ov: ['바닥 겹침', 'mm'], mg: ['여유(한쪽)', 'mm'], nt: ['손잡이 홈 반지름', 'mm'], tp: ['윗단 접기', 'mm'], hd: ['손잡이 구멍 (1 있음 · 0 없음)', ''], sv: ['옆날개 겹침', 'mm'], lid: ['뚜껑', 'mm'] };
@@ -1339,15 +1339,36 @@ function dieGeom(id, v) {
     vf(fl, 6, Hv); vf(fl + Wv, 6, Hv); hf(Hv, fl, fl + Wv);
     t.push([W / 2, Hv / 2, '앞면 ' + Wv + '×' + Hv], [W / 2, Hv + bot / 2, '아래 날개'], [W / 2, nr + 8, '입구']);
   } else if (id === 'env' || id === 'envj') {
-    // 일반 = 짧은 변 입구 · 자켓형 = 긴 변 입구 (가로가 긴 쪽이 되도록 맞춤)
-    var a1 = +v.w + 2 * +v.mg, a2 = +v.h + 2 * +v.mg;
-    var Wv = id === 'envj' ? Math.max(a1, a2) : Math.min(a1, a2), Hv = id === 'envj' ? Math.min(a1, a2) : Math.max(a1, a2);
-    // 일반형(2026-11-20 실장님): 옆날개가 앞면 절반씩 넓게 접혀 뒷면 가운데서 겹쳐 붙고, 아래 날개는 뚜껑 정도 높이
-    // 자켓형: 아래 날개가 뒷면 전체(앞면 높이 - 3mm)가 되고, 좁은 옆날개를 좌우에서 붙임 (국내 인쇄소 안내 기준)
-    var lid = +v.lid, fl = id === 'env' ? Math.round(Wv / 2 + (v.sv == null ? 10 : +v.sv) / 2) : +v.fl, bot = id === 'env' ? lid : Math.round(Hv - 3); W = Wv + 2 * fl; H = lid + Hv + bot;
-    poly([[fl + 6, 0], [fl + Wv - 6, 0], [fl + Wv, lid], [W, lid + 8], [W, lid + Hv - 8], [fl + Wv, lid + Hv], [fl + Wv - 4, H], [fl + 4, H], [fl, lid + Hv], [0, lid + Hv - 8], [0, lid + 8], [fl, lid]], c);
-    rect(fl, lid, Wv, Hv, f);
-    t.push([W / 2, lid + Hv / 2, '앞면 ' + Wv + '×' + Hv], [W / 2, lid / 2, '뚜껑'], [W / 2, lid + Hv + bot / 2, id === 'env' ? '아래 날개' : '뒷면 (아래 날개)']); if (id === 'env') t.push([fl / 2, lid + Hv / 2, '옆날개'], [W - fl / 2, lid + Hv / 2, '옆날개']);
+    // 2026-11-20 성원애드피아 대/중/소 봉투 보유칼선 모양 기준으로 다시 그림 (뚜껑은 왼쪽)
+    // 일반형(규격형): 앞면 가로로 길게 · 짧은 변(왼쪽) 뚜껑 · 오른쪽 하단 날개 · 위아래 큰 날개가 뒷면 가운데서 겹쳐 붙음
+    // 자켓형: 앞면 세로로 길게 · 긴 변(왼쪽) 뚜껑 · 오른쪽 하단(뒷면) · 위아래 작은 옆날개
+    var a1 = +v.w + 2 * +v.mg, a2 = +v.h + 2 * +v.mg, J = id === 'envj';
+    var pa = J ? Math.min(a1, a2) : Math.max(a1, a2), pb = J ? Math.max(a1, a2) : Math.min(a1, a2);
+    var lid = +v.lid, sv = v.sv == null ? 12 : +v.sv, sf = +v.fl || 18;
+    var FL = J ? { l: { d: lid, k: 4, r: 4 }, r: { d: Math.round(pa * 0.84), k: 5, r: 5 }, t: { d: sf, k: 8, r: 3, sh: 1 }, b: { d: sf, k: 8, r: 3, sh: 1 } }
+               : { l: { d: lid, k: 5, r: 4, sh: 1 }, r: { d: Math.max(10, lid - 4), k: 5, r: 3, sh: 1 }, t: { d: Math.round((pb + sv) / 2), k: 6, r: 5 }, b: { d: Math.round((pb + sv) / 2), k: 6, r: 5 } };
+    var X0 = FL.l.d, Y0 = FL.t.d; W = X0 + pa + FL.r.d; H = Y0 + pb + FL.b.d;
+    var P = [[X0, Y0], [X0 + pa, Y0], [X0 + pa, Y0 + pb], [X0, Y0 + pb]], out = [];
+    function flap(A, B, sp) {
+      var dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy), tx = dx / L, ty = dy / L, nx = ty, ny = -tx, d = sp.d, k = sp.k;
+      function pt(u, w) { return [A[0] + tx * u + nx * w, A[1] + ty * u + ny * w]; }
+      if (sp.sh) return [[pt(k, k), 0], [pt(k, d), sp.r], [pt(L - k, d), sp.r], [pt(L - k, k), 0]];
+      return [[pt(k, d), sp.r], [pt(L - k, d), sp.r]];
+    }
+    [['t', 0, 1], ['r', 1, 2], ['b', 2, 3], ['l', 3, 0]].forEach(function (e) { out.push([P[e[1]], 0]); out = out.concat(flap(P[e[1]], P[e[2]], FL[e[0]])); });
+    var pts = [];
+    out.forEach(function (o, i) {
+      var V = o[0], r = o[1]; if (!r) { pts.push(V); return; }
+      var Pp = out[(i + out.length - 1) % out.length][0], Nn = out[(i + 1) % out.length][0];
+      function tw(Q) { var dx = Q[0] - V[0], dy = Q[1] - V[1], l = Math.hypot(dx, dy), rr = Math.min(r, l / 2); return [V[0] + dx / l * rr, V[1] + dy / l * rr]; }
+      var p1 = tw(Pp), p2 = tw(Nn);
+      for (var s2 = 0; s2 <= 6; s2++) { var u = s2 / 6, m = 1 - u; pts.push([m * m * p1[0] + 2 * m * u * V[0] + u * u * p2[0], m * m * p1[1] + 2 * m * u * V[1] + u * u * p2[1]]); }
+    });
+    poly(pts, c); rect(X0, Y0, pa, pb, f);
+    var cx = X0 + pa / 2, cy = Y0 + pb / 2;
+    t.push([cx, cy, '앞면 ' + pa + '×' + pb]); if (FL.l.d >= 30) t.push([X0 / 2, cy, '뚜껑'], [X0 + pa + FL.r.d / 2, cy, J ? '하단 (뒷면)' : '하단']);
+    if (J && sf >= pb * 0.08) t.push([cx, Y0 / 2 + 3, '옆날개'], [cx, Y0 + pb + FL.b.d / 2 + 3, '옆날개']);
+    if (!J) t.push([cx, Y0 / 2, pa > 150 ? '뒷면 (가운데 ' + sv + 'mm 겹쳐 붙임)' : '뒷면'], [cx, Y0 + pb + FL.b.d / 2, '뒷면']);
   }
   return { c: c, f: f, t: t, W: W, H: H };
 }

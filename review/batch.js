@@ -366,19 +366,19 @@ function infoRules(artist) { // 영문명·팬덤명은 표기 검사에, 시트
   }
   return out.join('\n\n');
 }
+function anm(a) { return a === '공통' ? '모든 아티스트' : a; }
 function cnt() {
   var r = RV2.parseRules($('#rulesTa').value), n = r.members.length + r.terms.length + r.days.length;
-  $('#rulesCnt').textContent = '· ' + CUR + ' 멤버 ' + r.members.length + ' · 표기 ' + r.terms.length + ' · 날짜 ' + r.days.length;
+  $('#rulesCnt').textContent = '';
   drawInfo();
   var sm = $('#rulesSum'); if (!sm) return;
-  sm.innerHTML = n ? '<b>' + esc(CUR) + '</b> 규칙: ' + esc(r.members.map(function (m) { return m.forms.join('/'); }).slice(0, 6).join(', ') + (r.members.length > 6 ? ' 외' : '')) + (r.terms.length ? ' · 표기 ' + r.terms.length + '개' : '') + (r.days.length ? ' · 날짜 ' + r.days.length + '개' : '') : '<b>' + esc(CUR) + '</b> 규칙이 아직 없어요. 직접 입력으로 넣으면 팀 시트에 저장돼요.';
+  sm.innerHTML = n ? '<b>' + esc(anm(CUR)) + '</b> 규칙: ' + esc(r.members.map(function (m) { return m.forms.join('/'); }).slice(0, 6).join(', ') + (r.members.length > 6 ? ' 외' : '')) + (r.terms.length ? ' · 표기 ' + r.terms.length + '개' : '') + (r.days.length ? ' · 날짜 ' + r.days.length + '개' : '') : '<b>' + esc(anm(CUR)) + '</b> 규칙이 아직 없어요.';
 }
 function drawArtChips() {
   var fileA = Q.map(function (q) { return q.artist; }).filter(Boolean), list = ['공통'];
   fileA.concat(Object.keys(RULES)).forEach(function (a) { if (a && list.indexOf(a) < 0) list.push(a); });
-  $('#artChips').innerHTML = list.map(function (a) { var n = (RULES[a] || '').trim() ? RV2.parseRules(RULES[a]) : null, c = n ? n.members.length + n.terms.length + n.days.length : 0; return '<button type="button" data-a="' + esc(a) + '" class="' + (a === CUR ? 'on' : '') + '">' + esc(a) + (fileA.indexOf(a) >= 0 ? ' ·파일' : '') + ' <span class="mute">' + c + '</span></button>'; }).join('');
+  $('#artChips').innerHTML = list.map(function (a) { var n = (RULES[a] || '').trim() ? RV2.parseRules(RULES[a]) : null, c = n ? n.members.length + n.terms.length + n.days.length : 0; return '<button type="button" data-a="' + esc(a) + '" class="' + (a === CUR ? 'on' : '') + '">' + esc(anm(a)) + (fileA.indexOf(a) >= 0 ? ' ·파일' : '') + ' <span class="mute">' + c + '</span></button>'; }).join('');
   $$('#artChips button').forEach(function (b) { b.onclick = function () { if (b.dataset.a === '공통') setCur('공통'); else pickArtist(b.dataset.a); }; });
-  $('#artCur').textContent = CUR;
 }
 var SELART = '';
 function pickArtist(a) {
@@ -403,13 +403,13 @@ function save(a) {
 }
 function setupRules() {
   var ta = $('#rulesTa'); ta.placeholder = '한 줄에 하나씩 적어 주세요.\n[멤버]\n한글 이름 / 영문 이름 = 틀린 표기, 틀린 표기\n\n[표기]\n정식 표기 = 틀린 표기\n\n[생일·기념일]\n월/일 내용'; ta.value = RULES[CUR] || '';
-  $('#rulesOpen').onclick = function () { ta.hidden = !ta.hidden; this.textContent = ta.hidden ? '직접 입력' : '입력 닫기'; if (!ta.hidden) ta.focus(); };
+  $('#rulesOpen').onclick = function () { ta.hidden = !ta.hidden; $('#rulesHow').hidden = ta.hidden; this.textContent = ta.hidden ? '규칙 입력' : '입력 닫기'; if (!ta.hidden) ta.focus(); };
   ta.oninput = function () { RULES[CUR] = ta.value; cacheRules(); cnt(); drawArtChips(); if (A) { say('입력 중…'); var a = CUR; clearTimeout(timer); timer = setTimeout(function () { timer = null; save(a); }, 1500); } };
   ta.onblur = function () { flush(); };
   $('#artQ').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); pickArtist(this.value); } };
   $('#artQ').onchange = function () { pickArtist(this.value); };
   $('#artQ').oninput = function () { if (ARTISTS.indexOf(this.value.trim()) >= 0) pickArtist(this.value); };
-  $('#artCommon').onclick = function () { setCur('공통'); };
+  if ($('#artCommon')) $('#artCommon').onclick = function () { setCur('공통'); };
   cnt(); drawArtChips();
   if (!A) { say('PLYSH 밖에서 열어서 이 기기에만 저장돼요'); return; }
   loadArtistInfo();

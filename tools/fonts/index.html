@@ -214,6 +214,31 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
 .fhit { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #f2f4f6; }
 .fhit b { display:block; font-size:15px; } .fhit span { font-size:13px; color:#8b95a1; }
 .fgo { flex:none; height:36px; padding:0 14px; border:0; border-radius:999px; background:#e8f3ff; color:#3182f6; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* 필터 옆 목차 (2026-11-20) */
+.fwrap{display:flex;flex-direction:column}
+.fmain{display:contents}
+#toolArea{order:1} #fside{order:2} .fmain>*:not(#toolArea){order:3}
+#fside .fsh{display:none}
+@media (min-width:900px){
+  .fwrap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;align-items:start}
+  .fmain{display:block;min-width:0;order:1}
+  #fside{order:0}
+  #fside{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;scrollbar-width:none;padding:4px 0 24px}
+  #fside::-webkit-scrollbar{display:none}
+  #fside .fsh{display:block;font-size:16px;font-weight:800;color:#191f28;margin:8px 0 18px}
+  #fside .chipsrow{display:block;overflow:visible;margin:0 0 28px;padding:0}
+  #fside .chipsrow .lbl{display:block;width:auto;font-size:13px;font-weight:600;color:#4e5968;letter-spacing:0;margin:0 0 10px}
+  #fside .chipsrow .chip{display:flex;width:100%;justify-content:space-between;align-items:center;margin:0 0 2px;height:36px;padding:0 12px;border:0;border-radius:10px;background:none;color:#4e5968;font-size:14px;text-align:left}
+  #fside .chipsrow .chip:hover{background:#f2f4f6}
+  #fside .chipsrow .chip.on{background:#191f28;color:#fff}
+  #fside .chipsrow .chip .n{margin-left:8px}
+  #fside .seg{display:block;background:none !important;border:0 !important;box-shadow:none !important;padding:0 !important;border-radius:0;margin:0 0 6px}
+  #fside .seg button{display:flex;align-items:center;gap:8px;width:100%;height:36px;padding:0 12px;margin:0 0 2px;border-radius:10px;background:none;color:#4e5968;font-size:14px;font-weight:500;text-align:left}
+  #fside .seg button:hover{background:#f2f4f6}
+  #fside .seg button.on{background:#191f28;color:#fff;font-weight:600}
+  #fside #optBtn{margin:0 !important;width:100%;height:36px;border:0;border-radius:10px;background:#f2f4f6;color:#191f28;font-size:14px;font-weight:600;justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -773,6 +798,17 @@ async function findAI(){
 }
 $('#bFind').onclick=openFind;
 document.addEventListener('paste',e=>{ const it=[...(e.clipboardData||{}).items||[]].find(x=>/^image/.test(x.type)); if(!it) return; e.preventDefault(); if(!$('#ov').classList.contains('show')||!$('#fdrop')) openFind(); takeFindImg(it.getAsFile()); });
+
+/* ---------- 필터를 옆 목차처럼 (2026-11-20 실장님: 상단에 필터가 너무 많음) ---------- */
+(function(){
+  const m=document.querySelector('main'), f=$('#filters'); if(!m||!f) return;
+  const wrap=document.createElement('div'); wrap.className='fwrap';
+  const side=document.createElement('aside'); side.id='fside'; side.innerHTML='<div class="fsh">필터</div>';
+  const body=document.createElement('div'); body.className='fmain';
+  while(m.firstChild) body.appendChild(m.firstChild);
+  side.appendChild(f); wrap.appendChild(side); wrap.appendChild(body); m.appendChild(wrap);
+  const ta=$('#toolArea'); new MutationObserver(()=>{ side.style.display=ta.style.display==='none'?'none':''; }).observe(ta,{attributes:true,attributeFilter:['style']});
+})();
 </script>
 </body>
 </html>
