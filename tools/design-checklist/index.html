@@ -280,8 +280,11 @@
     .check-item { padding:14px 18px; }
     .check-text { font-size:14px; }
     .section-title { font-size:26px; }
-    .check-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    /* 2026-11-20 실장님: PC는 항목을 2열로 (묶음은 위아래로 쌓고, 묶음 안 항목이 2열) */
+    .check-grid { display:grid; grid-template-columns:1fr; gap:24px; }
     .check-grid .check-group { margin-bottom:0; }
+    .check-list { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; align-items:stretch; }
+    .check-list .check-item { height:100%; box-sizing:border-box; }
     .admin-banner { padding:8px 32px; }
   }
   @media (min-width:1200px) {
