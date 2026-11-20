@@ -1040,7 +1040,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 @media (min-width:1024px) { .wsc.wfull .wpc { grid-template-columns:repeat(4, minmax(0, 1fr)); } }
 .wday { font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:4px 0 14px; }
 .wday small { font-size:14px; color:var(--mute); font-weight:600; margin-left:8px; }
-.wwx { display:inline-flex; align-items:center; gap:5px; vertical-align:3px; color:#4e5968 !important; } .wwx svg { width:18px; height:18px; flex:none; } .wwx b { font-weight:700; color:#191f28; }
+.wwx { display:inline-flex; align-items:center; gap:5px; vertical-align:3px; color:#4e5968 !important; } .wwx svg { width:18px; height:18px; flex:none; } .wwx b { font-weight:700; color:#191f28; } .wwx .wxs { font-style:normal; font-size:13px; font-weight:500; color:#8b95a1; margin-left:6px; white-space:nowrap; } @media (max-width:600px) { .wwx { flex-wrap:wrap; } .wwx .wxs { flex-basis:100%; margin:2px 0 0; } }
 .wfl { display:flex; flex-direction:column; gap:6px; }
 .wfl a, .wfl button { display:flex; align-items:center; gap:10px; border:0; background:var(--bg); border-radius:12px; padding:11px 12px; font-size:13.5px; font-weight:600; color:var(--txt); text-decoration:none; text-align:left; }
 .wfl .nvi { color:var(--mute); }
@@ -1057,16 +1057,17 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .clkd { font-size:13px; font-weight:700; color:#4e5968; margin:0 0 8px; }
 .hcal { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; text-align:center; font-size:12px; font-variant-numeric:tabular-nums; }
 .hcal i { font-style:normal; font-size:11px; font-weight:600; color:#8b95a1; padding-bottom:4px; } .hcal i.su, .hcal span.su { color:#f04452; } .hcal i.sa, .hcal span.sa { color:#3182f6; }
-.hcal { row-gap:4px; column-gap:4px; }
-.hcal > span, .hcal > button { aspect-ratio:1 / 1; width:100%; max-width:40px; justify-self:center; }
-.hcal > button { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border:0; padding:0; margin:0; background:none; border-radius:8px; font:inherit; font-size:12px; color:#333d4b; font-weight:500; line-height:1; cursor:pointer; }
-.hcal > button:hover { background:#f2f4f6; }
+.hcal { row-gap:6px; column-gap:2px; }
+/* 날짜: 숫자는 동그라미 안(오늘 = 검은 동그라미), 일정 점은 동그라미 아래로 띄움 (2026-11-20 실장님) */
+.hcal > button { display:flex; flex-direction:column; align-items:center; gap:4px; border:0; padding:0; margin:0; background:none; font:inherit; font-size:12px; color:#333d4b; font-weight:500; line-height:1; cursor:pointer; }
+.hcal > button b { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-weight:inherit; }
+.hcal > button:hover b { background:#f2f4f6; }
 .hcal > button.su { color:#f04452; } .hcal > button.sa { color:#3182f6; }
-.hcal > button.ctd { background:#191f28; color:#fff !important; font-weight:700; }
-.hcal > button:after { content:''; width:4px; height:4px; border-radius:50%; background:transparent; } .hcal > button.cev:after { background:#3182f6; } .hcal > button.ctd.cev:after { background:#fff; }
+.hcal > button.ctd b { background:#191f28; color:#fff; font-weight:700; }
+.hcal > button:after { content:''; width:4px; height:4px; border-radius:50%; background:transparent; } .hcal > button.cev:after { background:#3182f6; }
 /* 밤 시계 (18시~6시) */
 .aclk.night .cf { fill:#191f28; stroke:#191f28; } .aclk.night .ctk { stroke:#6b7684; } .aclk.night .chd { stroke:#fff; } .aclk.night .cdot { fill:#fff; }
-@media (max-width:1023px) { .wsg > .wsc.wclk, .wclk { grid-template-columns:112px minmax(0, 1fr); gap:16px; } .aclk { width:112px; height:112px; } .hcal { row-gap:2px; column-gap:2px; } .hcal > button { gap:3px; } }
+@media (max-width:1023px) { .wsg > .wsc.wclk, .wclk { grid-template-columns:112px minmax(0, 1fr); gap:16px; } .aclk { width:112px; height:112px; } .hcal { row-gap:4px; } .hcal > button { gap:3px; } .hcal > button b { width:26px; height:26px; } }
 /* 일·주·월·기간 고르기 (2026-11-20 실장님: 원이 타원으로 찌그러짐) → 어디서나 회색 트랙 세그먼트, 글자 폭과 상관없이 같은 너비 */
 .aseg, .aseg.sw { background:#e5e8eb !important; border-radius:12px; padding:3px; gap:2px; }
 .aseg button, .aseg.sw button { min-width:48px; height:34px; min-height:34px !important; padding:0 12px !important; border-radius:9px !important; background:none !important; color:#8b95a1 !important; font-size:13px; font-weight:700; box-shadow:none; }
@@ -1555,7 +1556,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm11';
+var APP_VER = '20261120hm13';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2491,19 +2492,22 @@ function wxName(c) {
   if (c <= 67 || (c >= 80 && c <= 82)) return ['비', 'rain']; if (c <= 77 || c === 85 || c === 86) return ['눈', 'snow']; return ['뇌우', 'rain'];
 }
 function wxHtml() {
-  var w = null; try { w = JSON.parse(ls.get('d4:wx') || 'null'); } catch (e) {}
+  var w = null; try { w = JSON.parse(ls.get('d4:wx2') || 'null'); } catch (e) {}
   if (!w || Date.now() - w.at > 30 * 60000) wxFetch();
   if (!w) return '';
-  var n = wxName(w.c); return WX_ICON[n[1]] + n[0] + ' <b>' + Math.round(w.t) + '°</b>';
+  var n = wxName(w.c), x = [];
+  if (typeof w.f === 'number') x.push('체감 ' + Math.round(w.f) + '°'); if (typeof w.h === 'number') x.push('습도 ' + Math.round(w.h) + '%');
+  if (typeof w.ws === 'number') x.push('바람 ' + (Math.round(w.ws * 10) / 10) + 'm/s'); if (typeof w.p === 'number') x.push('강수 ' + (Math.round(w.p * 10) / 10) + 'mm');
+  return WX_ICON[n[1]] + n[0] + ' <b>' + Math.round(w.t) + '°</b>' + (x.length ? '<em class="wxs">' + x.join(' · ') + '</em>' : '');
 }
 var WX_BUSY = 0;
 function wxFetch() {
   if (WX_BUSY) return; WX_BUSY = 1;
   var go = function (la, lo) {
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + la + '&longitude=' + lo + '&current=temperature_2m,weather_code&timezone=auto')
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + la + '&longitude=' + lo + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&daily=precipitation_sum&wind_speed_unit=ms&forecast_days=1&timezone=auto')
       .then(function (r) { return r.json(); }).then(function (j) {
         var c = j && j.current; if (!c || typeof c.temperature_2m !== 'number') return;
-        ls.set('d4:wx', JSON.stringify({ t: c.temperature_2m, c: c.weather_code, at: Date.now() }));
+        ls.set('d4:wx2', JSON.stringify({ t: c.temperature_2m, c: c.weather_code, f: c.apparent_temperature, h: c.relative_humidity_2m, ws: c.wind_speed_10m, p: j.daily && j.daily.precipitation_sum ? j.daily.precipitation_sum[0] : null, at: Date.now() }));
         var el = document.querySelector('.wwx'); if (el) el.innerHTML = wxHtml();
       }).catch(function () {}).then(function () { WX_BUSY = 0; });
   };
@@ -2521,7 +2525,7 @@ function calCard(E) {
   S.D.events.forEach(function (e) { if (e.file.type === 'proj') ev[e.d] = 1; });
   var c = '<div class="hcal">' + '일월화수목금토'.split('').map(function (w, i) { return '<i class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</i>'; }).join('');
   for (var i = 0; i < first; i++) c += '<span></span>';
-  for (var d = 1; d <= days; d++) { var k = y + '-' + ('0' + (m + 1)).slice(-2) + '-' + ('0' + d).slice(-2), wd = (first + d - 1) % 7; c += '<button type="button" data-hcd="' + k + '" class="' + (k === TODAY ? 'ctd ' : '') + (wd === 0 ? 'su ' : wd === 6 ? 'sa ' : '') + (ev[k] ? 'cev' : '') + '">' + d + '</button>'; }
+  for (var d = 1; d <= days; d++) { var k = y + '-' + ('0' + (m + 1)).slice(-2) + '-' + ('0' + d).slice(-2), wd = (first + d - 1) % 7; c += '<button type="button" data-hcd="' + k + '" class="' + (k === TODAY ? 'ctd ' : '') + (wd === 0 ? 'su ' : wd === 6 ? 'sa ' : '') + (ev[k] ? 'cev' : '') + '"><b>' + d + '</b></button>'; }
   var tk = ''; for (var j = 0; j < 12; j++) tk += '<line x1="50" y1="7" x2="50" y2="11" class="ctk" stroke="#b0b8c1" stroke-width="2" stroke-linecap="round" transform="rotate(' + j * 30 + ' 50 50)"/>';
   var face = '<svg class="aclk" id="aClk" viewBox="0 0 100 100"><circle class="cf" cx="50" cy="50" r="47" fill="#f9fafb" stroke="#e5e8eb" stroke-width="1.5"/>' + tk +
     '<line id="chH" class="chd" x1="50" y1="50" x2="50" y2="28" stroke="#191f28" stroke-width="4" stroke-linecap="round"/><line id="chM" class="chd" x1="50" y1="50" x2="50" y2="17" stroke="#191f28" stroke-width="2.5" stroke-linecap="round"/>' +
