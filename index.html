@@ -1562,7 +1562,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm14';
+var APP_VER = '20261120hm15';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2399,15 +2399,14 @@ var SPACES = [
     { g: '개인', i: [{ k: 'todo', t: '할 일', s: '오늘 · 이번 주 할 일과 팀 공지' }, { k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 달력으로' }, { k: 'sched', t: '일정', s: '프로젝트별 일정표' }] }] },
-  { k: 'tool', t: '도구', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명', home: 'space:tool', ic: 'tool', g: [
-    { g: '도구', i: [{ k: 'review', t: '검수', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
-      { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
-  { k: 'lib', t: '도우미', d: '거래처 연락처, 로고, 폰트, 용어사전, 팬톤', home: 'space:lib', ic: 'ref', g: [
-    { g: '도우미', i: [{ k: 'qk', t: '퀵 배차', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
-  { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'pen', g: [
-    { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
-  { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
-    { g: '행정안내', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }] }] }
+  { k: 'tool', t: '도우미', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명, 로고 · 폰트 · 용어사전 · 팬톤', home: 'space:tool', ic: 'tool', g: [
+    { g: '도우미', i: [{ k: 'review', t: '검수', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
+      { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 },
+      { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
+  { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'pen', g: [
+    { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
+  { k: 'admin', t: '행정', d: '사무실 이용, 행정 업무, 업무 시스템 안내, 퀵 배차', home: 'space:admin', ic: 'office', g: [
+    { g: '행정', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }, { k: 'qk', t: '퀵 배차', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }] }] }
 ];
 // 2026-11-20: 메뉴 이름은 SPACES(실장님 확정)가 유일한 기준. 칩 · 카드 · 찾기 · 자주 쓰는 도구 모두 이 이름
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i.forEach(function (x) { if (typeof x === 'string') return; var t = tl(x.k); if (t.k) t.t = x.t; TOOL_SHORT[x.k] = x.t; }); }); });
@@ -2552,7 +2551,7 @@ function renderStart() {
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
-  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵 배차'], ['review', 'chk', '검수']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['review', 'chk', '검수'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
@@ -2713,7 +2712,7 @@ function navSync() {
   if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
     sd.innerHTML = sideHtml(); bindGo(sd); $('.sfs', sd).onclick = function () { navPal(); };
-    var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['all', 'menu', '전체']];
+    var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도우미'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
     $$('#ntb button').forEach(function (b) { b.onclick = function () { if (b.dataset.nt === 'all') return fullMenu(); if (b.dataset.nt === 'find') return navPal(); navGo(SPACES.filter(function (s) { return s.k === b.dataset.nt; })[0].home); }; });
