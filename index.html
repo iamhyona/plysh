@@ -827,6 +827,29 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wlsum { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; padding:9px 0; border-top:1px solid #f2f4f6; font-size:13px; color:var(--sub); font-weight:600; }
 .wlsum:first-of-type { border-top:0; }
 .wlsum b { font-size:14px; min-width:48px; }
+.wlsh { font-size:17px; font-weight:800; letter-spacing:-0.02em; margin:28px 2px 12px; }
+.wls2 { display:grid; gap:12px; }
+@media (min-width:1024px) { .wls2 { grid-template-columns:repeat(2, minmax(0, 1fr)); align-items:start; } }
+.wlc { background:#fff; border-radius:20px; padding:18px; }
+.wlch { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; min-height:34px; }
+.wlch > b { display:flex; align-items:center; gap:8px; font-size:17px; font-weight:800; letter-spacing:-0.02em; }
+.wlch > b i { width:10px; height:10px; border-radius:50%; flex:none; }
+.wlch .wlap { margin:0; }
+.wlst { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.wlst button { border:0; background:var(--chip); border-radius:14px; padding:12px 14px; text-align:left; display:flex; flex-direction:column; gap:2px; cursor:pointer; min-width:0; }
+.wlst button:disabled { cursor:default; }
+.wlst small { font-size:12.5px; font-weight:600; color:var(--mute); }
+.wlst b { font-size:22px; font-weight:800; letter-spacing:-0.02em; color:var(--txt); line-height:1.25; }
+.wlst b em { font-style:normal; font-size:13px; font-weight:600; color:var(--mute); margin-left:2px; }
+.wlst button:disabled b { color:var(--faint); }
+.wlst span { font-size:13px; font-weight:700; color:var(--sub); }
+.wlwt { margin-top:14px; border-top:1px solid var(--line); padding-top:10px; }
+.wlwt .t { font-size:12.5px; font-weight:700; color:var(--mute); margin-bottom:2px; } .wlwt .t small { font-weight:500; color:var(--faint); margin-left:4px; }
+.wlwt .wl0 { font-size:13px; color:var(--mute); padding:6px 0; }
+.wlw2 { display:flex; justify-content:space-between; align-items:baseline; padding:6px 0; font-size:14px; color:var(--sub); font-variant-numeric:tabular-nums; }
+.wlw2 b { font-weight:700; color:var(--txt); } .wlw2 b.x40 { color:#e8590c; } .wlw2 b.x52 { color:#e03131; }
+.wlw2 b em { font-style:normal; font-size:11.5px; font-weight:700; margin-left:6px; padding:2px 7px; border-radius:999px; background:#fff1e5; }
+.wlw2 b.x52 em { background:#fdecec; }
 .wlsb { border:0; background:var(--chip); border-radius:999px; padding:5px 10px; font-size:13px; font-weight:600; color:var(--sub); }
 .wlsb:disabled { background:none; padding-left:0; padding-right:0; cursor:default; }
 /* WORK LOG 월 합계 · 주별 근무시간 (근무표) + 부서장 결재 (2026-10-30) */
@@ -1006,13 +1029,18 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #ncr { display:none; flex:1; min-width:0; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--mute); white-space:nowrap; overflow:hidden; }
 #ncr b { color:var(--sub); font-size:13px; font-weight:700; overflow:hidden; text-overflow:ellipsis; }
 /* 페이지 머리 (2026-11-20): 모든 메뉴 화면 같은 구조 = 제목 24px + 한 줄 설명 14px */
-#npg { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:18px 16px 0; }
+#npg { position:relative; max-width:calc(var(--fw) + 32px); margin:0 auto; padding:18px 16px 20px; }
+#npg .pga { position:absolute; right:16px; bottom:20px; width:36px; height:36px; border-radius:50%; background:#fff; color:var(--sub); display:flex; align-items:center; justify-content:center; }
+#npg .pga svg { width:16px; height:16px; }
+#npg:not(.hide) + main > :first-child { margin-top:0 !important; }
+@media (max-width:1023px) { #npg:not(.hide):not(.subon) + main { padding-top:0; } #npg.subon ~ #rvWrap, #npg.subon ~ #imWrap, #npg.subon ~ #tkWrap { padding-top:14px; } }
+@media (min-width:1024px) { #npg:not(.hide) + main { padding-top:0; } }
 #npg.hide { display:none; }
 @media (max-width:1023px) { html[data-navc] #npg.subon { display:none; } }
 #npg h1 { margin:0; font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1.3; color:var(--txt); }
 #npg p { margin:6px 0 0; font-size:14px; font-weight:500; line-height:1.5; color:var(--mute); letter-spacing:-0.01em; }
 #npg p:empty { display:none; }
-@media (min-width:1024px) { #npg { max-width:calc(var(--fw) + 80px); padding:26px 40px 2px; } }
+@media (min-width:1024px) { #npg { max-width:calc(var(--fw) + 80px); padding:26px 40px 24px; } #npg .pga { right:40px; bottom:22px; } }
 #ncr svg { width:12px; height:12px; flex:none; color:var(--faint); }
 #nsd .sbh { display:flex; align-items:center; padding:4px 10px 14px; }
 #nsd .sbh button { border:0; background:none; padding:0; font-size:18px; font-weight:800; letter-spacing:.06em; color:var(--txt); }
@@ -1934,7 +1962,7 @@ function renderTk() {
   var f = $('#tkWrap iframe[data-f="' + t.f + '"]');
   if (!f) {
     f = document.createElement('iframe'); f.dataset.f = t.f; f.title = t.t;
-    f.onload = function () { f._ok = 1; embTidy(f); tkGo(f); };
+    f.onload = function () { f._ok = 1; embTidy(f); tkGo(f); setTimeout(pgSync, 50); };
     f.src = t.f + '?v=' + APP_VER + (t.pv ? '#' + t.pv : ''); $('#tkWrap').appendChild(f);
   }
   f._pv = t.pv || ''; if (f._ok) tkGo(f);
@@ -1945,7 +1973,7 @@ function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) f.contentWindow.p
 window.plyshSync = function (file, pv) {
   var t = TOOL_LIST.filter(function (x) { return x.f === file && x.pv === pv; })[0];
   if (!t || S.view !== 'tk' || S.tk === t.k) return;
-  S.tk = t.k; ls.set('d4:tk', t.k); var f = $('#tkWrap iframe[data-f="' + file + '"]'); if (f) f._pv = pv; toolBar();
+  S.tk = t.k; ls.set('d4:tk', t.k); var f = $('#tkWrap iframe[data-f="' + file + '"]'); if (f) f._pv = pv; toolBar(); navSync(); pgSync();
 };
 // 책등 계산기 (2026-11-19). 종이 두께 = 평량(g) × 계수, PREFLIGHT 사양서 검수(spec.js caliper)와 같은 기준
 var SPN_PAPERS = [
@@ -2061,7 +2089,9 @@ function rvSize() { var h = document.querySelector('header'); var pg = document.
 var EMB_TIDY = '/* PLYSH 안에서 열림: 제목은 PLYSH 페이지 머리가 맡음 */'
   + '.wrap > h2.noprint:first-child, .wrap > div.noprint:first-child > h2, .wrap > div.noprint:first-child > .lead { display:none !important; }'
   + '.phd:not(:has(.bk)) { display:none !important; } .hbar > .logo { display:none !important; }'
-  + 'html, body { font-family:"Pretendard Variable", Pretendard, -apple-system, sans-serif; }';
+  + 'html, body { font-family:"Pretendard Variable", Pretendard, -apple-system, sans-serif; }'
+  + 'html.emb main { padding-top:0 !important; } .wrap { padding-top:0 !important; } #fxBar { padding-top:0 !important; } .emb-segw { padding-top:0 !important; }'
+  + 'html.emb #lnk { display:none !important; } html.emb header .header-right { padding-top:0 !important; } html.emb body > #app > header, html.emb body > header { padding-top:0 !important; } .hbar { height:auto !important; padding-top:0 !important; padding-bottom:8px !important; }';
 var GD_TIDY = ':root { --accent:#3182f6 !important; --ok:#16a34a !important; --ng:#ef4444 !important; --ink:#191f28 !important; --muted:#4e5968 !important; --line:#e5e8eb !important; }'
   + '.toc, header .eyebrow, header h1, header .lede { display:none !important; } header { padding-bottom:20px !important; gap:6px !important; }'
   + '[data-toc].has-toc { display:block !important; max-width:none !important; }'
@@ -2283,7 +2313,6 @@ function renderRefs() { renderSpace('ref'); }
 /* ── 머리줄 · 펼침 판 · 전체 메뉴 · 왼쪽 메뉴 ── */
 function megaHtml(sp) {
   var cur = navCur(), cols = sp.g.slice();
-  if (sp.k === 'proj') cols.push({ g: '최근 연 프로젝트', rec: 1 });
   return '<div class="in"><div class="lead"><b>' + esc(sp.t) + '</b><p>' + esc(sp.d) + '</p><button type="button" data-ng="' + sp.home + '">' + esc(sp.t) + ' 첫 화면</button></div>' +
     cols.map(function (g) { return '<div><h4>' + esc(g.g) + '</h4>' + (g.rec ? (NAV.rec.length ? NAV.rec.slice(0, 5).map(function (r, i) { return '<button type="button" class="lk" data-wsr="' + i + '">' + esc(r.name) + '</button>'; }).join('') : '<p style="font-size:12.5px;color:var(--mute);margin:6px 0">아직 연 프로젝트가 없어요</p>') : g.i.map(function (x) { return lk(x, cur); }).join('')) + '</div>'; }).join('') + '</div>';
 }
@@ -2313,8 +2342,7 @@ function sideHtml() {
       if (!on) return h;
       h += '<div class="sx">';
       if (sp.k === 'proj') {
-        h += '<button type="button" class="si' + (cur === 'pj' && !inWs() ? ' on' : '') + '" data-ng="pj">프로젝트</button><button type="button" class="si' + (cur === 'month' ? ' on' : '') + '" data-ng="month">일정</button><div class="sg">최근 연 프로젝트</div>' +
-          NAV.rec.slice(0, 6).map(function (r, i) { return '<button type="button" class="si' + (S.ws && S.ws.name === r.name ? ' on' : '') + '" data-wsr="' + i + '">' + esc(r.name) + '</button>'; }).join('');
+        h += '<button type="button" class="si' + (cur === 'pj' && !inWs() ? ' on' : '') + '" data-ng="pj">프로젝트</button><button type="button" class="si' + (cur === 'month' ? ' on' : '') + '" data-ng="month">일정</button>';
       } else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { return '<button type="button" class="si' + (x.k === cur && !inWs() ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
@@ -2350,7 +2378,9 @@ function pgInfo() {
 }
 function pgSync() {
   var e = navEl('npg', 'div', function (e) { $('#main').insertAdjacentElement('beforebegin', e); }), i = pgInfo();
-  e.classList.toggle('hide', !i); e.classList.toggle('subon', !!subHtml()); e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' : '';
+  e.classList.toggle('hide', !i); e.classList.toggle('subon', !!subHtml());
+  var a = null; try { var f = S.view === 'tk' && $('#tkWrap iframe:not(.hide)'), l = f && f.contentDocument && f.contentDocument.getElementById('lnk'); if (l && l.getAttribute('href')) a = l; } catch (x) {}
+  e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' + (a ? '<a class="pga" href="' + esc(a.href) + '" target="_blank" rel="noopener" title="' + esc(a.title || '시트 · 폴더 열기') + '" aria-label="시트 · 폴더 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>' : '') : '';
 }
 function navSync() {
   document.documentElement.setAttribute('data-nav', NAV.s === 'c' ? 'w' : NAV.s);
@@ -3884,18 +3914,20 @@ function renderWl() {
   var wtRow = function (n) {
     if (!WT) return '<div class="wlwk"><span class="wl0">근무표 불러오는 중…</span></div>';
     var x = (WT.people || []).filter(function (q) { return q.p === n; })[0];
-    if (!x || x.none || x.err) return '<div class="wlwk"><span class="wl0">' + esc(x && x.err ? x.err : WT.err || '근무표에 이 달 탭이 없어요') + '</span></div>';
-    return '<div class="wlwk">' + (x.weeks || []).map(function (w) { var c = w.over > 0 || w.tot > 52 * 60 ? 'x52' : w.ot > 0 || w.tot > 40 * 60 ? 'x40' : ''; return '<span class="w ' + c + '">' + md(w.s) + '–' + md(w.e) + '<b>' + hmK(w.tot) + '</b></span>'; }).join('') + '</div>';
+    if (!x || x.none || x.err) return '<div class="wlwt"><div class="t">주별 근무시간</div><div class="wl0">' + esc(x && x.err ? x.err : WT.err || '근무표에 이 달 탭이 없어요') + '</div></div>';
+    return '<div class="wlwt"><div class="t">주별 근무시간 <small>근무표 기준</small></div>' + (x.weeks || []).map(function (w) { var c = w.over > 0 || w.tot > 52 * 60 ? 'x52' : w.ot > 0 || w.tot > 40 * 60 ? 'x40' : ''; return '<div class="wlw2"><span>' + md(w.s) + ' – ' + md(w.e) + '</span><b class="' + c + '">' + hmK(w.tot) + (c ? '<em>' + (c === 'x52' ? '52시간 초과' : '40시간 초과') + '</em>' : '') + '</b></div>'; }).join('') + '</div>';
   };
   var apBtn = function (n) {
     var x = WT && (WT.people || []).filter(function (q) { return q.p === n; })[0]; if (!x || x.none || x.err) return '';
     var on = !!(x.appr && x.appr[0]);
     return '<button class="wlap' + (on ? ' on' : '') + '" data-wlap="' + esc(n) + '" data-v="' + (on ? 1 : 0) + '">' + (on ? '부서장 결재 완료' + (x.at ? '<small>' + esc(x.at) + '</small>' : '') : '부서장 결재') + '</button>';
   };
-  h += '<div class="bd"><div class="bdh"><div><b>' + m + '월 합계</b></div></div>' + (wp ? [wp] : T).map(function (n) {
+  h += '<div class="wlsh">' + m + '월 합계</div><div class="wls2">' + (wp ? [wp] : T).map(function (n) {
     var L = M.filter(function (r) { return r.p === n; }), c = function (k) { return L.filter(function (r) { return r[k]; }).length; }, fare = L.reduce(function (a, r) { return a + (+r.fare || 0); }, 0);
-    return '<div class="wlsum"><b style="color:' + dcol(n) + '">' + esc(n) + '</b><button class="wlsb" data-wls="' + esc(n) + '|fd"' + (c('fd') ? '' : ' disabled') + '>야근식사 ' + c('fd') + '</button><button class="wlsb" data-wls="' + esc(n) + '|tx"' + (c('tx') ? '' : ' disabled') + '>야근택시 ' + c('tx') + (fare ? ' · ' + won(fare) + '원' : '') + '</button>' + apBtn(n) + '</div>' + wtRow(n);
-  }).join('') + '<div class="wlwlg"><span>주별 총 근무시간 · 근무표 기준</span><span><i style="background:#e8590c"></i>40시간 초과</span><span><i style="background:#e03131"></i>52시간 초과</span></div></div>';
+    return '<div class="wlc"><div class="wlch"><b><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</b>' + apBtn(n) + '</div><div class="wlst">' +
+      '<button data-wls="' + esc(n) + '|fd"' + (c('fd') ? '' : ' disabled') + '><small>야근식사</small><b>' + c('fd') + '<em>건</em></b></button>' +
+      '<button data-wls="' + esc(n) + '|tx"' + (c('tx') ? '' : ' disabled') + '><small>야근택시</small><b>' + c('tx') + '<em>건</em></b>' + (fare ? '<span>' + won(fare) + '원</span>' : '') + '</button></div>' + wtRow(n) + '</div>';
+  }).join('') + '</div>';
   $('#main').innerHTML = h;
   $$('[data-wls]').forEach(function (b) { b.onclick = function () { var a = b.dataset.wls.split('|'); openWlList(a[0], a[1], first, last); }; });
   $$('[data-wlap]').forEach(function (b) { b.onclick = function () {

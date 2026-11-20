@@ -161,6 +161,11 @@ html.emb .phd { padding-right:44px; }
 .seg.sm { display:inline-flex !important; width:fit-content; max-width:100%; overflow-x:auto; scrollbar-width:none; }
 .seg.sm button { flex:none; min-height:36px; font-size:13px; padding:0 14px; }
 .pkbar .seg { background:#e5e8eb !important; }
+.dtg { display:grid; grid-template-columns:1fr; gap:8px; }
+@media (min-width:760px) { .dtg { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+.dtg button { border:0; background:var(--chip, #f2f4f6); border-radius:14px; padding:14px 16px; text-align:left; display:flex; flex-direction:column; gap:4px; min-width:0; cursor:pointer; font:inherit; }
+.dtg button:hover { background:#e8ebee; }
+.dtg b { font-size:15px; font-weight:700; color:#191f28; } .dtg span { font-size:13px; color:#8b95a1; line-height:1.45; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -910,10 +915,23 @@ function rowTsv(r, i) {
 var DF = [['item', '세부 품목', ''], ['set', '소분류', ''], ['cat', '대분류', ''], ['q', '제작수량', ''], ['gift', '증정 / 총 제작', ''], ['size', '판형', ''], ['pg', '페이지', ''],
   ['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['pack', '배치·포장', 'dl-pack'], ['etc', '기타 전달 사항', '']];
 var OPEN = {};
+var DOC_TPL = [
+  { k: 'sg', t: '시즌그리팅', s: '아웃박스 · 캘린더 · 다이어리 · 포토카드 · 엽서', i: ['G형 골판지 박스 (겉합지·골판지·속합지)', '데스크 캘린더', '다이어리 (PUR)', '포토카드', '엽서'] },
+  { k: 'pb', t: '포토북', s: '슬리브 · 포토북 · 포토카드 · 엽서', i: ['슬리브', '포토북 (PUR)', '포토카드', '엽서'] },
+  { k: 'fk', t: '팬키트', s: '박스 · 책자 · 포토카드 · 증명사진 · 메시지 카드', i: ['싸바리 박스 (천지)', '무선 책자 (표지 + 본문)', '포토카드', '증명사진', '메시지 카드'] },
+  { k: 'one', t: '품목 하나', s: '빈 행 하나로 시작', i: [''] }];
+function docRow(name) {
+  var it = name ? itemRow(name) : null;
+  return { id: uid(), cat: it ? it[1] : '', set: '', item: name || '', q: '', gift: '', size: it ? it[2] : '', pg: it && it[1] === '책자' ? '' : '', paper: it ? it[3] : '', print: it ? it[4] : '', coat: it ? it[5] || '-' : '-', fin: '-', cut: '', bind: '-', pack: '', etc: '' };
+}
+function docTplHtml() {
+  return '<div class="card"><div class="ct">기본 구성으로 시작</div><div class="nt" style="margin:0 0 12px">고르면 품목명 · 크기 · 용지 · 인쇄 · 코팅이 대표 사양으로 채워져요. 페이지 · 수량만 넣고 고치면 돼요</div><div class="dtg">' +
+    DOC_TPL.map(function (t) { return '<button class="tc" data-tpl="' + t.k + '"><b>' + esc(t.t) + '</b><span>' + esc(t.s) + '</span></button>'; }).join('') + '</div></div>';
+}
 function renderDoc() {
   var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 이 기기에 저장돼요</small></div>';
   h += '<div class="chips" style="margin:0 0 12px">' + DOCS.map(function (x) { return '<button data-doc="' + x.id + '"' + (d && x.id === d.id ? ' class="on"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '<button id="dNew">+ 새 사양서</button></div>';
-  if (!d) { $('#main').innerHTML = h + '<div class="card"><div class="empty2">아직 사양서가 없어요 · ‘+ 새 사양서’를 눌러 시작해요</div></div>'; bindDoc(); return; }
+  if (!d) { $('#main').innerHTML = h + docTplHtml(); bindDoc(); return; }
   h += '<div class="card"><div class="f"><label>파일명</label><input id="dName" value="' + esc(d.name) + '"></div><div class="nt">' + d.rows.length + '행 · 만든 날 ' + d.date + '</div></div>';
   d.rows.forEach(function (r, i) {
     var o = OPEN[r.id];
@@ -926,6 +944,7 @@ function renderDoc() {
     } else h += sheetHint(r, { q: +String(r.q).replace(/[^\d]/g, '') || 0, k: 1 });
     h += '</div>';
   });
+  if (!d.rows.length) h += docTplHtml();
   h += '<button class="cp" id="dItem" style="background:var(--txt)">+ 품목 추가</button><div class="acts"><button class="rs" id="dAdd">대표 품목 계산에서 추가</button><button class="rs" id="dBlank">+ 빈 행</button></div>';
   h += '<button class="cp" id="dCopy">MASTER 양식으로 복사 (' + d.rows.length + '행)</button><div class="nt c">사양서 시트의 ‘대분류’ 첫 칸을 누르고 붙여넣으면 칸마다 들어가요 · 헤더 포함은 아래 버튼</div>';
   h += '<div class="acts"><button class="rs" id="dCopyH">헤더 포함 복사</button><button class="rs del" id="dDel">이 사양서 삭제</button></div>';
@@ -935,6 +954,11 @@ function bindDoc() {
   var d = curDoc();
   $$('[data-doc]').forEach(function (b) { b.onclick = function () { ls.set('pr:doc', b.dataset.doc); renderDoc(); }; });
   $('#dNew').onclick = function () { newDoc(); renderDoc(); setTimeout(function () { var n = $('#dName'); if (n) { n.focus(); n.select(); } }, 50); };
+  $$('[data-tpl]').forEach(function (b) { b.onclick = function () {
+    var t = DOC_TPL.filter(function (x) { return x.k === b.dataset.tpl; })[0], dd = curDoc() || newDoc();
+    t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) OPEN[r.id] = true; });
+    saveDocs(); renderDoc(); toast(t.t + ' 기본 구성을 넣었어요');
+  }; });
   if (!d) return;
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
   $$('[data-open]').forEach(function (e) { e.onclick = function () { OPEN[e.dataset.open] = !OPEN[e.dataset.open]; renderDoc(); }; });
