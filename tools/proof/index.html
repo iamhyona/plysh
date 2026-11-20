@@ -1387,14 +1387,34 @@ function dieGeom(id, v) {
   }
   return { c: c, f: f, t: t, W: W, H: H };
 }
+// 전개도 글자 (2026-11-20 실장님 "글자 너무 커"): 화면에서 11px 고정, 선에 닿으면 10 · 9px, 그래도 닿으면 숨김
+function dieFit(svg) {
+  var vb = svg.viewBox.baseVal, R = svg.getBoundingClientRect(); if (!vb || !R.width) return;
+  var k = Math.min(R.width / vb.width, R.height / vb.height), L = [];
+  svg.querySelectorAll('#CUT line, #FOLD line').forEach(function (l) { L.push([+l.getAttribute('x1'), +l.getAttribute('y1'), +l.getAttribute('x2'), +l.getAttribute('y2')]); });
+  function hit(b, m) { var x0 = b.x - m, y0 = b.y - m, x1 = b.x + b.width + m, y1 = b.y + b.height + m;
+    return L.some(function (l) { // 선분이 상자와 겹치는지 (클리핑)
+      var t0 = 0, t1 = 1, dx = l[2] - l[0], dy = l[3] - l[1], P = [-dx, dx, -dy, dy], Q = [l[0] - x0, x1 - l[0], l[1] - y0, y1 - l[1]];
+      for (var i = 0; i < 4; i++) { if (P[i] === 0) { if (Q[i] < 0) return false; } else { var r = Q[i] / P[i]; if (P[i] < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; } } }
+      return true; }); }
+  svg.querySelectorAll('#TEXT text').forEach(function (t) {
+    t.style.display = ''; var ok = false, x0 = +(t.dataset.x || t.getAttribute('x')), y0 = +(t.dataset.y || t.getAttribute('y')); t.dataset.x = x0; t.dataset.y = y0;
+    [11, 10, 9].some(function (px) { t.setAttribute('font-size', (px / k).toFixed(2)); var w = t.getBBox().width, h = px / k * 1.2;
+      return [[0, 0], [w * 0.6, 0], [-w * 0.6, 0], [0, h], [0, -h], [w * 0.6, h], [-w * 0.6, h]].some(function (d) { t.setAttribute('x', (x0 + d[0]).toFixed(2)); t.setAttribute('y', (y0 + d[1]).toFixed(2)); return ok = !hit(t.getBBox(), 3 / k); }); });
+    if (!ok) { t.setAttribute('x', x0); t.setAttribute('y', y0); t.style.display = 'none'; }
+  });
+}
+function dieFitAll() { document.querySelectorAll('svg.dsv').forEach(dieFit); }
+new MutationObserver(function () { if (document.querySelector('svg.dsv:not([data-fit])')) { document.querySelectorAll('svg.dsv:not([data-fit])').forEach(function (v) { v.setAttribute('data-fit', '1'); }); requestAnimationFrame(dieFitAll); } }).observe(document.documentElement, { childList: true, subtree: true });
+window.addEventListener('resize', function () { clearTimeout(dieFitAll._t); dieFitAll._t = setTimeout(dieFitAll, 120); });
 function dieSvg(G, forFile) {
   var pad = forFile ? 10 : 14, VW = G.W + 2 * pad, VH = G.H + 2 * pad, sw = forFile ? 0.25 : Math.max(VW, VH) / 400;
   var ln = function (a, st) { return '<line x1="' + r1(a[0] + pad) + '" y1="' + r1(a[1] + pad) + '" x2="' + r1(a[2] + pad) + '" y2="' + r1(a[3] + pad) + '"' + st + '/>'; };
-  var fs = Math.max(4, Math.min(G.W, G.H) / 18);
+  var fs = forFile ? 3 : Math.max(4, Math.min(G.W, G.H) / 18); // 화면은 dieFit 이 12px 고정으로 다시 맞춤
   var s = '<svg xmlns="http://www.w3.org/2000/svg" ' + (forFile ? 'width="' + r1(VW) + 'mm" height="' + r1(VH) + 'mm" ' : 'class="dsv" ') + 'viewBox="0 0 ' + r1(VW) + ' ' + r1(VH) + '">';
   s += '<g id="CUT" fill="none" stroke="#e5243b" stroke-width="' + sw + '">' + G.c.map(function (a) { return ln(a, ''); }).join('') + '</g>';
   s += '<g id="FOLD" fill="none" stroke="#0067d8" stroke-width="' + sw + '" stroke-dasharray="' + (sw * 8) + ' ' + (sw * 5) + '">' + G.f.map(function (a) { return ln(a, ''); }).join('') + '</g>';
-  s += '<g id="TEXT" fill="#8b95a1" font-family="sans-serif" font-size="' + r1(fs) + '" text-anchor="middle">' + G.t.map(function (a) { return '<text x="' + r1(a[0] + pad) + '" y="' + r1(a[1] + pad) + '">' + esc(a[2]) + '</text>'; }).join('') + '</g>';
+  s += '<g id="TEXT" fill="#8b95a1" font-family="sans-serif" font-size="' + r1(fs) + '" text-anchor="middle" dominant-baseline="middle">' + G.t.map(function (a) { return '<text x="' + r1(a[0] + pad) + '" y="' + r1(a[1] + pad) + '">' + esc(a[2]) + '</text>'; }).join('') + '</g>';
   return s + '</svg>';
 }
 var DS = (function () { var o = {}; try { o = JSON.parse(ls.get('pr:die') || '{}'); } catch (e) {} return o; })();
