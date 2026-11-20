@@ -29,7 +29,7 @@ function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
 var libsP = null;
 function libs() {
-  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120f'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
+  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120g'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
   return libsP;
 }
 var faceP = null;
@@ -443,6 +443,9 @@ function pageChecks(P) {
   if (rv) add('warn', 'print', 'rgbvec', 'RGB 색이 남아 있어요 (도형·글자)', rv + '곳', '색상 견본을 CMYK로 바꿔 주세요.', P.rgb.boxes.filter(function (b, i) { return i < 30; }));
   // 재단선 · 맞춤표는 원래 레지스트레이션이라 재단선 바깥은 빼고, 재단 안쪽 디자인에 쓰인 것만 알림
   var regIn = P.reg.filter(function (b) { var T = P.trim, e = 0.3 * MM; return b && b[0] < T[2] - e && b[2] > T[0] + e && b[1] < T[3] - e && b[3] > T[1] + e; });
+  // 위에 사진·흰 박스가 오버프린트 없이 완전히 덮은 건 판에 안 나오니 빼기 (덮은 게 오버프린트면 비쳐 나와서 남김) (2026-11-20 실장님)
+  var covers = P.images.filter(function (o) { return !o.smask && !o.mask && !o.rot && !o.op && (o.ca == null || o.ca >= 0.999) && o.vis; }).concat(P.fills.filter(function (o) { return o.rect && !o.op && (o.ca == null || o.ca >= 0.999) && o.vis && !o.ink.none && !o.ink.pattern; }));
+  regIn = regIn.filter(function (b) { var e = 0.05; return !covers.some(function (o) { var v = o.vis; return o.seq > (b.seq || 0) && v[0] <= b[0] + e && v[1] <= b[1] + e && v[2] >= b[2] - e && v[3] >= b[3] - e; }); });
   // 가는 선(칼선·접는선·가이드)은 주의, 면·글자는 경고 (2026-11-20 실장님)
   var regLine = regIn.filter(function (b) { return b.line; }), regArt = regIn.filter(function (b) { return !b.line; });
   if (regArt.length) add('err', 'print', 'reg', '재단 안쪽에 레지스트레이션 색 (면·글자)', regArt.length + '곳', 'K100 또는 리치블랙으로 바꾸기', regArt);
