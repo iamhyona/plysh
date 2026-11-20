@@ -1182,10 +1182,10 @@ var DIE = [
   { gr: '책', id: 'hard', n: '하드커버 싸개', d: '양장 표지 · 보드 3장 + 홈', in: { w: 148, h: 210, sp: 15, bd: 2, jt: 10, wr: 20 } },
   { gr: '책', id: 'cover', n: '무선 책 표지', d: '앞·뒤 + 책등 (+ 날개)', in: { w: 148, h: 210, sp: 10, fl: 0, bl: 3 } },
   { id: 'bag', gr: '쇼핑백', n: '쇼핑백', d: '앞 · 옆(가운데 접힘) · 뒤 · 옆 + 풀칠 · 윗단 접어넣기 · 바닥 날개', in: { L: 260, D: 100, H: 330, g: 20, tp: 40, hd: 1 } },
-  { id: 'envS', geo: 'env', gr: '봉투', n: '소봉투 (일반형)', d: '완성 105×220 · 짧은 변 입구', in: { w: 105, h: 220, mg: 0, sv: 10, lid: 35 } },
-  { id: 'envSJ', geo: 'envj', gr: '봉투', n: '소봉투 (자켓형)', d: '완성 220×105 · 긴 변 입구', in: { w: 220, h: 105, mg: 0, fl: 15, lid: 35 } },
-  { id: 'env', gr: '봉투', n: '대봉투 (일반형)', d: '완성 240×330 · A4 서류 · 짧은 변 입구', in: { w: 240, h: 330, mg: 0, sv: 10, lid: 45 } },
-  { id: 'envLJ', geo: 'envj', gr: '봉투', n: '대봉투 (자켓형)', d: '완성 330×240 · A4 서류 · 긴 변 입구', in: { w: 330, h: 240, mg: 0, fl: 20, lid: 45 } },
+  { id: 'envS', geo: 'env', gr: '봉투', n: '소봉투 (일반형)', d: '완성 105×220 · 짧은 변 입구 · 뒷면 가운데 접착 · 뚜껑 20', in: { w: 105, h: 220, mg: 0, sv: 10, lid: 20 } },
+  { id: 'envSJ', geo: 'envj', gr: '봉투', n: '소봉투 (자켓형)', d: '완성 220×105 · 긴 변 입구 · 좌우 접착 · 뚜껑 40', in: { w: 220, h: 105, mg: 0, fl: 15, lid: 40 } },
+  { id: 'env', gr: '봉투', n: '대봉투 (일반형)', d: '완성 245×330 · A4 서류 · 짧은 변 입구 · 뒷면 가운데 접착 · 뚜껑 34', in: { w: 245, h: 330, mg: 0, sv: 10, lid: 34 } },
+  { id: 'envLJ', geo: 'envj', gr: '봉투', n: '대봉투 (자켓형)', d: '완성 330×245 · A4 서류 · 긴 변 입구 · 좌우 접착', in: { w: 330, h: 245, mg: 0, fl: 20, lid: 45 } },
   { id: 'envCD', geo: 'envj', gr: '봉투', n: 'CD자켓 봉투', d: '완성 125×125 · CD 한 장', in: { w: 125, h: 125, mg: 0, fl: 12, lid: 30 } },
   { id: 'envPC', geo: 'env', gr: '봉투', n: '포토카드봉투 (뚜껑형)', d: '완성 62×92 · 포토카드 55×85 기준', in: { w: 62, h: 92, mg: 0, sv: 8, lid: 22 } },
   { id: 'envPN', geo: 'envn', gr: '봉투', n: '포토카드봉투 (뚜껑없는)', d: '완성 62×92 · 입구 손잡이 홈', in: { w: 62, h: 92, mg: 0, fl: 10, nt: 8 } },
@@ -1333,11 +1333,12 @@ function dieGeom(id, v) {
     // 일반 = 짧은 변 입구 · 자켓형 = 긴 변 입구 (가로가 긴 쪽이 되도록 맞춤)
     var a1 = +v.w + 2 * +v.mg, a2 = +v.h + 2 * +v.mg;
     var Wv = id === 'envj' ? Math.max(a1, a2) : Math.min(a1, a2), Hv = id === 'envj' ? Math.min(a1, a2) : Math.max(a1, a2);
-    // 일반형(2026-11-20 실장님): 옆날개가 앞면 절반씩 넓게 접혀 가운데서 겹치고, 아래 날개는 뚜껑 정도 높이
-    var lid = +v.lid, fl = id === 'env' ? Math.round(Wv / 2 + (v.sv == null ? 10 : +v.sv) / 2) : +v.fl, bot = id === 'env' ? lid : Math.round(Hv * 0.6); W = Wv + 2 * fl; H = lid + Hv + bot;
+    // 일반형(2026-11-20 실장님): 옆날개가 앞면 절반씩 넓게 접혀 뒷면 가운데서 겹쳐 붙고, 아래 날개는 뚜껑 정도 높이
+    // 자켓형: 아래 날개가 뒷면 전체(앞면 높이 - 3mm)가 되고, 좁은 옆날개를 좌우에서 붙임 (국내 인쇄소 안내 기준)
+    var lid = +v.lid, fl = id === 'env' ? Math.round(Wv / 2 + (v.sv == null ? 10 : +v.sv) / 2) : +v.fl, bot = id === 'env' ? lid : Math.round(Hv - 3); W = Wv + 2 * fl; H = lid + Hv + bot;
     poly([[fl + 6, 0], [fl + Wv - 6, 0], [fl + Wv, lid], [W, lid + 8], [W, lid + Hv - 8], [fl + Wv, lid + Hv], [fl + Wv - 4, H], [fl + 4, H], [fl, lid + Hv], [0, lid + Hv - 8], [0, lid + 8], [fl, lid]], c);
     rect(fl, lid, Wv, Hv, f);
-    t.push([W / 2, lid + Hv / 2, '앞면 ' + Wv + '×' + Hv], [W / 2, lid / 2, '뚜껑'], [W / 2, lid + Hv + bot / 2, '아래 날개'], [fl / 2, lid + Hv / 2, '옆날개'], [W - fl / 2, lid + Hv / 2, '옆날개']);
+    t.push([W / 2, lid + Hv / 2, '앞면 ' + Wv + '×' + Hv], [W / 2, lid / 2, '뚜껑'], [W / 2, lid + Hv + bot / 2, id === 'env' ? '아래 날개' : '뒷면 (아래 날개)']); if (id === 'env') t.push([fl / 2, lid + Hv / 2, '옆날개'], [W - fl / 2, lid + Hv / 2, '옆날개']);
   }
   return { c: c, f: f, t: t, W: W, H: H };
 }

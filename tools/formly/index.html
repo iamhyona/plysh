@@ -343,6 +343,27 @@ html.emb .fx-top .form-input { background-color:#fff !important; height:40px !im
 html.emb .fx-top .preset-btn, html.emb .fx-top button { height:40px; }
 html.emb .lbcard .copy-btn.secondary, html.emb .copy-btn.secondary { background:#f2f4f6 !important; color:#4e5968 !important; height:40px; font-size:14px; }
 html.emb .pv-section, html.emb .pv-prose-box { border-radius:14px !important; }
+
+/* 위쪽 정리 (2026-11-20 실장님: 상단이 복잡) */
+html.emb .fx-hide { display:none !important; }
+html.emb .fx-top { gap:12px !important; margin-bottom:20px !important; flex-wrap:wrap; }
+html.emb .fx-top .sel-wrap select { height:40px !important; border-radius:12px; }
+html.emb .fx-top .fx-lang { margin:0 !important; flex:1; min-width:0; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+html.emb .fx-top .fx-lang::-webkit-scrollbar { display:none; }
+html.emb .fx-top > div[style*="flex:1"] { display:none; }
+html:not(.emb) .fx-lang { margin:0 0 17px; width:100%; }
+.fxact { margin-left:auto; display:flex; gap:8px; }
+.fxact .fxsave { height:40px; padding:0 18px; border:0; border-radius:12px; background:#191f28; color:#fff; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.fxact .fxmore { display:inline-flex; align-items:center; gap:4px; height:40px; padding:0 12px 0 16px; border:0; border-radius:12px; background:#fff; color:#191f28; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.fxpop { position:absolute; z-index:80; min-width:180px; padding:6px; background:#fff; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.14); display:grid; }
+.fxpop button { height:40px; padding:0 14px; border:0; border-radius:10px; background:none; color:#191f28; font:inherit; font-size:14px; font-weight:600; text-align:left; cursor:pointer; }
+.fxpop button:hover { background:#f2f4f6; }
+.fxpop button.red { color:#f04452; }
+.fxpop i { height:1px; background:#f2f4f6; margin:4px 8px; }
+@media (max-width:640px) {
+  html.emb .fxr.fxm { flex-wrap:nowrap; } html.emb .fxact { margin-left:auto; width:auto; } html.emb .fxact button { flex:none; padding:0 12px; }
+  html.emb .fx-top .sel-wrap { flex:1 1 100% !important; } html.emb .fx-top .sel-wrap select { width:100%; } html.emb .fx-top .fx-lang { flex:1 1 100%; }
+}
 </style>
 </head>
 <body>
@@ -2402,10 +2423,19 @@ function renderFxBar(items){
   var el=document.getElementById('fxBar');if(!el||!document.documentElement.classList.contains('emb'))return;
   var m=fxMode();
   var segs=[['fields','작성'],['label','라벨'],['set','설정']].map(function(o){return '<button class="'+(m===o[0]?'on':'')+'" onclick="fxGo(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
-  el.innerHTML='<div class="fxr"><div class="fxchips" title="두 번 누르면 이름 바꾸기">'+items+'<button class="fxadd" onclick="addProduct()">+ 새 상품</button></div></div>'
-    +'<div class="fxr fxm"><div class="emb-seg">'+segs+'</div><div class="fxact"><button onclick="openGsImportModal()">불러오기</button><button onclick="exportFile()">엑셀 저장</button><button onclick="openGsModal()">시트로 보내기</button></div></div>'
+  el.innerHTML='<div class="fxr fxm"><div class="emb-seg">'+segs+'</div><div class="fxact">'+(m==='fields'?'<button class="fxsave" onclick="saveFieldsSnapshot()">입력 저장</button>':'')+'<button class="fxmore" onclick="fxMenu(event)">더보기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button></div></div>'
+    +'<div class="fxr"><div class="fxchips" title="두 번 누르면 이름 바꾸기">'+items+'<button class="fxadd" onclick="addProduct()">+ 새 상품</button></div></div>'
     +(m==='set'?'<div class="fxr"><div class="fxchips fxsub">'+FX_SET.map(function(o){return '<button class="'+(S.tab===o[0]?'on':'')+'" onclick="setTab(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div></div>':'');
 }
+function fxMenu(e){
+  e.stopPropagation();var old=document.getElementById('fxPop');if(old){old.remove();return;}
+  var b=e.currentTarget.getBoundingClientRect(),d=document.createElement('div');d.id='fxPop';d.className='fxpop';
+  d.innerHTML='<button onclick="fxPopGo(openGsImportModal)">불러오기</button><button onclick="fxPopGo(exportFile)">엑셀 저장</button><button onclick="fxPopGo(openGsModal)">시트로 보내기</button><i></i>'
+    +'<button onclick="fxPopGo(openHistoryModal)">저장 기록</button><button onclick="fxPopGo(undo)">실행 취소</button><i></i><button class="red" onclick="fxPopGo(resetCurrentProduct)">전체 초기화</button>';
+  d.style.top=(b.bottom+window.scrollY+6)+'px';d.style.right=(document.documentElement.clientWidth-b.right)+'px';document.body.appendChild(d);
+  setTimeout(function(){document.addEventListener('click',function h(){var x=document.getElementById('fxPop');if(x)x.remove();document.removeEventListener('click',h);});},0);
+}
+function fxPopGo(fn){var x=document.getElementById('fxPop');if(x)x.remove();fn();}
 function fxGo(m){setTab(m==='set'?(FX_SET.some(function(o){return o[0]===S._lastSet;})?S._lastSet:'caution'):m);}
 function renderContent(){
   renderSidebar();
@@ -2445,13 +2475,13 @@ function tabFields(p){
     +'<button class="preset-btn fx-pv" style="flex:none;padding:0 17px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="openPreview()">미리보기</button>'
     +'<div class="sel-wrap" style="flex:none"><select class="form-input sm" style="height:34px" onchange="setCauVer(this.value)" title="주의사항 버전">'+verOpts+'</select></div>'
     +'<div style="flex:1"></div>'
-    +'<button class="preset-btn" style="flex:none;padding:0 17px" onclick="undo()">실행취소</button>'
-    +'<button class="preset-btn" style="flex:none;padding:0 17px" onclick="openHistoryModal()">저장기록</button>'
-    +'<button class="preset-btn" style="flex:none;padding:0 17px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveFieldsSnapshot()">입력 저장</button>'
-    +'<button class="preset-btn" style="flex:none;padding:0 17px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="resetCurrentProduct()">전체 초기화</button>'
+    +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px" onclick="undo()">실행취소</button>'
+    +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px" onclick="openHistoryModal()">저장기록</button>'
+    +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveFieldsSnapshot()">입력 저장</button>'
+    +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="resetCurrentProduct()">전체 초기화</button>'
+    +'<div class="lang-pills fx-lang">'+langPills+'</div>'
     +'</div>'
-    +'<div style="height:1px;background:var(--border);margin-bottom:12px"></div>'
-    +'<div class="lang-pills" style="margin-bottom:17px">'+langPills+'</div>'
+    +'<div class="fx-hide" style="height:1px;background:var(--border);margin-bottom:12px"></div>'
     +'<div class="sect-hdr">상품 기본 정보</div><div class="fxsec">'
     +p.fields.map(function(f){return renderFieldCard(f);}).join('')
     +'<button class="add-row-btn" onclick="openFieldPicker()">+ 상품 정보 항목 추가</button></div>'
