@@ -343,7 +343,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 @media (min-width:900px) { html.emb .cw2 { grid-template-columns:400px minmax(0,1fr); align-items:start; } html.emb .cout { position:sticky; top:12px; } }
 .cin { padding:22px 20px !important; }
 .cstp { display:flex; align-items:center; gap:10px; margin:0 0 16px; flex-wrap:wrap; }
-.cstp em { font-style:normal; flex:none; width:24px; height:24px; border-radius:12px; background:var(--txt); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+/* 2026-11-21 실장님: 섹션 제목 앞 번호 없음 (다른 화면과 통일) */
 .cstp b { font-size:17px; font-weight:800; letter-spacing:-0.02em; } .cstp small { font-size:13px; color:var(--mute); }
 .cstp .mseg { margin-left:auto !important; }
 .cai { margin-left:auto; display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:10px; background:#f2f4f6; color:#333d4b; font-size:13px; font-weight:700; cursor:pointer; }
@@ -418,6 +418,8 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .rhc span { font-size:12.5px; color:#6b7684; line-height:1.45; margin-top:4px; } .rhc:hover { box-shadow:0 0 0 1px #e5e8eb inset; }
 .rhx { grid-template-columns:minmax(0, 1fr) !important; } .rhx .rnav { display:none !important; }
 @media (max-width:420px) { .rhl { grid-template-columns:1fr 1fr; } .rhc { padding:14px 14px 13px; } }
+.cbs { display:block !important; width:100%; max-width:360px; margin:0 0 14px !important; } .cbs select { width:100%; height:46px; padding:0 40px 0 16px; border:0; border-radius:12px; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23191f28' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; font-weight:700; color:#191f28; cursor:pointer; outline:0; }
+@media (max-width:759px) { .cbs { max-width:none; } }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -613,10 +615,11 @@ function renderCalc() {
   var c = CQ = cq(); if (c.t === 'pack') c.t = 'die'; if (c.t !== 'die') c.lastFlat = c.t; c.m = 'size'; c.fd = +c.fd || 3;
   var h = '<div class="phd"><b>종이연수·칼선</b><small>완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235</small></div>';
   var isDie = c.t === 'die';
-  h += '<div class="seg" id="cB">' + [['sheet', '낱장'], ['leaf', '리플렛'], ['book', '책 내지'], ['die', '칼선 (박스·봉투·표지)']].map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.t === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  // 2026-11-21 실장님: 낱장 · 리플렛 · 책 내지 · 칼선은 맨 위 드롭다운으로
+  h += '<label class="cbs" id="cB"><select id="cBs" aria-label="계산할 것">' + [['sheet', '낱장'], ['leaf', '리플렛'], ['book', '책 내지'], ['die', '칼선 (박스·봉투·표지)']].map(function (o) { return '<option value="' + o[0] + '"' + (c.t === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>';
   var mseg = '<span class="seg sm mseg" id="cM">' + [['size', '크기로'], ['cut', '절수로']].map(function (o) { return '<button data-m="' + o[0] + '" class="' + (c.m === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</span>';
   var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + '</label><span class="ifx"><input type="number" inputmode="decimal" data-k="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '>' + (unit ? '<em>' + unit + '</em>' : '') + '</span></div>'; };
-  var stp = function (n, t, sm, extra) { return '<div class="cstp"><em>' + n + '</em><b>' + t + '</b>' + (sm ? '<small>' + sm + '</small>' : '') + (extra || '') + '</div>'; };
+  var stp = function (n, t, sm, extra) { return '<div class="cstp"><b>' + t + '</b>' + (sm ? '<small>' + sm + '</small>' : '') + (extra || '') + '</div>'; };
   var gseg = '<div class="f cgf"><label>종이 결</label><div class="seg" id="cG">' + [['', '상관없음'], ['v', '세로결'], ['h', '가로결']].map(function (o) { return '<button data-g="' + o[0] + '" class="' + ((c.gn || '') === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
   var qty = '<div class="frow">' + num('q', '수량', '개') + num('ex', '여분', '%') + '</div>';
   var mar = stp(c.t === 'leaf' ? 4 : 3, '인쇄 여유', '인쇄소 기준') + '<div class="frow c3">' + num('bl', '도련 (사방)', 'mm') + num('gr', '물림', 'mm') + num('sd', '여백', 'mm') + '</div>' +
@@ -723,7 +726,7 @@ function calcOut(c) {
 function bindCalc() {
   var c = CQ, upd = function (keepInputs) { cqSave(c); if (keepInputs) { $('#cRes').innerHTML = calcOut(c); bindRes(); } else { var y0 = window.scrollY; renderCalc(); window.scrollTo(0, y0); } };
   $$('#cT button').forEach(function (b) { b.onclick = function () { c.t = b.dataset.t; upd(); }; });
-  $$('#cB button').forEach(function (b) { b.onclick = function () { c.t = b.dataset.b; upd(); }; });
+  $('#cBs').onchange = function () { c.t = this.value; upd(); };
   $$('[data-cd]').forEach(function (b) { b.onclick = function () { c.die = b.dataset.cd; c.selP = ''; upd(); }; });
   if ($('#cImg')) $('#cImg').onchange = function () { var f = this.files[0]; if (f) dieAI(f); this.value = ''; };
   $$('[data-cdv]').forEach(function (i) { i.oninput = function () { var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0]; dieVals(c, dd)[i.dataset.cdv] = i.value === '' ? 0 : +i.value; upd(true); }; });
