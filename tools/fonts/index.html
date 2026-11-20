@@ -540,7 +540,7 @@ function renderSaved(){
     <div class="chipsrow"><button class="chip ${!S.favFolder?'on':''}" data-ff="">전체<span class="n">${favIds.length}</span></button>${S.folders.map(x=>`<button class="chip ${S.favFolder===x?'on':''}" data-ff="${esc(x)}">${esc(x)}<span class="n">${fc[x]||0}</span></button>`).join('')}${none?`<button class="chip ${S.favFolder==='__none'?'on':''}" data-ff="__none">미분류<span class="n">${none}</span></button>`:''}</div>`;
   let ids=favIds; if(S.favFolder==='__none') ids=ids.filter(id=>!(S.favs[id].f||[]).length); else if(S.favFolder) ids=ids.filter(id=>(S.favs[id].f||[]).includes(S.favFolder));
   const out=$('#out');
-  if(!ids.length){ out.innerHTML=`<div class="empty">아직 즐겨찾기한 폰트가 없어요.<br>BROWSE에서 ☆를 눌러 폴더에 담아두세요.</div>`; return; }
+  if(!ids.length){ out.innerHTML=`<div class="empty">아직 즐겨찾기한 폰트가 없어요.<br>BROWSE에서 별 아이콘을 눌러 폴더에 담아 두세요.</div>`; return; }
   const list=ids.map(id=>S.byId[id]);
   const groups=[];
   if(S.favMode==='folder'){

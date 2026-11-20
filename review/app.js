@@ -61,7 +61,8 @@ async function analyzePdf(file, meta) {
   var pdfjs, plib;
   try {
     pdfjs = await pdfjsLib.getDocument({ data: buf.slice(), isEvalSupported: false, disableFontFace: false }).promise;
-    plib = await PDFLib.PDFDocument.load(buf.slice(), { ignoreEncryption: true, updateMetadata: false, throwOnInvalidObject: false });
+    plib = await PDFLib.PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false, throwOnInvalidObject: false });
+    buf = null;
   } catch (e) { return fatal(file.name, '파일을 여는 중 문제가 생겼어요', String(e && e.message || e)); }
   var doc = PRV.open(plib), n = pdfjs.numPages;
   R.offLayers = []; try { var NM = PDFLib.PDFName, ocp = plib.catalog.lookup(NM.of('OCProperties')), dd = ocp && ocp.lookup(NM.of('D')), off = dd && dd.lookup(NM.of('OFF')); if (off && off.size) for (var oi = 0; oi < off.size(); oi++) { var og = off.lookup(oi), on = og && og.lookup && og.lookup(NM.of('Name')); R.offLayers.push(on && on.decodeText ? on.decodeText() : '이름 없음'); } } catch (e) {}
@@ -75,15 +76,22 @@ async function analyzePdf(file, meta) {
     var P = PRV.page(doc, i, {}); P.no = i + 1; R.pages.push(P);
   }
   layoutPages();
+  var PXB = 0, PX_CAP = 480e6, pxDrop = 0; // 남겨 두는 픽셀 합계 한도 (약 480MB)
   for (var j = 0; j < n; j++) {
     prog('페이지 ' + (j + 1) + ' / ' + n + ' 검사 중' + (faceOK ? ' (얼굴 인식 포함)' : ''), 0.15 + 0.8 * j / n, lab);
     await tick();
-    await renderPage(pdfjs, R.pages[j], faceOK);
+    var PJ = R.pages[j];
+    try { await renderPage(pdfjs, PJ, faceOK); }
+    catch (e) { if (e && e.abort) throw e; PJ.renderErr = String(e && e.message || e); PJ.px = null; }
+    if (PJ.px) { try { pageChecks(PJ); } catch (e) { console.warn('pageChecks', e); } PJ._pc = 1; }
+    else { PJ.cw = PJ.cw || 1; PJ.ch = PJ.ch || 1; try { pageChecks(PJ); } catch (e) { console.warn('pageChecks', e); } PJ._pc = 1; }
+    if (PJ.px) { PXB += PJ.px.data.length; if (PXB > PX_CAP) { PJ.px = null; pxDrop++; } }
   }
+  if (pxDrop) R.notes.push('페이지가 많아 반복 칸 디자인 비교는 앞쪽 ' + (n - pxDrop) + 'p까지만 했어요. 나머지 검사는 모든 페이지에 했어요.');
   prog('페이지 사이 비교 중 (중복 사진, 디자인 규칙)…', 0.96);
   await tick();
   R.fonts = PRV.fonts(doc);
-  R.pages.forEach(pageChecks);
+  R.pages.forEach(function (P) { if (!P._pc) pageChecks(P); });
   docChecks();
   dupPhotos();
   designRules();
@@ -126,6 +134,7 @@ async function renderPage(pdfjs, P, faceOK) {
   // 얼굴
   P.faces = [];
   if (faceOK) await detectFaces(P, cv);
+  cv.width = cv.height = 0; tcv.width = tcv.height = 0;
   pg.cleanup();
 }
 async function detectFaces(P, cv) {
@@ -287,7 +296,7 @@ function toPt(P, r) { // 픽셀 → pt
   var a = inv(r[0], r[1]), b = inv(r[2], r[3]);
   return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1])];
 }
-function pix(P, x, y) { x = Math.max(0, Math.min(P.cw - 1, Math.round(x))); y = Math.max(0, Math.min(P.ch - 1, Math.round(y))); var i = (y * P.cw + x) * 4, d = P.px.data; return [d[i], d[i + 1], d[i + 2]]; }
+function pix(P, x, y) { if (!P.px) return [255, 255, 255]; x = Math.max(0, Math.min(P.cw - 1, Math.round(x))); y = Math.max(0, Math.min(P.ch - 1, Math.round(y))); var i = (y * P.cw + x) * 4, d = P.px.data; return [d[i], d[i + 1], d[i + 2]]; }
 function avgPix(P, x, y, r) { var s = [0, 0, 0], n = 0; for (var dx = -r; dx <= r; dx++) for (var dy = -r; dy <= r; dy++) { var p = pix(P, x + dx, y + dy); s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; n++; } return [s[0] / n, s[1] / n, s[2] / n]; }
 function isW(c) { return c[0] > 244 && c[1] > 244 && c[2] > 244; }
 function lum(c) { return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
@@ -797,6 +806,7 @@ function textStyleRule(TP, tol) {
 function near4(a, b, t) { return Math.abs(a[0] - b[0]) < t && Math.abs(a[1] - b[1]) < t && Math.abs(a[2] - b[2]) < t && Math.abs(a[3] - b[3]) < t; }
 function unionB(L) { return [Math.min.apply(null, L.map(function (b) { return b[0]; })), Math.min.apply(null, L.map(function (b) { return b[1]; })), Math.max.apply(null, L.map(function (b) { return b[2]; })), Math.max.apply(null, L.map(function (b) { return b[3]; }))]; }
 function cellColor(P, b, texts) { // 칸 안쪽(가장자리 20% 제외) 픽셀 중앙값, 글자 영역 제외
+  if (!P.px) return null;
   var r = toPx(P, b), w = r[2] - r[0], h = r[3] - r[1]; if (w < 6 || h < 6) return null;
   var tb = texts.filter(function (t) { return overlaps(t.vis, b); }).map(function (t) { return toPx(P, t.vis); });
   var R0 = [], G0 = [], B0 = [];

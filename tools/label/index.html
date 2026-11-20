@@ -174,7 +174,7 @@ textarea.form-input{line-height:1.6;}
 <div id="app">
   <header>
     <div class="logo">LABEL<span> / 상품 라벨 생성기</span></div>
-    <button class="header-edit-btn" id="global-defaults-btn">⚙ 기본정보</button>
+    <button class="header-edit-btn" id="global-defaults-btn">기본정보</button>
   </header>
   <!-- 비밀번호 모달 -->
   <div class="modal-overlay" id="pw-modal">
@@ -282,9 +282,9 @@ textarea.form-input{line-height:1.6;}
             <button class="lang-sel-btn" data-lang="zhTW">중국어 (번체)</button>
           </div>
         </div>
-        <div style="border-top:1px solid var(--border);margin:24px 0 0"></div><button class="gen-btn" id="bulk-gen-btn" style="margin-top:16px">▶ 라벨 생성</button>
+        <div style="border-top:1px solid var(--border);margin:24px 0 0"></div><button class="gen-btn" id="bulk-gen-btn" style="margin-top:16px">라벨 생성</button>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
-          <button class="action-btn" id="bulk-excel-btn" style="justify-content:center;height:44px">↓ CSV 저장</button>
+          <button class="action-btn" id="bulk-excel-btn" style="justify-content:center;height:44px">CSV 저장</button>
           <button class="action-btn" id="bulk-copy-all-btn" style="justify-content:center;height:44px">전체 복사</button>
         </div>
         <div class="warn-box" id="bulk-warn"><span id="bulk-warn-msg"></span></div>
@@ -348,7 +348,7 @@ textarea.form-input{line-height:1.6;}
             <div class="form-group" style="margin:0"><label class="form-label">재질명</label><input type="text" class="form-input sm" id="c-mat-zhTW" value="U"></div>
           </div>
         </div>
-        <button class="gen-btn" id="fetch-btn">↺ 시트에서 불러와 생성</button>
+        <button class="gen-btn" id="fetch-btn">시트에서 불러와 생성</button>
         <div class="status-line" id="s-status"></div>
         <div id="s-results"></div>
       </div>
@@ -967,7 +967,7 @@ function getBulkRows(){
 
 document.getElementById('bulk-gen-btn').addEventListener('click',function(){
   var rows=getBulkRows();
-  if(!rows.length){showToast('⚠ 데이터를 입력해주세요');return;}
+  if(!rows.length){showToast('데이터를 입력해 주세요');return;}
   var resultEl=document.getElementById('bulk-result');
   resultEl.innerHTML=''; resultEl.style.display='block';
   var grouped={}, order=[];
@@ -1006,7 +1006,7 @@ document.getElementById('bulk-gen-btn').addEventListener('click',function(){
       var badge='<span class="lang-badge lang-'+lang+'">'+LANG_BADGE_LABEL[lang]+'</span>';
       div.innerHTML='<div class="result-item-head"><span class="result-item-name">'+badge+eh(displayName)+'</span><button class="copy-one-btn" id="'+bid+'">복사</button></div>'+
         '<div class="result-item-preview">'+buildPreviewWithDef(displayName,trItemsForBuild,g.date,lang,def)+
-        '<button class="raw-toggle" id="rt-'+idx+'">▸ 원문 텍스트</button><div class="raw-text" id="rr-'+idx+'">'+eh(text)+'</div></div>';
+        '<button class="raw-toggle" id="rt-'+idx+'">원문 보기</button><div class="raw-text" id="rr-'+idx+'">'+eh(text)+'</div></div>';
       resultEl.appendChild(div);
       (function(ct,ci2){
         document.getElementById('brc'+ci2).addEventListener('click',function(){
@@ -1017,7 +1017,7 @@ document.getElementById('bulk-gen-btn').addEventListener('click',function(){
         });
         document.getElementById('rt-'+ci2).addEventListener('click',function(){
           var el=document.getElementById('rr-'+ci2);el.classList.toggle('open');
-          this.textContent=el.classList.contains('open')?'▾ 원문 텍스트':'▸ 원문 텍스트';
+          this.textContent=el.classList.contains('open')?'원문 접기':'원문 보기';
         });
       })(text,idx);
     });
@@ -1033,7 +1033,7 @@ document.getElementById('bulk-copy-all-btn').addEventListener('click',function()
 
 document.getElementById('bulk-excel-btn').addEventListener('click',function(){
   var rows=getBulkRows();
-  if(!rows.length){showToast('⚠ 데이터를 입력해주세요');return;}
+  if(!rows.length){showToast('데이터를 입력해 주세요');return;}
   var langName=bulkLangs.map(function(l){return LANG_NAMES[l]||l;}).join('_');
   var headers=['전체 품목명','전체 품목명('+langName+')','세부 구성품명','세부 구성품명('+langName+')','사이즈','종수','재질','재질('+langName+')'];
   var csvRows=[headers];
@@ -1173,7 +1173,7 @@ document.getElementById('fetch-btn').addEventListener('click',async function(){
         var headName=lang==='ko'?eh(name):(displayName!==name?eh(name)+' / '+eh(displayName):eh(name));
         div.innerHTML='<div class="result-item-head"><span class="result-item-name">'+badge+headName+'</span><button class="copy-one-btn" id="'+bid+'">복사</button></div>'+
           '<div class="result-item-preview">'+buildPreviewWithDef(displayName,trItems,d,lang,def)+
-          '<button class="raw-toggle" id="rt-btn-'+idx+'">▸ 원문 텍스트</button>'+
+          '<button class="raw-toggle" id="rt-btn-'+idx+'">원문 보기</button>'+
           '<div class="raw-text" id="'+rid+'">'+eh(label)+'</div></div>';
         results.appendChild(div);
         (function(cLabel,cBid,cRid,cIdx){
@@ -1185,7 +1185,7 @@ document.getElementById('fetch-btn').addEventListener('click',async function(){
           });
           document.getElementById('rt-btn-'+cIdx).addEventListener('click',function(){
             var el=document.getElementById(cRid);el.classList.toggle('open');
-            this.textContent=el.classList.contains('open')?'▾ 원문 텍스트':'▸ 원문 텍스트';
+            this.textContent=el.classList.contains('open')?'원문 접기':'원문 보기';
             if(el.classList.contains('open')) setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
           });
         })(label,bid,rid,idx);

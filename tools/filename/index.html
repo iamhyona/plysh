@@ -571,7 +571,7 @@ document.getElementById('copy-btn').addEventListener('click', () => {
   if (!text || document.getElementById('result-text').classList.contains('empty')) return;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copy-btn');
-    btn.textContent = '✓ 복사됨!'; btn.classList.add('copied');
+    btn.textContent = '복사됨'; btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '복사하기'; btn.classList.remove('copied'); }, 2000);
     history.unshift({ text, tab: TABS[activeTab].label, time: Date.now() });
     if (history.length > 20) history = history.slice(0,20);

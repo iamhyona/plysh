@@ -423,7 +423,7 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
   <div class="modal-box" style="max-width:480px">
     <div class="modal-header">
       <div class="modal-title">저장 기록</div>
-      <button class="modal-close" onclick="closeHistoryModal()">✕</button>
+      <button class="modal-close" onclick="closeHistoryModal()"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="modal-body" id="historyModalBody"></div>
   </div>
@@ -490,10 +490,10 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
     </div>
   </div>
   <div class="body-wrap">
-    <div class="sidebar" id="sidebar"><div class="sidebar-hdr">상품 목록</div><div style="padding:0 7px 7px"><button class="sidebar-add-btn" onclick="addProduct()">+ 새 상품</button></div><div class="prod-list"><div class="prod-item active" onclick="selProduct(&#39;_9tznf9imrpihohp&#39;)" ondblclick="startRenameProd(&#39;_9tznf9imrpihohp&#39;,this.querySelector(&#39;.prod-item-name&#39;))"><span class="prod-item-name" title="테스트입니다">테스트입니다</span><button class="prod-item-del" onclick="event.stopPropagation();deleteProduct(&#39;_9tznf9imrpihohp&#39;)">✕</button></div></div></div>
+    <div class="sidebar" id="sidebar"><div class="sidebar-hdr">상품 목록</div><div style="padding:0 7px 7px"><button class="sidebar-add-btn" onclick="addProduct()">+ 새 상품</button></div><div class="prod-list"><div class="prod-item active" onclick="selProduct(&#39;_9tznf9imrpihohp&#39;)" ondblclick="startRenameProd(&#39;_9tznf9imrpihohp&#39;,this.querySelector(&#39;.prod-item-name&#39;))"><span class="prod-item-name" title="테스트입니다">테스트입니다</span><button class="prod-item-del" onclick="event.stopPropagation();deleteProduct(&#39;_9tznf9imrpihohp&#39;)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div></div>
     <div class="main-content">
       <div id="fxBar"></div>
-      <div class="content"><div class="content-inner" id="ci"><div style="display:flex;gap:7px;margin-bottom:10px;align-items:center;flex-wrap:wrap"><button class="preset-btn" style="flex:none;padding:0 14px" onclick="openCauVerModal()">버전 관리</button><div style="flex:1"></div><button class="preset-btn" style="flex:none;padding:0 17px" onclick="undo()">실행취소</button><button class="preset-btn" style="flex:none;padding:0 17px" onclick="openHistoryModal()">저장기록</button><button class="preset-btn" style="flex:none;padding:0 17px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveFieldsSnapshot()">입력 저장</button><button class="preset-btn" style="flex:none;padding:0 17px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="resetCurrentProduct()">전체 초기화</button></div><div style="height:1px;background:var(--border);margin-bottom:14px"></div><div class="lang-pills" style="margin-bottom:19px"><button class="lang-pill active" onclick="switchEditLang(&#39;ko&#39;)">KR</button><button class="lang-pill" onclick="switchEditLang(&#39;en&#39;)">EN</button><button class="lang-pill" onclick="switchEditLang(&#39;ja&#39;)">JP</button><button class="lang-pill" onclick="switchEditLang(&#39;zh-cn&#39;)">CN</button><button class="lang-pill" onclick="switchEditLang(&#39;zh-tw&#39;)">TW</button></div><div class="sect-hdr">이 상품의 주의사항</div><div style="display:flex;gap:7px;align-items:center;margin-bottom:12px"><div class="sel-wrap" style="flex:none"><select class="form-input sm" style="height:36px" onchange="setCauVer(this.value)"><option value="doll" selected="">인형 (국외)</option><option value="paper">지류 및 잡화 (국내)</option><option value="paper_intl">지류 및 잡화 (국외)</option><option value="acrylic">아크릴류 (국내)</option><option value="textile">양말, 데스크매트 (국내)</option><option value="tshirt">티셔츠 (국내)</option><option value="tshirt_intl">티셔츠 (국외)</option><option value="simple">심플</option></select></div><div class="sel-wrap" style="flex:1;max-width:192px"><select class="form-input sm" onchange="setCauStyle(this.value)"><option value="circle" selected="">➀ 원형 테두리</option><option value="filled">❶ 원형 채움</option><option value="number">1. 숫자</option><option value="bullet">• 불릿</option><option value="hyphen">– 하이픈</option></select></div><button class="action-btn" style="flex-shrink:0" onclick="resetCauToCurTmpl(&#39;doll&#39;)">기본값으로 초기화</button></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,0)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,0)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➀</span><input class="form-input sm" style="flex:1" value="본 제품은 완구가 아닙니다." oninput="setCauText(&#39;ko&#39;,0,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,0)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,1)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,1)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➁</span><input class="form-input sm" style="flex:1" value="과도한 힘을 가하거나 뜯지 마십시오." oninput="setCauText(&#39;ko&#39;,1,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,1)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,2)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,2)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➂</span><input class="form-input sm" style="flex:1" value="제품에서 작은 조각이 분리될 경우 삼키지 마십시오." oninput="setCauText(&#39;ko&#39;,2,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,2)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,3)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,3)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➃</span><input class="form-input sm" style="flex:1" value="어린이, 유아 및 반려동물이 제품을 빨거나 물어뜯지 않도록 하십시오." oninput="setCauText(&#39;ko&#39;,3,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,3)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,4)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,4)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➄</span><input class="form-input sm" style="flex:1" value="날카로운 물체와의 접촉을 피하십시오." oninput="setCauText(&#39;ko&#39;,4,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,4)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,5)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,5)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➅</span><input class="form-input sm" style="flex:1" value="고온·다습한 곳, 물, 직사광선 및 화기를 피해 사용·보관하십시오." oninput="setCauText(&#39;ko&#39;,5,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,5)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,6)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,6)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➆</span><input class="form-input sm" style="flex:1" value="세탁하지 마십시오." oninput="setCauText(&#39;ko&#39;,6,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,6)">✕</button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,7)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,7)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➇</span><input class="form-input sm" style="flex:1" value="용도 외 사용을 금합니다." oninput="setCauText(&#39;ko&#39;,7,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,7)">✕</button></div></div><button class="add-row-btn" onclick="openModal()">+ 항목 추가</button></div></div>
+      <div class="content"><div class="content-inner" id="ci"><div style="display:flex;gap:7px;margin-bottom:10px;align-items:center;flex-wrap:wrap"><button class="preset-btn" style="flex:none;padding:0 14px" onclick="openCauVerModal()">버전 관리</button><div style="flex:1"></div><button class="preset-btn" style="flex:none;padding:0 17px" onclick="undo()">실행취소</button><button class="preset-btn" style="flex:none;padding:0 17px" onclick="openHistoryModal()">저장기록</button><button class="preset-btn" style="flex:none;padding:0 17px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveFieldsSnapshot()">입력 저장</button><button class="preset-btn" style="flex:none;padding:0 17px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="resetCurrentProduct()">전체 초기화</button></div><div style="height:1px;background:var(--border);margin-bottom:14px"></div><div class="lang-pills" style="margin-bottom:19px"><button class="lang-pill active" onclick="switchEditLang(&#39;ko&#39;)">KR</button><button class="lang-pill" onclick="switchEditLang(&#39;en&#39;)">EN</button><button class="lang-pill" onclick="switchEditLang(&#39;ja&#39;)">JP</button><button class="lang-pill" onclick="switchEditLang(&#39;zh-cn&#39;)">CN</button><button class="lang-pill" onclick="switchEditLang(&#39;zh-tw&#39;)">TW</button></div><div class="sect-hdr">이 상품의 주의사항</div><div style="display:flex;gap:7px;align-items:center;margin-bottom:12px"><div class="sel-wrap" style="flex:none"><select class="form-input sm" style="height:36px" onchange="setCauVer(this.value)"><option value="doll" selected="">인형 (국외)</option><option value="paper">지류 및 잡화 (국내)</option><option value="paper_intl">지류 및 잡화 (국외)</option><option value="acrylic">아크릴류 (국내)</option><option value="textile">양말, 데스크매트 (국내)</option><option value="tshirt">티셔츠 (국내)</option><option value="tshirt_intl">티셔츠 (국외)</option><option value="simple">심플</option></select></div><div class="sel-wrap" style="flex:1;max-width:192px"><select class="form-input sm" onchange="setCauStyle(this.value)"><option value="circle" selected="">➀ 원형 테두리</option><option value="filled">❶ 원형 채움</option><option value="number">1. 숫자</option><option value="bullet">• 불릿</option><option value="hyphen">– 하이픈</option></select></div><button class="action-btn" style="flex-shrink:0" onclick="resetCauToCurTmpl(&#39;doll&#39;)">기본값으로 초기화</button></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,0)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,0)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➀</span><input class="form-input sm" style="flex:1" value="본 제품은 완구가 아닙니다." oninput="setCauText(&#39;ko&#39;,0,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,0)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,1)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,1)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➁</span><input class="form-input sm" style="flex:1" value="과도한 힘을 가하거나 뜯지 마십시오." oninput="setCauText(&#39;ko&#39;,1,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,1)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,2)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,2)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➂</span><input class="form-input sm" style="flex:1" value="제품에서 작은 조각이 분리될 경우 삼키지 마십시오." oninput="setCauText(&#39;ko&#39;,2,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,2)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,3)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,3)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➃</span><input class="form-input sm" style="flex:1" value="어린이, 유아 및 반려동물이 제품을 빨거나 물어뜯지 않도록 하십시오." oninput="setCauText(&#39;ko&#39;,3,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,3)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,4)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,4)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➄</span><input class="form-input sm" style="flex:1" value="날카로운 물체와의 접촉을 피하십시오." oninput="setCauText(&#39;ko&#39;,4,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,4)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,5)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,5)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➅</span><input class="form-input sm" style="flex:1" value="고온·다습한 곳, 물, 직사광선 및 화기를 피해 사용·보관하십시오." oninput="setCauText(&#39;ko&#39;,5,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,5)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,6)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,6)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➆</span><input class="form-input sm" style="flex:1" value="세탁하지 마십시오." oninput="setCauText(&#39;ko&#39;,6,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,6)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><div class="field-card" draggable="true" ondragstart="onProdCauDS(event,&#39;ko&#39;,7)" ondragover="event.preventDefault()" ondrop="onProdCauDrop(event,&#39;ko&#39;,7)"><div class="field-row-inner"><span class="drag-handle">⠿</span><span class="field-lbl" style="color:var(--accent)">➇</span><input class="form-input sm" style="flex:1" value="용도 외 사용을 금합니다." oninput="setCauText(&#39;ko&#39;,7,this.value)"><button class="del-btn" onclick="delCauItem(&#39;ko&#39;,7)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div><button class="add-row-btn" onclick="openModal()">+ 항목 추가</button></div></div>
     </div>
   </div>
   <footer style="flex-shrink:0;height:46px;padding:0 24px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:14px">
@@ -509,9 +509,9 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
 <div class="mp-overlay" id="mpOverlay" onclick="if(event.target===this)closeMp()">
   <div class="mp-box">
     <div class="mp-year-row">
-      <button class="mp-yr-btn" onclick="mpAdjYear(-1)">◀</button>
+      <button class="mp-yr-btn" onclick="mpAdjYear(-1)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M15 6l-6 6 6 6"/></svg></button>
       <span class="mp-yr-lbl" id="mpYearLbl"></span>
-      <button class="mp-yr-btn" onclick="mpAdjYear(1)">▶</button>
+      <button class="mp-yr-btn" onclick="mpAdjYear(1)"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
     <div class="mp-grid" id="mpGrid"></div>
     <button class="mp-cancel" onclick="closeMp()">취소</button>
@@ -522,7 +522,7 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">상품 정보 항목 추가</div>
-      <button class="modal-close" onclick="closeFieldPicker()">✕</button>
+      <button class="modal-close" onclick="closeFieldPicker()"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="modal-body" id="fieldPickerBody"></div>
   </div>
@@ -532,7 +532,7 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
   <div class="modal-box" style="max-height:92vh">
     <div class="modal-header">
       <div class="modal-title">미리보기</div>
-      <button class="modal-close" onclick="closePreview()">✕</button>
+      <button class="modal-close" onclick="closePreview()"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="modal-body" id="previewModalBody"></div>
   </div>
@@ -542,7 +542,7 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">주의사항 항목 추가</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="modal-body">
       <textarea class="form-input" id="addModalTa" rows="3" placeholder="내용 입력..." style="margin-bottom: 12px; height: 0px;"></textarea>
@@ -1424,10 +1424,10 @@ function renderCauVerModal(){
     return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">'
       +'<span style="width:19px;text-align:center;font-size:var(--t-xs);color:var(--text3);flex-shrink:0">'+(i+1)+'</span>'
       +'<input class="form-input sm" style="flex:1;min-width:0;font-size:var(--t-md)" value="'+eh(vr.l)+'" oninput="renameCauVersion(\''+vr.v+'\',this.value)">'
-      +'<button style="'+btnBase+';color:'+(isDef?'var(--accent)':'var(--text3)')+';border-color:'+(isDef?'rgba(49,130,246,.5)':'var(--border)')+'" title="필드편집 기본값으로 설정" onclick="setDefaultCauVersion(\''+vr.v+'\')">'+(isDef?'★ 기본값':'☆ 기본값')+'</button>'
-      +'<button style="'+btnBase+'" onclick="moveCauVerModal('+i+',-1)"'+(canUp?'':' disabled style="'+btnBase+'opacity:.3;cursor:default"')+'>↑</button>'
-      +'<button style="'+btnBase+'" onclick="moveCauVerModal('+i+',1)"'+(canDn?'':' disabled style="'+btnBase+'opacity:.3;cursor:default"')+'>↓</button>'
-      +'<button style="'+btnBase+';color:var(--danger);border-color:rgba(255,95,95,.2)" onclick="deleteCauVersionModal(\''+vr.v+'\')"'+(cv.length<=1?' disabled':'')+'>✕</button>'
+      +'<button style="'+btnBase+';color:'+(isDef?'var(--accent)':'var(--text3)')+';border-color:'+(isDef?'rgba(49,130,246,.5)':'var(--border)')+'" title="필드편집 기본값으로 설정" onclick="setDefaultCauVersion(\''+vr.v+'\')">'+(isDef?'기본값':'기본값으로')+'</button>'
+      +'<button style="'+btnBase+'" onclick="moveCauVerModal('+i+',-1)"'+(canUp?'':' disabled style="'+btnBase+'opacity:.3;cursor:default"')+'><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button>'
+      +'<button style="'+btnBase+'" onclick="moveCauVerModal('+i+',1)"'+(canDn?'':' disabled style="'+btnBase+'opacity:.3;cursor:default"')+'><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button>'
+      +'<button style="'+btnBase+';color:var(--danger);border-color:rgba(255,95,95,.2)" onclick="deleteCauVersionModal(\''+vr.v+'\')"'+(cv.length<=1?' disabled':'')+'><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div>';
   }).join('');
   var addRow='<div style="padding-top:12px;display:flex;gap:8px">'
@@ -1497,7 +1497,7 @@ function onCauVerDrop(e,i){e.preventDefault();if(_settCauDragI===i)return;var ar
 // ── acc-hdr 변형 (드래그핸들 + 삭제버튼) ──
 // justify-content:flex-start + margin-left:auto 패턴으로 정렬 보장
 function accHdrFs(key,label,meta,isOpen,i,hasBody){
-  var delBtn='<button class="del-btn" style="width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();deleteFieldSection(\''+key+'\')" title="섹션 숨기기">✕</button>';
+  var delBtn='<button class="del-btn" style="width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();deleteFieldSection(\''+key+'\')" title="섹션 숨기기"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
   var dragH='<span class="drag-handle" onmousedown="_fsDragFromHandle=true;event.stopPropagation()" onclick="event.stopPropagation()">⠿</span>';
   if(hasBody===false){
     return '<div class="acc-hdr" style="cursor:default;justify-content:flex-start;gap:7px">'
@@ -1524,8 +1524,8 @@ function accHdrCauVer(v,l,isOpen,i){
     +'<span class="drag-handle" onmousedown="_cauVerDragFromHandle=true;event.stopPropagation()" onclick="event.stopPropagation()">⠿</span>'
     +'<input class="field-lbl-input" style="font-size:var(--t-md);font-weight:600;color:var(--text2);letter-spacing:-.01em;flex:1;min-width:0" value="'+eh(l)+'" oninput="renameCauVersion(\''+v+'\',this.value)" onclick="event.stopPropagation()" onfocus="event.stopPropagation()">'
     +'<span style="display:flex;align-items:center;gap:10px;margin-left:10px">'
-    +'<button class="default-radio'+(isDef?' active':'')+'" title="필드편집 기본값" onclick="event.stopPropagation();setDefaultCauVersion(\''+v+'\')">'+(isDef?'⬤':'○')+'</button>'
-    +'<button class="del-btn" style="width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();deleteCauVersion(\''+v+'\')" title="버전 삭제">✕</button>'
+    +'<button class="default-radio'+(isDef?' active':'')+'" title="필드편집 기본값" onclick="event.stopPropagation();setDefaultCauVersion(\''+v+'\')">'+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button>'
+    +'<button class="del-btn" style="width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();deleteCauVersion(\''+v+'\')" title="버전 삭제"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'<span class="acc-arrow'+(isOpen?' open':'')+'">▾</span>'
     +'</span></div>';
 }
@@ -2180,7 +2180,7 @@ function _exportViaGas(gasUrl){
   .then(function(res){
     clearTimeout(_timer);
     if(res.ok){
-      showToast('구글 시트 저장 완료 ✓');
+      showToast('구글 시트 저장 완료');
       var a=document.createElement('a');
       a.href=res.url;a.target='_blank';a.rel='noopener';
       document.body.appendChild(a);a.click();document.body.removeChild(a);
@@ -2381,7 +2381,7 @@ function _importProducts(products){
   products.forEach(function(p){S.products.push(p);});
   S.cur=products[products.length-1].id;
   save();renderSidebar();renderContent();
-  showToast(products.length+'개 상품을 가져왔어요 ✓');
+  showToast(products.length+'개 상품을 가져왔어요');
 }
 
 // 우클릭으로 Client ID 재설정
@@ -2449,7 +2449,7 @@ function renderSidebar(){
     var isActive=p.id===S.cur;
     return '<div class="prod-item'+(isActive?' active':'')+'" onclick="selProduct(\''+p.id+'\')" ondblclick="startRenameProd(\''+p.id+'\',this.querySelector(\'.prod-item-name\'))">'
       +'<span class="prod-item-name" title="'+eh(p.name)+'">'+eh(p.name)+'</span>'
-      +'<button class="prod-item-del" onclick="event.stopPropagation();deleteProduct(\''+p.id+'\')">✕</button>'
+      +'<button class="prod-item-del" onclick="event.stopPropagation();deleteProduct(\''+p.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div>';
   }).join('');
   sb.innerHTML='<div class="sidebar-hdr">상품 목록</div>'
@@ -2562,7 +2562,7 @@ function renderHiddenCard(f){
     +'<span class="field-lbl">'+eh(lbl)+'</span>'
     +'<span style="flex:1;font-size:11px;color:var(--text3)">숨김</span>'
     +'<button class="action-btn" style="font-size:12px;padding:3px 10px" onclick="toggleFieldHidden(\''+f.id+'\')">표시</button>'
-    +'<button class="del-btn" onclick="removeField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="removeField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div></div>';
 }
 
@@ -2574,7 +2574,7 @@ function renderTextCard(f){
     +'<div class="field-row-inner"><span class="drag-handle">⠿</span>'
     +'<input class="field-lbl-input" value="'+eh(lbl)+'" '+(isNonKo?'readonly style="opacity:.5;pointer-events:none" ':'')+'oninput="setProdFieldLabel(\''+f.id+'\',this.value)">'
     +'<input class="form-input sm" style="flex:1" value="'+eh(val)+'" placeholder="'+(isNonKo?'번역 대기...':eh(lbl)+' 입력')+'" oninput="setFieldVal(\''+f.id+'\',_editLang,this.value)">'
-    +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div></div>';
 }
 function renderSizeCard(f){
@@ -2585,7 +2585,7 @@ function renderSizeCard(f){
     +'<div class="unit-sel"><select class="form-input sm" onchange="setFieldUnit(\''+f.id+'\',this.value)">'
     +(S.settings.sizeUnits||['mm','cm']).map(function(u){return'<option value="'+u+'"'+(unit===u?' selected':'')+'>'+u+'</option>';}).join('')
     +'</select></div>'
-    +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div></div>';
 }
 function renderWeightCard(f){
@@ -2596,7 +2596,7 @@ function renderWeightCard(f){
     +'<div class="unit-sel"><select class="form-input sm" onchange="setFieldUnit(\''+f.id+'\',this.value)">'
     +(S.settings.weightUnits||['mg','g','kg']).map(function(u){return'<option value="'+u+'"'+(unit===u?' selected':'')+'>'+u+'</option>';}).join('')
     +'</select></div>'
-    +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div></div>';
 }
 function renderSelectCard(f){
@@ -2614,7 +2614,7 @@ function renderSelectCard(f){
       +'<div class="field-row-inner"><span class="drag-handle">⠿</span>'
       +'<input class="field-lbl-input" value="'+eh(lbl)+'" readonly style="opacity:.5;pointer-events:none">'
       +'<input class="form-input sm" style="flex:1;opacity:'+(trVal?'1':'.4')+'" value="'+eh(displayVal)+'" placeholder="번역 대기..." readonly>'
-      +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+      +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div></div>';
   }
   var selVal=isCustom?'__custom__':val;
@@ -2624,7 +2624,7 @@ function renderSelectCard(f){
     +'<div class="field-row-inner"><span class="drag-handle">⠿</span>'
     +'<input class="field-lbl-input" value="'+eh(lbl)+'" oninput="setProdFieldLabel(\''+f.id+'\',this.value)">'
     +'<div class="sel-wrap" style="flex:1"><select class="form-input sm" onchange="handleSelectChange(\''+f.id+'\',this)">'+optHtml+'</select></div>'
-    +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div>'
     +(isCustom?'<div class="field-card-sub"><span style="width:17px;flex-shrink:0"></span><span class="field-lbl">직접</span><input class="form-input sm" id="cust_'+f.id+'" style="flex:1" value="'+eh(val)+'" placeholder="'+eh(lbl)+' 입력" oninput="setFieldVal(\''+f.id+'\',\'ko\',this.value)"></div>':'')
     +'</div>';
@@ -2634,7 +2634,7 @@ function renderDateCard(f){
   return '<div class="field-card"'+_da(f.id)+'><div class="field-row-inner"><span class="drag-handle">⠿</span>'
     +'<input class="field-lbl-input" value="'+eh(lbl)+'" oninput="setProdFieldLabel(\''+f.id+'\',this.value)">'
     +'<div class="date-display" onclick="openMp(\''+f.id+'\')">'+eh(val)+'</div>'
-    +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div></div>';
 }
 function renderMaterialCard(f){
@@ -2662,7 +2662,7 @@ function renderMaterialCard(f){
     +'<div class="mat-val-display'+(val?' has-val':'')+'" onclick="toggleMatPicker(\''+f.id+'\')">'
     +(val?eh(val):'<span style="color:var(--text3)">소재 선택</span>')+'</div>'
     +'<button class="mat-chip-toggle" onclick="toggleMatPicker(\''+f.id+'\')">'+(isOpen?'닫기':'선택')+'</button>'
-    +'<button class="del-btn" onclick="delField(\''+f.id+'\')">✕</button>'
+    +'<button class="del-btn" onclick="delField(\''+f.id+'\')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
     +'</div>'+pickerHtml+'</div>';
 }
 
@@ -2677,7 +2677,7 @@ function renderCauSection(p){
       +'<div class="field-row-inner">'
       +'<span class="field-lbl" style="color:var(--accent)">'+getSym(style,i)+'</span>'
       +'<input class="form-input sm" style="flex:1" value="'+eh(t)+'" oninput="setCauText(\''+lang+'\','+i+',this.value)">'
-      +'<button class="del-btn" onclick="delCauItem(\''+lang+'\','+i+')">✕</button>'
+      +'<button class="del-btn" onclick="delCauItem(\''+lang+'\','+i+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div></div>';
   }).join('');
   var cauLang=CAU_LBL[lang]||'주의사항';
@@ -2805,13 +2805,13 @@ function renderDropSec(optKey,label,defaultKey,defs){
         +' ondragover="event.preventDefault()"'
         +' ondrop="onSettDrop(event,\''+optKey+'\','+i+')">'
         +'<span class="drag-handle">⠿</span>'
-        +'<button class="default-radio'+(isDef?' active':'')+'" title="기본값으로 설정" onclick="setSettingDefault(\''+optKey+'\',\''+defaultKey+'\',\''+safeOpt+'\')">  '+(isDef?'⬤':'○')+'</button>'
+        +'<button class="default-radio'+(isDef?' active':'')+'" title="기본값으로 설정" onclick="setSettingDefault(\''+optKey+'\',\''+defaultKey+'\',\''+safeOpt+'\')">  '+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button>'
         +(showTr
           ?'<input class="form-input sm" style="flex:1" value="'+eh(inputVal)+'" placeholder="번역 입력..." oninput="setOptTr(\''+optKey+'\',\''+safeOpt+'\',\''+lang+'\',this.value)">'
           +'<span style="font-size:11px;color:var(--text3);flex-shrink:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 5px" title="'+eh(opt)+'">'+eh(opt)+'</span>'
           :'<input class="form-input sm" style="flex:1" data-sopt="'+optKey+'" value="'+eh(opt)+'" oninput="updateSettingOpt(\''+optKey+'\','+i+',this.value)" onchange="updateSettingOpt(\''+optKey+'\','+i+',this.value)">'
         )
-        +'<button class="del-btn" onclick="delSettingOpt(\''+optKey+'\','+i+')">✕</button>'
+        +'<button class="del-btn" onclick="delSettingOpt(\''+optKey+'\','+i+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
         +'</div>';
     }).join('');
     html+='<div class="acc-body">'+items+'<button class="add-row-btn" style="margin-top:5px" onclick="addSettingOpt(\''+optKey+'\')">+ 추가</button></div>';
@@ -2878,8 +2878,8 @@ function tabCaution(p){
       +'<span class="field-lbl" style="color:var(--accent)">'+getSym(style,i)+'</span>'
       +'<input class="form-input sm" style="flex:1" value="'+eh(t)+'" oninput="setCauText(\'ko\','+i+',this.value)">'
       +'<button class="action-btn" id="btnTrCauItem_'+i+'" style="padding:2px 8px;font-size:12px;flex-shrink:0;white-space:nowrap" onclick="trCauItem('+i+',\'btnTrCauItem_'+i+'\')">번역</button>'
-      +'<button class="action-btn view-ok" style="padding:2px 8px;font-size:12px;flex-shrink:0" onclick="toggleCauItem('+i+')" title="번역 보기/숨기기">'+(isOpen?'▲':'▼')+'</button>'
-      +'<button class="del-btn" onclick="delCauItem(\'ko\','+i+')">✕</button>'
+      +'<button class="action-btn view-ok" style="padding:2px 8px;font-size:12px;flex-shrink:0" onclick="toggleCauItem('+i+')" title="번역 보기/숨기기">'+(isOpen?'<svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg>')+'</button>'
+      +'<button class="del-btn" onclick="delCauItem(\'ko\','+i+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div>'
       +subRows
       +'</div>';
@@ -2909,9 +2909,9 @@ function tabSettings(){
   su.forEach(function(u,i){
     var isDef=u===sdu;
     html+='<div style="display:inline-flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid '+(isDef?'var(--accent)':'var(--border)')+';border-radius:6px;padding:5px 10px">'
-      +'<button class="default-radio'+(isDef?' active':'')+'" style="width:16px;height:16px;font-size:11px;padding:0" onclick="setSizeDefault(\''+eh(u)+'\')">'+(isDef?'⬤':'○')+'</button>'
+      +'<button class="default-radio'+(isDef?' active':'')+'" style="width:16px;height:16px;font-size:11px;padding:0" onclick="setSizeDefault(\''+eh(u)+'\')">'+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button>'
       +'<input class="form-input sm" style="width:42px;background:transparent;border:none;padding:0;text-align:center;font-size:13px;font-weight:600;color:var(--text)" value="'+eh(u)+'" oninput="updateSizeUnit('+i+',this.value)">'
-      +'<button class="del-btn" style="margin:0;width:15px;height:15px;font-size:10px;line-height:1" onclick="delSizeUnit('+i+')">✕</button>'
+      +'<button class="del-btn" style="margin:0;width:15px;height:15px;font-size:10px;line-height:1" onclick="delSizeUnit('+i+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div>';
   });
   html+='</div>'
@@ -2924,9 +2924,9 @@ function tabSettings(){
   wu.forEach(function(u,i){
     var isDef=u===wdu;
     html+='<div style="display:inline-flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid '+(isDef?'var(--accent)':'var(--border)')+';border-radius:6px;padding:5px 10px">'
-      +'<button class="default-radio'+(isDef?' active':'')+'" style="width:16px;height:16px;font-size:11px;padding:0" onclick="setWeightDefault(\''+eh(u)+'\')">'+(isDef?'⬤':'○')+'</button>'
+      +'<button class="default-radio'+(isDef?' active':'')+'" style="width:16px;height:16px;font-size:11px;padding:0" onclick="setWeightDefault(\''+eh(u)+'\')">'+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button>'
       +'<input class="form-input sm" style="width:42px;background:transparent;border:none;padding:0;text-align:center;font-size:13px;font-weight:600;color:var(--text)" value="'+eh(u)+'" oninput="updateWeightUnit('+i+',this.value)">'
-      +'<button class="del-btn" style="margin:0;width:15px;height:15px;font-size:10px;line-height:1" onclick="delWeightUnit('+i+')">✕</button>'
+      +'<button class="del-btn" style="margin:0;width:15px;height:15px;font-size:10px;line-height:1" onclick="delWeightUnit('+i+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
       +'</div>';
   });
   html+='</div>'
@@ -2963,10 +2963,10 @@ function tabAgeSettings(){
       }
     }).join('');
     return '<tr>'
-      +'<td style="text-align:center;width:36px"><button class="default-radio'+(isDef?' active':'')+'" title="기본값으로 설정" onclick="setSettingDefault(\'ageOptions\',\'age\',\''+safeOpt+'\')">'+(isDef?'⬤':'○')+'</button></td>'
+      +'<td style="text-align:center;width:36px"><button class="default-radio'+(isDef?' active':'')+'" title="기본값으로 설정" onclick="setSettingDefault(\'ageOptions\',\'age\',\''+safeOpt+'\')">'+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button></td>'
       +cells
       +'<td style="text-align:center;width:44px"><button class="action-btn" id="btnTrAge_'+oi+'" style="font-size:11px;padding:2px 6px;white-space:nowrap" onclick="trOptRow(\'ageOptions\',\''+safeOpt+'\',\'btnTrAge_'+oi+'\')">번역</button></td>'
-      +'<td style="text-align:center;width:36px"><button class="del-btn" style="margin:0 auto" onclick="delSettingOpt(\'ageOptions\','+oi+')">✕</button></td>'
+      +'<td style="text-align:center;width:36px"><button class="del-btn" style="margin:0 auto" onclick="delSettingOpt(\'ageOptions\','+oi+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></td>'
       +'</tr>';
   }).join('');
 
@@ -3007,10 +3007,10 @@ function tabDropSetting(optKey,defKey,label){
       }
     }).join('');
     return '<tr>'
-      +'<td style="text-align:center;width:36px"><button class="default-radio'+(isDef?' active':'')+'" title="기본값으로 설정" onclick="setSettingDefault(\''+optKey+'\',\''+defKey+'\',\''+safeOpt+'\')">'+(isDef?'⬤':'○')+'</button></td>'
+      +'<td style="text-align:center;width:36px"><button class="default-radio'+(isDef?' active':'')+'" title="기본값으로 설정" onclick="setSettingDefault(\''+optKey+'\',\''+defKey+'\',\''+safeOpt+'\')">'+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button></td>'
       +cells
       +'<td style="text-align:center;width:44px"><button class="action-btn" id="btnTrOpt_'+optKey+'_'+oi+'" style="font-size:11px;padding:2px 6px;white-space:nowrap" onclick="trOptRow(\''+optKey+'\',\''+safeOpt+'\',\'btnTrOpt_'+optKey+'_'+oi+'\')">번역</button></td>'
-      +'<td style="text-align:center;width:36px"><button class="del-btn" style="margin:0 auto" onclick="delSettingOpt(\''+optKey+'\','+oi+')">✕</button></td>'
+      +'<td style="text-align:center;width:36px"><button class="del-btn" style="margin:0 auto" onclick="delSettingOpt(\''+optKey+'\','+oi+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></td>'
       +'</tr>';
   }).join('');
 
@@ -3116,21 +3116,21 @@ var _CAT_OPTS=['지류','봉제류','의류','섬유','아크릴류','식기류'
 var _PKG_OPTS=['OPP','PVC지퍼백','LDPE지퍼백','기성골판지박스','제작골판지박스','기성박스','제작박스','틴케이스','글리스터','PET박스','라벨스티커'];
 var _RECYCLE_OPTS=['종이','비닐류','플라스틱','합성수지','철','알루미늄','유리','스티로폼','섬유류'];
 var _CARE_SYMBOLS=[
-  {id:'wash30',label:'30°C 물세탁',sym:'🫧30'},
-  {id:'wash40',label:'40°C 물세탁',sym:'🫧40'},
-  {id:'wash_hand',label:'손세탁',sym:'🤲'},
-  {id:'no_wash',label:'세탁 불가',sym:'🚫세탁'},
-  {id:'bleach_ok',label:'염소계 표백 가능',sym:'△'},
-  {id:'no_bleach',label:'표백 불가',sym:'🚫표백'},
-  {id:'tumble_low',label:'저온 건조기',sym:'⊙낮음'},
-  {id:'no_tumble',label:'건조기 불가',sym:'🚫건조기'},
-  {id:'iron_low',label:'저온 다림질',sym:'🔥낮음'},
-  {id:'iron_med',label:'중온 다림질',sym:'🔥중간'},
-  {id:'no_iron',label:'다림질 불가',sym:'🚫다림질'},
-  {id:'dryclean',label:'드라이클리닝 가능',sym:'⊙P'},
-  {id:'no_dryclean',label:'드라이클리닝 불가',sym:'🚫드라이'},
-  {id:'dry_flat',label:'뉘어서 건조',sym:'━건조'},
-  {id:'dry_shade',label:'그늘 건조',sym:'🌙건조'}
+  {id:'wash30',label:'30°C 물세탁',sym:'물 30°C'},
+  {id:'wash40',label:'40°C 물세탁',sym:'물 40°C'},
+  {id:'wash_hand',label:'손세탁',sym:'손세탁'},
+  {id:'no_wash',label:'세탁 불가',sym:'세탁 불가'},
+  {id:'bleach_ok',label:'염소계 표백 가능',sym:'표백 가능'},
+  {id:'no_bleach',label:'표백 불가',sym:'표백 불가'},
+  {id:'tumble_low',label:'저온 건조기',sym:'건조기 저온'},
+  {id:'no_tumble',label:'건조기 불가',sym:'건조기 불가'},
+  {id:'iron_low',label:'저온 다림질',sym:'다림 저온'},
+  {id:'iron_med',label:'중온 다림질',sym:'다림 중온'},
+  {id:'no_iron',label:'다림질 불가',sym:'다림 불가'},
+  {id:'dryclean',label:'드라이클리닝 가능',sym:'드라이 가능'},
+  {id:'no_dryclean',label:'드라이클리닝 불가',sym:'드라이 불가'},
+  {id:'dry_flat',label:'뉘어서 건조',sym:'뉘어 건조'},
+  {id:'dry_shade',label:'그늘 건조',sym:'그늘 건조'}
 ];
 var _CARE_NOTICE={
   wash30:'30°C 이하 물에서 세탁 가능합니다.',
@@ -3348,7 +3348,7 @@ function tabMaterials(){
         var val=item[l]||'';
         return '<td><input class="tbl-inp" value="'+eh(val)+'" oninput="updateMatItem('+gi+','+ii+',\''+l+'\',this.value)"></td>';
       }).join('');
-      return '<tr>'+cells+'<td style="padding:2px 4px;text-align:center"><button class="action-btn" id="btnTrMat_'+gi+'_'+ii+'" style="font-size:11px;padding:2px 6px;white-space:nowrap" onclick="trMatRow('+gi+','+ii+',\'btnTrMat_'+gi+'_'+ii+'\')">번역</button></td><td style="padding:2px 4px;text-align:center"><button class="del-btn" style="margin:0 auto" onclick="delMatItem('+gi+','+ii+')">✕</button></td></tr>';
+      return '<tr>'+cells+'<td style="padding:2px 4px;text-align:center"><button class="action-btn" id="btnTrMat_'+gi+'_'+ii+'" style="font-size:11px;padding:2px 6px;white-space:nowrap" onclick="trMatRow('+gi+','+ii+',\'btnTrMat_'+gi+'_'+ii+'\')">번역</button></td><td style="padding:2px 4px;text-align:center"><button class="del-btn" style="margin:0 auto" onclick="delMatItem('+gi+','+ii+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></td></tr>';
     }).join('');
 
     html+='<div style="border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden">'
@@ -3356,8 +3356,8 @@ function tabMaterials(){
       +'<span style="font-size:14px;font-weight:600;flex:1">'+eh(g.group)+'</span>'
       +'<span style="font-size:12px;color:var(--text3)">'+g.items.length+'개</span>'
       +'<button class="action-btn" style="font-size:11px;padding:2px 8px" onclick="event.stopPropagation();renameMatGroup('+gi+')">그룹명 변경</button>'
-      +'<button class="del-btn" style="margin:0" onclick="event.stopPropagation();delMatGroup('+gi+')">✕</button>'
-      +'<span style="font-size:11px;color:var(--text3)">'+(open?'▲':'▼')+'</span>'
+      +'<button class="del-btn" style="margin:0" onclick="event.stopPropagation();delMatGroup('+gi+')"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+      +'<span style="font-size:11px;color:var(--text3)">'+(open?'<svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg>')+'</span>'
       +'</div>';
 
     if(open){

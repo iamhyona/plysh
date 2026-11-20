@@ -206,6 +206,7 @@
     background:linear-gradient(transparent, var(--bg) 30%);
     display:flex; gap:10px; pointer-events:none;
   }
+  .bottom-bar .page-reset, .bottom-bar .complete-btn, .ia-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
   .bottom-bar .page-reset {
     pointer-events:all; flex:1; height:48px; border:1px solid var(--border);
     background:var(--surface); color:var(--text2); font-size:13px;
@@ -356,7 +357,7 @@ html.emb .progress-label { grid-column:2; grid-row:1; align-self:center; font-si
   </header>
 
   <div class="admin-banner" id="admin-banner">
-    <span class="admin-banner-text">✦ 편집 모드 — 항목을 추가·수정·삭제하거나 드래그로 순서를 바꿀 수 있어요</span>
+    <span class="admin-banner-text">편집 모드 — 항목을 추가·수정·삭제하거나 드래그로 순서를 바꿀 수 있어요</span>
     <div class="admin-banner-actions">
       <button class="ab-btn add-tab" id="add-tab-btn">+ 새 탭</button>
     </div>
@@ -369,8 +370,8 @@ html.emb .progress-label { grid-column:2; grid-row:1; align-self:center; font-si
   <div class="content" id="content"></div>
 
   <div class="bottom-bar" id="bottom-bar" style="display:none">
-    <button class="page-reset" id="page-reset">↩ 초기화</button>
-    <button class="complete-btn" id="complete-btn">✓ 완료 처리</button>
+    <button class="page-reset" id="page-reset"><svg class="pic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/></svg>초기화</button>
+    <button class="complete-btn" id="complete-btn"><svg class="pic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>완료 처리</button>
   </div>
 
   <!-- MODAL -->
@@ -388,6 +389,8 @@ html.emb .progress-label { grid-column:2; grid-row:1; align-self:center; font-si
 </div>
 
 <script>
+/* 이모지 쓰지 않기 (2026-11-20 실장님): 저장된 항목 글자에 남은 이모지도 화면에서는 빼고 보여 줌 */
+function noEmo(t) { return String(t || '').replace(/[\u{1F300}-\u{1FAFF}]\uFE0F?\s*/gu, '').replace(/\s*\(([^()]*?)\s*\u274C\)/g, ' ($1 아님)').replace(/\s*\u274C/g, ' 금지'); }
 // ── DATA ──
 const DEFAULT_DATA = {
   "자가체크": {
@@ -427,23 +430,23 @@ const DEFAULT_DATA = {
   "표기법체크": {
     desc:"자주 혼용되는 앨범/굿즈/인쇄 표기법을 최종 점검",
     items:[
-      {id:"k1",cat:"표기법",text:"🟢 CREDITS (CREDIT ❌)"},
-      {id:"k2",cat:"표기법",text:"🟢 1st / 2nd / 3rd"},
-      {id:"k3",cat:"표기법",text:"🟢 TRACK LIST (TRACKLIST ❌)"},
-      {id:"k4",cat:"표기법",text:"🟢 PHOTOCARD (PHOTO CARD ❌)"},
-      {id:"k5",cat:"표기법",text:"🟢 PHOTO BOOK (PHOTOBOOK ❌)"},
-      {id:"k6",cat:"표기법",text:"🟢 RANDOM N OUT OF NN"},
-      {id:"k7",cat:"표기법",text:"🟢 POSTCARD (POST CARD ❌)"},
-      {id:"k8",cat:"표기법",text:"🟢 Digipack (Digi Pack ❌)"},
-      {id:"k9",cat:"표기법",text:"🟢 Jewel Case (Jewelcase ❌)"},
-      {id:"k10",cat:"표기법",text:"🟢 Mini Album (MINI ALBUM ❌)"},
-      {id:"k11",cat:"표기법",text:"🟢 Folded Poster (Folding Poster ❌)"},
-      {id:"k12",cat:"표기법",text:"🟢 Double-Sided Poster (Double Side Poster ❌)"},
-      {id:"k13",cat:"표기법",text:"🟢 Image Card (Imagecard ❌)"},
-      {id:"k14",cat:"표기법",text:"🟢 Sticker Set (Stickerset ❌)"},
-      {id:"k15",cat:"표기법",text:"🟢 The 1st Mini Album (1th Mini Album ❌)"},
-      {id:"k16",cat:"표기법",text:"🟢 The 2nd Album (2th Album ❌)"},
-      {id:"k17",cat:"표기법",text:"🟢 CD-R (CDR ❌)"},
+      {id:"k1",cat:"표기법",text:"CREDITS (CREDIT 아님)"},
+      {id:"k2",cat:"표기법",text:"1st / 2nd / 3rd"},
+      {id:"k3",cat:"표기법",text:"TRACK LIST (TRACKLIST 아님)"},
+      {id:"k4",cat:"표기법",text:"PHOTOCARD (PHOTO CARD 아님)"},
+      {id:"k5",cat:"표기법",text:"PHOTO BOOK (PHOTOBOOK 아님)"},
+      {id:"k6",cat:"표기법",text:"RANDOM N OUT OF NN"},
+      {id:"k7",cat:"표기법",text:"POSTCARD (POST CARD 아님)"},
+      {id:"k8",cat:"표기법",text:"Digipack (Digi Pack 아님)"},
+      {id:"k9",cat:"표기법",text:"Jewel Case (Jewelcase 아님)"},
+      {id:"k10",cat:"표기법",text:"Mini Album (MINI ALBUM 아님)"},
+      {id:"k11",cat:"표기법",text:"Folded Poster (Folding Poster 아님)"},
+      {id:"k12",cat:"표기법",text:"Double-Sided Poster (Double Side Poster 아님)"},
+      {id:"k13",cat:"표기법",text:"Image Card (Imagecard 아님)"},
+      {id:"k14",cat:"표기법",text:"Sticker Set (Stickerset 아님)"},
+      {id:"k15",cat:"표기법",text:"The 1st Mini Album (1th Mini Album 아님)"},
+      {id:"k16",cat:"표기법",text:"The 2nd Album (2th Album 아님)"},
+      {id:"k17",cat:"표기법",text:"CD-R (CDR 아님)"},
     ]
   },
   "이미지체크": {
@@ -492,7 +495,7 @@ const DEFAULT_DATA = {
       {id:"m23",cat:"컬러(인쇄)",text:"불필요한 별색 및 미사용 컬러 스와치에서 삭제"},
       {id:"m24",cat:"컬러(인쇄)",text:"사용한 컬러 스와치 지정 확인"},
       {id:"m25",cat:"컬러(인쇄)",text:"총 잉크량 TAC 확인"},
-      {id:"m26",cat:"컬러(인쇄)",text:"5% 이하 농도 ❌, 10% 농도 주의"},
+      {id:"m26",cat:"컬러(인쇄)",text:"5% 이하 농도 금지, 10% 농도 주의"},
     ]
   },
   "레이아웃체크": {
@@ -741,9 +744,9 @@ function renderContent() {
     group.innerHTML = `
       <div class="check-group-header">
         <div class="check-group-label">${cat}</div>
-        <button class="group-edit-btn group-rename-btn" data-cat="${cat}">✎ 이름</button>
+        <button class="group-edit-btn group-rename-btn" data-cat="${cat}">이름 수정</button>
         <button class="group-edit-btn group-add-btn" data-cat="${cat}">+ 항목</button>
-        <button class="group-edit-btn group-delete-btn" data-cat="${cat}">✕ 삭제</button>
+        <button class="group-edit-btn group-delete-btn" data-cat="${cat}">삭제</button>
       </div>`;
 
     // bind group buttons
@@ -804,11 +807,11 @@ function buildItemEl(item, list, checks) {
         <path d="M1 5l3.5 3.5L11 1" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <span class="check-text">${item.text}</span>
+    <span class="check-text">${noEmo(item.text)}</span>
     <div class="item-actions">
-      <button class="ia-btn ia-edit" title="이름 수정">✎</button>
-      <button class="ia-btn ia-move" title="탭 이동">⇄</button>
-      <button class="ia-btn ia-del" title="삭제">✕</button>
+      <button class="ia-btn ia-edit" title="이름 수정"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
+      <button class="ia-btn ia-move" title="탭 이동"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M4 8h15l-3-3M20 16H5l3 3"/></svg></button>
+      <button class="ia-btn ia-del" title="삭제"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>`;
 
   // check toggle — only when not clicking action buttons or drag handle
@@ -1102,7 +1105,7 @@ document.getElementById('complete-btn').addEventListener('click', () => {
   if (!checkState[activeTab]) checkState[activeTab] = {};
   SHEETS[activeTab].items.forEach(i => { checkState[activeTab][i.id] = true; });
   saveState(); render();
-  showToast('✓ ' + activeTab + ' 완료!');
+  showToast(activeTab + ' 완료');
 });
 
 // ── TOAST ──
