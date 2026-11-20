@@ -1343,6 +1343,9 @@ html[data-nav] #cvSeg { display:none !important; }
 .frow { gap:10px !important; margin-bottom:18px !important; }
 .spg { margin:12px 0 18px !important; gap:8px !important; }
 .card .ct + .frow, .card h3 + .frow { margin-top:4px; }
+.pst { position:relative; } .pst input { padding-right:64px !important; -moz-appearance:textfield; } .pst input::-webkit-outer-spin-button, .pst input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+.pst em { right:44px !important; } .psb { position:absolute; right:6px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:2px; }
+.psb button { width:30px; height:19px; border:0; border-radius:6px; background:#fff; color:#4e5968; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; box-shadow:0 0 0 1px #e5e8eb; } .psb button:active { background:#e5e8eb; }
 </style>
 </head>
 <body>
@@ -2197,8 +2200,15 @@ var SPN_PAPERS = [
   { k: 'el', n: '이라이트', f: 0.0015, g: [70, 80] },
   { k: 'cu', n: '두께 직접 입력', f: 0, g: [] }];
 var SPN_BIND = [['pb', '무선'], ['sew', '사철'], ['hc', '양장'], ['ss', '중철'], ['ring', '링']];
-// 2026-11-20 실장님: 쪽수 위아래 화살표 = 제본 배수 (무선 8p, 중철 4p). 다른 제본은 확인 전이라 그대로
-var SPN_STEP = { pb: 8, ss: 4 };
+// 2026-11-20 실장님: 쪽수 위아래 화살표 = 제본 배수 (무선 8p, 중철 4p). 사철·양장·링은 확인 전이라 2p(앞뒤)
+var SPN_STEP = { pb: 8, ss: 4, sew: 2, hc: 2, ring: 2 };
+// 쪽수 위아래 = 제본 배수 (2026-11-21 실장님 다시: 기본 화살표 말고 앱 화살표, 누르면 배수로)
+function pStepNext(v, s, d) { v = +v || 0; s = +s || 1; var n = d > 0 ? (Math.floor(v / s) + 1) * s : (Math.ceil(v / s) - 1) * s; return Math.max(s, n); }
+function pStepBind(root) { (root || document).querySelectorAll('.pst').forEach(function (w) { var i = w.querySelector('input'), s = +w.dataset.step || 1;
+  var go = function (d) { i.value = pStepNext(i.value, s, d); i.dispatchEvent(new Event('input', { bubbles: true })); };
+  w.querySelectorAll('[data-pst]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); go(+b.dataset.pst); }; });
+  i.addEventListener('keydown', function (e) { if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); go(e.key === 'ArrowUp' ? 1 : -1); } }); }); }
+
 var SPN_RING = [[6.4, '1/4"'], [7.9, '5/16"'], [9.5, '3/8"'], [11.1, '7/16"'], [12.7, '1/2"'], [14.3, '9/16"'], [15.9, '5/8"'], [19.0, '3/4"'], [22.2, '7/8"'], [25.4, '1"'], [28.6, '1-1/8"'], [31.8, '1-1/4"']];
 function spq() {
   var d = { b: 'pb', p: 120, ip: 'mo', ig: 100, it: 0.12, cp: 'art', cg: 250, ct: 0.25, bd: 2.5, w: 148, h: 210, fl: 0 };
@@ -2221,13 +2231,13 @@ function renderSpine() {
         : '<div class="frow">' + num(pre + 't', '장당 두께', 'mm', '0.01') + '</div>');
   };
   h += '<div class="seg" id="spB">' + SPN_BIND.map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.b === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
-  h += '<div class="card"><div class="ct">내지</div><div class="frow">' + num('p', '쪽수', 'p', SPN_STEP[c.b] || '') + '</div>' + (SPN_STEP[c.b] ? '<div class="nt" style="margin:8px 0 18px">' + SPN_BIND.filter(function (x) { return x[0] === c.b; })[0][1] + ' 제본은 ' + SPN_STEP[c.b] + 'p 단위 · 위아래 화살표를 누르면 ' + SPN_STEP[c.b] + 'p씩 바뀌어요</div>' : '') + paperSel('i', '종이') + '</div>';
+  h += '<div class="card"><div class="ct">내지</div><div class="frow"><div class="f"><label>쪽수</label>' + '<span class="ifx pst" data-step="' + (SPN_STEP[c.b] || 2) + '"><input type="number" inputmode="numeric" data-sk="p" value="' + c.p + '"><em>p</em><span class="psb"><button type="button" data-pst="1" aria-label="늘리기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" data-pst="-1" aria-label="줄이기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></span></span>' + '</div></div>' + '<div class="nt" style="margin:8px 0 18px">' + SPN_BIND.filter(function (x) { return x[0] === c.b; })[0][1] + ' 제본 · 위아래 화살표를 누르면 ' + (SPN_STEP[c.b] || 2) + 'p씩 바뀌어요</div>' + paperSel('i', '종이') + '</div>';
   if (c.b === 'hc') h += '<div class="card"><div class="ct">양장 표지</div><div class="f"><label>판지 두께</label></div><div class="chips spg">' + [2, 2.5, 3].map(function (v) { return '<button type="button" data-bd="' + v + '" class="' + (+c.bd === v ? 'on' : '') + '">' + v + 'mm</button>'; }).join('') + '</div></div>';
   else if (c.b !== 'ring') h += '<div class="card"><div class="ct">표지</div>' + paperSel('c', '종이') + '</div>';
   h += '<details class="card cset"' + (+c.fl || c.b !== 'ss' ? ' open' : '') + '><summary class="ct">판형<small>표지 펼친 크기 계산</small></summary><div class="chips cpre" style="margin-top:12px">' + PRESETS.slice(0, 7).map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '">' + p[0] + '<small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
     '<div class="frow">' + num('w', '가로', 'mm') + num('h', '세로', 'mm') + (c.b === 'pb' || c.b === 'sew' ? num('fl', '날개', 'mm') : '') + '</div></details>';
   h += '<div id="spRes" class="io-r">' + spineOut(c) + '</div>';
-  $('#main').innerHTML = h; bindSpine();
+  $('#main').innerHTML = h; bindSpine(); pStepBind($('#main'));
 }
 function spineOut(c) {
   var p = Math.max(0, Math.round(+c.p || 0)), ic = spCal(c.ip, +c.ig, c.it), cc = spCal(c.cp, +c.cg, c.ct), sh = Math.ceil(p / 2), body = sh * ic, out = '', warn = [], spine = 0, rows = [], copy = '';
