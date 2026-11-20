@@ -325,6 +325,12 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .mseg { display:inline-flex !important; margin:0 !important; }
 #cB { margin-bottom:12px !important; }
 @media (max-width:520px) { #cB button { font-size:13px !important; padding:0 6px !important; } }
+.dqw { display:flex; align-items:center; gap:8px; flex:1 1 auto; min-width:0; }
+.dqw .dqp { flex:0 1 96px; width:96px; min-width:56px; }
+.dqu { font-weight:600; color:var(--sub, #4e5968); }
+.dqv { font-size:14px; font-weight:600; white-space:nowrap; color:var(--sub, #4e5968); }
+.dqt .dqtv { flex:1 1 auto; font-size:16px; font-weight:800; color:var(--txt, #191f28); padding:12px 0; }
+.dqt .dqtv i { font-style:normal; font-size:14px; font-weight:500; color:var(--mute, #8b95a1); }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -749,7 +755,7 @@ var PICK = {
   fin: { n: '특수가공', tabs: function () { return tabsOf(['박', '가공']).concat(tabsOf(['코팅']).filter(function (n) { return /실크|부분/.test(n); })); }, mode: 'many', each: ['앞면', '뒷면', '양면'] },
   cut: { n: '톰슨·접지·가공', tabs: function () { return tabsOf(['톰슨', '조립']); }, mode: 'many' },
   bind: { n: '제본·부속', tabs: function () { return tabsOf(['제본', '부속']); }, mode: 'many' },
-  pack: { n: '배치·포장', tabs: function () { return tabsOf(['포장']); }, mode: 'many' }
+  pack: { n: '포장', tabs: function () { return tabsOf(['포장']); }, mode: 'many' }
 };
 /* 열 이름으로 찾기 (시트에서 열 순서가 바뀌어도 OK) */
 function hcol(n, re) { var h = (CAT.T[n] || [[]])[0] || []; for (var i = 0; i < h.length; i++) if (re.test(h[i])) return i; return -1; }
@@ -1036,7 +1042,7 @@ function sheetHint(r, v) {
   var q = (v && v.q) || 0, need = r.flat ? Math.ceil(q * ((v && v.k) || 1) * r.flat[2] / bs.n * 1.05) : Math.ceil(r.book[2] / (bs.n * 2) * q * 1.05);
   return '<div class="sh"><b>' + bs.P.n + '</b> ' + (r.book ? bs.n + '판걸이 (1장 ' + bs.n * 2 + 'p)' : bs.n + '개 걸이') + ' · 로스 ' + Math.round(bs.loss * 100) + '%' + (q ? ' · 전지 약 ' + fmtN(need) + '장 (' + fmtN(need / 500, 2) + '연)' : '') + (r.gn || r.book ? ' · ' + GN_LB[r.book ? 'v' : r.gn] : '') + '</div>';
 }
-var FLD = [['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['pack', '배치·포장', 'dl-pack']];
+var FLD = [['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['pack', '포장', 'dl-pack']];
 function renderOne() {
   var t = tpl(S.id); if (!t) return go('list');
   if (!CUR || CUR.id !== t.id) { var st = stateOf(t); CUR = { id: t.id, v: st.v, R: st.R }; }
@@ -1097,7 +1103,7 @@ function bindOne(t) {
 }
 
 /* ── 사양서 (여러 품목 → MASTER 양식) ── */
-var MASTER = ['대분류', '소분류', 'NO.', '세부 품목', '제작수량', '증정 / 총 제작', '판형 (가로x세로x높이)', '페이지', '용지', '평량', '인쇄', '코팅', '특수가공', '톰슨 · 접지 · 가공', '제본', '배치 · 포장', '기타 전달 사항'];
+var MASTER = ['대분류', '중분류', 'NO.', '세부 품목', '제작수량', '증정 / 총 제작', '판형 (가로x세로x높이)', '페이지', '용지', '평량', '인쇄', '코팅', '특수가공', '톰슨 · 접지 · 가공', '제본', '정합', '포장', '기타 전달 사항'];
 var DOCS = (function () { try { return JSON.parse(ls.get('pr:docs') || '[]'); } catch (e) { return []; } })();
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function saveDocs() { ls.set('pr:docs', JSON.stringify(DOCS)); }
@@ -1106,10 +1112,11 @@ function newDoc(name) { var d = { id: uid(), name: name || '[아티스트]프로
 function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*g|[\d.]+\s*(?:T|㎛|μm))\s*(\(.*\))?\s*$/); return m ? [(m[1] + (m[3] ? ' ' + m[3] : '')).trim(), m[2].replace(/\s/g, '')] : [p || '', '']; }
 function rowTsv(r, i) {
   var pp = splitPaper(r.paper);
-  return [r.cat, r.set, i == null ? '' : i + 1, r.item, r.q, r.gift, r.size, r.pg, pp[0], pp[1], r.print, r.coat, r.fin, r.cut, r.bind, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
+  var Q = dQty(r), qa = Q.has ? fmtN(Q.s) : r.q, qb = Q.has ? ((Q.p + Q.d) ? fmtN(Q.p + Q.d) + ' / ' + fmtN(Q.t) : '') : r.gift;
+  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, r.fin, r.cut, r.bind, r.mat, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
 }
-var DF = [['item', '세부 품목', ''], ['set', '소분류', ''], ['cat', '대분류', ''], ['q', '제작수량', ''], ['gift', '증정 / 총 제작', ''], ['size', '판형', ''], ['pg', '페이지', ''],
-  ['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['pack', '배치·포장', 'dl-pack'], ['etc', '기타 전달 사항', '']];
+var DF = [['item', '세부 품목', ''], ['set', '중분류', ''], ['cat', '대분류', ''], ['q', '제작수량', ''], ['gift', '증정 / 총 제작', ''], ['size', '판형', ''], ['pg', '페이지', ''],
+  ['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['mat', '정합', ''], ['pack', '포장', 'dl-pack'], ['etc', '기타 전달 사항', '']];
 var OPEN = {};
 var DOC_TPL = [
   { k: 'sg', t: '시즌그리팅', s: '아웃박스 · 캘린더 · 다이어리 · 포토카드 · 엽서', i: ['G형 골판지 박스 (겉합지·골판지·속합지)', '데스크 캘린더', '다이어리 (PUR)', '포토카드', '엽서'] },
@@ -1127,15 +1134,23 @@ function docTplHtml() {
 /* 2026-11-20 실장님: 사양서 작성이 어려움 → 상품 라벨 생성처럼 항목을 묶음별로 나눠 보이게, 품목은 위 칩으로 하나씩 추가·선택.
    왼쪽 = 고른 품목 입력 (기본 정보 / 크기·페이지 / 용지·인쇄 / 가공·제본 / 포장·전달), 오른쪽 = 시트 순서 미리보기 + 복사 */
 var DSEC = [
-  ['기본 정보', [['item', '세부 품목'], ['cat', '대분류', '예: 책자 · 패키지 · 낱장'], ['set', '소분류', '예: 구성 이름 (A세트)'], ['q', '제작수량', '예: 1,000'], ['gift', '증정 / 총 제작', '예: 20 / 1,020']]],
+  // 2026-11-20 실장님: 세부 품목에 '아웃박스 / 상짝'처럼 쓰면 앞 = 대분류, 뒤 = 중분류. 수량은 기본 정보 맨 끝에 판매용 · 홍보용 · 불량대응용(%) + 총 제작
+  ['기본 정보', [['item', '세부 품목'], ['cat', '대분류', '예: 아웃박스'], ['set', '중분류', '예: 상짝'], ['qs', '판매용 수량', '예: 1,000'], ['qp', '홍보용 수량', '예: 20'], ['qdp', '불량대응용 수량'], ['qt', '총 제작 수량']]],
   ['크기 · 페이지', [['size', '판형', '가로×세로(×높이) mm'], ['pg', '페이지', '예: 24p · 표지 4p']]],
   ['용지 · 인쇄', [['paper', '용지'], ['print', '인쇄'], ['coat', '코팅']]],
   ['가공 · 제본', [['fin', '특수가공'], ['cut', '톰슨 · 접지 · 가공'], ['bind', '제본']]],
-  ['포장 · 전달', [['pack', '배치 · 포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]]];
-var DNEED = [['q', '제작수량'], ['size', '판형'], ['paper', '용지'], ['print', '인쇄']];
+  // 2026-11-20 실장님: 정합(구성품 맞춰 넣기)과 포장(개별 · 외부 포장)을 따로
+  ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]]];
+var DNEED = [['qs', '판매용 수량'], ['size', '판형'], ['paper', '용지'], ['print', '인쇄']];
+function numOf(v) { return +String(v == null ? '' : v).replace(/[^\d.]/g, '') || 0; }
+// 수량: 판매용 qs · 홍보용 qp · 불량대응 % qdp(판매용 기준, 올림) · 총 = 합. 예전 행(q만 있음)은 q를 판매용으로 봄
+function dQty(r) {
+  var s0 = r.qs != null ? r.qs : r.q, s = numOf(s0), p = numOf(r.qp), pc = numOf(r.qdp), d = pc ? Math.ceil(s * pc / 100) : 0;
+  return { has: r.qs != null || r.qp != null || r.qdp != null, s: s, p: p, pc: pc, d: d, t: s + p + d };
+}
 function dEmpty(v) { v = String(v == null ? '' : v).trim(); return !v || v === '-'; }
 function dSel(d) { var id = ls.get('pr:dsel'); return d.rows.filter(function (r) { return r.id === id; })[0] || d.rows[0] || null; }
-function dMiss(r) { var m = DNEED.filter(function (f) { return dEmpty(r[f[0]]); }).map(function (f) { return f[1]; }); if (r.cat === '책자' && dEmpty(r.pg)) m.push('페이지'); return m; }
+function dMiss(r) { var m = DNEED.filter(function (f) { return f[0] === 'qs' ? !dQty(r).s : dEmpty(r[f[0]]); }).map(function (f) { return f[1]; }); if (r.cat === '책자' && dEmpty(r.pg)) m.push('페이지'); return m; }
 function dLine(r) {
   return [r.size, r.pg, r.paper, r.print, r.coat, r.fin, r.cut, r.bind].filter(function (x) { return !dEmpty(x); }).join(' · ');
 }
@@ -1143,7 +1158,7 @@ function dPrevHtml(d, sel) {
   var h = '<div class="card"><div class="ct">사양서 미리보기<small>' + d.rows.length + '개 품목 · 시트 순서</small></div>';
   if (!d.rows.length) h += '<div class="empty2">품목을 넣으면 여기에 시트 순서대로 보여요</div>';
   h += d.rows.map(function (r, i) {
-    var m = dMiss(r), q = dEmpty(r.q) ? '' : ' <small>' + esc(r.q) + '부</small>';
+    var m = dMiss(r), Q = dQty(r), q = Q.t ? ' <small>총 ' + fmtN(Q.t) + '부</small>' : '';
     return '<div class="dpv' + (sel && r.id === sel.id ? ' on' : '') + '" data-sel="' + r.id + '"><b><em class="no">' + (i + 1) + '</em>' + esc(r.item || '품목명 없음') + q + '</b>' +
       (dLine(r) ? '<p>' + esc(dLine(r)) + '</p>' : '') + (m.length ? '<div class="miss">빈칸 · ' + esc(m.join(', ')) + '</div>' : '') + '</div>';
   }).join('');
@@ -1152,6 +1167,9 @@ function dPrevHtml(d, sel) {
 }
 function dFieldHtml(r, f) {
   var k = f[0], v = r[k], a = 'data-dr="' + r.id + '" data-k="' + k + '"', c;
+  if (k === 'qs' && v == null && r.q) v = r.q;
+  if (k === 'qdp') { var Q = dQty(r); c = '<div class="dqw"><input class="din dqp" inputmode="decimal" ' + a + ' value="' + esc(v || '') + '" placeholder="예: 3"><span class="dqu">%</span><span class="dqv" data-qv="d">' + (Q.pc ? '= ' + fmtN(Q.d) + '개' : '판매용 수량 기준') + '</span></div>'; return '<div class="dfr"><label>' + f[1] + '</label>' + c + '</div>'; }
+  if (k === 'qt') { var T = dQty(r); return '<div class="dfr dqt"><label>' + f[1] + '</label><div class="dqtv" data-qv="t">' + (T.t ? fmtN(T.t) + '개' : '<i>수량을 넣으면 합계가 나와요</i>') + '</div></div>'; }
   if (k === 'item') c = '<div class="dinw"><input class="din" ' + a + ' value="' + esc(v || '') + '" placeholder="품목명 쓰기 · 예: 엽서"><button type="button" class="dlk" data-pick="item" ' + a + '>목록에서 고르기</button></div>';
   else if (PICK[k]) c = '<button type="button" class="dpk" data-pick="' + k + '" ' + a + '>' + (dEmpty(v) ? '<i>' + (k === 'item' ? '품목 고르기' : '고르기 · 없으면 비워 두기') + '</i>' : '<span>' + esc(v) + '</span>') + '</button>';
   else if (k === 'etc') c = '<textarea class="din" rows="2" ' + a + ' placeholder="' + esc(f[2] || '') + '">' + esc(v || '') + '</textarea>';
@@ -1173,7 +1191,7 @@ function renderDoc() {
     h += DSEC.map(function (sc) {
       var x = '<div class="dsc"><div class="dst">' + sc[0] + '</div>' + sc[1].map(function (f) { return dFieldHtml(sel, f); }).join('');
       if (sc[0] === '크기 · 페이지' && sel.flat && !sel.book) x += '<div class="dfr"><label>결</label><select class="din" data-dr="' + sel.id + '" data-k="gn">' + ['', 'v', 'h'].map(function (g) { return '<option value="' + g + '"' + ((sel.gn || '') === g ? ' selected' : '') + '>' + GN_LB[g] + '</option>'; }).join('') + '</select></div>';
-      if (sc[0] === '용지 · 인쇄') x += sheetHint(sel, { q: +String(sel.q).replace(/[^\d]/g, '') || 0, k: 1 });
+      if (sc[0] === '용지 · 인쇄') x += sheetHint(sel, { q: dQty(sel).t, k: 1 });
       return x + '</div>';
     }).join('');
     h += '</div>';
@@ -1194,7 +1212,7 @@ function bindDoc() {
   $$('[data-tpl]').forEach(function (b) { b.onclick = function () { tplLoad(b.dataset.tpl); }; });
   function tplLoad(k) {
     var t = DOC_TPL.filter(function (x) { return x.k === k; })[0], dd = curDoc() || newDoc();
-    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'size', 'pg', 'paper', 'print', 'cut', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
+    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'qs', 'qp', 'size', 'pg', 'paper', 'print', 'cut', 'mat', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
     t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
     saveDocs(); renderDoc(); toast(t.t + ' 구성을 불러왔어요');
   }
@@ -1207,8 +1225,12 @@ function bindDoc() {
   // 글자 칸: 치는 대로 저장 + 오른쪽 미리보기만 새로 그림 (입력 중인 칸은 그대로)
   $$('.din[data-dr]').forEach(function (i) {
     var up = function () { var r = row(i.dataset.dr); r[i.dataset.k] = i.value; saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
-      if (i.dataset.k === 'item') { var t = i.value || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); } };
-    i.oninput = up; i.onchange = function () { up(); if (/^(gn|size|q)$/.test(i.dataset.k)) renderDoc(); };
+      if (i.dataset.k === 'item') { var t = i.value || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); }
+      if (/^q(s|p|dp)$/.test(i.dataset.k)) { var Q = dQty(r), qd = $('[data-qv="d"]'), qt = $('[data-qv="t"]'); if (qd) qd.textContent = Q.pc ? '= ' + fmtN(Q.d) + '개' : '판매용 수량 기준'; if (qt) qt.innerHTML = Q.t ? fmtN(Q.t) + '개' : '<i>수량을 넣으면 합계가 나와요</i>'; } };
+    i.oninput = up; i.onchange = function () { up();
+      var r = row(i.dataset.dr);
+      if (i.dataset.k === 'item' && /\//.test(i.value)) { var pp = i.value.split('/').map(function (x) { return x.trim(); }).filter(Boolean); if (pp[0]) r.cat = pp[0]; if (pp[1]) r.set = pp.slice(1).join(' / '); saveDocs(); renderDoc(); toast('대분류 ' + (pp[0] || '') + (pp[1] ? ' · 중분류 ' + pp.slice(1).join(' / ') : '') + '로 넣었어요'); return; }
+      if (/^(gn|size)$/.test(i.dataset.k)) renderDoc(); };
   });
   $$('[data-pick][data-dr]').forEach(function (i) { i.onclick = function () { var r = row(i.dataset.dr); openPick(i.dataset.pick, r[i.dataset.k], function (x) {
     if (i.dataset.k === 'item' && x && x !== '-') { var it = itemRow(x); if (it) { if (dEmpty(r.cat)) r.cat = it[1]; if (dEmpty(r.size)) r.size = it[2]; if (dEmpty(r.paper)) r.paper = it[3]; if (dEmpty(r.print)) r.print = it[4]; if (dEmpty(r.coat)) r.coat = it[5] || '-'; } }
