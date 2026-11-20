@@ -46,7 +46,7 @@ header{position:sticky;top:0;z-index:30;background:rgba(242,244,246,.92);backdro
 .rbtn.pending .dot{display:block}
 .rbtn.spin svg{animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-nav.tabs{display:flex;gap:4px;padding:0 16px 8px;max-width:1600px;margin:0 auto}
+nav.tabs{display:none !important;gap:4px;padding:0 16px 8px;max-width:1600px;margin:0 auto}
 nav.tabs button{padding:7px 14px;border-radius:999px;color:var(--tx2);font-weight:600;font-size:13px;letter-spacing:.02em}
 nav.tabs button.on{background:var(--tx);color:#fff}
 nav.tabs .cnt{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;opacity:.6;margin-left:4px}
@@ -224,6 +224,7 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
 .fmain{display:contents}
 #toolArea{order:1} #fside{order:2} .fmain>*:not(#toolArea){order:3}
 #fside .fsh{display:none}
+@media (max-width:899px){ #favTop{margin-top:16px} }
 @media (min-width:900px){
   .fwrap{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:32px;align-items:start}
   .fmain{display:block;min-width:0;order:0}
@@ -444,9 +445,13 @@ function sorted(list){
 function cnt(fn){ let n=0; for(const f of S.data) if(fn(f)) n++; return n; }
 function renderFilters(){
   const el=$('#filters');
+  // 보기: 전체 폰트 / 즐겨찾기 (2026-11-20 실장님: 둘러보기·시대별·저장 하위메뉴 대신 필터 안에)
+  const fvn=Object.keys(S.favs).length;
+  const vrow=`<div class="chipsrow"><span class="lbl">보기</span><button class="chip ${S.tab!=='saved'?'on':''}" data-t="browse">전체 폰트</button><button class="chip ${S.tab==='saved'?'on':''}" data-t="saved">즐겨찾기<span class="n">${fvn}</span></button></div>`;
+  if(S.tab==='saved'){ el.innerHTML=vrow; return; }
   const base=S.data.filter(f=>baseFilter(f,'major'));
   const mc={}; base.forEach(f=>mc[cat(f)]=(mc[cat(f)]||0)+1);
-  let h=`<div class="chipsrow"><span class="lbl">출처</span><div class="seg" id="srcSeg">`+
+  let h=vrow+`<div class="chipsrow"><span class="lbl">출처</span><div class="seg" id="srcSeg">`+
     [['all','전체'],['g','Google'],['a','Adobe'],['k','한글 무료']].map(([k,l])=>`<button data-src="${k}" class="${S.src===k?'on':''}">${k!=='all'?`<span class="src-dot s${k}"></span>`:''}${l}</button>`).join('')+
     `</div><button class="chip" id="optBtn" style="margin-left:6px">${ICON.filter.replace('class="i"','class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px"')}옵션${optCount()?' · '+optCount():''}</button></div>`;
   const lb=S.data.filter(f=>baseFilter(f,'lang')); const lc={}; lb.forEach(f=>(f.sc||[]).forEach(x=>lc[x]=(lc[x]||0)+1));
@@ -477,7 +482,7 @@ function optCount(){ const o=S.opt; return ['ko','pv','vf','com'].filter(k=>o[k]
 let curList=[];
 function render(keepShown){
   if(!keepShown) S.shown=60;
-  $('#toolArea').style.display = S.tab==='saved' ? 'none' : '';
+  $('#toolArea .tools').style.display = S.tab==='saved' ? 'none' : '';
   $('#eraArea').style.display = S.tab==='era' ? '' : 'none';
   $('#favTop').style.display = S.tab==='saved' ? '' : 'none';
   $('#favCnt').textContent=Object.keys(S.favs).length;
@@ -630,7 +635,7 @@ function setFav(id,v){
   const f=S.byId[id];
   if(v){ S.favs[id]=v; enqueue({a:'upsert',id,n:f.n,s:SRC[f.s],c:MAJOR[f.m]||'',e:(ERAS[ERA_IDX[f.e]]||[])[1]||'',f:(v.f||[]).join(', '),m:v.m||'',t:v.t,u:linkOf(f)[1]}); }
   else { delete S.favs[id]; enqueue({a:'remove',id}); }
-  SS('favs',S.favs); refreshStars(id); $('#favCnt').textContent=Object.keys(S.favs).length;
+  SS('favs',S.favs); refreshStars(id); $('#favCnt').textContent=Object.keys(S.favs).length; if(S.tab!=='saved') renderFilters();
   if(S.tab==='saved') renderSaved();
 }
 function refreshStars(id){ document.querySelectorAll(`[data-star="${CSS.escape(id)}"]`).forEach(b=>b.classList.toggle('on',!!S.favs[id])); }

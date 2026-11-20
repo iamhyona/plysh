@@ -1616,7 +1616,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm38';
+var APP_VER = '20261120hm39';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2717,10 +2717,6 @@ function subItems() {
     } else if (S.view === 'gdoc') {
       // 소메뉴는 문서 원본에서 미리 읽은 목차로 바로 그린다 (화면 로딩을 기다리면 이전 문서 목차가 잠깐 보였음)
       L = gdKids(S.gdf || 'folder-file.html', 0);
-    } else if (S.view === 'tk' && S.tk === 'fonts') {
-      // 폰트 > 둘러보기 · 시대별 · 저장 (2026-11-20 실장님: 화면 위 탭 대신 왼쪽 소메뉴)
-      var ff = subFrame('fonts'), fd = ff && ff.contentDocument; if (!fd) return L;
-      $$('#tabs button', fd).forEach(function (e) { var cn = e.querySelector('.cnt'); L.push({ t: [].filter.call(e.childNodes, function (c) { return c.nodeType === 3; }).map(function (c) { return c.textContent; }).join('').trim(), n: cn && +cn.textContent ? cn.textContent : '', on: e.classList.contains('on'), go: function () { e.click(); } }); });
     } else if (S.view === 'tk' && S.tk === 'ref') {
       if (!SUB.refIn) { SUB.refIn = 1; SUB.refOpen = ''; } // 용어사전에 새로 들어오면 접힌 상태
       var f = subFrame(S.tk), d = f && f.contentDocument; if (!d) return L;
@@ -2784,7 +2780,7 @@ function subPaint(box, cur, cls) {
 function subTick() {
   var sd = document.getElementById('nsd'), pc = !!(sd && sd.offsetWidth);
   var L = subItems(), sig = S.view + '|' + (S.tk || '') + '|' + L.map(function (x) { return (x.h || x.t) + (x.n || '') + (x.on ? '*' : ''); }).join(',');
-  subHide(pc && (S.view === 'tk' && (S.tk === 'ref' || S.tk === 'fonts') || S.view === 'gdoc') && L.length > 0);
+  subHide(pc && (S.view === 'tk' && S.tk === 'ref' || S.view === 'gdoc') && L.length > 0);
   if (sig === SUB.sig && (!sd || !L.length || $('.s3', sd))) return; SUB.sig = sig;
   if (sd) subPaint(sd, null, '.si');
   var fm = document.getElementById('nfm'); if (fm && fm.classList.contains('open')) subPaint(fm, null, '.lk');
