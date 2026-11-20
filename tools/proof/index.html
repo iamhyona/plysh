@@ -572,7 +572,7 @@ function renderCalc() {
   if (isDie) {
     var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd);
     L += stp(1, '전개도', dd.d) + '<div class="chips cdie">' + DIE.map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div>' +
-      '<div class="ig">' + Object.keys(dv).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
+      '<div class="ig">' + Object.keys(dd.in).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
       '<div class="csep"></div>' + stp(2, '수량') + qty + gseg + '<div class="nt cnt0">전개도 모양 그대로 원판에 앉혀요 · 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div>';
   } else if (c.m === 'size') {
     L += stp(1, '완성 크기', '재단 후', mseg) + '<div class="cpg cpre">' + PRESETS.map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '"><b>' + p[0].replace('국배판(A4)', 'A4') + '</b><small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
@@ -588,7 +588,9 @@ function renderCalc() {
   h += '<div class="cw2"><div class="card cin">' + L + '</div><div class="cout" id="cRes">' + calcOut(c) + '</div></div>';
   $('#main').innerHTML = h; bindCalc();
 }
-function dieVals(c, dd) { c.dvs = c.dvs || {}; var v = c.dvs[dd.id]; if (!v) { v = c.dvs[dd.id] = JSON.parse(JSON.stringify(dd.in)); } return v; }
+function dieVals(c, dd) { c.dvs = c.dvs || {}; var v = c.dvs[dd.id]; if (!v) { v = c.dvs[dd.id] = JSON.parse(JSON.stringify(dd.in)); } Object.keys(dd.in).forEach(function (k) { if (!isFinite(+v[k]) || v[k] === null) v[k] = dd.in[k]; }); return v; }
+// 저장된 값에 빠진 칸·빈 칸이 있으면 기본값으로 그림 (예전 버전 저장값 때문에 전개도가 안 보이던 문제, 2026-11-21)
+function dieFix(dd, v) { var o = {}; Object.keys(dd.in).forEach(function (k) { var x = +v[k]; o[k] = isFinite(x) && (x > 0 || !(dd.in[k] > 0)) ? x : dd.in[k]; }); return o; }
 function nestCard(r, i, G, extra, spec) { return acrTxt(r, nestCard0(r, i, G, extra, spec)); }
 function nestCard0(r, i, G, extra, spec) {
   if (!r.n) return '<div class="card cres"><div class="ct">' + r.P.n + '<small>' + r.P.s + '×' + r.P.l + '</small></div><div class="empty2">이 전개도는 ' + r.P.n + '에 안 들어가요</div></div>';
@@ -600,7 +602,7 @@ function nestCard0(r, i, G, extra, spec) {
 function calcOut(c) {
   var w = +c.w, hh = +c.h, q = Math.max(0, +c.q || 0), ex = 1 + (+c.ex || 0) / 100, out = '';
   if (c.t === 'die') {
-    var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd), G = dieGeom(dd.id, dv), pad = dd.id === 'cover' ? 0 : +c.bl;
+    var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd), G = dieGeom(dd.geo || dd.id, dieFix(dd, dv)), pad = dd.id === 'cover' ? 0 : +c.bl;
     // 절수(표지·패키지)에도 대략 전개도 먼저 (2026.10.07)
     out += '<div class="card"><div class="ct">대략 전개도<small>' + mm(G.W) + ' × ' + mm(G.H) + 'mm</small></div>' + dieSvg(G, false) +
       '<div class="legend"><span><b style="color:#e5243b">━</b> 재단선</span><span><b style="color:#0067d8">┅</b> 접는선(오시)</span></div></div>';
@@ -1627,7 +1629,7 @@ function dieSvg(G, forFile) {
   return s + '</svg>';
 }
 var DS = (function () { var o = {}; try { o = JSON.parse(ls.get('pr:die') || '{}'); } catch (e) {} return o; })();
-function dieState() { DS.id = DS.id || 'mailer'; var d = DIE.filter(function (x) { return x.id === DS.id; })[0] || DIE[0]; DS.v = DS.v && DS.vid === d.id ? DS.v : JSON.parse(JSON.stringify(d.in)); DS.vid = d.id; return d; }
+function dieState() { DS.id = DS.id || 'mailer'; var d = DIE.filter(function (x) { return x.id === DS.id; })[0] || DIE[0]; DS.v = DS.v && DS.vid === d.id ? (function (o) { var n = {}; Object.keys(d.in).forEach(function (k) { n[k] = isFinite(+o[k]) && o[k] !== null ? +o[k] : d.in[k]; }); return n; })(DS.v) : JSON.parse(JSON.stringify(d.in)); DS.vid = d.id; return d; }
 function renderDie() {
   var d = dieState();
   var h = '<div class="phd"><b>전개도 생성기</b><small>형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일</small></div>';
@@ -1644,7 +1646,7 @@ function renderDie() {
   $('#dieImg').onchange = function () { var f = this.files[0]; if (f) dieAI(f); this.value = ''; };
 }
 function dieOut() {
-  var d = dieState(), G = dieGeom(d.geo || d.id, DS.v), NR = nestItem(G, { bl: MAR.bl, gr: MAR.gr, sd: MAR.sd, gn: '' }, d.id === 'cover' ? 0 : MAR.bl), bs = NR[0] && NR[0].n ? NR[0] : null;
+  var d = dieState(), G = dieGeom(d.geo || d.id, dieFix(d, DS.v)), NR = nestItem(G, { bl: MAR.bl, gr: MAR.gr, sd: MAR.sd, gn: '' }, d.id === 'cover' ? 0 : MAR.bl), bs = NR[0] && NR[0].n ? NR[0] : null;
   var h = '<div class="card"><div class="ct">대략 전개도<small>' + mm(G.W) + ' × ' + mm(G.H) + 'mm</small></div>' + dieSvg(G, false) +
     '<div class="legend"><span><b style="color:#e5243b">━</b> 재단선</span><span><b style="color:#0067d8">┅</b> 접는선(오시)</span></div>';
   if (bs) h += '<div class="sh"><b>' + bs.P.n + '</b> ' + bs.n + '개 걸이 · 로스 ' + Math.round(bs.loss * 100) + '% · ' + esc(bs.nest.desc || '') + ' (도련 ' + MAR.bl + ' · 물림 ' + MAR.gr + ' · 여백 ' + MAR.sd + 'mm)</div>' + nestSvg(bs.P, bs.nest, G, MAR);
