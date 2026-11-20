@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script>/* 승인된 팀원만 (2026-11-19): 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>용지 크기</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
@@ -13,7 +14,7 @@ html, body { background:var(--bg); color:var(--txt); font-family:'Pretendard Var
 main { max-width:1040px; margin:0 auto; padding:20px 16px 80px; }
 html.emb main { padding-top:6px; }
 .phd { margin:0 0 20px; } .phd b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; } .phd small { display:block; margin-top:6px; font-size:14px; color:#6b7684; line-height:1.5; }
-html.emb .phd { display:none; }
+html.emb .phd { display:none; } html.emb .view { position:static; }
 .wrap { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
 @media (min-width:900px) { .wrap { grid-template-columns:360px minmax(0,1fr); align-items:start; } .view { position:sticky; top:12px; } }
 .card { background:var(--card); border-radius:20px; padding:22px 20px; }

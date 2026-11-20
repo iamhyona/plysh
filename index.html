@@ -930,7 +930,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .pgt th, .pgt td { border-bottom:1px solid var(--line); vertical-align:top; padding:8px 6px; text-align:left; }
 .pgt tbody tr:last-child > * { border-bottom:0; } .pgt td:last-child, .pgt th:last-child { padding-right:16px; }
 .pgt .pgn { position:sticky; left:0; z-index:2; background:var(--card); width:120px; min-width:120px; max-width:120px; padding:10px 10px 10px 16px; font-weight:700; color:var(--txt); }
-.pgt .pgn i { float:left; width:4px; height:30px; border-radius:2px; margin-right:8px; }
+.pgt .pgn i { float:left; width:8px; height:8px; border-radius:50%; margin:6px 8px 0 0; } /* 2026-11-20 실장님: 프로젝트명 앞은 바 대신 불릿 */
 .pgt .pgn span { display:block; line-height:1.35; word-break:keep-all; overflow-wrap:anywhere; }
 .pgt .pgd { min-width:96px; width:96px; font-weight:700; color:var(--sub); white-space:nowrap; }
 .pgt .pgd b { display:block; font-size:14px; color:var(--txt); }
@@ -938,7 +938,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .pgt .pgd.sun b, .pgt .pgd.sun small { color:var(--red); } .pgt .pgd.sat b, .pgt .pgd.sat small { color:var(--acc); }
 .pgt .pgd.td b, .pgt .pgd.td small { color:var(--acc); }
 .pgt td.td, .pgt .pgd.td { background:#f5f9ff; }
-.pge { display:flex; align-items:flex-start; gap:6px; border-radius:8px; padding:6px 8px 6px 6px; margin:0 0 4px; background:color-mix(in srgb, var(--pc) 14%, #fff); border-left:3px solid var(--pc); }
+.pge { display:flex; align-items:flex-start; gap:6px; border-radius:8px; padding:6px 8px; margin:0 0 4px; background:color-mix(in srgb, var(--pc) 14%, #fff); }
 .pge:last-child { margin-bottom:0; }
 .pgk { flex:0 0 18px; width:18px; height:18px; margin-top:0; padding:0; border:1.5px solid var(--faint); border-radius:50%; background:#fff; color:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 .pgk svg { width:11px; height:11px; }
@@ -1616,7 +1616,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm39';
+var APP_VER = '20261120hm41';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2052,7 +2052,7 @@ function renderLogo() {
     fetch('logo/logos.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (d) { d.forEach(function (x) { if (x.c === 'actor') x.c = 'agency'; }); LG.list = d; if (LG.tab === 'actor') LG.tab = 'agency'; if (S.view === 'logo') renderLogo(); }, function () { $('#main').innerHTML = '<div class="ld">로고 목록을 불러오지 못했어요</div>'; });
     return;
   }
-  var ic = { grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>', list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>' };
+  var ic = { grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M12 3.5v17M3.5 12h17"/></svg>', list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg>' };
   $('#main').innerHTML = '<div class="srow"><div class="lgtop"><label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="lgQ" type="search" placeholder="로고 검색 (한글·영어)" value="' + esc(LG.q) + '" autocomplete="off"></label>' +
     '<div class="lgvw">' + ['grid', 'list'].map(function (v) { return '<button data-lv="' + v + '" class="' + (LG.vw === v ? 'on' : '') + '" aria-label="' + (v === 'grid' ? '미리보기로 보기' : '리스트로 보기') + '">' + ic[v] + '</button>'; }).join('') + '</div></div>' +
     '<div class="tabs2" id="lgT">' + LG_TABS.map(function (t) { return '<button data-lt="' + t[0] + '" class="' + (LG.tab === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div></div><div id="lgB"></div>';
@@ -2103,7 +2103,7 @@ var GUIDES = [];
 GUIDE_GROUPS.forEach(function (gr) { gr.i.forEach(function (g) { GUIDES.push(g); }); });
 function renderGuide() {
   var n = 0;
-  $('#main').innerHTML = GUIDE_GROUPS.map(function (gr) { return '<div class="gdg"><h4>' + esc(gr.g) + '</h4><div class="gdl">' + gr.i.map(function (g) { var i = n++; return '<div class="gdc" role="button" tabindex="0" data-i="' + i + '"><b>' + esc(g.t) + '</b><i>→</i>' + (g.s.length ? '<span class="gds">' + g.s.map(function (x) { return '<button type="button" data-i="' + i + '" data-a="' + esc(x[1]) + '">' + esc(x[0]) + '</button>'; }).join('') + '</span>' : '') + '</div>'; }).join('') + '</div></div>'; }).join('');
+  $('#main').innerHTML = GUIDE_GROUPS.map(function (gr) { return '<div class="gdg"><h4>' + esc(gr.g) + '</h4><div class="gdl">' + gr.i.map(function (g) { var i = n++; return '<div class="gdc" role="button" tabindex="0" data-i="' + i + '"><b>' + esc(g.t) + '</b><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></i>' + (g.s.length ? '<span class="gds">' + g.s.map(function (x) { return '<button type="button" data-i="' + i + '" data-a="' + esc(x[1]) + '">' + esc(x[0]) + '</button>'; }).join('') + '</span>' : '') + '</div>'; }).join('') + '</div></div>'; }).join('');
   $$('.gdc').forEach(function (b) { b.onclick = function () { openGd(GUIDES[+b.dataset.i]); }; b.onkeydown = function (e) { if (e.key === 'Enter') b.onclick(); }; });
   $$('.gds button').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); openGd(GUIDES[+b.dataset.i], b.dataset.a); }; });
 }
@@ -2127,6 +2127,7 @@ var TOOLS = [
     { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
     { k: 'cut', t: '절수 계산기', s: '완성 크기·전개도로 전지 걸이와 절수, 필요 전지 수', f: 'tools/proof/', pv: 'calc' },
     { k: 'die', t: '전개도 생성기', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
+    { k: 'paper', t: '용지 크기', s: '규격 용지와 생활 속 인쇄물 크기를 실제 비율로 비교', f: 'tools/paper/' },
     { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
     { k: 'review', t: '검수기', s: 'PDF·AI 인쇄 파일 · 사양서', v: 'review' },
@@ -2461,7 +2462,7 @@ var SPACES = [
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 달력으로' }, { k: 'sched', t: '일정', s: '프로젝트별 일정표' }] }] },
   { k: 'tool', t: '도우미', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명, 로고 · 폰트 · 용어사전 · 팬톤', home: 'space:tool', ic: 'tool', g: [
-    { g: '도우미', i: [{ k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
+    { g: '도우미', i: [{ k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도 생성기', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '폴더·파일명 생성기', tool: 1 },
       { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [

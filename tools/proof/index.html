@@ -171,6 +171,7 @@ html.emb .phd { padding-right:44px; }
 @media (min-width:760px) { .dsw { display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:16px; align-items:start; } .dsw > .dsr { position:sticky; top:12px; } }
 .dit { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin:0 0 12px; } .dit::-webkit-scrollbar { display:none; }
 @media (min-width:760px) { .dit { flex-wrap:wrap; overflow:visible; } }
+@media (max-width:759px) { .dit { flex-wrap:wrap; overflow:visible; } .dit .dld { flex:1 1 100%; margin:6px 0 0; } .dit .dld select { flex:1; max-width:none; } }
 .dit button { flex:none; border:0; background:#fff; border-radius:999px; height:40px; padding:0 16px 0 7px; font-size:14px; font-weight:600; color:var(--sub); display:flex; align-items:center; gap:7px; white-space:nowrap; max-width:260px; overflow:hidden; text-overflow:ellipsis; }
 .dit button em { font-style:normal; flex:none; min-width:26px; height:26px; border-radius:50%; background:var(--chip); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 .dit button.on { background:var(--txt); color:#fff; } .dit button.on em { background:rgba(255,255,255,.2); }
@@ -181,6 +182,8 @@ html.emb .phd { padding-right:44px; }
 .dst { font-size:16px; font-weight:800; color:var(--txt); letter-spacing:-0.02em; margin:24px 0 10px; }
 .dsv { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px 12px; margin:14px 0 0; padding-top:14px; border-top:1px solid var(--line); } .dsv .nt { margin:0; } .dsv .nt b { font-weight:600; color:var(--sub); }
 .dsv button { flex:none; height:40px; padding:0 16px; border:0; border-radius:10px; background:var(--txt); color:#fff; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.dcls { margin:-4px 0 4px; }
+.dinw .dlk { flex:none; } .dfr.dclr { grid-template-columns:minmax(0,1fr); }
 .card.dsc { padding:22px 18px 16px; margin-bottom:16px; } .card.dsc .dst { margin:0 0 14px; } .card.dhd { margin-bottom:16px; padding:16px 18px; }
 .dfr { display:grid; grid-template-columns:108px minmax(0, 1fr); align-items:center; gap:10px; margin-bottom:8px; }
 .dfr > label { font-size:14px; font-weight:600; color:var(--sub); line-height:1.35; }
@@ -1154,8 +1157,12 @@ function bindOne(t) {
 var MASTER = ['대분류', '중분류', 'NO.', '세부 품목', '제작수량', '증정 / 총 제작', '판형 (가로x세로x높이)', '페이지', '용지', '평량', '인쇄', '코팅', '특수가공', '톰슨 · 접지 · 가공', '제본', '정합', '포장', '기타 전달 사항'];
 var DOCS = (function () { try { return JSON.parse(ls.get('pr:docs') || '[]'); } catch (e) { return []; } })();
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-function saveDocs() { var d = curDoc(); if (d) d.saved = Date.now(); ls.set('pr:docs', JSON.stringify(DOCS)); var e = document.getElementById('dSaved'); if (e) e.textContent = savedTxt(d); }
-function savedTxt(d) { if (!d || !d.saved) return '아직 저장 안 함'; var t = new Date(d.saved), n = new Date(), hm = (t.getHours() < 12 ? '오전 ' : '오후 ') + ((t.getHours() + 11) % 12 + 1) + ':' + ('0' + t.getMinutes()).slice(-2); return '임시 저장됨 · ' + (t.toDateString() === n.toDateString() ? '오늘 ' : (t.getMonth() + 1) + '.' + t.getDate() + ' ') + hm; }
+// 2026-11-20 실장님: 사양서는 '임시 저장'을 눌러야 저장. 고치는 동안은 화면에만 두고 표시만 바꿈
+var DDIRTY = false;
+function saveDocs() { DDIRTY = true; var e = document.getElementById('dSaved'); if (e) e.textContent = savedTxt(curDoc()); }
+function commitDocs() { var d = curDoc(); if (d) d.saved = Date.now(); ls.set('pr:docs', JSON.stringify(DOCS)); DDIRTY = false; var e = document.getElementById('dSaved'); if (e) e.textContent = savedTxt(d); }
+window.addEventListener('beforeunload', function (e) { if (DDIRTY) { e.preventDefault(); e.returnValue = ''; } });
+function savedTxt(d) { if (DDIRTY) return '저장 안 한 내용이 있어요'; if (!d || !d.saved) return '아직 저장 안 함'; var t = new Date(d.saved), n = new Date(), hm = (t.getHours() < 12 ? '오전 ' : '오후 ') + ((t.getHours() + 11) % 12 + 1) + ':' + ('0' + t.getMinutes()).slice(-2); return '임시 저장됨 · ' + (t.toDateString() === n.toDateString() ? '오늘 ' : (t.getMonth() + 1) + '.' + t.getDate() + ' ') + hm; }
 function curDoc() { var id = ls.get('pr:doc'); return DOCS.filter(function (d) { return d.id === id; })[0] || DOCS[0] || null; }
 function newDoc(name) { var d = { id: uid(), name: name || '[아티스트]프로젝트_사양서', date: new Date().toISOString().slice(0, 10), rows: [docRow('')] }; DOCS.unshift(d); ls.set('pr:doc', d.id); saveDocs(); return d; }
 function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*g|[\d.]+\s*(?:T|㎛|μm))\s*(\(.*\))?\s*$/); return m ? [(m[1] + (m[3] ? ' ' + m[3] : '')).trim(), m[2].replace(/\s/g, '')] : [p || '', '']; }
@@ -1184,12 +1191,20 @@ function docTplHtml() {
    왼쪽 = 고른 품목 입력 (기본 정보 / 크기·페이지 / 용지·인쇄 / 가공·제본 / 포장·전달), 오른쪽 = 시트 순서 미리보기 + 복사 */
 var DSEC = [
   // 2026-11-20 실장님: 세부 품목에 '아웃박스 / 상짝'처럼 쓰면 앞 = 대분류, 뒤 = 중분류. 수량은 기본 정보 맨 끝에 판매용 · 홍보용 · 불량대응용(%) + 총 제작
-  ['기본 정보', [['item', '세부 품목'], ['cat', '대분류', '예: 아웃박스'], ['set', '중분류', '예: 상짝'], ['qs', '판매용 수량', '예: 1,000'], ['qp', '홍보용 수량', '예: 20'], ['qdp', '불량대응용 수량'], ['qt', '총 제작 수량']]],
+  // 2026-11-20 실장님 (다시): 대분류 / 중분류 / 세부 품목을 한 칸에 슬래시로 구분. 수량은 맨 아래 따로
+  ['품목', [['cls', '품목']]],
   ['크기 · 페이지', [['size', '판형', '가로×세로(×높이) mm'], ['pg', '페이지', '예: 24p · 표지 4p']]],
   ['용지 · 인쇄', [['paper', '용지'], ['print', '인쇄'], ['coat', '코팅']]],
   ['가공 · 제본', [['fin', '특수가공'], ['cut', '톰슨 · 접지 · 가공'], ['bind', '제본']]],
   // 2026-11-20 실장님: 정합(구성품 맞춰 넣기)과 포장(개별 · 외부 포장)을 따로
-  ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]]];
+  ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]],
+  ['수량', [['qs', '판매용 수량', '예: 1,000'], ['qp', '홍보용 수량', '예: 20'], ['qdp', '불량대응용 수량'], ['qt', '총 제작 수량']]]];
+function clsOf(r) { return [r.cat, r.set, r.item].filter(function (x) { return !dEmpty(x); }).join(' / '); }
+// 슬래시 3개 = 대분류 / 중분류 / 세부 품목, 2개 = 대분류 / 중분류, 1개 = 세부 품목
+function clsSet(r, v) { var p = String(v || '').split('/').map(function (x) { return x.trim(); }).filter(Boolean);
+  if (p.length >= 3) { r.cat = p[0]; r.set = p[1]; r.item = p.slice(2).join(' / '); }
+  else if (p.length === 2) { r.cat = p[0]; r.set = p[1]; r.item = ''; }
+  else { r.cat = ''; r.set = ''; r.item = p[0] || ''; } }
 var DNEED = [['qs', '판매용 수량'], ['size', '판형'], ['paper', '용지'], ['print', '인쇄']];
 function numOf(v) { return +String(v == null ? '' : v).replace(/[^\d.]/g, '') || 0; }
 // 수량: 판매용 qs · 홍보용 qp · 불량대응 % qdp(판매용 기준, 올림) · 총 = 합. 예전 행(q만 있음)은 q를 판매용으로 봄
@@ -1208,7 +1223,7 @@ function dPrevHtml(d, sel) {
   if (!d.rows.length) h += '<div class="empty2">품목을 넣으면 여기에 시트 순서대로 보여요</div>';
   h += d.rows.map(function (r, i) {
     var m = dMiss(r), Q = dQty(r), q = Q.t ? ' <small>총 ' + fmtN(Q.t) + '부</small>' : '';
-    return '<div class="dpv' + (sel && r.id === sel.id ? ' on' : '') + '" data-sel="' + r.id + '"><b><em class="no">' + (i + 1) + '</em>' + esc(r.item || '품목명 없음') + q + '</b>' +
+    return '<div class="dpv' + (sel && r.id === sel.id ? ' on' : '') + '" data-sel="' + r.id + '"><b><em class="no">' + (i + 1) + '</em>' + esc(r.item || r.set || r.cat || '품목명 없음') + q + '</b>' +
       (dLine(r) ? '<p>' + esc(dLine(r)) + '</p>' : '') + (m.length ? '<div class="miss">빈칸 · ' + esc(m.join(', ')) + '</div>' : '') + '</div>';
   }).join('');
   if (d.rows.length) h += '<button class="dcp" id="dCopy">시트에 붙여넣기용 복사 (' + d.rows.length + '행)</button><button class="dcp2" id="dCopyH">제목 줄까지 같이 복사</button><div class="nt c">사양서 시트의 ‘대분류’ 첫 칸을 누르고 붙여넣으면 칸마다 들어가요</div>';
@@ -1219,6 +1234,7 @@ function dFieldHtml(r, f) {
   if (k === 'qs' && v == null && r.q) v = r.q;
   if (k === 'qdp') { var Q = dQty(r); c = '<div class="dqw"><input class="din dqp" inputmode="decimal" ' + a + ' value="' + esc(v || '') + '" placeholder="예: 3"><span class="dqu">%</span><span class="dqv" data-qv="d">' + (Q.pc ? '= ' + fmtN(Q.d) + '개' : '판매용 수량 기준') + '</span></div>'; return '<div class="dfr"><label>' + f[1] + '</label>' + c + '</div>'; }
   if (k === 'qt') { var T = dQty(r); return '<div class="dfr dqt"><label>' + f[1] + '</label><div class="dqtv" data-qv="t">' + (T.t ? fmtN(T.t) + '개' : '<i>수량을 넣으면 합계가 나와요</i>') + '</div></div>'; }
+  if (k === 'cls') return '<div class="dfr dclr"><div class="dinw"><input class="din" ' + a + ' value="' + esc(clsOf(r)) + '" placeholder="대분류 / 중분류 / 세부 품목"><button type="button" class="dlk" data-pick="item" data-dr="' + r.id + '" data-k="item">목록에서 고르기</button></div></div><div class="nt dcls">예: 아웃박스 / 상짝 / 이너 · 슬래시(/)로 나눠 쓰면 대분류, 중분류, 세부 품목으로 들어가요</div>';
   if (k === 'item') c = '<div class="dinw"><input class="din" ' + a + ' value="' + esc(v || '') + '" placeholder="품목명 쓰기 · 예: 엽서"><button type="button" class="dlk" data-pick="item" ' + a + '>목록에서 고르기</button></div>';
   else if (PICK[k]) c = '<button type="button" class="dpk" data-pick="' + k + '" ' + a + '>' + (dEmpty(v) ? '<i>' + (k === 'item' ? '품목 고르기' : '고르기 · 없으면 비워 두기') + '</i>' : '<span>' + esc(v) + '</span>') + '</button>';
   else if (k === 'etc') c = '<textarea class="din" rows="2" ' + a + ' placeholder="' + esc(f[2] || '') + '">' + esc(v || '') + '</textarea>';
@@ -1226,17 +1242,17 @@ function dFieldHtml(r, f) {
   return '<div class="dfr"><label>' + f[1] + '</label>' + c + '</div>';
 }
 function renderDoc() {
-  var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 쓰는 대로 이 기기에 임시 저장돼요</small></div>';
+  var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 임시 저장을 눌러야 이 기기에 저장돼요</small></div>';
   h += '<div class="chips" style="margin:0 0 12px">' + DOCS.map(function (x) { return '<button data-doc="' + x.id + '"' + (d && x.id === d.id ? ' class="on"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '<button id="dNew">+ 새 사양서</button></div>';
   if (!d) { d = newDoc(); h = h.replace('<button id="dNew">', '<button data-doc="' + d.id + '" class="on">' + esc(d.name) + '</button><button id="dNew">'); }
   if (!d.rows.length) { d.rows.push(docRow('')); saveDocs(); }
   var sel = dSel(d);
   h += '<div class="dsw"><div class="dsl">';
   h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="dsv"><span class="nt">만든 날 ' + d.date + ' · <b id="dSaved">' + savedTxt(d) + '</b></span><button type="button" id="dSave">임시 저장</button></div></div>';
-  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><label class="dld">구성 불러오기<select id="dLoad"><option value="">선택</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label></div>';
+  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || r.set || r.cat || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><label class="dld">구성 불러오기<select id="dLoad"><option value="">선택</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label></div>';
   {
     var n = d.rows.indexOf(sel);
-    h += '<div class="card dhd"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div></div>';
+    h += '<div class="card dhd"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || sel.set || sel.cat || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div></div>';
     // 2026-11-20 실장님: 기본 정보 · 크기·페이지 · 용지·인쇄 · 가공·제본 · 정합·포장 묶음마다 박스 따로
     h += DSEC.map(function (sc) {
       var x = '<div class="card dsc"><div class="dst">' + sc[0] + '</div>' + sc[1].map(function (f) { return dFieldHtml(sel, f); }).join('');
@@ -1268,14 +1284,14 @@ function bindDoc() {
   var lb = $('#dLoad'); if (lb) lb.onchange = function () { var k = lb.value; lb.value = ''; if (k) tplLoad(k); }; // 구성 불러오기 = 드롭다운 (2026-11-20 실장님: 상품 라벨 생성의 언어 선택처럼)
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
-  $('#dSave').onclick = function () { saveDocs(); toast('임시 저장했어요 · 이 기기에서 이어 쓸 수 있어요'); };
+  $('#dSave').onclick = function () { commitDocs(); toast('임시 저장했어요 · 이 기기에서 이어 쓸 수 있어요'); };
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
   bindDocPrev(d);
   var row = function (id) { return d.rows.filter(function (r) { return r.id === id; })[0]; };
   // 글자 칸: 치는 대로 저장 + 오른쪽 미리보기만 새로 그림 (입력 중인 칸은 그대로)
   $$('.din[data-dr]').forEach(function (i) {
-    var up = function () { var r = row(i.dataset.dr); r[i.dataset.k] = i.value; saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
-      if (i.dataset.k === 'item') { var t = i.value || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); }
+    var up = function () { var r = row(i.dataset.dr); if (i.dataset.k === 'cls') clsSet(r, i.value); else r[i.dataset.k] = i.value; saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
+      if (i.dataset.k === 'item' || i.dataset.k === 'cls') { var t = r.item || r.set || r.cat || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); }
       if (/^q(s|p|dp)$/.test(i.dataset.k)) { var Q = dQty(r), qd = $('[data-qv="d"]'), qt = $('[data-qv="t"]'); if (qd) qd.textContent = Q.pc ? '= ' + fmtN(Q.d) + '개' : '판매용 수량 기준'; if (qt) qt.innerHTML = Q.t ? fmtN(Q.t) + '개' : '<i>수량을 넣으면 합계가 나와요</i>'; } };
     i.oninput = up; i.onchange = function () { up();
       var r = row(i.dataset.dr);
@@ -1292,7 +1308,7 @@ function bindDoc() {
   $('#dItem').onclick = function () { add(docRow('')); };
   var db = $('#dBlank'); if (db) db.onclick = function () { add(docRow('')); };
   bindDel();
-  function bindDel() { $('#dDel').onclick = function () { if (!confirm('‘' + d.name + '’ 사양서를 지울까요? 되돌릴 수 없어요')) return; DOCS.splice(DOCS.indexOf(d), 1); ls.set('pr:doc', DOCS[0] ? DOCS[0].id : ''); saveDocs(); renderDoc(); }; }
+  function bindDel() { $('#dDel').onclick = function () { if (!confirm('‘' + d.name + '’ 사양서를 지울까요? 되돌릴 수 없어요')) return; DOCS.splice(DOCS.indexOf(d), 1); ls.set('pr:doc', DOCS[0] ? DOCS[0].id : ''); commitDocs(); renderDoc(); }; }
 }
 
 /* ── 자료 (카탈로그 탭별 보기 · 용어 사전) ── */
@@ -1606,7 +1622,7 @@ function dieSvg(G, forFile) {
   var fs = forFile ? 3 : Math.max(4, Math.min(G.W, G.H) / 18); // 화면은 dieFit 이 12px 고정으로 다시 맞춤
   var s = '<svg xmlns="http://www.w3.org/2000/svg" ' + (forFile ? 'width="' + r1(VW) + 'mm" height="' + r1(VH) + 'mm" ' : 'class="dsv" ') + 'viewBox="0 0 ' + r1(VW) + ' ' + r1(VH) + '">';
   s += '<g id="CUT" fill="none" stroke="#e5243b" stroke-width="' + sw + '">' + G.c.map(function (a) { return ln(a, ''); }).join('') + '</g>';
-  s += '<g id="FOLD" fill="none" stroke="#0067d8" stroke-width="' + sw + '" stroke-dasharray="' + (sw * 8) + ' ' + (sw * 5) + '">' + G.f.map(function (a) { return ln(a, ''); }).join('') + '</g>';
+  s += '<g id="FOLD" fill="none" stroke="#0067d8" stroke-width="' + sw + '" stroke-dasharray="' + (forFile ? (sw * 8) + ' ' + (sw * 5) : r1(sw * 3) + ' ' + r1(sw * 2)) + '">' + G.f.map(function (a) { return ln(a, ''); }).join('') + '</g>';
   s += '<g id="TEXT" fill="#8b95a1" font-family="sans-serif" font-size="' + r1(fs) + '" text-anchor="middle" dominant-baseline="middle">' + G.t.map(function (a) { return '<text x="' + r1(a[0] + pad) + '" y="' + r1(a[1] + pad) + '">' + esc(a[2]) + '</text>'; }).join('') + '</g>';
   return s + '</svg>';
 }
