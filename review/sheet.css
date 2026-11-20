@@ -121,3 +121,6 @@ table.bc{border-collapse:collapse;width:100%;font-size:12.5px}table.bc th{width:
 .facts{display:flex!important;flex-wrap:wrap}.facts .f{flex:1 1 0;min-width:92px}
 .items th{white-space:nowrap}.items td:nth-child(2){min-width:96px}
 @media(max-width:640px){.facts .f{flex:1 1 40%;order:0!important;grid-column:auto!important}.facts .fs{flex-basis:100%;order:-1!important}h3.sec{flex-wrap:wrap;row-gap:4px}h3.sec small{white-space:normal}}
+/* PDF 저장도 웹 화면과 똑같이 (2026-11-20 실장님): 배경색·칩·번호 동그라미 유지, 제목만 페이지 끝에 남지 않게 */
+@page{size:A4;margin:12mm 10mm}
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.sheet{padding:0!important}h3.sec,h2.sec,.fhead{break-after:avoid;page-break-after:avoid}.sum tr,.oks li,.cg,.facts .f,.items tr{break-inside:avoid}.fix.done,.sum tr.done{opacity:1}}
