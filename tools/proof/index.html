@@ -223,6 +223,19 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 }
 @keyframes pkIn { from { opacity:0; transform:scale(.98); } to { opacity:1; transform:none; } }
 
+
+/* 전개도 형태 묶음 (2026-11-20) */
+.dgrp { padding:12px 20px !important; }
+.dgr { display:grid; grid-template-columns:64px 1fr; gap:12px; align-items:start; padding:8px 0; }
+.dgr + .dgr { border-top:1px solid #f2f4f6; }
+.dgl { font-size:14px; font-weight:700; color:#4e5968; line-height:36px; }
+.dgr .chips { margin:0 !important; flex-wrap:wrap; }
+@media (max-width:560px) { .dgr { grid-template-columns:1fr; gap:6px; } .dgl { line-height:1.4; } }
+
+/* 용어 정돈 (2026-11-20): # 바로가기 줄 빼고, 팁은 경고색 대신 회색 상자 */
+.pki small.tip, .gl .tip, .pblk .tip { color:#4e5968 !important; background:#f2f4f6; border-radius:10px; padding:8px 12px; display:block; font-size:13px; line-height:1.55; margin-top:12px; }
+.pki small.tip:before, .gl .tip:before, .pblk .tip:before { content:'참고  '; font-weight:700; color:#191f28; }
+.pblk .tip { margin-top:14px; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -1139,7 +1152,6 @@ function renderRef() {
       var rows = rowsOf(st);
       if (k === '용지') {
         var G = grp(rows, 1);
-        h += '<div class="pidx">' + G.map(function (g, i) { return '<a href="#pb' + i + '">' + esc(g[0]) + '</a>'; }).join('') + '</div>';
         h += G.map(function (g, i) { return '<div class="card" id="pb' + i + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('');
         h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용 · ~는 추정) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
       } else {
@@ -1160,17 +1172,27 @@ function renderRef() {
    형태 고르고 크기 넣으면 → 대략 전개도 SVG (재단선 실선 / 접는선 점선) + 절수 + 일러스트용 SVG 저장
    * 대략 도면이에요. 실제 목형은 박스·제본 업체 도면으로 확인 */
 var DIE = [
-  { id: 'sleeve', n: '슬리브', d: '양옆이 뚫린 띠 형태', in: { X: 150, Y: 210, D: 10, g: 15 } },
-  { id: 'rte', n: '단상자 (꽂이형)', d: '위아래 꽂이 뚜껑 · 지기 RTE', in: { L: 100, D: 40, H: 150, g: 15, t: 15 } },
-  { id: 'rtg', n: '단상자 (꽂이+풀바닥)', d: '위 꽂이 뚜껑 · 아래 4날개 십자 풀접착', in: { L: 100, D: 40, H: 150, g: 15, t: 15, ov: 10 } },
-  { id: 'mailer', n: '가로 G형 박스', d: '시즌그리팅 아웃박스 · 옆벽 두겹 + 앞 꽂이 뚜껑', in: { L: 310, W: 220, H: 40 } },
-  { id: 'sabari', n: '싸바리 싸개지', d: '상짝·하짝 한 장씩 · 보드 겉에 감싸기', in: { L: 200, W: 270, H: 50, bd: 2, wr: 15 } },
-  { id: 'hard', n: '하드커버 싸개', d: '양장 표지 · 보드 3장 + 홈', in: { w: 148, h: 210, sp: 15, bd: 2, jt: 10, wr: 20 } },
-  { id: 'cover', n: '무선 책 표지', d: '앞·뒤 + 책등 (+ 날개)', in: { w: 148, h: 210, sp: 10, fl: 0, bl: 3 } },
-  { id: 'env', n: '봉투', d: '내용물 기준 · 옆날개 + 아래 + 뚜껑', in: { w: 100, h: 150, mg: 4, fl: 15, lid: 35 } }
+  { gr: '패키지', id: 'sleeve', n: '슬리브', d: '양옆이 뚫린 띠 형태', in: { X: 150, Y: 210, D: 10, g: 15 } },
+  { gr: '단상자', id: 'cross', n: '하단 십자형 조립박스', d: '단상자 · 위 꽂이 뚜껑 · 아래 날개 4장을 십자로 끼워 조립 (풀 없음)', in: { L: 100, D: 40, H: 150, g: 15, t: 15 } },
+  { gr: '단상자', id: 'auto', n: '삼면접착 박스', d: '단상자 · 위 꽂이 뚜껑 · 아래 원터치 바닥 (옆 풀칠 + 바닥 2곳 접착)', in: { L: 100, D: 40, H: 150, g: 15, t: 15 } },
+  { gr: '단상자', id: 'rtg', n: '하단 수접착 박스', d: '단상자 · 위 꽂이 뚜껑 · 아래 날개 4장을 손으로 풀접착', in: { L: 100, D: 40, H: 150, g: 15, t: 15, ov: 10 } },
+  { gr: '단상자', id: 'rte', n: '맞뚜껑 박스', d: '단상자 · 위아래 모두 꽂이 뚜껑 (서로 반대쪽에서 닫힘)', in: { L: 100, D: 40, H: 150, g: 15, t: 15 } },
+  { gr: '패키지', id: 'mailer', n: '가로 G형 박스', d: '시즌그리팅 아웃박스 · 옆벽 두겹 + 앞 꽂이 뚜껑', in: { L: 310, W: 220, H: 40 } },
+  { gr: '패키지', id: 'sabari', n: '싸바리 싸개지', d: '상짝·하짝 한 장씩 · 보드 겉에 감싸기', in: { L: 200, W: 270, H: 50, bd: 2, wr: 15 } },
+  { gr: '책', id: 'hard', n: '하드커버 싸개', d: '양장 표지 · 보드 3장 + 홈', in: { w: 148, h: 210, sp: 15, bd: 2, jt: 10, wr: 20 } },
+  { gr: '책', id: 'cover', n: '무선 책 표지', d: '앞·뒤 + 책등 (+ 날개)', in: { w: 148, h: 210, sp: 10, fl: 0, bl: 3 } },
+  { id: 'bag', gr: '쇼핑백', n: '쇼핑백', d: '앞 · 옆(가운데 접힘) · 뒤 · 옆 + 풀칠 · 윗단 접어넣기 · 바닥 날개', in: { L: 260, D: 100, H: 330, g: 20, tp: 40, hd: 1 } },
+  { id: 'envS', geo: 'env', gr: '봉투', n: '소봉투 (일반형)', d: '완성 105×220 · 짧은 변 입구', in: { w: 105, h: 220, mg: 0, fl: 15, lid: 35 } },
+  { id: 'envSJ', geo: 'envj', gr: '봉투', n: '소봉투 (자켓형)', d: '완성 220×105 · 긴 변 입구', in: { w: 220, h: 105, mg: 0, fl: 15, lid: 35 } },
+  { id: 'env', gr: '봉투', n: '대봉투 (일반형)', d: '완성 240×330 · A4 서류 · 짧은 변 입구', in: { w: 240, h: 330, mg: 0, fl: 20, lid: 45 } },
+  { id: 'envLJ', geo: 'envj', gr: '봉투', n: '대봉투 (자켓형)', d: '완성 330×240 · A4 서류 · 긴 변 입구', in: { w: 330, h: 240, mg: 0, fl: 20, lid: 45 } },
+  { id: 'envCD', geo: 'envj', gr: '봉투', n: 'CD자켓 봉투', d: '완성 125×125 · CD 한 장', in: { w: 125, h: 125, mg: 0, fl: 12, lid: 30 } },
+  { id: 'envPC', geo: 'env', gr: '봉투', n: '포토카드봉투 (뚜껑형)', d: '완성 62×92 · 포토카드 55×85 기준', in: { w: 62, h: 92, mg: 0, fl: 10, lid: 22 } },
+  { id: 'envPN', geo: 'envn', gr: '봉투', n: '포토카드봉투 (뚜껑없는)', d: '완성 62×92 · 입구 손잡이 홈', in: { w: 62, h: 92, mg: 0, fl: 10, nt: 8 } },
+  { id: 'envPS', geo: 'envj', gr: '봉투', n: '엽서 봉투', d: '완성 160×110 · 엽서 100×148 기준 · 긴 변 입구', in: { w: 160, h: 110, mg: 0, fl: 12, lid: 40 } }
 ];
 var DIE_LB = { X: ['정면 가로', 'mm'], Y: ['높이', 'mm'], D: ['폭(옆면)', 'mm'], g: ['풀칠날개', 'mm'], L: ['가로(L)', 'mm'], W: ['세로(W)', 'mm'], H: ['높이(H)', 'mm'], t: ['꽂이날개', 'mm'],
-  bd: ['보드 두께', 'mm'], wr: ['접어넣기', 'mm'], w: ['가로', 'mm'], h: ['세로', 'mm'], sp: ['책등', 'mm'], jt: ['홈', 'mm'], fl: ['날개', 'mm'], bl: ['도련', 'mm'], ov: ['바닥 겹침', 'mm'], mg: ['여유(한쪽)', 'mm'], lid: ['뚜껑', 'mm'] };
+  bd: ['보드 두께', 'mm'], wr: ['접어넣기', 'mm'], w: ['가로', 'mm'], h: ['세로', 'mm'], sp: ['책등', 'mm'], jt: ['홈', 'mm'], fl: ['날개', 'mm'], bl: ['도련', 'mm'], ov: ['바닥 겹침', 'mm'], mg: ['여유(한쪽)', 'mm'], nt: ['손잡이 홈 반지름', 'mm'], tp: ['윗단 접기', 'mm'], hd: ['손잡이 구멍 (1 있음 · 0 없음)', ''], nt: ['손잡이 홈 반지름', 'mm'], lid: ['뚜껑', 'mm'] };
 
 // 도형: c=[[x1,y1,x2,y2],...] 재단선 / f=접는선 / t=치수 글자 [x,y,'글']
 function dieGeom(id, v) {
@@ -1214,6 +1236,52 @@ function dieGeom(id, v) {
     [xs[0], xs[1], xs[2], xs[3]].forEach(function (x) { vf(x, y0, yb); });
     t.push([xs[0] + L / 2, y0 + Hh / 2, 'L ' + L], [xs[1] + D / 2, y0 + Hh / 2, D], [xs[2] + L / 2, y0 + Hh / 2, 'L ' + L], [xs[3] + D / 2, y0 + Hh / 2, D], [xs[0] + L / 2, y0 + Hh / 2 + 12, 'H ' + Hh], [xs[0] + L / 2, tk + D / 2, '뚜껑'],
       [xs[0] + L / 2, yb + bl / 2, '풀'], [xs[2] + L / 2, yb + bl / 2, '풀']);
+  } else if (id === 'cross' || id === 'auto') {
+    // 공통: 풀칠날개 + 몸통 4면 + 위 꽂이 뚜껑(앞 L면) + 먼지날개 — 바닥만 다름 (2026-11-20)
+    var L = +v.L, D = +v.D, Hh = +v.H, g = +v.g, tk = +v.t, y0 = D + tk, yb = y0 + Hh;
+    var xs = [g, g + L, g + L + D, g + 2 * L + D, g + 2 * L + 2 * D], dh = Math.min(D * 0.8, L / 2); W = g + 2 * L + 2 * D;
+    open([[g, y0], [0, y0 + 4], [0, yb - 4], [g, yb]], c);
+    open([[xs[0], y0], [xs[0], tk], [xs[0] + 3, 0], [xs[1] - 3, 0], [xs[1], tk], [xs[1], y0]], c); hf(y0, xs[0], xs[1]); hf(tk, xs[0], xs[1]);
+    [[xs[1], xs[2]], [xs[3], xs[4]]].forEach(function (p) { open([[p[0], y0], [p[0] + 2, y0 - dh], [p[1] - 4, y0 - dh], [p[1], y0 - 4], [p[1], y0]], c); hf(y0, p[0], p[1]); });
+    c.push([xs[2], y0, xs[3], y0], [xs[4], y0, xs[4], yb]);
+    [xs[0], xs[1], xs[2], xs[3]].forEach(function (x) { vf(x, y0, yb); });
+    [0, 1, 2, 3].forEach(function (i) { hf(yb, xs[i], xs[i + 1]); });
+    if (id === 'cross') {
+      // 하단 십자형 조립 (1-2-3 바닥): 앞 L날개 혀 → 뒤 L날개 홈에 끼움, 옆 D날개는 갈고리
+      var a0 = xs[0], b0 = xs[1], tw = L * 0.3, d1 = D * 0.55;
+      open([[a0, yb], [a0 + 2, yb + d1], [a0 + tw, yb + d1], [a0 + tw + 3, yb + D], [b0 - tw - 3, yb + D], [b0 - tw, yb + d1], [b0 - 2, yb + d1], [b0, yb]], c);
+      var a2 = xs[2], b2 = xs[3];
+      open([[a2, yb], [a2 + 2, yb + d1], [b2 - 2, yb + d1], [b2, yb]], c);
+      c.push([a2 + tw, yb + d1 - 6, b2 - tw, yb + d1 - 6]); // 끼움 칼선(홈)
+      [1, 3].forEach(function (i) { var a = xs[i], b = xs[i + 1], dd = D * 0.45;
+        open([[a, yb], [a + 2, yb + dd], [b - dd * 0.8, yb + dd], [b - dd * 0.8, yb + dd * 0.55], [b - 2, yb + dd * 0.3], [b, yb]], c); });
+      H = yb + D;
+      t.push([a0 + L / 2, yb + d1 / 2, '①'], [xs[1] + D / 2, yb + D * 0.22, '②'], [a2 + L / 2, yb + d1 / 2, '③ 홈'], [xs[3] + D / 2, yb + D * 0.22, '②']);
+    } else {
+      // 삼면접착 (원터치 바닥): L날개에 45° 접는선 · 삼각 풀자리 2곳 + 옆 풀칠날개 = 3곳 접착
+      var dl = Math.min(D * 0.8, L * 0.6);
+      [0, 2].forEach(function (i) { var a = xs[i], b = xs[i + 1];
+        open([[a, yb], [a + 2, yb + dl], [b - dl * 0.7, yb + dl], [b, yb + dl * 0.3], [b, yb]], c);
+        f.push([a, yb, a + dl * 0.95, yb + dl * 0.95]); t.push([a + dl * 0.28, yb + dl * 0.78, '풀']); });
+      [1, 3].forEach(function (i) { var a = xs[i], b = xs[i + 1], dd = D * 0.5;
+        open([[a, yb], [a + dd * 0.3, yb + dd], [b - 2, yb + dd], [b, yb]], c); });
+      H = yb + dl;
+      t.push([xs[0] + L / 2 + dl * 0.2, yb + dl * 0.45, '바닥'], [xs[2] + L / 2 + dl * 0.2, yb + dl * 0.45, '바닥']);
+    }
+    t.push([xs[0] + L / 2, y0 + Hh / 2, 'L ' + L], [xs[1] + D / 2, y0 + Hh / 2, D], [xs[2] + L / 2, y0 + Hh / 2, 'L ' + L], [xs[3] + D / 2, y0 + Hh / 2, D], [xs[0] + L / 2, y0 + Hh / 2 + 12, 'H ' + Hh], [xs[0] + L / 2, tk + D / 2, '뚜껑'], [g / 2, y0 + Hh / 2, '풀']);
+  } else if (id === 'bag') {
+    // 쇼핑백: 풀칠 + 앞 L · 옆 D(가운데 안으로 접힘) · 뒤 L · 옆 D / 위 윗단 접어넣기 / 아래 바닥 날개(칼집으로 나뉨) — 2026-11-20
+    var L = +v.L, D = +v.D, Hh = +v.H, g = +v.g, tp = +v.tp, yb = tp + Hh, bd = Math.round(D / 2 + 15);
+    var xs = [g, g + L, g + L + D, g + 2 * L + D, g + 2 * L + 2 * D]; W = xs[4]; H = yb + bd;
+    poly([[g, 0], [W, 0], [W, H], [g, H], [g, yb], [0, yb - 5], [0, 5]], c);
+    [xs[1], xs[2], xs[3]].forEach(function (x) { c.push([x, yb, x, H]); });
+    [xs[0], xs[1], xs[2], xs[3]].forEach(function (x) { vf(x, 0, yb); });
+    [1, 3].forEach(function (i) { var a = xs[i], b = xs[i + 1], m = (a + b) / 2; vf(m, 0, yb); f.push([a, yb, m, yb - D / 2], [b, yb, m, yb - D / 2]); });
+    hf(tp, 0, W); hf(yb, g, W); hf(yb + D / 2, g, W);
+    if (+v.hd) [0, 2].forEach(function (i) { var cx = xs[i] + L / 2; [cx - L * 0.18, cx + L * 0.18].forEach(function (x) { [tp / 2, tp + tp / 2].forEach(function (y) {
+      var pts = []; for (var k = 0; k < 12; k++) { var an = Math.PI * 2 * k / 12; pts.push([x + 2.5 * Math.cos(an), y + 2.5 * Math.sin(an)]); } poly(pts, c); }); }); });
+    t.push([xs[0] + L / 2, tp + Hh / 2, '앞 ' + L + '×' + Hh], [xs[1] + D / 4, tp + Hh / 2, '옆'], [xs[1] + D * 0.75, tp + Hh / 2, D], [xs[2] + L / 2, tp + Hh / 2, '뒤'], [xs[3] + D / 4, tp + Hh / 2, '옆'],
+      [xs[2] + L / 2, tp / 2 + 3, '윗단 접어넣기 ' + tp], [xs[0] + L / 2, yb + bd / 2, '바닥'], [xs[2] + L / 2, yb + bd / 2, '바닥']);
   } else if (id === 'mailer') {
     // 가로 G형 (롤엔드 앞꽂이): 위→아래 = 앞벽(+귀) / 바닥 + 옆벽 두겹(+고정 날개) / 뒷벽(+귀) / 뚜껑 + 먼지날개 / 앞 꽂이
     var L = +v.L, Wd = +v.W, Hh = +v.H, e = Math.min(2 * Hh - 3, Wd / 2), r = Math.min(4, Hh / 4);
@@ -1252,8 +1320,20 @@ function dieGeom(id, v) {
     x += w; vf(x, 0, H); x += sp; vf(x, 0, H); x += w; if (fl) vf(x, 0, H);
     f.push([bl, bl, W - bl, bl], [W - bl, bl, W - bl, H - bl], [W - bl, H - bl, bl, H - bl], [bl, H - bl, bl, bl]);
     t.push([bl + fl + w / 2, H / 2, '뒤 ' + w], [bl + fl + w + sp / 2, H / 2, sp], [bl + fl + w + sp + w / 2, H / 2, '앞 ' + w]);
-  } else if (id === 'env') {
-    var Wv = +v.w + 2 * +v.mg, Hv = +v.h + 2 * +v.mg, fl = +v.fl, lid = +v.lid, bot = Math.round(Hv * 0.6); W = Wv + 2 * fl; H = lid + Hv + bot;
+  } else if (id === 'envn') {
+    // 뚜껑없는 봉투: 입구 쪽은 앞판 그대로 · 가운데 반원 손잡이 홈
+    var Wv = +v.w + 2 * +v.mg, Hv = +v.h + 2 * +v.mg, fl = +v.fl, nr = Math.min(+v.nt || 0, Wv / 4), bot = Math.round(Hv * 0.6); W = Wv + 2 * fl; H = Hv + bot;
+    var top = [[fl, 0]];
+    if (nr > 0) { for (var k = 0; k <= 12; k++) { var an = Math.PI * k / 12; top.push([W / 2 - nr * Math.cos(an), nr * Math.sin(an)]); } }
+    top.push([fl + Wv, 0]);
+    poly(top.concat([[fl + Wv, 6], [W, 14], [W, Hv - 8], [fl + Wv, Hv], [fl + Wv - 4, H], [fl + 4, H], [fl, Hv], [0, Hv - 8], [0, 14], [fl, 6]]), c);
+    vf(fl, 6, Hv); vf(fl + Wv, 6, Hv); hf(Hv, fl, fl + Wv);
+    t.push([W / 2, Hv / 2, '앞면 ' + Wv + '×' + Hv], [W / 2, Hv + bot / 2, '아래 날개'], [W / 2, nr + 8, '입구']);
+  } else if (id === 'env' || id === 'envj') {
+    // 일반 = 짧은 변 입구 · 자켓형 = 긴 변 입구 (가로가 긴 쪽이 되도록 맞춤)
+    var a1 = +v.w + 2 * +v.mg, a2 = +v.h + 2 * +v.mg;
+    var Wv = id === 'envj' ? Math.max(a1, a2) : Math.min(a1, a2), Hv = id === 'envj' ? Math.min(a1, a2) : Math.max(a1, a2);
+    var fl = +v.fl, lid = +v.lid, bot = Math.round(Hv * 0.6); W = Wv + 2 * fl; H = lid + Hv + bot;
     poly([[fl + 6, 0], [fl + Wv - 6, 0], [fl + Wv, lid], [W, lid + 8], [W, lid + Hv - 8], [fl + Wv, lid + Hv], [fl + Wv - 4, H], [fl + 4, H], [fl, lid + Hv], [0, lid + Hv - 8], [0, lid + 8], [fl, lid]], c);
     rect(fl, lid, Wv, Hv, f);
     t.push([W / 2, lid + Hv / 2, '앞면 ' + Wv + '×' + Hv], [W / 2, lid / 2, '뚜껑']);
@@ -1276,7 +1356,9 @@ function renderDie() {
   var d = dieState();
   var h = '<div class="phd"><b>전개도</b><small>형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일</small></div>';
   h += '<div class="card"><div class="ct">사진으로 형태 추정<small>AI</small></div><div class="nt" style="margin:0 0 10px">비슷한 박스·책 사진을 올리면 형태와 대략 크기를 골라 줘요 (루틴 PIN 필요)</div><label class="cpy" style="display:block;text-align:center;margin:0">사진 고르기<input type="file" accept="image/*" id="dieImg" hidden></label><div id="dieAi" class="nt"></div></div>';
-  h += '<div class="chips" style="margin:0 0 12px">' + DIE.map(function (x) { return '<button data-die="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div>';
+  h += '<div class="card dgrp">' + ['단상자', '패키지', '쇼핑백', '봉투', '책'].map(function (gk) {
+    return '<div class="dgr"><span class="dgl">' + gk + '</span><div class="chips">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-die="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>';
+  }).join('') + '</div>';
   h += '<div class="card"><div class="ct">' + d.n + '<small>' + d.d + '</small></div><div class="ig">' + Object.keys(DS.v).map(function (k) {
     var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + ' <i>' + L[1] + '</i></label><input type="number" inputmode="decimal" step="any" data-dv="' + k + '" value="' + DS.v[k] + '"></div>';
   }).join('') + '</div></div><div id="dieOut" class="io-r"></div>';
@@ -1286,7 +1368,7 @@ function renderDie() {
   $('#dieImg').onchange = function () { var f = this.files[0]; if (f) dieAI(f); this.value = ''; };
 }
 function dieOut() {
-  var d = dieState(), G = dieGeom(d.id, DS.v), NR = nestItem(G, { bl: MAR.bl, gr: MAR.gr, sd: MAR.sd, gn: '' }, d.id === 'cover' ? 0 : MAR.bl), bs = NR[0] && NR[0].n ? NR[0] : null;
+  var d = dieState(), G = dieGeom(d.geo || d.id, DS.v), NR = nestItem(G, { bl: MAR.bl, gr: MAR.gr, sd: MAR.sd, gn: '' }, d.id === 'cover' ? 0 : MAR.bl), bs = NR[0] && NR[0].n ? NR[0] : null;
   var h = '<div class="card"><div class="ct">대략 전개도<small>' + mm(G.W) + ' × ' + mm(G.H) + 'mm</small></div>' + dieSvg(G, false) +
     '<div class="legend"><span><b style="color:#e5243b">━</b> 재단선</span><span><b style="color:#0067d8">┅</b> 접는선(오시)</span></div>';
   if (bs) h += '<div class="sh"><b>' + bs.P.n + '</b> ' + bs.n + '개 걸이 · 로스 ' + Math.round(bs.loss * 100) + '% · ' + esc(bs.nest.desc || '') + ' (도련 ' + MAR.bl + ' · 물림 ' + MAR.gr + ' · 여백 ' + MAR.sd + 'mm)</div>' + nestSvg(bs.P, bs.nest, G, MAR);
