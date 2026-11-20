@@ -1586,7 +1586,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm32';
+var APP_VER = '20261120hm33';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2040,11 +2040,14 @@ function lgBody() {
     return qs.every(function (w) { return h.indexOf(w) > -1; });
   });
   var cat = {}; LG_TABS.forEach(function (t) { cat[t[0]] = t[1]; });
-  function grp(x) {
-    if (x.c === 'laundry') return '세탁기호 · ' + (LG_SUB.Laundry[x.n.split('_')[1]] || '');
+  // 2026-11-20: 배우 소속사를 소속사로 합친 뒤 목록 순서대로라 소속사가 두 군데로 나뉨 → 분류 순서로 모음 (분류 안 순서는 그대로)
+  var ord = LG_TABS.map(function (t) { return t[0]; }); function grp(x) {
+    if (x.c === 'laundry') return LG_SUB.Laundry[x.n.split('_')[1]] || '';
     if (x.c === 'recycle' || x.c === 'print') return x.b;
     return '';
   }
+  var gFirst = {}; L.forEach(function (x, i) { var k = x.c + '|' + grp(x); if (!(k in gFirst)) gFirst[k] = i; });
+  L = L.map(function (x, i) { return [x, i]; }).sort(function (a, b) { return (ord.indexOf(a[0].c) - ord.indexOf(b[0].c)) || (gFirst[a[0].c + '|' + grp(a[0])] - gFirst[b[0].c + '|' + grp(b[0])]) || (a[1] - b[1]); }).map(function (a) { return a[0]; });
   function card(x) {
     var nm = x.n.replace(/^Laundry_/, '').replace(/_/g, ' ');
     var p = '<div class="lgp' + (x.d ? ' dk' : '') + '"><img loading="lazy" src="' + esc(x.s) + '" alt="' + esc(x.n) + '"></div>';
