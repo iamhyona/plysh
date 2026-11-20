@@ -1012,6 +1012,14 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wfl a, .wfl button { display:flex; align-items:center; gap:10px; border:0; background:var(--bg); border-radius:12px; padding:11px 12px; font-size:13.5px; font-weight:600; color:var(--txt); text-decoration:none; text-align:left; }
 .wfl .nvi { color:var(--mute); }
 @media (max-width:1023px) { .wsg { grid-template-columns:1fr; } }
+/* 홈 (2026-11-20 실장님): 제목 아래 간격 = 오늘 할 일 정도, PC에서 나란한 박스 높이 같게 */
+.wsc h3 + .wpc, .wsc h3 + .wsq { margin-top:6px; }
+@media (min-width:1024px) {
+  .wsg { align-items:stretch; }
+  .wsg > .wsc { display:flex; flex-direction:column; }
+  .wsg > .wsc > .wpc, .wsg > .wsc > .wsq { flex:1; grid-auto-rows:1fr; }
+  .wsg > .wsc > .wsq { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
 /* 도구·자료 공간 첫 화면: 카드 */
 .spg h4 { margin:18px 0 8px; font-size:12px; color:var(--faint); font-weight:700; letter-spacing:.04em; }
 .spg h4:first-child { margin-top:4px; }
@@ -1207,6 +1215,12 @@ html[data-nav] #cvSeg { display:none !important; }
   .mcal .grid > button:hover { background:#f9fafb; }
   .tmv .mcal .grid > button, .wlcal .grid > button { min-height:104px; }
 }
+
+/* 항목 간격 · 행간 (2026-11-20 실장님): 이름 13/600 #4e5968 · 이름→칸 8 · 항목 사이 18 · 칩 줄 위 12 아래 18 */
+.f label { font-size:13px !important; color:#4e5968 !important; margin:0 0 8px 2px !important; line-height:1.4; }
+.frow { gap:10px !important; margin-bottom:18px !important; }
+.spg { margin:12px 0 18px !important; gap:8px !important; }
+.card .ct + .frow, .card h3 + .frow { margin-top:4px; }
 </style>
 </head>
 <body>

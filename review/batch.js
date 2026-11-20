@@ -303,7 +303,7 @@ var RULES = { '공통': '' }, CUR = '공통', RKEY = 'rv:rules2', R_OLD = false;
 (function () { try { var o = JSON.parse(ls.get(RKEY) || 'null'); if (o) RULES = o; else { var t = ls.get('rv:rules'); if (t) RULES['공통'] = t; } } catch (e) {} if (RULES['공통'] == null) RULES['공통'] = ''; })();
 function rulesFor(artist) { return [RULES['공통'] || '', artist && RULES[artist] || '', infoRules(artist)].filter(function (s) { return s.trim(); }).join('\n\n'); }
 function cacheRules() { ls.set(RKEY, JSON.stringify(RULES)); }
-function say(t, bad) { var st = $('#rulesSt'); st.textContent = t; st.style.color = bad ? '#c2410c' : ''; }
+function say(t, bad) { var st = $('#rulesSt'); st.textContent = t; st.style.color = bad ? '#f04452' : ''; st.style.background = bad ? '#fdecec' : ''; }
 var INFO_KEYS = ['국문명', '영문명', '데뷔일', '팬덤명 (국문)', '팬덤명 (영문)', '소속사'], INFO_EDIT = false;
 // 아티스트 기본 정보 시트 (PLASH › 05_아티스트정보) — 열: 아티스트 | 별칭 | 국문명 | 영문명 | 데뷔일 | 팬덤명 국문 | 팬덤명 영문 | 소속사 | 확인 필요 | 확인일
 var AINFO = {}, AINFO_URL = '', AINFO_LIST = [];

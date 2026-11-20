@@ -364,6 +364,17 @@ html:not(.emb) .fx-lang { margin:0 0 17px; width:100%; }
   html.emb .fxr.fxm { flex-wrap:nowrap; } html.emb .fxact { margin-left:auto; width:auto; } html.emb .fxact button { flex:none; padding:0 12px; }
   html.emb .fx-top .sel-wrap { flex:1 1 100% !important; } html.emb .fx-top .sel-wrap select { width:100%; } html.emb .fx-top .fx-lang { flex:1 1 100%; }
 }
+
+/* 위쪽 2차 정리 (2026-11-20): 주의사항 버전 고르기는 주의사항 칸에만(중복 제거), 언어는 회색 바탕 작은 탭으로 구분 */
+html.emb .fx-top .sel-wrap, html.emb .fx-top .fx-pv { display:none !important; }
+html.emb .fx-top { margin:4px 0 24px !important; }
+.fx-langw { display:flex; align-items:center; gap:12px; min-width:0; flex:1; }
+.fx-ll { flex:none; font-size:14px; font-weight:700; color:#4e5968; }
+html.emb .fx-top .fx-lang { flex:none !important; display:inline-flex !important; gap:2px !important; padding:3px; background:#e5e8eb; border-radius:12px; max-width:100%; }
+html.emb .fx-top .fx-lang .lang-pill { height:34px !important; min-height:34px !important; padding:0 14px !important; border:0 !important; border-radius:9px !important; background:none !important; color:#8b95a1 !important; font-size:14px !important; font-weight:700 !important; box-shadow:none !important; }
+html.emb .fx-top .fx-lang .lang-pill.active { background:#fff !important; color:#191f28 !important; box-shadow:0 1px 3px rgba(0,0,0,.08) !important; }
+html.emb #fxBar .fxr + .fxr { margin-top:14px; }
+@media (max-width:640px) { .fx-langw { flex-wrap:wrap; gap:8px; } }
 </style>
 </head>
 <body>
@@ -2479,7 +2490,7 @@ function tabFields(p){
     +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px" onclick="openHistoryModal()">저장기록</button>'
     +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveFieldsSnapshot()">입력 저장</button>'
     +'<button class="preset-btn fx-hide" style="flex:none;padding:0 17px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="resetCurrentProduct()">전체 초기화</button>'
-    +'<div class="lang-pills fx-lang">'+langPills+'</div>'
+    +'<div class="fx-langw"><span class="fx-ll">입력 언어</span><div class="lang-pills fx-lang">'+langPills+'</div></div>'
     +'</div>'
     +'<div class="fx-hide" style="height:1px;background:var(--border);margin-bottom:12px"></div>'
     +'<div class="sect-hdr">상품 기본 정보</div><div class="fxsec">'

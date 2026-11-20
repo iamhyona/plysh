@@ -62,7 +62,7 @@ function setupRulesUI() {
   var box = document.getElementById('rulesBox'); if (!box) return;
   var ta = document.getElementById('rulesTa'), st = document.getElementById('rulesSt'); ta.value = rulesText(); ta.placeholder = RULES_EX;
   var api = plyshApi(), timer = null, saving = false, dirty = false, lastSaved = ta.value;
-  function say(t, bad) { if (st) { st.textContent = t; st.style.color = bad ? 'var(--warn, #c2410c)' : ''; } }
+  function say(t, bad) { if (st) { st.textContent = t; st.style.color = bad ? '#f04452' : ''; st.style.background = bad ? '#fdecec' : ''; } }
   function cache(v) { try { localStorage.setItem(RULES_KEY, v); } catch (e) {} }
   function hm() { var d = new Date(); return d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2); }
   function cnt() { var r = parseRules(ta.value); document.getElementById('rulesCnt').textContent = '멤버 ' + r.members.length + ' · 표기 ' + r.terms.length + ' · 날짜 ' + r.days.length; }

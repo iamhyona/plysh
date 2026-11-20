@@ -102,6 +102,27 @@ details.more summary { cursor:pointer; font-size:13.5px; font-weight:700; color:
 
 .drop { border:0 !important; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3e%3crect width='100%25' height='100%25' rx='18' ry='18' fill='none' stroke='%23b0b8c1' stroke-width='3' stroke-dasharray='4%2c 3'/%3e%3c/svg%3e") !important; background-repeat:no-repeat !important; }
 
+
+/* 간격 · 행간 정리 (2026-11-20 실장님): 항목 사이 24 · 이름→칸 10 · 칩 간격 8 · 입력칸 46 */
+#opts.card { padding:24px !important; }
+.set { gap:0 48px; }
+.fl { font-size:14px !important; font-weight:700; color:var(--sub); margin:28px 0 12px !important; line-height:1.4; }
+.set > div > .fl:first-child { margin-top:0 !important; }
+.seg { gap:8px !important; }
+.seg button { min-height:40px; padding:0 16px !important; font-size:14px !important; }
+.chk { margin-top:14px !important; gap:10px !important; font-size:14px !important; line-height:1.5; align-items:flex-start; }
+.chk + .chk { margin-top:10px !important; }
+.chk input { width:20px !important; height:20px !important; margin-top:1px !important; flex:none; }
+.row { gap:10px !important; }
+.seg + .row { margin-top:12px !important; }
+.inp { height:46px; width:120px !important; border:0 !important; border-radius:12px !important; background:var(--chip) !important; padding:0 14px !important; font-size:15px; }
+.inp:focus { outline:none; background:#fff !important; box-shadow:0 0 0 2px var(--acc); }
+.u { font-size:14px !important; }
+details.more summary { margin-top:28px !important; font-size:14px !important; }
+details.more .row { margin-top:12px !important; }
+details.more .row .u:first-child { width:130px !important; }
+.note { margin-top:28px !important; padding-top:20px; border-top:1px solid #f2f4f6; font-size:13px !important; line-height:1.7 !important; color:var(--mute); }
+@media (max-width:760px) { .set > div + div > .fl:first-child { margin-top:28px !important; } }
 </style>
 </head>
 <body>

@@ -236,6 +236,15 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .pki small.tip, .gl .tip, .pblk .tip { color:#4e5968 !important; background:#f2f4f6; border-radius:10px; padding:8px 12px; display:block; font-size:13px; line-height:1.55; margin-top:12px; }
 .pki small.tip:before, .gl .tip:before, .pblk .tip:before { content:'참고  '; font-weight:700; color:#191f28; }
 .pblk .tip { margin-top:14px; }
+
+/* 항목 간격 · 행간 (2026-11-20 실장님): 이름 13/600 · 이름→칸 8 · 항목 사이 18 · 칩 줄 위아래 12 */
+.f label { font-size:13px !important; color:#4e5968 !important; margin:0 0 8px 2px !important; line-height:1.4; }
+.ig { gap:18px 10px !important; }
+.card .ct { margin-bottom:18px !important; }
+.card .chips { margin-top:12px !important; margin-bottom:16px !important; gap:8px !important; }
+.card .f + .chips, .card .f + .f { margin-top:18px; }
+.card > .f + .f, .card > .f + .ig, .card > .ig + .f, .card > .chips + .ig, .card > .chips + .f { margin-top:18px; }
+.nt, .nt.c { line-height:1.65 !important; font-size:13px !important; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
