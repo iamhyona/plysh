@@ -179,7 +179,9 @@ html.emb .phd { padding-right:44px; }
 .deh b { display:flex; align-items:center; min-width:0; font-size:17px; font-weight:800; letter-spacing:-0.02em; } .deh b span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .dra { display:flex; gap:4px; flex:none; } .dra button { border:0; background:var(--chip); border-radius:10px; height:34px; min-width:34px; padding:0 10px; font-size:13px; font-weight:600; color:var(--sub); } .dra button:disabled { opacity:.35; cursor:default; }
 .dst { font-size:16px; font-weight:800; color:var(--txt); letter-spacing:-0.02em; margin:24px 0 10px; }
-.dsc:first-of-type .dst { margin-top:18px; }
+.dsv { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px 12px; margin:14px 0 0; padding-top:14px; border-top:1px solid var(--line); } .dsv .nt { margin:0; } .dsv .nt b { font-weight:600; color:var(--sub); }
+.dsv button { flex:none; height:40px; padding:0 16px; border:0; border-radius:10px; background:var(--txt); color:#fff; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.card.dsc { padding:22px 18px 16px; margin-bottom:16px; } .card.dsc .dst { margin:0 0 14px; } .card.dhd { margin-bottom:16px; padding:16px 18px; }
 .dfr { display:grid; grid-template-columns:108px minmax(0, 1fr); align-items:center; gap:10px; margin-bottom:8px; }
 .dfr > label { font-size:14px; font-weight:600; color:var(--sub); line-height:1.35; }
 .din, .dpk { display:block; width:100%; min-height:46px; border:0; background:var(--chip); border-radius:12px; padding:0 14px; font-size:15px; color:var(--txt); text-align:left; outline:0; -webkit-appearance:none; appearance:none; }
@@ -1106,7 +1108,8 @@ function bindOne(t) {
 var MASTER = ['대분류', '중분류', 'NO.', '세부 품목', '제작수량', '증정 / 총 제작', '판형 (가로x세로x높이)', '페이지', '용지', '평량', '인쇄', '코팅', '특수가공', '톰슨 · 접지 · 가공', '제본', '정합', '포장', '기타 전달 사항'];
 var DOCS = (function () { try { return JSON.parse(ls.get('pr:docs') || '[]'); } catch (e) { return []; } })();
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-function saveDocs() { ls.set('pr:docs', JSON.stringify(DOCS)); }
+function saveDocs() { var d = curDoc(); if (d) d.saved = Date.now(); ls.set('pr:docs', JSON.stringify(DOCS)); var e = document.getElementById('dSaved'); if (e) e.textContent = savedTxt(d); }
+function savedTxt(d) { if (!d || !d.saved) return '아직 저장 안 함'; var t = new Date(d.saved), n = new Date(), hm = (t.getHours() < 12 ? '오전 ' : '오후 ') + ((t.getHours() + 11) % 12 + 1) + ':' + ('0' + t.getMinutes()).slice(-2); return '임시 저장됨 · ' + (t.toDateString() === n.toDateString() ? '오늘 ' : (t.getMonth() + 1) + '.' + t.getDate() + ' ') + hm; }
 function curDoc() { var id = ls.get('pr:doc'); return DOCS.filter(function (d) { return d.id === id; })[0] || DOCS[0] || null; }
 function newDoc(name) { var d = { id: uid(), name: name || '[아티스트]프로젝트_사양서', date: new Date().toISOString().slice(0, 10), rows: [docRow('')] }; DOCS.unshift(d); ls.set('pr:doc', d.id); saveDocs(); return d; }
 function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*g|[\d.]+\s*(?:T|㎛|μm))\s*(\(.*\))?\s*$/); return m ? [(m[1] + (m[3] ? ' ' + m[3] : '')).trim(), m[2].replace(/\s/g, '')] : [p || '', '']; }
@@ -1177,24 +1180,24 @@ function dFieldHtml(r, f) {
   return '<div class="dfr"><label>' + f[1] + '</label>' + c + '</div>';
 }
 function renderDoc() {
-  var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 이 기기에 저장돼요</small></div>';
+  var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 쓰는 대로 이 기기에 임시 저장돼요</small></div>';
   h += '<div class="chips" style="margin:0 0 12px">' + DOCS.map(function (x) { return '<button data-doc="' + x.id + '"' + (d && x.id === d.id ? ' class="on"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '<button id="dNew">+ 새 사양서</button></div>';
   if (!d) { d = newDoc(); h = h.replace('<button id="dNew">', '<button data-doc="' + d.id + '" class="on">' + esc(d.name) + '</button><button id="dNew">'); }
   if (!d.rows.length) { d.rows.push(docRow('')); saveDocs(); }
   var sel = dSel(d);
   h += '<div class="dsw"><div class="dsl">';
-  h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="nt" style="margin:10px 0 0 118px">만든 날 ' + d.date + ' · 이 기기에 저장돼요</div></div>';
+  h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="dsv"><span class="nt">만든 날 ' + d.date + ' · <b id="dSaved">' + savedTxt(d) + '</b></span><button type="button" id="dSave">임시 저장</button></div></div>';
   h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><label class="dld">구성 불러오기<select id="dLoad"><option value="">선택</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label></div>';
   {
     var n = d.rows.indexOf(sel);
-    h += '<div class="card"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div>';
+    h += '<div class="card dhd"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div></div>';
+    // 2026-11-20 실장님: 기본 정보 · 크기·페이지 · 용지·인쇄 · 가공·제본 · 정합·포장 묶음마다 박스 따로
     h += DSEC.map(function (sc) {
-      var x = '<div class="dsc"><div class="dst">' + sc[0] + '</div>' + sc[1].map(function (f) { return dFieldHtml(sel, f); }).join('');
+      var x = '<div class="card dsc"><div class="dst">' + sc[0] + '</div>' + sc[1].map(function (f) { return dFieldHtml(sel, f); }).join('');
       if (sc[0] === '크기 · 페이지' && sel.flat && !sel.book) x += '<div class="dfr"><label>결</label><select class="din" data-dr="' + sel.id + '" data-k="gn">' + ['', 'v', 'h'].map(function (g) { return '<option value="' + g + '"' + ((sel.gn || '') === g ? ' selected' : '') + '>' + GN_LB[g] + '</option>'; }).join('') + '</select></div>';
       if (sc[0] === '용지 · 인쇄') x += sheetHint(sel, { q: dQty(sel).t, k: 1 });
       return x + '</div>';
     }).join('');
-    h += '</div>';
     h += '<div class="acts"><button class="rs" id="dAdd">대표 품목 계산에서 추가</button></div>';
   }
   h += '</div><div class="dsr" id="dPrev">' + dPrevHtml(d, sel) + '<button class="ddel" id="dDel">이 사양서 삭제</button></div></div>';
@@ -1219,6 +1222,7 @@ function bindDoc() {
   var lb = $('#dLoad'); if (lb) lb.onchange = function () { var k = lb.value; lb.value = ''; if (k) tplLoad(k); }; // 구성 불러오기 = 드롭다운 (2026-11-20 실장님: 상품 라벨 생성의 언어 선택처럼)
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
+  $('#dSave').onclick = function () { saveDocs(); toast('임시 저장했어요 · 이 기기에서 이어 쓸 수 있어요'); };
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
   bindDocPrev(d);
   var row = function (id) { return d.rows.filter(function (r) { return r.id === id; })[0]; };

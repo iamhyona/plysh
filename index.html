@@ -900,7 +900,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wlwk .w b { color:#191f28; font-weight:700; margin-left:4px; }
 .wlwk .w.x40 { background:#e5e8eb; color:#191f28; } .wlwk .w.x40 b { color:#191f28; }
 .wlwk .w.x52 { background:#fdecec; color:#f04452; } .wlwk .w.x52 b { color:#f04452; }
-.wlwk .wl0 { font-size:12px; color:var(--faint); }
+.wlwk .wl0 { display:block; width:100%; text-align:center; padding:28px 0 18px; font-size:14px; color:var(--mute); } /* 2026-11-20 실장님: 불러오는 중 문구가 위 상자에 붙지 않게 */
 .wlap { border:0; border-radius:999px; padding:5px 11px; font-size:12.5px; font-weight:700; background:var(--chip); color:var(--sub); margin-left:auto; }
 .wlap.on { background:#e8f3ff; color:#3182f6; }
 .wlap small { font-weight:500; margin-left:4px; opacity:.8; }
@@ -2197,6 +2197,8 @@ var SPN_PAPERS = [
   { k: 'el', n: '이라이트', f: 0.0015, g: [70, 80] },
   { k: 'cu', n: '두께 직접 입력', f: 0, g: [] }];
 var SPN_BIND = [['pb', '무선'], ['sew', '사철'], ['hc', '양장'], ['ss', '중철'], ['ring', '링']];
+// 2026-11-20 실장님: 쪽수 위아래 화살표 = 제본 배수 (무선 8p, 중철 4p). 다른 제본은 확인 전이라 그대로
+var SPN_STEP = { pb: 8, ss: 4 };
 var SPN_RING = [[6.4, '1/4"'], [7.9, '5/16"'], [9.5, '3/8"'], [11.1, '7/16"'], [12.7, '1/2"'], [14.3, '9/16"'], [15.9, '5/8"'], [19.0, '3/4"'], [22.2, '7/8"'], [25.4, '1"'], [28.6, '1-1/8"'], [31.8, '1-1/4"']];
 function spq() {
   var d = { b: 'pb', p: 120, ip: 'mo', ig: 100, it: 0.12, cp: 'art', cg: 250, ct: 0.25, bd: 2.5, w: 148, h: 210, fl: 0 };
@@ -2219,7 +2221,7 @@ function renderSpine() {
         : '<div class="frow">' + num(pre + 't', '장당 두께', 'mm', '0.01') + '</div>');
   };
   h += '<div class="seg" id="spB">' + SPN_BIND.map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.b === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
-  h += '<div class="card"><div class="ct">내지</div><div class="frow">' + num('p', '쪽수', 'p') + '</div>' + paperSel('i', '종이') + '</div>';
+  h += '<div class="card"><div class="ct">내지</div><div class="frow">' + num('p', '쪽수', 'p', SPN_STEP[c.b] || '') + '</div>' + (SPN_STEP[c.b] ? '<div class="nt" style="margin:8px 0 18px">' + SPN_BIND.filter(function (x) { return x[0] === c.b; })[0][1] + ' 제본은 ' + SPN_STEP[c.b] + 'p 단위 · 위아래 화살표를 누르면 ' + SPN_STEP[c.b] + 'p씩 바뀌어요</div>' : '') + paperSel('i', '종이') + '</div>';
   if (c.b === 'hc') h += '<div class="card"><div class="ct">양장 표지</div><div class="f"><label>판지 두께</label></div><div class="chips spg">' + [2, 2.5, 3].map(function (v) { return '<button type="button" data-bd="' + v + '" class="' + (+c.bd === v ? 'on' : '') + '">' + v + 'mm</button>'; }).join('') + '</div></div>';
   else if (c.b !== 'ring') h += '<div class="card"><div class="ct">표지</div>' + paperSel('c', '종이') + '</div>';
   h += '<details class="card cset"' + (+c.fl || c.b !== 'ss' ? ' open' : '') + '><summary class="ct">판형<small>표지 펼친 크기 계산</small></summary><div class="chips cpre" style="margin-top:12px">' + PRESETS.slice(0, 7).map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '">' + p[0] + '<small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
@@ -2231,6 +2233,7 @@ function spineOut(c) {
   var p = Math.max(0, Math.round(+c.p || 0)), ic = spCal(c.ip, +c.ig, c.it), cc = spCal(c.cp, +c.cg, c.ct), sh = Math.ceil(p / 2), body = sh * ic, out = '', warn = [], spine = 0, rows = [], copy = '';
   var bn = SPN_BIND.filter(function (o) { return o[0] === c.b; })[0][1], inN = spName(c.ip, c.ig, c.it), cvN = spName(c.cp, c.cg, c.ct);
   if (!p || !ic) return '<div class="card"><div class="empty2">쪽수와 종이를 넣으면 계산돼요</div></div>';
+  if (SPN_STEP[c.b] && p % SPN_STEP[c.b]) warn.push(SPN_BIND.filter(function (x) { return x[0] === c.b; })[0][1] + ' 제본은 ' + SPN_STEP[c.b] + 'p 단위예요 · ' + (Math.floor(p / SPN_STEP[c.b]) * SPN_STEP[c.b] || SPN_STEP[c.b]) + 'p 또는 ' + Math.ceil(p / SPN_STEP[c.b]) * SPN_STEP[c.b] + 'p로 맞추기 권장');
   if (p % 2) warn.push('쪽수가 홀수예요 · 마지막 장 뒷면 포함 ' + (p + 1) + 'p로 계산');
   rows.push(['내지', sh + '장 × ' + (Math.round(ic * 1000) / 1000) + 'mm', body]);
   if (c.b === 'pb' || c.b === 'sew') {
@@ -2714,6 +2717,10 @@ function subItems() {
     } else if (S.view === 'gdoc') {
       // 소메뉴는 문서 원본에서 미리 읽은 목차로 바로 그린다 (화면 로딩을 기다리면 이전 문서 목차가 잠깐 보였음)
       L = gdKids(S.gdf || 'folder-file.html', 0);
+    } else if (S.view === 'tk' && S.tk === 'fonts') {
+      // 폰트 > 둘러보기 · 시대별 · 저장 (2026-11-20 실장님: 화면 위 탭 대신 왼쪽 소메뉴)
+      var ff = subFrame('fonts'), fd = ff && ff.contentDocument; if (!fd) return L;
+      $$('#tabs button', fd).forEach(function (e) { var cn = e.querySelector('.cnt'); L.push({ t: [].filter.call(e.childNodes, function (c) { return c.nodeType === 3; }).map(function (c) { return c.textContent; }).join('').trim(), n: cn && +cn.textContent ? cn.textContent : '', on: e.classList.contains('on'), go: function () { e.click(); } }); });
     } else if (S.view === 'tk' && S.tk === 'ref') {
       if (!SUB.refIn) { SUB.refIn = 1; SUB.refOpen = ''; } // 용어사전에 새로 들어오면 접힌 상태
       var f = subFrame(S.tk), d = f && f.contentDocument; if (!d) return L;
@@ -2760,7 +2767,7 @@ function gdSecLoad(f) {
 }
 setTimeout(function () { GUIDE_GROUPS.forEach(function (g) { g.i.forEach(function (d) { gdSecLoad(d.f); }); }); SPACES.forEach(function (sp) { (sp.g || []).forEach(function (g) { (g.i || []).forEach(function (x) { if (/^gd:/.test(x.k)) gdSecLoad(x.k.slice(3)); }); }); }); }, 800);
 function subHide(on) { // PC에서 화면 안 색인 숨기기
-  [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }']].forEach(function (x) {
+  [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }'], ['fonts', 'nav.tabs { display:none !important; } header { border-bottom:0 !important; }']].forEach(function (x) {
     var f = subFrame(x[0]), d; try { d = f && f.contentDocument; } catch (e) { d = null; } if (!d || !d.head) return;
     var st = d.getElementById('s3hide'); if (on && !st) { st = d.createElement('style'); st.id = 's3hide'; st.textContent = '@media (min-width:900px) { ' + x[1] + ' }'; d.head.appendChild(st); } else if (!on && st) st.remove();
   });
@@ -2777,7 +2784,7 @@ function subPaint(box, cur, cls) {
 function subTick() {
   var sd = document.getElementById('nsd'), pc = !!(sd && sd.offsetWidth);
   var L = subItems(), sig = S.view + '|' + (S.tk || '') + '|' + L.map(function (x) { return (x.h || x.t) + (x.n || '') + (x.on ? '*' : ''); }).join(',');
-  subHide(pc && (S.view === 'tk' && S.tk === 'ref' || S.view === 'gdoc') && L.length > 0);
+  subHide(pc && (S.view === 'tk' && (S.tk === 'ref' || S.tk === 'fonts') || S.view === 'gdoc') && L.length > 0);
   if (sig === SUB.sig && (!sd || !L.length || $('.s3', sd))) return; SUB.sig = sig;
   if (sd) subPaint(sd, null, '.si');
   var fm = document.getElementById('nfm'); if (fm && fm.classList.contains('open')) subPaint(fm, null, '.lk');
@@ -4114,8 +4121,15 @@ function clOf(o) {
 }
 function nasOf(o) { var c = clOf(o); if (c) return { u: c, cl: 1 }; var k = pjKey(o.artist, o.title); return ((S.nas && S.nas.rows) || []).filter(function (r) { return pjKey(r.a, r.t) === k && r.u; })[0]; }
 var PJL = [];
-function pjKey(o) { return [o.artist || '', o.title || '', o.year || ''].join('|'); }
-function pjDone() { try { return JSON.parse(ls.get('d4:pjdone') || '{}') || {}; } catch (e) { return {}; } }
+// 프로젝트 완료 (2026-11-20 실장님: 팀원 모두에게 보이게) = 일정완료 탭에 '프로젝트 완료 | 완료한 날 | 아티스트|제목|연도' 한 줄
+// (이름이 pjKey면 NAS 링크 찾는 pjKey(a, t)를 덮어써서 pjDK로)
+var PJD_N = '프로젝트 완료';
+function pjDK(o) { return [o.artist || '', o.title || '', o.year || ''].join('|'); }
+function pjDone() {
+  var d = {}; try { d = JSON.parse(ls.get('d4:pjdone') || '{}') || {}; } catch (e) {}
+  if (S.D && S.D.evDone) { var srv = {}; S.D.evDone.forEach(function (x) { if (x.indexOf(PJD_N + '|') === 0) { var p = x.split('|'); srv[p.slice(2).join('|')] = p[1]; } }); d = srv; }
+  return d;
+}
 function renderPj() {
   if (!S.SL) { try { S.SL = JSON.parse(ls.get('d4:sl') || 'null'); } catch (e) {} }
   if (!S.SL || !S.slAt) loadSpecs().then(function () { if (S.view === 'pj') renderPj(); }).catch(function () {});
@@ -4130,13 +4144,15 @@ function renderPj() {
     return x < y ? -1 : x > y ? 1 : (b.year || '').localeCompare(a.year || '') || a.title.localeCompare(b.title, 'ko');
   });
   // 2026-11-20 실장님: 체크하면 완료된 프로젝트로 (이 기기에 저장)
-  var DN = pjDone(), act = F.filter(function (o) { return !DN[pjKey(o)]; }), fin = F.filter(function (o) { return DN[pjKey(o)]; });
+  // 예전에 이 기기에만 저장한 완료 표시는 한 번만 시트로 옮김
+  if (S.D && S.D.evDone && !ls.get('d4:pjmig')) { ls.set('d4:pjmig', '1'); try { var LOC = JSON.parse(ls.get('d4:pjdone') || '{}') || {}, SRV = pjDone(); Object.keys(LOC).forEach(function (k) { if (SRV[k]) return; S.D.evDone.push(PJD_N + '|' + LOC[k] + '|' + k); call('appEvDone', S.pin, { n: PJD_N, d: LOC[k], t: k, done: true }).catch(function () {}); }); } catch (e) {} }
+  var DN = pjDone(), act = F.filter(function (o) { return !DN[pjDK(o)]; }), fin = F.filter(function (o) { return DN[pjDK(o)]; });
   F = act.concat(fin);
   PJL = F;
   var h = '<div class="spf"><input id="gQ" type="search" placeholder="아티스트, 프로젝트명 검색" value="' + esc(S.gq) + '">' +
     '<div class="sps"><select id="gY"><option value="">연도 전체</option>' + ys.map(function (y) { return '<option' + (S.gy === y ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select><select id="gA"><option value="">아티스트 전체</option>' + as.map(function (a) { return '<option' + (S.ga === a ? ' selected' : '') + '>' + esc(a) + '</option>'; }).join('') + '</select></div></div>';
   var row = function (o, i) {
-    var g = o.g, sp = o.sp, nx = g && g.next, nas = nasOf(o), dn = !!DN[pjKey(o)];
+    var g = o.g, sp = o.sp, nx = g && g.next, nas = nasOf(o), dn = !!DN[pjDK(o)];
     var sub = g ? (nx ? dot(nx.d) + ' ' + esc(nx.t) : '남은 일정 없음') : '사양서만 있어요';
     return '<div class="spi gsi pjr' + (dn ? ' dn' : '') + '"><button class="m" data-pj="' + i + '">' + artHtml(o) + '<small style="margin:3px 0 0;font-weight:500">' + sub + '</small></button><div class="pjic">' +
       '<button type="button" class="pjb pjck' + (dn ? ' on' : '') + '" data-pjck="' + i + '" aria-label="' + (dn ? '완료 취소' : '완료') + '" title="' + (dn ? '완료 취소' : '완료로 옮기기') + '">' + CKSVG + '</button>' +
@@ -4154,7 +4170,14 @@ function renderPj() {
   $('#gA').onchange = function () { S.ga = this.value; renderPj(); };
   $('#gY').onchange = function () { S.gy = this.value; renderPj(); };
   var dh = $('#pjDh'); if (dh) dh.onclick = function () { S.pjDo = !S.pjDo; var y0 = window.scrollY; renderPj(); window.scrollTo(0, y0); };
-  $$('[data-pjck]').forEach(function (b) { b.onclick = function () { var o = PJL[+b.dataset.pjck], k = pjKey(o), d = pjDone(); if (d[k]) { delete d[k]; toast('진행 중으로 되돌렸어요'); } else { d[k] = TODAY; toast('완료된 프로젝트로 옮겼어요'); } ls.set('d4:pjdone', JSON.stringify(d)); var y0 = window.scrollY; renderPj(); window.scrollTo(0, y0); }; });
+  $$('[data-pjck]').forEach(function (b) { b.onclick = function () {
+    var o = PJL[+b.dataset.pjck], k = pjDK(o), d = pjDone(), on = !d[k], dd = on ? TODAY : d[k], ek = PJD_N + '|' + dd + '|' + k, L = S.D.evDone || (S.D.evDone = []);
+    var paint = function () { try { var loc = JSON.parse(ls.get('d4:pjdone') || '{}') || {}; if (on) loc[k] = dd; else delete loc[k]; ls.set('d4:pjdone', JSON.stringify(loc)); } catch (e) {} var y0 = window.scrollY; renderPj(); window.scrollTo(0, y0); };
+    if (on) L.push(ek); else L.splice(L.indexOf(ek), 1);
+    paint(); toast(on ? '완료된 프로젝트로 옮겼어요 · 팀 모두에게 보여요' : '진행 중으로 되돌렸어요');
+    call('appEvDone', S.pin, { n: PJD_N, d: dd, t: k, done: on }).then(function () { saveCache(); })
+      .catch(function (x) { var i = L.indexOf(ek); if (on && i >= 0) L.splice(i, 1); if (!on && i < 0) L.push(ek); on = !on; paint(); toast(errMsg(x)); });
+  }; });
   $$('[data-pj]').forEach(function (b) { b.onclick = function () { var o = PJL[+b.dataset.pj]; if (window.wsOpen) return wsOpen(o); if (o.g) openProj(o.g.f.id); else if (o.sp) { S.sp = o.sp.id; S.st = ''; ls.set('d4:sp', S.sp); S.view = 'spec'; window.scrollTo(0, 0); render(); } }; });
   $$('[data-nas]').forEach(function (b) {
     var o = PJL[+b.dataset.nas], t = null, long = false;
