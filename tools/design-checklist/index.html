@@ -345,8 +345,13 @@ html.emb .progress-label { grid-column:2; grid-row:1; align-self:center; font-si
   html.emb .tab .tab-badge, html.emb .tab.active .tab-badge { background:none !important; padding:0; margin-left:auto; }
   html.emb .tab.done .tab-badge { color:#00a861; }
   html.emb .content-inner { padding-right:0 !important; }
-  html.emb .bottom-bar { grid-column:1 / -1; }
+  html.emb .bottom-bar { grid-column:1; grid-row:4; }
 }
+/* 2026-11-20 실장님: 하단 바가 마지막 항목을 가리고 목록보다 넓음 → 화면에 붙는(fixed) 대신 목록 칸 맨 아래에 따라 붙게(sticky). 문서 길이에 바 높이가 들어가서 끝까지 내리면 마지막 항목이 다 보임 */
+html.emb .bottom-bar { position:sticky !important; bottom:0; left:auto !important; right:auto !important; transform:none !important; width:auto; padding:12px 0 16px !important; margin:0 16px; z-index:5; }
+html.emb .content-inner { padding-bottom:8px !important; }
+html.emb body { height:auto !important; min-height:100%; overflow:visible !important; } /* 몸통이 화면 높이로 잘려 끝까지 안 내려가던 문제 */
+@media (min-width:900px) { html.emb .bottom-bar { margin:0 0 0 16px; } }
 </style>
 </head>
 <body>
