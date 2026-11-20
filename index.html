@@ -924,7 +924,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .pjb svg { width:17px; height:17px; } .pjb.off { opacity:.3; }
 .pjck.on { background:#191f28; color:#fff; } .pjr.dn .m { opacity:.55; }
 .pjdh { display:flex; align-items:center; gap:6px; width:100%; border:0; background:none; padding:20px 4px 10px; font-size:14px; font-weight:800; color:#191f28; cursor:pointer; font-family:inherit; } .pjdh small { font-size:13px; font-weight:600; color:#8b95a1; margin-right:auto; } .pjdh span { font-size:13px; font-weight:600; color:#4e5968; }
-.pmd { position:relative; margin:0 0 12px; } .pjtb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 12px; } .pjtb .pmd { margin:0; } .pjtb .aseg { margin:0; }
+.pmd { position:relative; margin:0 0 12px; } .pjtb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 12px; } .pjtb .pmd { margin:0; } .pjtb .aseg { margin:0; } .cvk button { display:inline-flex; align-items:center; gap:5px; } .cvk svg { flex:none; }
 .pgw { background:var(--card); border-radius:20px; padding:8px 0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .pgt { border-collapse:separate; border-spacing:0; font-size:13px; }
 .pgt th, .pgt td { border-bottom:1px solid var(--line); vertical-align:top; padding:8px 6px; text-align:left; }
@@ -1616,7 +1616,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm42';
+var APP_VER = '20261120hm43';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2022,7 +2022,7 @@ function rtKey() {
   if (v === 'gdoc') return S.gdf ? 'gd:' + S.gdf : null;
   if (v === 'glist') return 'gl:' + S.gl;
   if (v === 'space') return 'space:' + S.spk;
-  if (v === 'month') return S.cv === 'proj' ? 'sched' : 'cal';
+  if (v === 'month') return 'cal';
   if (v === 'ws') return null;
   return v || null;
 }
@@ -2125,8 +2125,7 @@ var TOOLS = [
     { k: 'filename', t: '폴더·파일명 생성기', s: '규칙에 맞는 파일명·작업폴더명·하위폴더명 복사', f: 'tools/filename/' }] },
   { g: '계산', i: [
     { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
-    { k: 'cut', t: '절수 계산기', s: '완성 크기·전개도로 전지 걸이와 절수, 필요 전지 수', f: 'tools/proof/', pv: 'calc' },
-    { k: 'die', t: '전개도 생성기', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
+    { k: 'cut', t: '종이연수·칼선', s: '완성 크기·칼선 형태로 원판 걸이와 필요 전지(연) 수, 전개도 일러스트 파일', f: 'tools/proof/', pv: 'calc' },
     { k: 'paper', t: '용지 크기', s: '규격 용지와 생활 속 인쇄물 크기를 실제 비율로 비교', f: 'tools/paper/' },
     { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
@@ -2139,9 +2138,9 @@ var TOOLS = [
     { k: 'logo', t: '로고', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
     { k: 'fonts', t: '폰트', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' }] }
 ];
-var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut' }; // 예전 저장값 → 새 메뉴
+var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut', die: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
-var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '절수', die: '전개도', impose: '터잡기', review: 'PREFLIGHT', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
+var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', review: 'PREFLIGHT', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
 if (TOOL_OLD[S.tk]) S.tk = TOOL_OLD[S.tk]; if (S.view === 'calc') S.view = 'tk', S.tk = 'cut';
 function toolKey() { if (S.view === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === S.view; })[0]; return t ? t.k : ''; }
 function isToolView(v) { return v === 'tools' || v === 'tk' || TOOL_LIST.some(function (x) { return x.v === v; }); }
@@ -2460,10 +2459,10 @@ var SPACES = [
   { k: 'me', t: '개인', d: '할 일, 근태, 지출결의를 한곳에서', home: 'todo', ic: 'todo', g: [
     { g: '개인', i: [{ k: 'todo', t: '할 일', s: '오늘 · 이번 주 할 일과 팀 공지' }, { k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
-    { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 달력으로' }, { k: 'sched', t: '일정', s: '프로젝트별 일정표' }] }] },
+    { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 세로형 · 가로형 · 리스트로' }] }] },
   { k: 'tool', t: '도우미', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명, 로고 · 폰트 · 용어사전 · 팬톤', home: 'space:tool', ic: 'tool', g: [
     { g: '도우미', i: [{ k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
-      { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도 생성기', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '폴더·파일명 생성기', tool: 1 },
+      { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '폴더·파일명 생성기', tool: 1 },
       { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
@@ -2475,7 +2474,7 @@ SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i.forEach(function 
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i = g.i.map(function (x) { if (typeof x !== 'string') { if (x.tool && !x.s) x.s = tl(x.k).s; return x; } var t = tl(x); return { k: x, t: t.t, s: t.s, tool: 1 }; }); }); });
 function spItems(sp) { var L = []; sp.g.forEach(function (g) { g.i.forEach(function (x) { L.push(x); }); }); return L; }
 var WS_TOOLS = { doc: 1, filename: 1, review: 1, spine: 1, cut: 1, die: 1, impose: 1 };
-function navCur() { var v = S.view; if (v === 'space') return 'space:' + S.spk; if (v === 'month') return S.cv === 'proj' ? 'sched' : 'cal'; if (v === 'glist') return 'gl:' + S.gl;
+function navCur() { var v = S.view; if (v === 'space') return 'space:' + S.spk; if (v === 'month') return 'cal'; if (v === 'glist') return 'gl:' + S.gl;
   if (v === 'gdoc') { var k = 'gd:' + S.gdf, gi = -1; GUIDE_GROUPS.forEach(function (g, i) { if (g.i.some(function (d) { return d.f === S.gdf; })) gi = i; }); return (gi > 0 && S.gdf !== 'folder-file.html') ? 'gl:' + gi : k; } if (v === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === v; })[0]; return t ? t.k : v; }
 function inWs() { if (!S.ws) return false; var c = navCur(); return S.view === 'ws' || (S.view === 'spec' && S.sp && S.sp === S.ws.sp) || !!WS_TOOLS[c]; }
 function spOf() {
@@ -2486,13 +2485,14 @@ function spOf() {
 }
 function navGo(k) {
   navClose(); S.ws = null;
+  if (TOOL_OLD[k]) k = TOOL_OLD[k]; // 예전 메뉴 키 (전개도 생성기 → 종이연수·칼선)
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
   if (k.indexOf('gd:') === 0) { S.gdf = k.slice(3); S.view = 'gdoc'; window.scrollTo(0, 0); return render(); }
   if (k.indexOf('gl:') === 0) { S.gl = +k.slice(3); S.view = 'glist'; window.scrollTo(0, 0); return render(); }
   if (k === 'guide') { S.spk = 'design'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'tools') { S.spk = 'tool'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
-  if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'sched' ? 'proj' : 'cal'; ls.set('d4:cv', S.cv); k = 'month'; }
+  if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'sched' ? 'proj' : (ls.get('d4:cv') || 'cal'); ls.set('d4:cv', S.cv); k = 'month'; }
   S.view = k; if (k !== 'refs' && k !== 'start') ls.set('d4:view', k); window.scrollTo(0, 0); render();
 }
 function navClose() { document.documentElement.style.overflow = ''; ['#npl', '#nmg', '#nbd', '#nfm', '#nfb'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
@@ -2524,7 +2524,7 @@ function wsBar() {
     (nx ? '다음 · ' + esc(nx.t) + ' ' + dot(nx.d) + ' <em>' + (dd === 0 ? '오늘' : 'D-' + dd) + '</em>' : '남은 일정 없음') + ' · 일정 ' + E.length + '건</small></div>' +
     '<div class="wl">' + (w.url ? '<a href="' + esc(w.url) + '" target="_blank" rel="noopener">' + navIc('sheet') + '<span>일정 시트</span></a>' : '') + '<a href="https://drive.google.com/drive/folders/11nRHl1v00YxiSLaQyQy07cUN8hq8rbY8" target="_blank" rel="noopener">' + navIc('proj') + '<span>폴더</span></a></div></div>' +
     '<div class="wtab">' + T.map(function (t) { return '<button type="button" data-wt="' + t[0] + '" class="' + ((t[0] === 'spine' ? 'calc' : t[0]) === tab ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div>' +
-    (tab === 'calc' ? '<div class="wcalc">' + [['spine', '책등'], ['cut', '절수'], ['die', '전개도'], ['impose', '터잡기']].map(function (x) { return '<button type="button" data-wt="' + x[0] + '" class="' + (c === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' : '');
+    (tab === 'calc' ? '<div class="wcalc">' + [['spine', '책등'], ['cut', '종이연수·칼선'], ['impose', '터잡기']].map(function (x) { return '<button type="button" data-wt="' + x[0] + '" class="' + (c === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' : '');
 }
 function renderWs() {
   var w = S.ws; if (!w) { S.view = 'pj'; return renderPj(); }
@@ -2805,7 +2805,7 @@ function sideHtml() {
       if (!on) return h;
       h += '<div class="sx">';
       if (sp.k === 'proj') {
-        h += [['pj', '목록'], ['cal', '달력'], ['sched', '일정']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
+        h += [['pj', '목록'], ['cal', '달력']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { return '<button type="button" class="si' + (x.k === cur && !inWs() ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
@@ -2825,7 +2825,7 @@ function crumbHtml() {
 var PG_DESC = {
   todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
-  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '완성 크기와 수량을 넣으면 원판마다 몇 개 앉는지, 몇 장 필요한지 비교해요 · 원판 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
+  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
   qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '인쇄 · 후가공 · 제본 용어와 디자인 용어',
   checklist: '컨펌 요청 전 단계별 자가 점검' };
@@ -3100,7 +3100,7 @@ function renderMonth() {
   // 이번 달: 지난 주차는 접고, 접은 만큼 다음 달 주차를 더 보여줌 (2026-10-20)
   var tw = sunOf(TODAY), cur = TODAY.slice(0, 7) === first.slice(0, 7), pastN = cur ? Math.round((P(tw) - P(start)) / 864e5 / 7) : 0, folded = pastN > 0 && !S.calPast;
   if (folded) { start = tw; end = addD(end, pastN * 7); }
-  var h = calHead(y, m) + filterBar();
+  var h = calHead(y, m) + '<div class="pjtb">' + cvKSeg() + filterBar() + '</div>';
   h += '<div class="mcal' + (S.fold ? ' fold' : '') + '"><div class="wd">' + WEN.map(function (w) { return '<div>' + w + '</div>'; }).join('') + '</div>' +
     (pastN > 0 ? '<button class="wkf" id="wkF">' + (folded ? '지난 ' + pastN + '주 펼치기' : '지난 주 접기') + '<i class="chev' + (folded ? '' : ' up') + '"></i>' + '</button>' : '') + '<div class="grid">';
   for (var d = start; d <= end; d = addD(d, 1)) {
@@ -3261,7 +3261,7 @@ function renderProject() {
   var MODES = [['d', '날짜별'], ['p', '프로젝트별']].concat(tm ? [['w', '디자이너별']] : []), md = S.pjm || ls.get('d4:pjm') || 'd'; if (!MODES.some(function (x) { return x[0] === md; })) md = 'd'; S.pjm = md;
   var body = tm ? (md === 'p' ? pjTeamProj() : md === 'w' ? pjTeam(null) : pjTeamDate()) : (md === 'p' ? pjListProj() : pjGrid());
   var h = top + '<div class="seg" id="pSeg"><button data-m="sched" class="' + (tm ? '' : 'on') + '">제작일정</button><button data-m="team" class="' + (tm ? 'on' : '') + '">팀 업무</button></div>' +
-    '<div class="pjtb"><div class="aseg" id="pjM">' + MODES.map(function (x) { return '<button data-m="' + x[0] + '" class="' + (x[0] === md ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' + filterBar() + '</div>' +
+    '<div class="pjtb">' + (tm ? '<div class="aseg" id="pjM">' + MODES.map(function (x) { return '<button data-m="' + x[0] + '" class="' + (x[0] === md ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' : cvKSeg()) + filterBar() + '</div>' +
     '<div class="pjs1">' + body + '</div>';
   $('#main').innerHTML = h; bindItems(); bindRep(); bindEvCk(); bindFilter();
   var gw = $('.pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
@@ -3858,6 +3858,13 @@ function renderCal() {
   if (S.cv === 'proj') renderProject(); else renderMonth();
   if ($('#pSeg')) $('#pSeg').remove(); if ($('#mSeg')) $('#mSeg').remove();
   pjSeg();
+  $$('#cvK button').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; if (k === 'v') S.cv = 'cal'; else { S.cv = 'proj'; S.pjm = k === 'l' ? 'p' : 'd'; ls.set('d4:pjm', S.pjm); } ls.set('d4:cv', S.cv); window.scrollTo(0, 0); render(); }; });
+}
+// 2026-11-21 실장님: 달력 하나에 보기 3가지 (세로형 = 달력, 가로형 = 날짜가 가로로 놓인 일정표, 리스트 = 프로젝트별), '일정' 메뉴는 달력 안으로
+function cvKSeg() {
+  var cur = S.cv !== 'proj' ? 'v' : (S.pjm === 'p' ? 'l' : 'h');
+  var IC = { v: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 10v10M15 10v10"/>', h: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M3 10h18M3 14.5h18"/>', l: '<path d="M9 7h11M9 12h11M9 17h11"/><circle cx="5" cy="7" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="17" r="1"/>' };
+  return '<div class="aseg cvk" id="cvK">' + [['v', '세로형'], ['h', '가로형'], ['l', '리스트']].map(function (x) { return '<button data-k="' + x[0] + '" class="' + (x[0] === cur ? 'on' : '') + '"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[x[0]] + '</svg>' + x[1] + '</button>'; }).join('') + '</div>';
 }
 // PROJECT 메뉴 = 목록 · 달력 · 일정 (CALENDAR 메뉴 합침, 2026-11-19)
 function pjSeg() {
