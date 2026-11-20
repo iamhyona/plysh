@@ -429,6 +429,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .csum .big small { font-size:11px !important; color:var(--mute) !important; font-weight:600; } .csum .big b { font-size:22px !important; margin-top:4px; } .csum .big b i { font-size:12px !important; color:var(--sub) !important; font-weight:700 !important; margin:0 1px !important; }
 .csum .big span { font-size:11px !important; color:var(--mute) !important; }
 .csum .cpy, .cres .cpy { margin-top:12px !important; width:100%; height:48px; padding:0; border:0; border-radius:12px; background:var(--txt) !important; color:#fff !important; font:inherit; font-size:15px; font-weight:700; }
+.cflt .cfl { display:none; } .cflt .cfg { margin-top:6px; } /* 종류는 맨 위 드롭다운에서 고르므로 묶음 제목 숨김 */
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -625,7 +626,10 @@ function renderCalc() {
   var h = '<div class="phd"><b>종이연수·칼선</b><small>완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235</small></div>';
   var isDie = c.t === 'die';
   // 2026-11-21 실장님: 낱장 · 리플렛 · 책 내지 · 칼선은 맨 위 드롭다운으로
-  h += '<label class="cbs" id="cB"><select id="cBs" aria-label="계산할 것">' + [['sheet', '낱장'], ['leaf', '리플렛'], ['book', '책 내지'], ['die', '칼선 (박스·봉투·표지)']].map(function (o) { return '<option value="' + o[0] + '"' + (c.t === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>';
+  // 2026-11-21 실장님: 칼선은 박스 형태별로 드롭다운에서 바로 고름 → 오른쪽엔 그 종류 형태만
+  var dg0 = ((DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0]).gr), cbv = c.t === 'die' ? 'die:' + dg0 : c.t;
+  h += '<label class="cbs" id="cB"><select id="cBs" aria-label="계산할 것"><optgroup label="종이 연수">' + [['sheet', '낱장'], ['leaf', '리플렛'], ['book', '책 내지']].map(function (o) { return '<option value="' + o[0] + '"' + (cbv === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+    '</optgroup><optgroup label="칼선">' + DIE_GR.map(function (g) { return '<option value="die:' + g[0] + '"' + (cbv === 'die:' + g[0] ? ' selected' : '') + '>' + g[1] + '</option>'; }).join('') + '</optgroup></select></label>';
   var mseg = '<span class="seg sm mseg" id="cM">' + [['size', '크기로'], ['cut', '절수로']].map(function (o) { return '<button data-m="' + o[0] + '" class="' + (c.m === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</span>';
   var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + '</label><span class="ifx"><input type="number" inputmode="decimal" data-k="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '>' + (unit ? '<em>' + unit + '</em>' : '') + '</span></div>'; };
   var stp = function (n, t, sm, extra) { return '<div class="cstp"><b>' + t + '</b>' + (sm ? '<small>' + sm + '</small>' : '') + (extra || '') + '</div>'; };
@@ -656,7 +660,7 @@ function renderCalc() {
   var FL = '';
   if (isDie) { var dd0 = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0];
     FL = '<aside class="cflt"><div class="cfh">칼선 형태</div><label class="cai"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>사진으로 고르기<input type="file" accept="image/*" id="cImg" hidden></label><div id="dieAi" class="nt cnt0"></div>' +
-      ['단상자', '패키지', '쇼핑백', '봉투', '책'].map(function (gk) { return '<div class="cfg"><div class="cfl">' + gk + '</div><div class="cfc">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd0.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>'; }).join('') + '</aside>'; }
+      [dd0.gr].map(function (gk) { return '<div class="cfg"><div class="cfl">' + DIE_GR.filter(function (g) { return g[0] === gk; })[0][1] + '</div><div class="cfc">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd0.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>'; }).join('') + '</aside>'; }
   h += '<div class="cw2' + (isDie ? ' cw3' : '') + '">' + FL + '<div class="card cin">' + L + '</div><div class="cout" id="cRes">' + calcOut(c) + '</div></div>';
   $('#main').innerHTML = h; bindCalc(); pStepBind($('#main'));
 }
@@ -741,7 +745,7 @@ function calcOut(c) {
 function bindCalc() {
   var c = CQ, upd = function (keepInputs) { cqSave(c); if (keepInputs) { $('#cRes').innerHTML = calcOut(c); bindRes(); } else { var y0 = window.scrollY; renderCalc(); window.scrollTo(0, y0); } };
   $$('#cT button').forEach(function (b) { b.onclick = function () { c.t = b.dataset.t; upd(); }; });
-  $('#cBs').onchange = function () { c.t = this.value; upd(); };
+  $('#cBs').onchange = function () { var v = this.value; if (v.indexOf('die:') === 0) { var g = v.slice(4); c.t = 'die'; if (!DIE.some(function (x) { return x.id === c.die && x.gr === g; })) { c.die = (DIE.filter(function (x) { return x.gr === g; })[0] || DIE[0]).id; c.selP = ''; } } else c.t = v; upd(); };
   $$('[data-cd]').forEach(function (b) { b.onclick = function () { c.die = b.dataset.cd; c.selP = ''; upd(); }; });
   if ($('#cImg')) $('#cImg').onchange = function () { var f = this.files[0]; if (f) dieAI(f); this.value = ''; };
   $$('[data-cdv]').forEach(function (i) { i.oninput = function () { var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0]; dieVals(c, dd)[i.dataset.cdv] = i.value === '' ? 0 : +i.value; upd(true); }; });
@@ -1531,6 +1535,7 @@ var DIE = [
   { id: 'hdEnv', geo: 'envj', gr: '봉투', n: '하도메 봉투', d: '끈봉투 · 단추끈 봉투 · 와샤 봉투 · String & Button Envelope · 자켓형 봉투 + 뚜껑과 몸통에 하도메 단추 2개 · 끈을 감아 닫음 · 서류 A4 기준 예시', in: { w: 245, h: 330, mg: 0, fl: 22, lid: 70, ey: 4 } },
   { id: 'envPS', geo: 'envj', gr: '봉투', n: '엽서 봉투', d: '완성 160×110 · 엽서 100×148 기준 · 긴 변 입구', in: { w: 110, h: 160, mg: 0, fl: 15, lid: 40 } }
 ];
+var DIE_GR = [['단상자', '단상자'], ['패키지', '패키지 박스 (싸바리·하도메·G형·슬리브)'], ['쇼핑백', '쇼핑백'], ['봉투', '봉투'], ['책', '책 표지 (무선·양장)']];
 var DIE_LB = { ey: ['하도메 구멍 지름', 'mm'], X: ['정면 가로', 'mm'], Y: ['높이', 'mm'], D: ['폭(옆면)', 'mm'], g: ['풀칠날개', 'mm'], L: ['가로(L)', 'mm'], W: ['세로(W)', 'mm'], H: ['높이(H)', 'mm'], t: ['꽂이날개', 'mm'],
   bd: ['보드 두께', 'mm'], wr: ['접어넣기', 'mm'], w: ['가로', 'mm'], h: ['세로', 'mm'], sp: ['책등', 'mm'], jt: ['홈', 'mm'], fl: ['날개', 'mm'], bl: ['도련', 'mm'], ov: ['바닥 겹침', 'mm'], mg: ['여유(한쪽)', 'mm'], nt: ['손잡이 홈 반지름', 'mm'], tp: ['윗단 접기', 'mm'], hd: ['손잡이 구멍 (1 있음 · 0 없음)', ''], sv: ['옆날개 겹침', 'mm'], lid: ['뚜껑', 'mm'] };
 
