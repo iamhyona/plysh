@@ -927,16 +927,22 @@ function median(a) { a = a.slice().sort(function (x, y) { return x - y; }); retu
 
 // ── 보고서 화면 ──
 var CATS = [['all', '전체'], ['top', '가장 중요'], ['print', '인쇄'], ['img', '이미지 파일'], ['bind', '제본'], ['photo', '중복 사진'], ['rule', '디자인 규칙'], ['text', '글자·표기'], ['cal', '달력'], ['face', '인물 사진']];
-var SEVN = { err: '오류', warn: '확인', info: '참고', adv: '의견' };
+// 단계 이름: 오탈자 / 경고 / 주의 / 조언 (+ 안내) — 결과지와 같은 말 (2026-11-20 실장님)
+var TYPO_CODES = ['typoko', 'typoen', 'repword', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix'];
+function isTypo(x) { return x.sev !== 'info' && TYPO_CODES.indexOf(x.code) > -1; }
+var SEVN = { err: '경고', warn: '주의', info: '안내', adv: '조언' };
+function sevName(x) { return isTypo(x) ? '오탈자' : SEVN[x.sev]; }
+function sevCls(x) { return isTypo(x) ? 'err' : x.sev; }
+function sevO(x) { return isTypo(x) ? -1 : SEVO[x.sev]; }
 var UI = { tab: 'all', onlyBad: true };
 function renderReport() {
   var I = R.issues.filter(function (x) { return !x.hidden; });
-  var c = { err: 0, warn: 0, adv: 0, info: 0 }; I.forEach(function (x) { c[x.sev]++; });
+  var c = { typo: 0, err: 0, warn: 0, adv: 0, info: 0 }; I.forEach(function (x) { c[isTypo(x) ? 'typo' : x.sev]++; });
   var T0 = R.pages[0] ? R.pages[0].trim : [0, 0, 0, 0];
   var meta = R.isImg ? '이미지 ' + R.n + '개' + (R.WO && R.WO.w ? ' · 사양 ' + R.WO.w + '×' + R.WO.h + 'mm' : '') : 'PDF ' + R.n + '장 · 책 ' + R.bookPages + '쪽 · 재단 ' + f1(mm(T0[2] - T0[0])) + '×' + f1(mm(T0[3] - T0[1])) + 'mm';
   var h = '<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">' + esc(R.file) + '</h3><div class="small sub" style="margin-top:4px">' + meta + ' · ' + KIND_LABEL[R.kind] + (R.prodName ? ' · ' + esc(R.prodName) : '') + (R.title ? ' · ' + esc(R.title) : '') + (R.artist ? ' · ' + esc(R.artist) : '') + '</div></div>' +
     '<div class="row noprint"><button class="ib" id="print">이 파일 결과지</button></div></div>' +
-    '<div class="sum"><span class="pill ' + (c.err ? 'err' : 'ok') + '"><b>' + c.err + '</b>오류</span><span class="pill warn"><b>' + c.warn + '</b>확인 필요</span><span class="pill adv"><b>' + c.adv + '</b>의견</span><span class="pill"><b>' + c.info + '</b>참고</span></div>' +
+    '<div class="sum">' + (c.typo ? '<span class="pill err"><b>' + c.typo + '</b>오탈자</span>' : '') + '<span class="pill ' + (c.err ? 'err' : 'ok') + '"><b>' + c.err + '</b>경고</span><span class="pill warn"><b>' + c.warn + '</b>주의</span><span class="pill adv"><b>' + c.adv + '</b>조언</span><span class="pill"><b>' + c.info + '</b>안내</span></div>' +
     '<div class="note">“의심” 표시는 자동으로 추정한 거라 직접 한 번 더 봐 주세요. 색은 화면용(RGB)으로 바꿔 본 대략값이에요.</div></div>';
   h += '<div class="tabs noprint" id="tabs">' + CATS.filter(function (t) { return t[0] === 'all' || t[0] === 'top' || I.some(function (x) { return inCat(x, t[0]); }) || (t[0] === 'face' && R.people && R.people.length); }).map(function (t) { var n = I.filter(function (x) { return inCat(x, t[0]); }).length; return '<button data-t="' + t[0] + '" class="' + (UI.tab === t[0] ? 'on' : '') + '">' + t[1] + '<em>' + n + '</em></button>'; }).join('') + '</div>';
   h += '<div id="tabB"></div>';
@@ -956,12 +962,12 @@ function renderTab() {
   // 이슈 묶기 (같은 코드+제목)
   var G = {}, order = [];
   I.filter(function (x) { return x.code !== 'dup' && x.code !== 'dupnear'; }).forEach(function (x) { var k = x.code + '|' + x.title; if (!G[k]) { G[k] = []; order.push(k); } G[k].push(x); });
-  order.sort(function (a, b) { return SEVO[G[a][0].sev] - SEVO[G[b][0].sev] || (G[b][0].top ? 1 : 0) - (G[a][0].top ? 1 : 0); });
+  order.sort(function (a, b) { return sevO(G[a][0]) - sevO(G[b][0]) || (G[b][0].top ? 1 : 0) - (G[a][0].top ? 1 : 0); });
   if (order.length) {
     h += '<div class="card"><h3>' + (t === 'all' ? '검사 결과' : CATS.find(function (c) { return c[0] === t; })[1]) + '</h3>';
     order.forEach(function (k) {
       var L = G[k], x = L[0], pages = uniq(L.map(function (y) { return y.page; }).filter(function (p) { return p !== null; }));
-      h += '<div class="iss"><div class="ih"><span class="sev ' + x.sev + '">' + SEVN[x.sev] + '</span><div class="t"><b>' + esc(x.title) + '</b>' + (x.sus ? '<span class="sus">의심</span>' : '') +
+      h += '<div class="iss"><div class="ih"><span class="sev ' + sevCls(x) + '">' + sevName(x) + '</span><div class="t"><b>' + esc(x.title) + '</b>' + (x.sus ? '<span class="sus">의심</span>' : '') +
         (L.length === 1 || pages.length <= 1 ? '<div class="d">' + rich(x.detail) + '</div>' : '<div class="d">' + pages.length + '개 페이지 · 예: ' + rich(x.detail) + '</div>') +
         (x.fix ? '<div class="fx">→ ' + rich(x.fix) + '</div>' : '') +
         (pages.length ? '<div class="pgs">' + pages.slice(0, 80).map(function (p) { return '<button data-pg="' + p + '" data-iss="' + L.find(function (y) { return y.page === p; }).id + '">' + esc(pl(p)) + '</button>'; }).join('') + '</div>' : '') +
@@ -1063,9 +1069,9 @@ function drawViewer() {
   var w = V.zoom ? Math.max(aw, 1400) : Math.min(aw, ah * ratio); st.style.width = w + 'px';
   st.innerHTML = '<img src="' + P.thumb + '" style="width:100%;display:block" alt="">' + overlaySVG(P, P.tw, P.th, true, null, V.hi);
   if (V.zoom && R.pdfHi !== V.p) {} // 썸네일 해상도로 충분 (최대 1100px)
-  var I = R.issues.filter(function (x) { return x.page === P.i; }).sort(function (a, b) { return SEVO[a.sev] - SEVO[b.sev]; });
+  var I = R.issues.filter(function (x) { return x.page === P.i; }).sort(function (a, b) { return sevO(a) - sevO(b); });
   var h = '<div class="leg"><span><i style="background:rgba(239,68,68,.25)"></i>재단선 안쪽 ' + SET.safe + 'mm</span><span><i style="border:1px solid #3182f6"></i>재단선</span><span><i style="border:1px dashed #8b95a1"></i>도련</span>' + (P.zones && P.zones.length ? '<span><i style="background:rgba(245,158,11,.3)"></i>제본 안쪽 ' + R.gz + 'mm</span>' : '') + '</div>';
-  h += I.length ? I.map(function (x) { return '<div class="iss" data-hi="' + x.id + '"><div class="ih"><span class="num ' + ({ err: '', warn: 'w', adv: 'a', info: 'i' })[x.sev] + '">' + x.id + '</span><div class="t"><b>' + esc(x.title) + '</b>' + (x.sus ? '<span class="sus">의심</span>' : '') + '<div class="d">' + rich(x.detail) + '</div>' + (x.fix ? '<div class="fx">→ ' + rich(x.fix) + '</div>' : '') + (x.ref != null ? compareHTML(x) : '') + '</div></div></div>'; }).join('') : '<div class="sub">이 페이지에서 찾은 문제가 없어요.</div>';
+  h += I.length ? I.map(function (x) { return '<div class="iss" data-hi="' + x.id + '"><div class="ih"><span class="num ' + (isTypo(x) ? '' : ({ err: '', warn: 'w', adv: 'a', info: 'i' })[x.sev]) + '">' + x.id + '</span><div class="t"><b>' + esc(x.title) + '</b>' + (x.sus ? '<span class="sus">의심</span>' : '') + '<div class="d">' + rich(x.detail) + '</div>' + (x.fix ? '<div class="fx">→ ' + rich(x.fix) + '</div>' : '') + (x.ref != null ? compareHTML(x) : '') + '</div></div></div>'; }).join('') : '<div class="sub">이 페이지에서 찾은 문제가 없어요.</div>';
   $('#vl').innerHTML = h;
   $$('#vl .cmp').forEach(drawCompare);
   $$('#vl [data-hi]').forEach(function (d) { d.classList.toggle('on', +d.dataset.hi === V.hi); d.onclick = function () { V.hi = V.hi === +d.dataset.hi ? null : +d.dataset.hi; drawViewer(); }; });

@@ -507,11 +507,11 @@ async function run() {
   if (CURR) select(CURR);
   if (RS.length) $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-function counts(r) { var c = { err: 0, warn: 0, adv: 0, info: 0 }; (r.issues || []).forEach(function (x) { if (!x.hidden) c[x.sev]++; }); return c; }
+function counts(r) { var c = { typo: 0, err: 0, warn: 0, adv: 0, info: 0 }; (r.issues || []).forEach(function (x) { if (!x.hidden) c[x.sev !== 'info' && TYPO_CODES.indexOf(x.code) > -1 ? 'typo' : x.sev]++; }); return c; }
 function drawResults() {
   if (!RS.length) { $('#results').hidden = true; return; }
   var h = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 class="sh" style="margin:0">검수 결과 · 파일 ' + RS.length + '개' + (RUN ? ' <span class="mute small" style="font-weight:600">· 끝난 파일부터 바로 눌러 볼 수 있어요</span>' : '') + '</h3><div class="row"><button class="ib" id="pAll"' + (RUN ? ' disabled' : '') + '>전체 결과지</button><button class="ib" id="again">파일 비우고 새로</button></div></div><div class="rf">';
-  h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : !r._seen ? 'new' : '') + '"><b>' + (!r._seen && r !== CURR ? '<em class="nw">새 결과</em>' : '') + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.err ? '<i class="e">경고 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">주의 ' + c.warn + '</i>' : '') + (c.adv ? '<i class="a">조언 ' + c.adv + '</i>' : '') + (!c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
+  h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : !r._seen ? 'new' : '') + '"><b>' + (!r._seen && r !== CURR ? '<em class="nw">새 결과</em>' : '') + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.typo ? '<i class="e">오탈자 ' + c.typo + '</i>' : '') + (c.err ? '<i class="e">경고 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">주의 ' + c.warn + '</i>' : '') + (c.adv ? '<i class="a">조언 ' + c.adv + '</i>' : '') + (!c.typo && !c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
   $('#results').innerHTML = h + '</div>'; $('#results').hidden = false;
   $$('#results .rf button').forEach(function (b) { b.onclick = function () { select(RS[+b.dataset.i]); }; });
   $('#pAll').onclick = function () { printSheet(RS); };
@@ -612,7 +612,7 @@ var CHECK = [
     ['인쇄 감리용 출력 색 확인', [], PRINTISH, 1]
   ]]
 ];
-var STN = { info: '참고', ok: '통과', err: '경고', warn: '주의', na: '해당 없음', man: '직접 확인', wait: '검수 전', chk: '확인함' };
+var STN = { info: '안내', ok: '통과', err: '경고', warn: '주의', na: '해당 없음', man: '직접 확인', wait: '검수 전', chk: '확인함' };
 var STI = { info: 'i', ok: '<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>', err: '!', warn: '?', na: '–', man: '<svg class="pic" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>', wait: '·', chk: '<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>' };
 function evalItem(r, it) {
   var key = it[0];
@@ -729,7 +729,7 @@ function extraIssues(r) { // 결과지 전용 리마인드 (품목 성격에 따
 var SHEET_CHECK_EXTRA = [['아웃박스', [['FSC · 소이잉크 표기', ['boxfsc']], ['증지 위치 가이드', ['boxsticker']], ['증지 크기', ['boxsize']]], function (r) { return BOXRE.test((r.prodName || '') + ' ' + r.file); }],
   ['멤버 · 구성', [['멤버 배치 순서 (정합 순서)', ['memorder']]], function (r) { return SETRE.test((r.prodName || '') + ' ' + r.file); }]];
 // 오탈자·표기 항목은 단계와 상관없이 '오탈자'로 맨 위에 (2026-11-20 실장님: 오탈자 / 경고 / 주의 / 조언)
-var TYPO_CODES = ['typoko', 'typoen', 'repword', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix'];
+var TYPO_CODES = ['typoko', 'typoen', 'repword', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix']; // app.js와 같은 목록
 function lvOf(x) { return LV[x.sev] ? (TYPO_CODES.indexOf(x.code) > -1 ? 't' : LV[x.sev]) : ''; }
 function groupsOf(r) {
   var G = {}, order = [];
