@@ -1616,7 +1616,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm37';
+var APP_VER = '20261120hm38';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2828,7 +2828,7 @@ function crumbHtml() {
 var PG_DESC = {
   todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
-  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '46전 788×1091 · 국전 636×939 · 결(종목/횡목) 반영', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
+  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '완성 크기와 수량을 넣으면 원판마다 몇 개 앉는지, 몇 장 필요한지 비교해요 · 원판 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
   qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '인쇄 · 후가공 · 제본 용어와 디자인 용어',
   checklist: '컨펌 요청 전 단계별 자가 점검' };

@@ -333,6 +333,42 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .dqv { font-size:14px; font-weight:600; white-space:nowrap; color:var(--sub, #4e5968); }
 .dqt .dqtv { flex:1 1 auto; font-size:16px; font-weight:800; color:var(--txt, #191f28); padding:12px 0; }
 .dqt .dqtv i { font-style:normal; font-size:14px; font-weight:500; color:var(--mute, #8b95a1); }
+/* 절수 계산기 개선 (2026-11-20) */
+.cw2 { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !important; }
+.cw2 > .card { margin:0; } .cout > * + * { margin-top:16px; } .cout .card { margin-bottom:0; }
+@media (min-width:900px) { html.emb .cw2 { grid-template-columns:400px minmax(0,1fr); align-items:start; } html.emb .cout { position:sticky; top:12px; } }
+.cin { padding:22px 20px !important; }
+.cstp { display:flex; align-items:center; gap:10px; margin:0 0 16px; flex-wrap:wrap; }
+.cstp em { font-style:normal; flex:none; width:24px; height:24px; border-radius:12px; background:var(--txt); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.cstp b { font-size:17px; font-weight:800; letter-spacing:-0.02em; } .cstp small { font-size:13px; color:var(--mute); }
+.cstp .mseg { margin-left:auto !important; }
+.csep { height:1px; background:var(--line); margin:22px 0; }
+.cpg { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:0 0 14px !important; }
+.cpg button { height:52px; border:0; border-radius:12px; background:var(--chip); text-align:left; padding:0 12px; display:flex; flex-direction:column; justify-content:center; font:inherit; cursor:pointer; min-width:0; }
+.cpg button b { font-size:14px; font-weight:700; color:var(--txt); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .cpg button small { margin:2px 0 0 !important; font-size:12px; color:var(--mute); opacity:1 !important; }
+.cpg button.on { background:var(--txt); } .cpg button.on b { color:#fff; } .cpg button.on small { color:#b0b8c1; }
+.frow.c3 > .f { flex:1 1 0; }
+.cgf { margin-top:4px; } .cgf .seg { margin:0 !important; }
+.cnt0 { margin:10px 0 0 !important; line-height:1.5; }
+.cdie { margin:0 0 14px !important; }
+.csum { background:#191f28; color:#fff; border-radius:20px; padding:22px 20px; }
+.csum .t { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:600; color:#d1d6db; flex-wrap:wrap; }
+.csum .t em { font-style:normal; font-size:12px; font-weight:700; background:#3182f6; color:#fff; border-radius:6px; padding:3px 7px; } .csum .t small { margin-left:auto; font-size:13px; color:#8b95a1; }
+.csum .big { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:16px 0 18px; }
+.csum .big small { display:block; font-size:13px; color:#8b95a1; } .csum .big b { display:block; font-size:28px; font-weight:800; letter-spacing:-0.02em; margin-top:4px; white-space:nowrap; } .csum .big b i { font-style:normal; font-size:15px; font-weight:600; color:#d1d6db; margin-left:2px; }
+.csum .big span { display:block; font-size:12px; color:#8b95a1; margin-top:2px; }
+.csum .cpy { width:100%; height:48px; border:0; border-radius:12px; background:#fff !important; color:#191f28 !important; font:inherit; font-size:15px; font-weight:700; margin:0; }
+.ctag { font-size:13px; font-weight:600; color:var(--mute); margin:0 0 10px; }
+.ccmp table { width:100%; border-collapse:collapse; font-size:14px; }
+.ccmp th { font-size:12px; font-weight:600; color:var(--mute); text-align:right; padding:0 6px 10px; white-space:nowrap; } .ccmp th:first-child { text-align:left; padding-left:0; }
+.ccmp td { padding:14px 6px; border-top:1px solid var(--line); text-align:right; font-weight:700; white-space:nowrap; } .ccmp td:last-child, .ccmp th:last-child { padding-right:0; }
+.ccmp td:first-child { text-align:left; padding-left:0; } .ccmp td:first-child small { display:block; font-size:12px; font-weight:500; color:var(--mute); margin:2px 0 0 26px; }
+.ccmp tr[data-selp] { cursor:pointer; } .ccmp tr.on td { color:#3182f6; } .ccmp tr.x td { color:var(--faint); font-weight:500; }
+.ccmp .rb { display:inline-block; width:18px; height:18px; border-radius:9px; border:2px solid #d1d6db; vertical-align:-4px; margin-right:8px; box-sizing:border-box; }
+.ccmp tr.on .rb { border:6px solid #3182f6; }
+.clay .csv { max-height:440px; }
+#cP button { white-space:normal; line-height:1.3; padding:6px 4px; } @media (max-width:520px) { #cP button { font-size:13px; } }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -517,32 +553,36 @@ function resCard0(r, i, extra, spec) {
 }
 var CQ = null;
 function renderCalc() {
-  var c = CQ = cq(); if (c.t === 'pack') c.t = 'die'; if (c.t !== 'die') c.lastFlat = c.t; var h = '<div class="phd"><b>절수</b><small>46전 788×1091 · 국전 636×939 · 아크릴 335×235 · 결(종목/횡목) 반영</small></div>';
+  // 2026-11-20 실장님 개선 시안: 왼쪽 = 1 완성 크기 → 2 수량 → 3 인쇄 여유, 오른쪽 = 추천 원판 · 원판별 비교 · 배치도
+  var c = CQ = cq(); if (c.t === 'pack') c.t = 'die'; if (c.t !== 'die') c.lastFlat = c.t;
+  var h = '<div class="phd"><b>절수</b><small>완성 크기와 수량을 넣으면 원판마다 몇 개 앉는지, 몇 장 필요한지 비교해요 · 원판 46전 788×1091 · 국전 636×939 · 아크릴 335×235</small></div>';
   var isDie = c.t === 'die';
   h += '<div class="seg" id="cB">' + [['sheet', '낱장'], ['book', '책 (본문 + 표지)'], ['die', '표지 · 패키지 (전개도)']].map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.t === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
   var mseg = '<span class="seg sm mseg" id="cM">' + [['size', '크기로'], ['cut', '절수로']].map(function (o) { return '<button data-m="' + o[0] + '" class="' + (c.m === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</span>';
-  var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + (unit ? ' (' + unit + ')' : '') + '</label><input type="number" inputmode="decimal" data-k="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '></div>'; };
+  var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + '</label><span class="ifx"><input type="number" inputmode="decimal" data-k="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '>' + (unit ? '<em>' + unit + '</em>' : '') + '</span></div>'; };
+  var stp = function (n, t, sm, extra) { return '<div class="cstp"><em>' + n + '</em><b>' + t + '</b>' + (sm ? '<small>' + sm + '</small>' : '') + (extra || '') + '</div>'; };
+  var gseg = '<div class="f cgf"><label>종이 결</label><div class="seg" id="cG">' + [['', '상관없음'], ['v', '세로결'], ['h', '가로결']].map(function (o) { return '<button data-g="' + o[0] + '" class="' + ((c.gn || '') === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
+  var qty = '<div class="frow">' + num('q', '수량', '개') + num('ex', '여분', '%') + '</div>';
+  var mar = stp(!isDie && c.m === 'cut' ? 2 : 3, '인쇄 여유', '인쇄소 기준') + '<div class="frow c3">' + num('bl', '도련 (사방)', 'mm') + num('gr', '물림', 'mm') + num('sd', '여백', 'mm') + '</div>' +
+    '<div class="nt cnt0">인쇄소마다 물림 · 여백이 달라요. 아크릴은 물림 없이 계산해요</div>';
+  var L = '';
   if (isDie) {
     var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd);
-    h += '<div class="chips" style="margin:0 0 12px">' + DIE.map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div>';
-    h += '<div class="card"><div class="ct">' + dd.n + '<small>' + dd.d + '</small></div><div class="ig">' + Object.keys(dv).map(function (k) { var L = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + L[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (L[1] ? '<em>' + L[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
-      '<div class="frow" style="margin-top:10px">' + num('q', '수량', '개') + num('ex', '여분', '%') + '</div><div class="seg" id="cG">' + [['', '결 상관없음'], ['v', '세로결'], ['h', '가로결']].map(function (o) { return '<button data-g="' + o[0] + '" class="' + ((c.gn || '') === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>' +
-      '<div class="nt">전개도 모양 그대로 전지에 앉혀서 계산해요 · 한 장 안에서는 결 방향을 섞지 않고, 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div></div>';
+    L += stp(1, '전개도', dd.d) + '<div class="chips cdie">' + DIE.map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div>' +
+      '<div class="ig">' + Object.keys(dv).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
+      '<div class="csep"></div>' + stp(2, '수량') + qty + gseg + '<div class="nt cnt0">전개도 모양 그대로 원판에 앉혀요 · 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div>';
   } else if (c.m === 'size') {
-    h += '<div class="card"><div class="ct ctm"><span>' + (c.t === 'pack' ? '펼친 크기 (전개도)' : '완성 크기') + '<small>재단 후</small></span>' + mseg + '</div>';
-    if (c.t !== 'pack') h += '<div class="chips cpre">' + PRESETS.map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '">' + p[0] + '<small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>';
-    h += '<div class="frow">' + num(c.t === 'pack' ? 'cw' : 'w', '가로', 'mm') + num(c.t === 'pack' ? 'ch' : 'h', '세로', 'mm') + '</div>';
-    if (c.t === 'book') h += '<div class="frow">' + num('p', '본문', '쪽') + num('q', '부수', '부') + '</div><div class="frow">' + num('sp', '책등', 'mm', '0.5') + num('fl', '날개', 'mm') + '</div>';
-    else h += '<div class="frow">' + num('q', '수량', '개') + num('ex', '여분', '%') + '</div><div class="seg" id="cG">' + [['', '결 상관없음'], ['v', '세로결'], ['h', '가로결']].map(function (o) { return '<button data-g="' + o[0] + '" class="' + ((c.gn || '') === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
-    if (c.t === 'book') h += '<div class="nt">책은 결이 책등과 같은 방향(세로결)으로 자동 계산해요 · 종목/횡목 따로 보여줘요</div>';
-    h += '</div>';
+    L += stp(1, '완성 크기', '재단 후', mseg) + '<div class="cpg cpre">' + PRESETS.map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '"><b>' + p[0].replace('국배판(A4)', 'A4') + '</b><small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
+      '<div class="frow">' + num('w', '가로', 'mm') + num('h', '세로', 'mm') + '</div><div class="csep"></div>';
+    if (c.t === 'book') L += stp(2, '쪽수 · 부수') + '<div class="frow">' + num('p', '본문', '쪽') + num('q', '부수', '부') + '</div><div class="frow">' + num('sp', '책등', 'mm', '0.5') + num('fl', '날개', 'mm') + '</div><div class="frow">' + num('ex', '여분', '%') + '<div class="f"></div></div>' +
+      '<div class="nt cnt0">책은 결이 책등과 같은 방향(세로결)으로 자동 계산해요 · 종목/횡목 따로 보여줘요</div>';
+    else L += stp(2, '수량') + qty + gseg;
   } else {
-    h += '<div class="card"><div class="ct ctm"><span>전지 · 절수</span>' + mseg + '</div><div class="seg" id="cP">' + PAPERS.map(function (P) { return '<button data-pp="' + P.k + '" class="' + (c.paper === P.k ? 'on' : '') + '">' + P.n + ' ' + (P.acr ? P.l + '×' + P.s : P.s + '×' + P.l) + '</button>'; }).join('') + '</div>' +
-      '<div class="chips">' + CUTS.map(function (n) { return '<button data-cut="' + n + '" class="' + (+c.cut === n ? 'on' : '') + '">' + n + '절</button>'; }).join('') + '</div></div>';
+    L += stp(1, '원판 · 절수', '', mseg) + '<div class="seg" id="cP">' + PAPERS.map(function (P) { return '<button data-pp="' + P.k + '" class="' + (c.paper === P.k ? 'on' : '') + '">' + P.n + ' ' + (P.acr ? P.l + '×' + P.s : P.s + '×' + P.l) + '</button>'; }).join('') + '</div>' +
+      '<div class="chips">' + CUTS.map(function (n) { return '<button data-cut="' + n + '" class="' + (+c.cut === n ? 'on' : '') + '">' + n + '절</button>'; }).join('') + '</div>';
   }
-  h += '<details class="card cset"><summary class="ct">여유 설정<small>도련 ' + c.bl + ' · 물림 ' + c.gr + ' · 여백 ' + c.sd + 'mm</small></summary><div class="frow" style="margin-top:12px">' + num('bl', '도련(사방)', 'mm') + num('gr', '물림', 'mm') + num('sd', '여백', 'mm') + '</div>' +
-    (c.t === 'book' ? '<div class="frow">' + num('ex', '여분', '%') + '</div>' : '') + '<div class="legend" style="justify-content:flex-start">인쇄소마다 물림·여백이 달라요 · 결(종목/횡목) 방향은 인쇄소와 확인</div></details>';
-  h += '<div id="cRes" class="io-r">' + calcOut(c) + '</div>';
+  L += '<div class="csep"></div>' + mar;
+  h += '<div class="cw2"><div class="card cin">' + L + '</div><div class="cout" id="cRes">' + calcOut(c) + '</div></div>';
   $('#main').innerHTML = h; bindCalc();
 }
 function dieVals(c, dd) { c.dvs = c.dvs || {}; var v = c.dvs[dd.id]; if (!v) { v = c.dvs[dd.id] = JSON.parse(JSON.stringify(dd.in)); } return v; }
@@ -602,13 +642,18 @@ function calcOut(c) {
     return out;
   }
   var pw = c.t === 'pack' ? +c.cw : w, ph = c.t === 'pack' ? +c.ch : hh, R2 = calcItem(pw, ph, c, false);
-  out += '<div class="sec">' + (c.t === 'pack' ? '전개도' : '낱장') + '<small>' + pw + '×' + ph + ' · ' + fmtN(q) + '개</small></div>';
-  R2.forEach(function (r, i) {
-    if (!r.n) { out += resCard(r, i); return; }
-    var sh = Math.ceil(q / r.n * ex);
-    out += resCard(r, i, '<div class="cst sm"><div><small>필요 전지</small><b>' + fmtN(sh) + '<i>장</i></b><em>' + yeon(sh) + ' · 여분 ' + c.ex + '%</em></div></div>',
-      (c.t === 'pack' ? '전개도 ' : '') + pw + '×' + ph + 'mm · ' + r.P.n + ' ' + r.n + '개 걸이 · ' + fmtN(q) + '개 · 전지 ' + fmtN(sh) + '장(' + yeon(sh) + ')');
-  });
+  var ok = R2.filter(function (r) { return r.n; });
+  if (!ok.length) return '<div class="card"><div class="empty2">이 크기는 어느 원판에도 안 들어가요</div></div>';
+  var best = ok[0], sel = ok.filter(function (r) { return r.P.k === c.selP; })[0] || best;
+  var shOf = function (r) { return Math.ceil(q / r.n * ex); }, unitW = function (r) { return r.P.acr ? '원판' : '전지'; };
+  var bs = shOf(best), spec = pw + '×' + ph + 'mm · ' + best.P.n + ' ' + best.n + '개 걸이 · ' + fmtN(q) + '개 · ' + unitW(best) + ' ' + fmtN(bs) + '장' + (best.P.acr ? '' : '(' + yeon(bs) + ')');
+  out += '<div class="csum"><div class="t">' + best.P.n + ' ' + (best.P.acr ? best.P.l + '×' + best.P.s : best.P.s + '×' + best.P.l) + '<em>추천</em><small>사용률 가장 높음</small></div>' +
+    '<div class="big"><div><small>1장에</small><b>' + best.n + '<i>개</i></b><span>' + esc(best.f.desc) + '</span></div><div><small>필요 ' + unitW(best) + '</small><b>' + fmtN(bs) + '<i>장</i></b><span>' + (best.P.acr ? '' : yeon(bs) + ' · ') + '여분 ' + c.ex + '%</span></div><div><small>사용률</small><b>' + Math.round(best.use * 100) + '<i>%</i></b><span>로스 ' + Math.round(best.loss * 100) + '%</span></div></div>' +
+    '<button class="cpy" data-cpy="' + esc(spec) + '">사양서용 복사</button></div>';
+  out += '<div class="card ccmp"><div class="ctag">원판별 비교 · 눌러서 배치도 보기</div><table><tr><th>원판</th><th>1장에</th><th>사용률</th><th>필요 장수</th></tr>' +
+    R2.map(function (r) { return r.n ? '<tr data-selp="' + r.P.k + '" class="' + (r === sel ? 'on' : '') + '"><td><span class="rb"></span>' + r.P.n + '<small>' + (r.P.acr ? r.P.l + '×' + r.P.s : r.P.s + '×' + r.P.l) + '</small></td><td>' + r.n + '개</td><td>' + Math.round(r.use * 100) + '%</td><td>' + fmtN(shOf(r)) + '장</td></tr>'
+      : '<tr class="x"><td><span class="rb"></span>' + r.P.n + '<small>' + r.P.s + '×' + r.P.l + '</small></td><td colspan="3">안 들어가요</td></tr>'; }).join('') + '</table></div>';
+  out += '<div class="card clay"><div class="ctag">' + sel.P.n + ' 배치도</div>' + acrTxt(sel, sheetSvg(sel.P, sel.f, CQ) + '<div class="cds">배치 ' + esc(sel.f.desc) + ' · 빨간 띠 = 물림</div>') + '</div>';
   return out;
 }
 function bindCalc() {
@@ -625,6 +670,7 @@ function bindCalc() {
   $$('#main [data-k]').forEach(function (i) { i.oninput = function () { c[i.dataset.k] = i.value === '' ? '' : +i.value; upd(true); }; });
   bindRes();
   function bindRes() {
+    $$('[data-selp]').forEach(function (r) { r.onclick = function () { c.selP = r.dataset.selp; upd(true); }; });
     $$('.cfit [data-pw]').forEach(function (b) { b.onclick = function () { c.w = +b.dataset.pw; c.h = +b.dataset.ph; c.m = 'size'; upd(); }; });
     $$('[data-cpy]').forEach(function (b) { b.onclick = function () { var t = b.dataset.cpy; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('복사했어요 · 사양서에 붙여넣기'); }, function () { prompt('복사해서 쓰세요', t); }); }; });
   }
