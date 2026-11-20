@@ -583,19 +583,20 @@ function resCard0(r, i, extra, spec) {
     sheetSvg(r.P, r.f, CQ) + '<div class="cds">배치 ' + esc(r.f.desc) + ' · 빨간 띠 = 물림</div>' + (extra || '') +
     (spec ? '<button class="cpy" data-cpy="' + esc(spec) + '">사양서용 복사</button>' : '') + '</div>';
 }
+var LEAF_PRE = [['A4 펼침', 297, 210], ['A3 펼침', 420, 297], ['B4 펼침', 364, 257], ['B5 펼침', 257, 182], ['A5 펼침', 210, 148], ['국판 펼침', 296, 210]]; // 리플렛: 펼친 크기 기준
 var CQ = null;
 function renderCalc() {
   // 2026-11-20 실장님 개선 시안: 왼쪽 = 1 완성 크기 → 2 수량 → 3 인쇄 여유, 오른쪽 = 추천 원판 · 원판별 비교 · 배치도
-  var c = CQ = cq(); if (c.t === 'pack') c.t = 'die'; if (c.t !== 'die') c.lastFlat = c.t;
+  var c = CQ = cq(); if (c.t === 'pack') c.t = 'die'; if (c.t !== 'die') c.lastFlat = c.t; c.m = 'size'; c.fd = +c.fd || 3;
   var h = '<div class="phd"><b>종이연수·칼선</b><small>완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235</small></div>';
   var isDie = c.t === 'die';
-  h += '<div class="seg" id="cB">' + [['sheet', '낱장'], ['book', '책 (본문 + 표지)'], ['die', '칼선 (박스·봉투·표지)']].map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.t === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  h += '<div class="seg" id="cB">' + [['sheet', '낱장'], ['leaf', '리플렛'], ['book', '책 내지'], ['die', '칼선 (박스·봉투·표지)']].map(function (o) { return '<button data-b="' + o[0] + '" class="' + (c.t === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>';
   var mseg = '<span class="seg sm mseg" id="cM">' + [['size', '크기로'], ['cut', '절수로']].map(function (o) { return '<button data-m="' + o[0] + '" class="' + (c.m === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</span>';
   var num = function (k, lb, unit, step) { return '<div class="f"><label>' + lb + '</label><span class="ifx"><input type="number" inputmode="decimal" data-k="' + k + '" value="' + c[k] + '"' + (step ? ' step="' + step + '"' : '') + '>' + (unit ? '<em>' + unit + '</em>' : '') + '</span></div>'; };
   var stp = function (n, t, sm, extra) { return '<div class="cstp"><em>' + n + '</em><b>' + t + '</b>' + (sm ? '<small>' + sm + '</small>' : '') + (extra || '') + '</div>'; };
   var gseg = '<div class="f cgf"><label>종이 결</label><div class="seg" id="cG">' + [['', '상관없음'], ['v', '세로결'], ['h', '가로결']].map(function (o) { return '<button data-g="' + o[0] + '" class="' + ((c.gn || '') === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
   var qty = '<div class="frow">' + num('q', '수량', '개') + num('ex', '여분', '%') + '</div>';
-  var mar = stp(!isDie && c.m === 'cut' ? 2 : 3, '인쇄 여유', '인쇄소 기준') + '<div class="frow c3">' + num('bl', '도련 (사방)', 'mm') + num('gr', '물림', 'mm') + num('sd', '여백', 'mm') + '</div>' +
+  var mar = stp(c.t === 'leaf' ? 4 : 3, '인쇄 여유', '인쇄소 기준') + '<div class="frow c3">' + num('bl', '도련 (사방)', 'mm') + num('gr', '물림', 'mm') + num('sd', '여백', 'mm') + '</div>' +
     '<div class="nt cnt0">인쇄소마다 물림 · 여백이 달라요. 아크릴은 물림 없이 계산해요</div>';
   var L = '';
   if (isDie) {
@@ -606,10 +607,12 @@ function renderCalc() {
       '<div class="ig">' + Object.keys(dd.in).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
       '<div class="csep"></div>' + stp(2, '수량') + qty + gseg + '<div class="nt cnt0">칼선 모양 그대로 원판에 앉혀요 · 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div>';
   } else if (c.m === 'size') {
-    L += stp(1, '완성 크기', '재단 후', mseg) + '<div class="cpg cpre">' + PRESETS.map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '"><b>' + p[0].replace('국배판(A4)', 'A4') + '</b><small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
+    L += stp(1, c.t === 'leaf' ? '펼친 크기' : '완성 크기', c.t === 'leaf' ? '재단 후 · 접기 전' : '재단 후') + '<div class="cpg cpre">' + (c.t === 'leaf' ? LEAF_PRE : PRESETS).map(function (p) { return '<button data-pw="' + p[1] + '" data-ph="' + p[2] + '" class="' + (+c.w === p[1] && +c.h === p[2] ? 'on' : '') + '"><b>' + p[0].replace('국배판(A4)', 'A4') + '</b><small>' + p[1] + '×' + p[2] + '</small></button>'; }).join('') + '</div>' +
       '<div class="frow">' + num('w', '가로', 'mm') + num('h', '세로', 'mm') + '</div><div class="csep"></div>';
-    if (c.t === 'book') L += stp(2, '쪽수 · 부수') + '<div class="frow">' + num('p', '본문', '쪽') + num('q', '부수', '부') + '</div><div class="frow">' + num('sp', '책등', 'mm', '0.5') + num('fl', '날개', 'mm') + '</div><div class="frow">' + num('ex', '여분', '%') + '<div class="f"></div></div>' +
+    if (c.t === 'book') L += stp(2, '쪽수 · 부수') + '<div class="frow">' + num('p', '내지', '쪽') + num('q', '부수', '부') + '</div><div class="frow">' + num('ex', '여분', '%') + '<div class="f"></div></div>' +
       '<div class="nt cnt0">책은 결이 책등과 같은 방향(세로결)으로 자동 계산해요 · 종목/횡목 따로 보여줘요</div>';
+    else if (c.t === 'leaf') L += stp(2, '접지') + '<div class="chips" id="cFd">' + [2, 3, 4, 5, 6].map(function (n) { return '<button data-fd="' + n + '" class="' + (c.fd === n ? 'on' : '') + '">' + n + '단</button>'; }).join('') + '</div>' +
+      '<div class="nt cnt0">한 면 가로 = 펼친 가로 ÷ 단수 · 안으로 접혀 들어가는 면은 보통 1~2mm 작게 잡아요</div><div class="csep"></div>' + stp(3, '수량') + qty + gseg;
     else L += stp(2, '수량') + qty + gseg;
   } else {
     L += stp(1, '원판 · 절수', '', mseg) + '<div class="seg" id="cP">' + PAPERS.map(function (P) { return '<button data-pp="' + P.k + '" class="' + (c.paper === P.k ? 'on' : '') + '">' + P.n + ' ' + (P.acr ? P.l + '×' + P.s : P.s + '×' + P.l) + '</button>'; }).join('') + '</div>' +
@@ -633,7 +636,7 @@ function nestCard0(r, i, G, extra, spec) {
 function calcOut(c) {
   var w = +c.w, hh = +c.h, q = Math.max(0, +c.q || 0), ex = 1 + (+c.ex || 0) / 100, out = '';
   if (c.t === 'die') {
-    var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd), G = dieGeom(dd.geo || dd.id, dieFix(dd, dv)), pad = dd.id === 'cover' ? 0 : +c.bl;
+    var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd), G = dieGeom(dd.geo || dd.id, dieFix(dd, dv)), pad = +c.bl;
     // 종이연수·칼선 (2026-11-21 실장님 "절수 계산기랑 전개도 생성기 겹쳐, 한데 모아"): 전개도 + 파일 저장 → 추천 · 원판별 비교 · 배치도 (낱장과 같은 모양)
     out += '<div class="card"><div class="ct">대략 전개도<small>' + mm(G.W) + ' × ' + mm(G.H) + 'mm</small></div>' + dieSvg(G, false) +
       '<div class="legend"><span><b style="color:#e5243b">━</b> 재단선</span><span><b style="color:#0067d8">┅</b> 접는선(오시)</span></div>' +
@@ -672,14 +675,6 @@ function calcOut(c) {
       var ex2 = '<div class="cst sm"><div><small>전지 1장(앞뒤)</small><b>' + per + '<i>쪽</i></b></div><div><small>대수 (16쪽)</small><b>' + dae + '<i>대</i>' + (rest ? ' +' + rest + '<i>쪽</i>' : '') + '</b></div><div><small>필요 전지</small><b>' + fmtN(sheets) + '<i>장</i></b><em>' + yeon(sheets) + '</em></div></div>' + tip;
       out += resCard(r, i, ex2, '본문 ' + w + '×' + hh + 'mm · ' + pages + 'p · ' + r.P.n + ' ' + r.n + '판걸이(1장 ' + per + 'p) · ' + fmtN(q) + '부 · 전지 ' + fmtN(sheets) + '장(' + yeon(sheets) + ', 여분 ' + c.ex + '% 포함)');
     });
-    var cw = 2 * w + (+c.sp || 0) + 2 * (+c.fl || 0), GC = dieGeom('cover', { w: w, h: hh, sp: +c.sp || 0, fl: +c.fl || 0, bl: +c.bl }), cgn = c.gn; c.gn = 'v';
-    var Rc = nestItem(GC, c, 0); c.gn = cgn;
-    out += '<div class="sec">표지<small>펼친 크기 ' + fmtN(cw, 1) + '×' + hh + ' (앞뒤 + 책등 ' + (+c.sp || 0) + (+c.fl ? ' + 날개 ' + c.fl + '×2' : '') + ') · 세로결</small></div>';
-    Rc.forEach(function (r, i) {
-      if (!r.n) { out += nestCard(r, i, GC); return; }
-      var sh = Math.ceil(q / r.n * ex);
-      out += nestCard(r, i, GC, '<div class="cst sm"><div><small>필요 전지</small><b>' + fmtN(sh) + '<i>장</i></b><em>' + yeon(sh) + '</em></div></div>', '표지 ' + fmtN(cw, 1) + '×' + hh + 'mm (책등 ' + (+c.sp || 0) + ') · ' + r.P.n + ' ' + r.n + '개 걸이 · 전지 ' + fmtN(sh) + '장(' + yeon(sh) + ')');
-    });
     return out;
   }
   var pw = c.t === 'pack' ? +c.cw : w, ph = c.t === 'pack' ? +c.ch : hh, R2 = calcItem(pw, ph, c, false);
@@ -687,7 +682,9 @@ function calcOut(c) {
   if (!ok.length) return '<div class="card"><div class="empty2">이 크기는 어느 원판에도 안 들어가요</div></div>';
   var best = ok[0], sel = ok.filter(function (r) { return r.P.k === c.selP; })[0] || best;
   var shOf = function (r) { return Math.ceil(q / r.n * ex); }, unitW = function (r) { return r.P.acr ? '원판' : '전지'; };
-  var bs = shOf(best), spec = pw + '×' + ph + 'mm · ' + best.P.n + ' ' + best.n + '개 걸이 · ' + fmtN(q) + '개 · ' + unitW(best) + ' ' + fmtN(bs) + '장' + (best.P.acr ? '' : '(' + yeon(bs) + ')');
+  var lf = c.t === 'leaf' ? (+c.fd || 3) : 0;
+  if (lf) out += '<div class="card clf"><div class="ctag">리플렛 ' + lf + '단 접지</div><div class="cst c2"><div><small>펼친 크기</small><b>' + pw + '<i>×</i>' + ph + '<i>mm</i></b></div><div><small>접은 크기 (한 면)</small><b>' + fmtN(pw / lf, 1) + '<i>×</i>' + ph + '<i>mm</i></b></div></div></div>';
+  var bs = shOf(best), spec = (lf ? '리플렛 ' + lf + '단 접지 · 펼친 ' : '') + pw + '×' + ph + 'mm · ' + best.P.n + ' ' + best.n + '개 걸이 · ' + fmtN(q) + '개 · ' + unitW(best) + ' ' + fmtN(bs) + '장' + (best.P.acr ? '' : '(' + yeon(bs) + ')');
   out += '<div class="csum"><div class="t">' + best.P.n + ' ' + (best.P.acr ? best.P.l + '×' + best.P.s : best.P.s + '×' + best.P.l) + '<em>추천</em><small>사용률 가장 높음</small></div>' +
     '<div class="big"><div><small>1장에</small><b>' + best.n + '<i>개</i></b><span>' + esc(best.f.desc) + '</span></div><div><small>필요 ' + unitW(best) + '</small><b>' + fmtN(bs) + '<i>장</i></b><span>' + (best.P.acr ? '' : yeon(bs) + ' · ') + '여분 ' + c.ex + '%</span></div><div><small>사용률</small><b>' + Math.round(best.use * 100) + '<i>%</i></b><span>로스 ' + Math.round(best.loss * 100) + '%</span></div></div>' +
     '<button class="cpy" data-cpy="' + esc(spec) + '">사양서용 복사</button></div>';
@@ -708,6 +705,7 @@ function bindCalc() {
   $$('#cM button').forEach(function (b) { b.onclick = function () { c.m = b.dataset.m; upd(); }; });
   $$('#cP button').forEach(function (b) { b.onclick = function () { c.paper = b.dataset.pp; upd(); }; });
   $$('[data-cut]').forEach(function (b) { b.onclick = function () { c.cut = +b.dataset.cut; upd(); }; });
+  $$('#cFd button').forEach(function (b) { b.onclick = function () { c.fd = +b.dataset.fd; upd(); }; });
   $$('.cpre [data-pw]').forEach(function (b) { b.onclick = function () { c.w = +b.dataset.pw; c.h = +b.dataset.ph; upd(); }; });
   $$('#main [data-k]').forEach(function (i) { i.oninput = function () { c[i.dataset.k] = i.value === '' ? '' : +i.value; upd(true); }; });
   bindRes();
@@ -1459,9 +1457,11 @@ var DIE = [
   { gr: '단상자', id: 'rtg', n: '하단 수접착 박스', d: '단상자 · 위 꽂이 뚜껑 · 아래 날개 4장을 손으로 풀접착', in: { L: 100, D: 40, H: 150, g: 15, t: 15, ov: 10 } },
   { gr: '단상자', id: 'rte', n: '맞뚜껑 박스', d: '단상자 · 위아래 모두 꽂이 뚜껑 (서로 반대쪽에서 닫힘)', in: { L: 100, D: 40, H: 150, g: 15, t: 15 } },
   { gr: '패키지', id: 'mailer', n: '가로 G형 박스', d: '시즌그리팅 아웃박스 · 옆벽 두겹 + 앞 꽂이 뚜껑', in: { L: 310, W: 220, H: 40 } },
-  { gr: '패키지', id: 'sabari', n: '싸바리 싸개지', d: '상짝·하짝 한 장씩 · 보드 겉에 감싸기', in: { L: 200, W: 270, H: 50, bd: 2, wr: 15 } },
+  // 2026-11-21 실장님: 싸바리는 칼선이 상짝 · 하짝 따로
+  { gr: '패키지', id: 'sabari', n: '싸바리 하짝 (몸통)', d: '하짝 싸개지 · 보드 겉에 감싸기 · 크기는 하짝 안쪽 기준', in: { L: 200, W: 270, H: 50, bd: 2, wr: 15 } },
+  { gr: '패키지', id: 'sabariT', geo: 'sabari', n: '싸바리 상짝 (뚜껑)', d: '상짝 싸개지 · 상짝 안쪽 = 하짝 바깥(보드 포함) + 여유 1mm씩이 보통 · 기본값은 예시', in: { L: 206, W: 276, H: 30, bd: 2, wr: 15 } },
   { gr: '책', id: 'hard', n: '하드커버 싸개', d: '양장 표지 · 보드 3장 + 홈', in: { w: 148, h: 210, sp: 15, bd: 2, jt: 10, wr: 20 } },
-  { gr: '책', id: 'cover', n: '무선 책 표지', d: '앞·뒤 + 책등 (+ 날개)', in: { w: 148, h: 210, sp: 10, fl: 0, bl: 3 } },
+  { gr: '책', id: 'cover', n: '무선 책 표지', d: '뒤 + 책등 + 앞 · 여분 · 오시 없음 (2026-11-21 실장님) · 도련은 인쇄 여유에서', in: { w: 148, h: 210, sp: 10 } },
   { id: 'bag', gr: '쇼핑백', n: '쇼핑백', d: '앞 · 옆(가운데 접힘) · 뒤 · 옆 + 풀칠 · 윗단 접어넣기 · 바닥 날개', in: { L: 260, D: 100, H: 330, g: 20, tp: 40, hd: 1 } },
   { id: 'envS', geo: 'env', gr: '봉투', n: '소봉투 (일반형)', d: '완성 220×105 · 짧은 변 입구 · 위아래 날개 가운데 겹쳐 붙임 · 뚜껑 20', in: { w: 220, h: 105, mg: 0, sv: 12, lid: 20 } },
   { id: 'envSJ', geo: 'envj', gr: '봉투', n: '소봉투 (자켓형)', d: '완성 220×105 · 긴 변 입구 · 위아래 옆날개 · 뚜껑 42', in: { w: 105, h: 220, mg: 0, fl: 18, lid: 42 } },
@@ -1585,22 +1585,25 @@ function dieGeom(id, v) {
     t.push([cx, yB + Wd / 2, '바닥 ' + L + '×' + Wd], [cx, yL + Wd / 2, '뚜껑 (윗면)'], [cx, yB / 2, '앞벽 ' + Hh], [cx, yK + Hh / 2, '뒷벽 ' + Hh], [cx, yT + tk / 2, '앞 꽂이'],
       [X0 - Hh / 2, yB + Wd / 2, '옆벽'], [X1 + Hh * 1.5, yB + Wd / 2, '안쪽'], [X1 + Hh / 2, yL + Wd / 2, '날개']);
   } else if (id === 'sabari') {
-    var t2 = +v.bd, oL = +v.L + 2 * t2, oW = +v.W + 2 * t2, oH = +v.H + t2, wr = +v.wr, s = oH + wr; W = oL + 2 * s; H = oW + 2 * s;
-    poly([[s, 0], [s + oL, 0], [s + oL, s - 3], [W, s - 3], [W, s + oW + 3], [s + oL, s + oW + 3], [s + oL, H], [s, H], [s, s + oW + 3], [0, s + oW + 3], [0, s - 3], [s, s - 3]], c);
-    rect(s, s, oL, oW, f); hf(wr, s, s + oL); hf(H - wr, s, s + oL); vf(wr, s, s + oW); vf(W - wr, s, s + oW);
-    t.push([W / 2, H / 2, '바닥 ' + oL + '×' + oW], [W / 2, s / 2 + wr / 2, '벽 ' + oH], [W / 2, wr / 2, '접어넣기 ' + wr]);
+    // 싸바리 싸개지 (상짝 · 하짝 따로, 같은 모양): 가운데 바닥 + 네 벽 + 접어넣기.
+    // 긴 벽(위·아래)에 귀(모서리 감싸는 날개)를 붙여 옆벽 쪽으로 감싸고, 옆벽 접어넣기 끝은 45°로 잘라 안쪽에서 겹치지 않게.
+    // 참고: 리지드 박스 싸개 일반 규칙 — 접어넣기 15~20mm, 보드 1.5~2.5mm에 따라 크기 달라짐, 모서리 45° 처리 (2026-11-21 실장님 "칼선 모양 다시")
+    var t2 = +v.bd, oL = +v.L + 2 * t2, oW = +v.W + 2 * t2, oH = +v.H + t2, wr = +v.wr, s = oH + wr, e = Math.max(4, Math.min(15, oH - 4)), g = Math.min(wr, 8);
+    W = oL + 2 * s; H = oW + 2 * s; var R = s + oL, B = s + oW;
+    poly([[s, 0], [R, 0], [R, wr], [R + e, wr + e], [R + e, s - 2], [R, s], [W - wr, s], [W, s + g], [W, B - g], [W - wr, B], [R, B], [R + e, B + 2], [R + e, H - wr - e], [R, H - wr], [R, H],
+      [s, H], [s, H - wr], [s - e, H - wr - e], [s - e, B + 2], [s, B], [wr, B], [0, B - g], [0, s + g], [wr, s], [s, s], [s - e, s - 2], [s - e, wr + e], [s, wr]], c);
+    rect(s, s, oL, oW, f); hf(wr, s, R); hf(H - wr, s, R); vf(wr, s, B); vf(W - wr, s, B);
+    vf(s, wr, s); vf(R, wr, s); vf(s, B, H - wr); vf(R, B, H - wr);
+    t.push([W / 2, H / 2, '바닥 ' + r1(oL) + '×' + r1(oW)], [W / 2, wr + oH / 2, '벽 ' + r1(oH)], [W / 2, wr / 2, '접어넣기 ' + wr], [wr + oH / 2, H / 2, '옆벽'], [s - e / 2, s / 2 + wr / 2, '귀']);
   } else if (id === 'hard') {
     var bw = +v.w - 4, bh = +v.h + 7, sw = +v.sp + 4, jt = +v.jt, wr = +v.wr; W = 2 * bw + sw + 2 * jt + 2 * wr; H = bh + 2 * wr;
     var k = wr * 0.6; poly([[k, 0], [W - k, 0], [W, k], [W, H - k], [W - k, H], [k, H], [0, H - k], [0, k]], c);
     var x = wr; rect(x, wr, bw, bh, f); x += bw + jt; rect(x, wr, sw, bh, f); x += sw + jt; rect(x, wr, bw, bh, f);
     t.push([wr + bw / 2, H / 2, '뒤 보드 ' + bw + '×' + bh], [wr + bw + jt + sw / 2, H / 2 - 8, '책등'], [wr + bw + jt + sw / 2, H / 2, sw], [W - wr - bw / 2, H / 2, '앞 보드']);
   } else if (id === 'cover') {
-    var bl = +v.bl, w = +v.w, h = +v.h, sp = +v.sp, fl = +v.fl; W = 2 * w + sp + 2 * fl + 2 * bl; H = h + 2 * bl;
-    rect(0, 0, W, H, c); var x = bl;
-    if (fl) { x += fl; vf(x, 0, H); }
-    x += w; vf(x, 0, H); x += sp; vf(x, 0, H); x += w; if (fl) vf(x, 0, H);
-    f.push([bl, bl, W - bl, bl], [W - bl, bl, W - bl, H - bl], [W - bl, H - bl, bl, H - bl], [bl, H - bl, bl, bl]);
-    t.push([bl + fl + w / 2, H / 2, '뒤 ' + w], [bl + fl + w + sp / 2, H / 2, sp], [bl + fl + w + sp + w / 2, H / 2, '앞 ' + w]);
+    var w = +v.w, h = +v.h, sp = +v.sp; W = 2 * w + sp; H = h;
+    rect(0, 0, W, H, c);
+    t.push([w / 2, H / 2, '뒤 ' + w], [w + sp / 2, H / 2, sp], [w + sp + w / 2, H / 2, '앞 ' + w]);
   } else if (id === 'envn') {
     // 뚜껑없는 봉투: 입구 쪽은 앞판 그대로 · 가운데 반원 손잡이 홈
     var Wv = +v.w + 2 * +v.mg, Hv = +v.h + 2 * +v.mg, fl = +v.fl, nr = Math.min(+v.nt || 0, Wv / 4), bot = Math.round(Hv * 0.6); W = Wv + 2 * fl; H = Hv + bot;
@@ -1692,7 +1695,7 @@ function renderDie() {
   $('#dieImg').onchange = function () { var f = this.files[0]; if (f) dieAI(f); this.value = ''; };
 }
 function dieOut() {
-  var d = dieState(), G = dieGeom(d.geo || d.id, dieFix(d, DS.v)), NR = nestItem(G, { bl: MAR.bl, gr: MAR.gr, sd: MAR.sd, gn: '' }, d.id === 'cover' ? 0 : MAR.bl), bs = NR[0] && NR[0].n ? NR[0] : null;
+  var d = dieState(), G = dieGeom(d.geo || d.id, dieFix(d, DS.v)), NR = nestItem(G, { bl: MAR.bl, gr: MAR.gr, sd: MAR.sd, gn: '' }, MAR.bl), bs = NR[0] && NR[0].n ? NR[0] : null;
   var h = '<div class="card"><div class="ct">대략 전개도<small>' + mm(G.W) + ' × ' + mm(G.H) + 'mm</small></div>' + dieSvg(G, false) +
     '<div class="legend"><span><b style="color:#e5243b">━</b> 재단선</span><span><b style="color:#0067d8">┅</b> 접는선(오시)</span></div>';
   if (bs) h += '<div class="sh"><b>' + bs.P.n + '</b> ' + bs.n + '개 걸이 · 로스 ' + Math.round(bs.loss * 100) + '% · ' + esc(bs.nest.desc || '') + ' (도련 ' + MAR.bl + ' · 물림 ' + MAR.gr + ' · 여백 ' + MAR.sd + 'mm)</div>' + nestSvg(bs.P, bs.nest, G, MAR);
