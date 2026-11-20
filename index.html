@@ -1586,7 +1586,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm25';
+var APP_VER = '20261120hm27';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2656,16 +2656,33 @@ function megaOpen(k) {
    지금 열린 중메뉴 아래에 그 화면의 구분(안내 문서 목차, 용어사전 분류, 자가점검리스트 분류)을 펼쳐 보여 준다.
    PC는 왼쪽 메뉴, 모바일은 전체 메뉴(서랍) 안. PC에서는 화면 안 오른쪽 색인을 숨긴다. 필터(팬톤·폰트)는 오른쪽 그대로 */
 function subFrame(tk) { var t = TOOL_LIST.filter(function (x) { return x.k === tk; })[0]; return t && t.f ? $('#tkWrap iframe[data-f="' + t.f + '"]') : null; }
+function gdKids(gf, lv) { // 안내 문서 목차 → 소메뉴 항목
+  var L = [], G = GDSEC[gf]; if (!G) { gdSecLoad(gf); return L; }
+  var live = !!(NAV.gdFr && NAV.gdFr === $('#gdIn') && NAV.gdF === gf), nav = $('#gdToc'), on = live && nav ? [].indexOf.call($$('a', nav), $('a.on', nav)) : -1;
+  if (on < 0) on = 0;
+  G.forEach(function (x, i) { L.push({ t: x.t, on: i === on, lv: lv || 0, go: function () { var a = NAV.gdFr === $('#gdIn') && NAV.gdF === gf && $$('#gdToc a')[i]; if (a) a.onclick(); else NAV.gdPend = x.id; } }); });
+  return L;
+}
 function subItems() {
   var L = [];
+  if (typeof SUB === 'object' && !(S.view === 'tk' && S.tk === 'ref')) SUB.refIn = 0;
   try {
-    if (S.view === 'gdoc') {
+    var nc = navCur();
+    if ((S.view === 'glist' || S.view === 'gdoc') && nc.indexOf('gl:') === 0 && GUIDE_GROUPS[+nc.slice(3)]) {
+      // 프로그램 기본 셋팅 · 디자인 실무: 문서 이름이 소메뉴, 누르면 그 문서가 열리고 목차가 그 아래 펼쳐짐 (2026-11-20 실장님)
+      var curF = S.view === 'gdoc' ? (S.gdf || '') : '';
+      if (SUB.glF !== curF) { SUB.glF = curF; SUB.glShut = false; }
+      GUIDE_GROUPS[+nc.slice(3)].i.forEach(function (dd) {
+        if (dd.f === 'folder-file.html') return;
+        var isCur = dd.f === curF, op = isCur && !SUB.glShut;
+        L.push({ t: dd.t, part: 1, on: isCur, open: op, go: function () { if (isCur) { SUB.glShut = !SUB.glShut; SUB.sig = ''; } else { navGo('gd:' + dd.f); try { navClose(); } catch (e) {} } } });
+        if (op) L = L.concat(gdKids(dd.f, 1));
+      });
+    } else if (S.view === 'gdoc') {
       // 소메뉴는 문서 원본에서 미리 읽은 목차로 바로 그린다 (화면 로딩을 기다리면 이전 문서 목차가 잠깐 보였음)
-      var gf = S.gdf || 'folder-file.html', G = GDSEC[gf]; if (!G) { gdSecLoad(gf); return L; }
-      var live = !!(NAV.gdFr && NAV.gdFr === $('#gdIn') && NAV.gdF === gf), nav = $('#gdToc'), on = live && nav ? [].indexOf.call($$('a', nav), $('a.on', nav)) : -1;
-      if (on < 0) on = 0;
-      G.forEach(function (x, i) { L.push({ t: x.t, on: i === on, go: function () { var a = NAV.gdFr === $('#gdIn') && NAV.gdF === gf && $$('#gdToc a')[i]; if (a) a.onclick(); else NAV.gdPend = x.id; } }); });
+      L = gdKids(S.gdf || 'folder-file.html', 0);
     } else if (S.view === 'tk' && S.tk === 'ref') {
+      if (!SUB.refIn) { SUB.refIn = 1; SUB.refOpen = ''; } // 용어사전에 새로 들어오면 접힌 상태
       var f = subFrame(S.tk), d = f && f.contentDocument; if (!d) return L;
       if (S.tk === 'ref') {
         // 용어사전 > 인쇄 / 디자인 > 세부 분류. 지금 보고 있는 파트만 펼침 (2026-11-20 실장님)
@@ -2675,9 +2692,10 @@ function subItems() {
           else if (cur && e.tagName === 'BUTTON' && !e.classList.contains('rdm')) { var sm = e.querySelector('small'); cur.k.push({ t: (sm ? e.firstChild.textContent : e.textContent).trim(), n: sm ? sm.textContent : '', on: e.classList.contains('on'), lv: 1, go: function () { e.click(); } }); }
         });
         PT.forEach(function (pt) {
-          var on = pt.k.some(function (x) { return x.on; });
-          L.push({ t: pt.t, part: 1, on: on, open: on, go: function () { if (on) return; var b = pt.t === '디자인' ? d.querySelector('.rnav .rdm') : null; if (b) b.click(); else if (pt.k[0]) pt.k[0].go(); } });
-          if (on) L = L.concat(pt.k);
+          // 인쇄 / 디자인은 눌러야 펼쳐짐 (2026-11-20 실장님: 용어사전 누르자마자 인쇄가 열리지 않게)
+          var on = pt.k.some(function (x) { return x.on; }), op = SUB.refOpen === pt.t;
+          L.push({ t: pt.t, part: 1, on: on, open: op, go: function () { SUB.refOpen = op ? '' : pt.t; SUB.sig = ''; } });
+          if (op) L = L.concat(pt.k);
         });
         if (L.length && !L.some(function (x) { return x.on; }) && d.querySelector('.rnav .rdm.on')) { /* 디자인 첫 칸 */ }
       } else {
@@ -2707,7 +2725,7 @@ function gdSecLoad(f) {
   else P = fetch('guide/' + f.split('#')[0]).then(function (r) { return r.text(); }).then(gdSecParse);
   P.then(function (L) { GDSEC[f] = L; SUB.sig = ''; subTick(); }, function () { GDSEC[f] = []; });
 }
-setTimeout(function () { SPACES.forEach(function (sp) { (sp.g || []).forEach(function (g) { (g.i || []).forEach(function (x) { if (/^gd:/.test(x.k)) gdSecLoad(x.k.slice(3)); }); }); }); }, 800);
+setTimeout(function () { GUIDE_GROUPS.forEach(function (g) { g.i.forEach(function (d) { gdSecLoad(d.f); }); }); SPACES.forEach(function (sp) { (sp.g || []).forEach(function (g) { (g.i || []).forEach(function (x) { if (/^gd:/.test(x.k)) gdSecLoad(x.k.slice(3)); }); }); }); }, 800);
 function subHide(on) { // PC에서 화면 안 색인 숨기기
   [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }']].forEach(function (x) {
     var f = subFrame(x[0]), d; try { d = f && f.contentDocument; } catch (e) { d = null; } if (!d || !d.head) return;
@@ -2721,7 +2739,7 @@ function subPaint(box, cur, cls) {
   var w = document.createElement('div'); w.className = 's3';
   w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '" class="' + (x.part ? 'pt' + (x.open ? ' op' : '') : x.lv ? 's4' + (x.on ? ' on' : '') : (x.on ? 'on' : '')) + '">' + esc(x.t) + (x.part ? '<i class="cv"></i>' : '') + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
   on.parentNode.insertBefore(w, on.nextSibling);
-  $$('[data-s3]', w).forEach(function (b) { b.onclick = function () { var x = L[+b.dataset.s3]; if (x && x.go) x.go(); if (box.id === 'nfm') navClose(); setTimeout(subTick, 60); }; });
+  $$('[data-s3]', w).forEach(function (b) { b.onclick = function () { var x = L[+b.dataset.s3]; if (x && x.go) x.go(); if (box.id === 'nfm' && !x.part) navClose(); setTimeout(subTick, 60); }; });
 }
 function subTick() {
   var sd = document.getElementById('nsd'), pc = !!(sd && sd.offsetWidth);

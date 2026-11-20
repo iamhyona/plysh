@@ -511,7 +511,7 @@ function counts(r) { var c = { err: 0, warn: 0, adv: 0, info: 0 }; (r.issues || 
 function drawResults() {
   if (!RS.length) { $('#results').hidden = true; return; }
   var h = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 class="sh" style="margin:0">검수 결과 · 파일 ' + RS.length + '개' + (RUN ? ' <span class="mute small" style="font-weight:600">· 끝난 파일부터 바로 눌러 볼 수 있어요</span>' : '') + '</h3><div class="row"><button class="ib" id="pAll"' + (RUN ? ' disabled' : '') + '>전체 결과지</button><button class="ib" id="again">파일 비우고 새로</button></div></div><div class="rf">';
-  h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : !r._seen ? 'new' : '') + '"><b>' + (!r._seen && r !== CURR ? '<em class="nw">새 결과</em>' : '') + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.err ? '<i class="e">경고 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">주의 ' + c.warn + '</i>' : '') + (c.adv ? '<i class="w">조언 ' + c.adv + '</i>' : '') + (!c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
+  h += RS.map(function (r, i) { var c = counts(r); return '<button data-i="' + i + '" class="' + (r === CURR ? 'on' : !r._seen ? 'new' : '') + '"><b>' + (!r._seen && r !== CURR ? '<em class="nw">새 결과</em>' : '') + esc(r.file) + '</b><span class="small sub">' + (r.fatal ? '열지 못함' : esc([RV.KIND_LABEL[r.kind], r.prodName, r.artist].filter(Boolean).join(' · '))) + '</span><span class="c">' + (r.fatal ? '<i class="f">' + esc(r.fatal) + '</i>' : (c.err ? '<i class="e">경고 ' + c.err + '</i>' : '') + (c.warn ? '<i class="w">주의 ' + c.warn + '</i>' : '') + (c.adv ? '<i class="a">조언 ' + c.adv + '</i>' : '') + (!c.err && !c.warn ? '<i class="o">통과</i>' : '')) + '</span></button>'; }).join('');
   $('#results').innerHTML = h + '</div>'; $('#results').hidden = false;
   $$('#results .rf button').forEach(function (b) { b.onclick = function () { select(RS[+b.dataset.i]); }; });
   $('#pAll').onclick = function () { printSheet(RS); };
@@ -644,7 +644,7 @@ async function crop(r, x) {
   var ow = Math.min(520, Math.round(rx[2] - rx[0]) * 2), sc = ow / (rx[2] - rx[0]), oh = Math.round((rx[3] - rx[1]) * sc);
   var cv = document.createElement('canvas'); cv.width = ow; cv.height = oh; var c = cv.getContext('2d');
   c.drawImage(im, rx[0], rx[1], rx[2] - rx[0], rx[3] - rx[1], 0, 0, ow, oh);
-  c.strokeStyle = x.sev === 'err' ? '#ef4444' : '#f59e0b'; c.lineWidth = 3;
+  c.strokeStyle = x.sev === 'err' ? '#e0263a' : x.sev === 'adv' ? '#8b71d0' : '#ff7300'; c.lineWidth = 3;
   bs.forEach(function (q) { c.strokeRect((q[0] - rx[0]) * sc - 3, (q[1] - rx[1]) * sc - 3, (q[2] - q[0]) * sc + 6, (q[3] - q[1]) * sc + 6); });
   return (x._crop = cv.toDataURL('image/jpeg', 0.85));
 }

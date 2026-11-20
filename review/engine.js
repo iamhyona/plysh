@@ -14,7 +14,7 @@
   function mm(pt) { return pt / MM; }
 
   // ── 후가공(별색) 이름 판별 ──
-  var FIN_RE = /(die|cut|kiss|thomson|dieline|crease|fold|perf|score|foil|hot.?stamp|stamp|emboss|deboss|varnish|spot.?uv|uv|epoxy|glitter|white|laser|hologram|칼선|도무송|톰슨|재단|접지|오시|미싱|타공|박|금박|은박|홀로그램|형압|엠보|에폭시|부분.?코팅|코팅|화이트|백색|글리터|투명|레이저)/i;
+  var FIN_RE = /(die|cut|kiss|knife|trim|contour|crop|guide|커팅|칼\s*선|칼라인|재단선|thomson|dieline|crease|fold|perf|score|foil|hot.?stamp|stamp|emboss|deboss|varnish|spot.?uv|uv|epoxy|glitter|white|laser|hologram|칼선|도무송|톰슨|재단|접지|오시|미싱|타공|박|금박|은박|홀로그램|형압|엠보|에폭시|부분.?코팅|코팅|화이트|백색|글리터|투명|레이저)/i;
   var REG_NAMES = { All: 1, all: 1 };
   var PROC = { Cyan: 0, Magenta: 1, Yellow: 2, Black: 3 };
 

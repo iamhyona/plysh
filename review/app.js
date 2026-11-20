@@ -29,7 +29,7 @@ function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
 var libsP = null;
 function libs() {
-  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120d'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
+  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120e'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
   return libsP;
 }
 var faceP = null;
@@ -651,10 +651,20 @@ function docChecks() {
   if (ne.length) add('err', 'print', 'fontembed', '파일에 포함되지 않은 서체', ne.map(function (f) { return f.name + (f.pages.length ? ' (' + f.pages.map(function (p) { return p + 1; }).join(', ') + 'p)' : ''); }).join(', '), 'PDF 내보내기에서 서체 포함(100%)이 되게 하거나 아웃라인 해 주세요.');
   // 별색
   var spots = {}; R.pages.forEach(function (P) { for (var s in P.spots) (spots[s] = spots[s] || []).push(P.i + 1); });
-  R.spotList = Object.keys(spots).map(function (s) { return { n: s, fin: PRV.isFin(s), pages: spots[s] }; });
+  // 칼선 같은 후가공 판은 이름이 낯설어도 '선으로만 쓰이고 오버프린트가 켜진 별색'이면 후가공으로 본다 (2026-11-20 칼선이 인쇄 별색으로 잡히던 문제)
+  var use = {}; var U = function (s) { return use[s] = use[s] || { f: 0, s: 0, t: 0, op: true }; };
+  R.pages.forEach(function (P) {
+    P.fills.forEach(function (o) { if (o.ink && o.ink.spots) for (var s in o.ink.spots) U(s).f++; });
+    P.strokes.forEach(function (o) { if (o.ink && o.ink.spots) for (var s in o.ink.spots) { U(s).s++; if (!o.op) U(s).op = false; } });
+    P.texts.forEach(function (o) { [o.ink, o.sink].forEach(function (k) { if (k && k.spots) for (var s in k.spots) U(s).t++; }); });
+  });
+  var isFinS = function (s) { var u = use[s]; return PRV.isFin(s) || !!(u && u.s > 0 && !u.f && !u.t && u.op); };
+  R.spotList = Object.keys(spots).map(function (s) { return { n: s, fin: isFinS(s), pages: spots[s] }; });
   var fin = [], other = [];
-  Object.keys(spots).forEach(function (s) { (PRV.isFin(s) ? fin : other).push(s); });
-  if (other.length) add('warn', 'print', 'spot', '별색이 쓰였어요: ' + other.join(', '), other.map(function (s) { return s + ' → ' + spots[s].slice(0, 12).join(',') + '쪽'; }).join(' · '), '의도한 별색(팬톤 인쇄)이 아니면 CMYK로 바꿔 주세요.', { pages: uniq([].concat.apply([], other.map(function (s) { return spots[s]; }))) });
+  Object.keys(spots).forEach(function (s) { (isFinS(s) ? fin : other).push(s); });
+  // 사양서와 비교: 사양서에 별색 인쇄가 있으면 안내, 없으면 주의, 사양서가 없으면 주의
+  var specT = String(R.spec || ''), specSpot = /별색|pantone|팬톤|spot|PMS/i.test(specT);
+  if (other.length) add(specT && specSpot ? 'info' : 'warn', 'print', 'spot', (specT && !specSpot ? '사양서에 별색 인쇄가 없는데 별색이 있어요: ' : '별색이 쓰였어요: ') + other.join(', '), other.map(function (s) { return s + ' → ' + spots[s].slice(0, 12).join(',') + '쪽'; }).join(' · '), '의도한 별색(팬톤 인쇄)이 아니면 CMYK로 바꿔 주세요.', { pages: uniq([].concat.apply([], other.map(function (s) { return spots[s]; }))) });
   if (fin.length) add('info', 'print', 'spotfin', '후가공 판: ' + fin.join(', '), fin.map(function (s) { return s + ' → ' + spots[s].slice(0, 12).join(',') + '쪽'; }).join(' · '), '판 이름이 인쇄소 요청과 같은지 확인해 주세요.');
   var finKo = fin.filter(function (s) { return /[가-힣]/.test(s); }); if (finKo.length) add('adv', 'print', 'finname', '후가공 판 이름이 한글이에요: ' + finKo.join(', '), '', '권장 영문 명칭 (예: Foil_Gold, Emboss, Die_Cut). 인쇄소 프로그램에서 한글 이름이 깨질 수 있어요');
   // 후가공 판 레이어 분리
@@ -1004,7 +1014,7 @@ function overlaySVG(P, w, h, full, only, hi) {
   }
   (P.zones || []).forEach(function (z) { s += rc(z.b, 'fill="rgba(245,158,11,' + (full ? '.18' : '.12') + ')" stroke="none"'); });
   function rp(b) { var r = toPx(P, b); return 'M' + (r[0] * k) + ' ' + (r[1] * k) + 'H' + (r[2] * k) + 'V' + (r[3] * k) + 'H' + (r[0] * k) + 'Z'; }
-  var col = { err: '#ef4444', warn: '#f59e0b', adv: '#7c3aed', info: '#8b95a1' }, n = 0;
+  var col = { err: '#e0263a', warn: '#ff7300', adv: '#8b71d0', info: '#8b95a1' }, n = 0;
   R.issues.forEach(function (x) {
     if (x.page !== P.i || !x.boxes.length) return; if (only && only !== x.id) return;
     n++; var c = col[x.sev], dim = hi && hi !== x.id ? ' opacity=".18"' : '', ww = hi === x.id ? sw * 2 : sw;
