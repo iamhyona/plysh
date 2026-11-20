@@ -68,6 +68,7 @@ main{max-width:1600px;margin:0 auto;padding:14px 16px 120px}
 .szw span{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;color:var(--tx2);width:30px;text-align:right}
 .vbtn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--tx3)}
 .vbtn.on{color:var(--tx);background:var(--card2)}
+.vbtn svg.vi{width:20px;height:20px;stroke-width:2}
 
 .chipsrow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0;margin-top:10px;align-items:center}
 .chipsrow::-webkit-scrollbar{display:none}
@@ -87,7 +88,7 @@ main{max-width:1600px;margin:0 auto;padding:14px 16px 120px}
 .meta-row{display:flex;justify-content:space-between;align-items:center;margin:20px 0 12px;gap:10px}
 .meta-row .count{color:var(--tx2);font-size:13px}
 .meta-row .count b{color:var(--tx);font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:500}
-.meta-row select{background:var(--card);border:1px solid var(--line);border-radius:10px;height:34px;padding:0 10px;color:var(--tx2);font-size:13px}
+.meta-row select{-webkit-appearance:none;appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b95a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/16px 16px;border:1px solid var(--line);border-radius:10px;height:34px;padding:0 34px 0 12px;color:var(--tx2);font-size:13px;outline:0;cursor:pointer}
 .linkbtn{color:var(--tx2);font-size:13px;display:inline-flex;gap:4px;align-items:center}
 .linkbtn:hover{color:var(--tx)}
 
@@ -276,8 +277,8 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
     <div class="count" id="count"></div>
     <div class="row">
       <select id="sort"><option value="rel">기본순</option><option value="name">이름순</option><option value="new">최근 추가순</option><option value="era">시대순</option><option value="pop">인기순(눈누)</option><option value="wt">굵기 많은순</option></select>
-      <button class="vbtn on" data-v="grid" title="그리드"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></button>
-      <button class="vbtn" data-v="list" title="리스트"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <button class="vbtn on" data-v="grid" title="그리드"><svg class="i vi" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M12 3.5v17M3.5 12h17"/></svg></button>
+      <button class="vbtn" data-v="list" title="리스트"><svg class="i vi" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg></button>
     </div>
   </div>
   <div id="out"><div class="loadingx">폰트 목록 불러오는 중…</div></div>

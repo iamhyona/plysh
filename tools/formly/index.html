@@ -92,7 +92,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-size:var(--t-b
 textarea.form-input{line-height:1.55;resize:none;}
 select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .sel-wrap{position:relative;}
-.sel-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:11px;}
+.sel-wrap::after{content:'';width:14px;height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/14px 14px no-repeat;position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;}
 .sel-wrap select{padding-right:26px;}
 .section-div{font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin:22px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--border);}
 .sect-hdr{font-size:var(--t-base);font-weight:700;color:var(--accent);padding:10px 0;border-bottom:1px solid var(--border);margin:17px 0 12px;letter-spacing:-.01em;}
@@ -133,7 +133,7 @@ select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .field-lbl-input:hover{border-color:var(--border);background:var(--surface2);cursor:text;}
 .field-lbl-input:focus{border-color:var(--border);background:var(--surface2);cursor:text;}
 .unit-sel{width:65px;flex-shrink:0;position:relative;}
-.unit-sel::after{content:'▾';position:absolute;right:7px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:11px;}
+.unit-sel::after{content:'';width:14px;height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/14px 14px no-repeat;position:absolute;right:7px;top:50%;transform:translateY(-50%);pointer-events:none;}
 .unit-sel select{padding:7px 22px 7px 10px;width:100%;font-size:var(--t-md);border-radius:var(--r);}
 .date-display{flex:1;padding:7px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);font-size:var(--t-base);color:var(--text);cursor:pointer;transition:border-color .15s;letter-spacing:-.01em;user-select:none;}
 .date-display:hover{border-color:var(--border);}
@@ -174,7 +174,7 @@ select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .acc-hdr:hover{border-color:rgba(49,130,246,.3);}
 .acc-lbl{font-size:var(--t-md);font-weight:600;color:var(--text2);letter-spacing:-.01em;}
 .acc-meta{font-size:var(--t-xs);color:var(--text3);}
-.acc-arrow{font-size:11px;color:var(--text3);transition:transform .2s;}
+.acc-arrow{display:inline-flex;color:var(--text3);transition:transform .2s;}
 .acc-arrow.open{transform:rotate(180deg);}
 .acc-body{padding:7px 0 7px 12px;margin:0 0 12px 5px;border-left:2px solid var(--border);}
 .acc-item{display:flex;align-items:center;gap:7px;padding:3px 0;}
@@ -1515,7 +1515,7 @@ function accHdrFs(key,label,meta,isOpen,i,hasBody){
     +'<span class="acc-meta" style="margin-left:auto;padding-left:10px">'+meta+'</span>'
     +'<span style="display:flex;align-items:center;gap:10px;margin-left:10px">'
     +delBtn
-    +'<span class="acc-arrow'+(isOpen?' open':'')+'">▾</span>'
+    +'<span class="acc-arrow'+(isOpen?' open':'')+'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>'
     +'</span></div>';
 }
 function accHdrCauVer(v,l,isOpen,i){
@@ -1526,7 +1526,7 @@ function accHdrCauVer(v,l,isOpen,i){
     +'<span style="display:flex;align-items:center;gap:10px;margin-left:10px">'
     +'<button class="default-radio'+(isDef?' active':'')+'" title="필드편집 기본값" onclick="event.stopPropagation();setDefaultCauVersion(\''+v+'\')">'+(isDef?'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>':'<svg class="pic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><circle cx="12" cy="12" r="6"/></svg>')+'</button>'
     +'<button class="del-btn" style="width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();deleteCauVersion(\''+v+'\')" title="버전 삭제"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
-    +'<span class="acc-arrow'+(isOpen?' open':'')+'">▾</span>'
+    +'<span class="acc-arrow'+(isOpen?' open':'')+'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>'
     +'</span></div>';
 }
 
@@ -2782,7 +2782,7 @@ function accHdr(key,label,meta,isOpen){
     +'<span class="acc-lbl">'+label+'</span>'
     +'<span style="display:flex;align-items:center;gap:10px">'
     +'<span class="acc-meta">'+meta+'</span>'
-    +'<span class="acc-arrow'+(isOpen?' open':'')+'">▾</span>'
+    +'<span class="acc-arrow'+(isOpen?' open':'')+'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>'
     +'</span></div>';
 }
 function renderDropSec(optKey,label,defaultKey,defs){
