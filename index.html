@@ -144,7 +144,7 @@ main { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:14px 16px calc(1
 #rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 32px); margin:0 auto; }
 /* 도구 안 팝업이 열린 동안: 도구 화면을 브라우저 전체로 (2026-11-20) */
 iframe.fmon { position:relative; z-index:2000 !important; } /* 팝업 열린 동안: 크기·위치 그대로, 앞으로만 */
-#fmDim { position:fixed; z-index:1999; pointer-events:none; } #fmCat { position:fixed; inset:0; z-index:1998; }
+#fmDim { position:fixed; inset:0; z-index:1999; pointer-events:none; } #fmCat { position:fixed; inset:0; z-index:1998; }
 #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
 /* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw 1024px, 양옆 여백 40px 이상) 안에서 헤더·메뉴·본문·도구가 같은 폭.
    1024px 이상: 카드 목록 = 여러 열, 입력 + 결과 = 왼쪽 입력 · 오른쪽 결과, 달력·표·검수 = 틀 폭 전체, 아래 시트(팝업) = 560px 가운데 */
@@ -1315,7 +1315,7 @@ html[data-nav] #cvSeg { display:none !important; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="todo">할 일</button><button data-v="wl">근태 작성</button><button data-v="pj">프로젝트</button><button data-v="qk">퀵 배차하기</button><button data-v="tools" type="button">도구</button><button data-v="exp">지출결의</button><button data-v="guide" id="navGuide" type="button">안내</button>
+    <button data-v="todo">할 일</button><button data-v="wl">근태 작성</button><button data-v="pj">프로젝트</button><button data-v="qk">퀵 배차</button><button data-v="tools" type="button">도구</button><button data-v="exp">지출결의</button><button data-v="guide" id="navGuide" type="button">안내</button>
   </nav>
   <div id="tkBar" class="tabs2 hide"></div>
 </header>
@@ -1555,7 +1555,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm10';
+var APP_VER = '20261120hm11';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2306,13 +2306,15 @@ function fmFind(d) {
 function fmBox(el) { var b = null, a = 0; [].forEach.call(el.children, function (c) { var r = c.getBoundingClientRect(), s = r.width * r.height; if (s > a) { a = s; b = c; } }); return b; }
 function fmPlace(f, el) {
   var r = f.getBoundingClientRect(), d = $('#fmDim'), cs = getComputedStyle(f);
-  d.style.left = r.left + 'px'; d.style.top = r.top + 'px'; d.style.width = r.width + 'px'; d.style.height = r.height + 'px'; d.style.borderRadius = cs.borderRadius;
-  var bg = el.ownerDocument.defaultView.getComputedStyle(el).backgroundColor; d.style.boxShadow = '0 0 0 300vmax ' + (bg && bg !== 'rgba(0, 0, 0, 0)' ? bg : 'rgba(0,0,0,.5)');
+  var bg = el.ownerDocument.defaultView.getComputedStyle(el).backgroundColor; d.style.background = bg && bg !== 'rgba(0, 0, 0, 0)' ? bg : 'rgba(0,0,0,.5)';
+  // 가운데 = 왼쪽 메뉴를 뺀 공간의 가운데 (2026-11-20 실장님)
+  var sd = document.getElementById('nsd'), sl = 0; if (sd && sd.offsetWidth && getComputedStyle(sd).display !== 'none') { var sr = sd.getBoundingClientRect(); if (sr.left < 4 && sr.right < innerWidth / 2) sl = sr.right; }
+  var cx = (sl + innerWidth) / 2;
   var b = fmBox(el); if (!b) return;
   var cur = (b.style.translate || '0px 0px').split(' '), ox = parseFloat(cur[0]) || 0, oy = parseFloat(cur[1]) || 0, q = b.getBoundingClientRect();
   var br = { left: q.left - ox, right: q.right - ox, top: q.top - oy, bottom: q.bottom - oy, width: q.width, height: q.height }, ih = el.ownerDocument.defaultView.innerHeight, m = 8;
   var cl = function (v, lo, hi) { return hi < lo ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)); };
-  var dx = cl(innerWidth / 2 - (r.left + br.left + br.width / 2), m - br.left, r.width - m - br.right);
+  var dx = cl(cx - (r.left + br.left + br.width / 2), m - br.left, r.width - m - br.right);
   var dy = br.bottom >= ih - 1 ? 0 : cl(innerHeight / 2 - (r.top + br.top + br.height / 2), m - br.top, r.height - m - br.bottom);
   var v = Math.abs(dx) > 1 || Math.abs(dy) > 1 ? Math.round(dx) + 'px ' + Math.round(dy) + 'px' : '';
   if ((b.style.translate || '') !== v && Math.abs(Math.round(dx) - ox) + Math.abs(Math.round(dy) - oy) > 1) b.style.translate = v;
@@ -2341,7 +2343,8 @@ function fmWatch(f, d) {
   new MutationObserver(go).observe(d.documentElement, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'style', 'hidden', 'open'] });
   d.addEventListener('transitionend', go, true); d.addEventListener('click', function () { setTimeout(go, 0); setTimeout(go, 320); }, true);
 }
-setInterval(function () { $$('iframe').forEach(function (f) { if (f.classList.contains('fmon')) fmCheck(f); }); }, 500);
+function fmAll() { $$('iframe').forEach(function (f) { if (f.classList.contains('fmon')) fmCheck(f); }); }
+setInterval(fmAll, 500); window.addEventListener('resize', function () { requestAnimationFrame(fmAll); });
 
 
 function renderView() {
@@ -2393,7 +2396,7 @@ var SPACES = [
     { g: '도구', i: [{ k: 'review', t: '검수', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 },
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
   { k: 'lib', t: '도우미', d: '거래처 연락처, 로고, 폰트, 팬톤, 용어사전', home: 'space:lib', ic: 'ref', g: [
-    { g: '도우미', i: [{ k: 'qk', t: '퀵 배차하기', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }] }] },
+    { g: '도우미', i: [{ k: 'qk', t: '퀵 배차', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어사전', tool: 1 }] }] },
   { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'pen', g: [
     { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
@@ -2539,7 +2542,7 @@ function renderStart() {
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
-  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵 배차하기'], ['review', 'chk', '검수']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵 배차'], ['review', 'chk', '검수']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
@@ -4411,7 +4414,7 @@ if (S.tok) { var c0 = cached(); if (c0) { setData(c0); render(); } load(); dvBad
 /* 퀵배차하기 (2026-11-20 실장님): 카카오 T 퀵 주문 화면. 카카오는 다른 사이트 안에 자기 화면(로그인 포함)을 띄우는 걸 막아서
    앱 안에 넣을 수 없음 → 같은 탭 하나(kakaoquick)로만 열리게 하고, 배차에 필요한 연락처를 바로 옆에서 볼 수 있게 안내 */
 var KQ_URL = 'https://quick.kakaomobility.com/orders/quick';
-function kqHtml() { // 퀵 배차하기 맨 위: 카카오 T 퀵 주문 (2026-11-20 실장님: 연락처와 합침)
+function kqHtml() { // 퀵 배차 맨 위: 카카오 T 퀵 주문 (2026-11-20 실장님: 연락처와 합침)
   return '<div class="kqr"><div class="kqt"><b>카카오 T 퀵으로 배차</b><span>카카오는 다른 사이트 안에서 주문·로그인을 열 수 없게 막아 두어서 새 탭(늘 같은 탭 하나)에서 열려요</span></div>' +
     '<a class="kqb" href="' + KQ_URL + '" target="kakaoquick" rel="noopener">카카오 T 퀵 주문 열기</a></div>';
 }
