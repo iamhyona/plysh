@@ -380,10 +380,13 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 
 /* 사양서 머리 (2026-11-20 단순화) */
 .dtabs { display:flex; gap:4px; align-items:flex-end; overflow-x:auto; scrollbar-width:none; padding:0 6px; margin:0; } .dtabs::-webkit-scrollbar { display:none; }
-.dtabs button { flex:none; border:0; height:38px; padding:0 18px; border-radius:12px 12px 0 0; background:#e5e8eb; color:var(--sub); font:inherit; font-size:13px; font-weight:600; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
-.dtabs button.on { background:#fff; color:var(--txt); font-weight:700; height:42px; }
+.dtabs button { flex:none; border:0; height:38px; padding:0 18px; border-radius:12px 12px 0 0; background:#fff; box-shadow:inset 0 0 0 1px #e5e8eb; color:var(--sub); font:inherit; font-size:13px; font-weight:600; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
+.dtabs button.on { box-shadow:none; background:#e4e8ee; color:var(--txt); font-weight:700; height:42px; }
 .dtabs .dtn { width:38px; padding:0; display:flex; align-items:center; justify-content:center; background:transparent; color:var(--sub); }
-.card.dhead { padding:20px 20px 0 !important; margin-bottom:16px; border-top-left-radius:0 !important; }
+.dfold { background:#e4e8ee; border-radius:0 18px 18px 18px; padding:16px; margin:0 0 8px; } /* 폴더: 탭 + 사양 전체 한 덩어리 */
+.dfold .card { margin-bottom:12px; } .dfold .dsr .card { margin-bottom:12px; }
+.card.dhead { padding:20px 20px 0 !important; margin-bottom:12px; }
+.dtitle::placeholder { color:#b0b8c1; font-weight:700; }
 .dh1 { display:flex; align-items:center; gap:10px; }
 .dtitle { flex:1; min-width:0; border:0; background:none; font:inherit; font-size:19px; font-weight:800; letter-spacing:-0.02em; color:var(--txt); padding:6px 0; outline:0; border-bottom:1.5px solid transparent; }
 .dtitle:focus { border-bottom-color:var(--txt); }
@@ -395,9 +398,9 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .dhead .dit button { width:36px; height:36px; min-width:36px; max-width:none; padding:0 !important; border-radius:50%; background:var(--chip); color:var(--sub); font-size:14px; font-weight:700; justify-content:center; }
 .dhead .dit button.on { background:var(--txt); color:#fff; }
 .dhead .dit button.add { background:#fff; box-shadow:inset 0 0 0 1.5px var(--line); color:var(--txt); }
-.dhead .dld { margin-left:auto; flex:none; } .dhead .dld select { width:auto; max-width:240px; height:36px; padding:0 34px 0 14px; border:0; border-radius:10px; background:var(--chip) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/12px 12px; -webkit-appearance:none; appearance:none; font:inherit; font-size:13px; font-weight:600; color:var(--sub); outline:0; cursor:pointer; }
+.dhead .dld { display:block; margin:14px 0 0; } .dhead .dld select { width:100%; max-width:none; height:36px; padding:0 34px 0 14px; border:0; border-radius:10px; background:var(--chip) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/12px 12px; -webkit-appearance:none; appearance:none; font:inherit; font-size:13px; font-weight:600; color:var(--sub); outline:0; cursor:pointer; }
 .dhead .deh { margin:16px -20px 0; padding:14px 20px 16px; border-top:1px solid var(--line); }
-@media (max-width:759px) { .dhead .dld { margin-left:0; flex:1 1 100%; } .dhead .dld select { width:100%; max-width:none; } .dtabs button { max-width:150px; padding:0 14px; } .dtabs { padding:0; } }
+@media (max-width:759px) { .dtabs button { max-width:150px; padding:0 14px; } .dtabs { padding:0; } .dfold { padding:10px; border-radius:0 14px 14px 14px; } .dtitle { font-size:17px; } }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -1117,7 +1120,7 @@ window.plyshGo = function (v) { if (S.view !== v) go(v); };
 
 /* ── 대표 품목 ── */
 function renderList() {
-  var d = curDoc(), h = '<div class="phd"><b>대표 품목</b><small>' + (S.add && d ? '<span class="addb">‘' + esc(d.name) + '’에 넣을 품목을 골라요</span>' : '지난 사양서에서 많이 쓴 스펙이 미리 채워져요') + '</small></div>';
+  var d = curDoc(), h = '<div class="phd"><b>대표 품목</b><small>' + (S.add && d ? '<span class="addb">‘' + esc(dNmS(d)) + '’에 넣을 품목을 골라요</span>' : '지난 사양서에서 많이 쓴 스펙이 미리 채워져요') + '</small></div>';
   GROUPS.forEach(function (g) {
     h += '<div class="sec">' + g + '</div><div class="tg">' + T.filter(function (t) { return t.g === g; }).map(function (t) {
       var my = ls.get('pr:my:' + t.id); return '<button data-id="' + t.id + '"><b>' + esc(t.n) + '</b><small>' + esc(t.def[0].paper) + (my ? ' · 내 기본값' : '') + '</small></button>';
@@ -1144,7 +1147,7 @@ function renderOne() {
     (t.note ? '<div class="nt">' + esc(t.note) + '</div>' : '') + '</div>';
   h += '<div id="out">' + outHtml(t) + '</div>';
   var d = curDoc();
-  h += '<button class="cp" id="toDoc">' + (d ? '‘' + esc(d.name) + '’에 추가' : '새 사양서 만들어서 추가') + '</button>';
+  h += '<button class="cp" id="toDoc">' + (d ? '‘' + esc(dNmS(d)) + '’에 추가' : '새 사양서 만들어서 추가') + '</button>';
   h += '<div class="acts"><button class="rs" id="copy">이 품목만 복사</button><button class="sv" id="save">내 기본값으로 저장</button><button class="rs" id="reset">처음 값</button></div>';
   $('#main').innerHTML = h; bindOne(t);
 }
@@ -1203,7 +1206,10 @@ function commitDocs() { var d = curDoc(); if (d) d.saved = Date.now(); ls.set('p
 window.addEventListener('beforeunload', function (e) { if (DDIRTY) { e.preventDefault(); e.returnValue = ''; } });
 function savedTxt(d) { if (DDIRTY) return '저장 안 한 내용이 있어요'; if (!d || !d.saved) return '아직 저장 안 함'; var t = new Date(d.saved), n = new Date(), hm = (t.getHours() < 12 ? '오전 ' : '오후 ') + ((t.getHours() + 11) % 12 + 1) + ':' + ('0' + t.getMinutes()).slice(-2); return '임시 저장됨 · ' + (t.toDateString() === n.toDateString() ? '오늘 ' : (t.getMonth() + 1) + '.' + t.getDate() + ' ') + hm; }
 function curDoc() { var id = ls.get('pr:doc'); return DOCS.filter(function (d) { return d.id === id; })[0] || DOCS[0] || null; }
-function newDoc(name) { var d = { id: uid(), name: name || '[아티스트]프로젝트_사양서', date: new Date().toISOString().slice(0, 10), rows: [docRow('')] }; DOCS.unshift(d); ls.set('pr:doc', d.id); saveDocs(); return d; }
+var DOC_PH = '[아티스트]프로젝트_사양서'; // 이름 칸 흐린 안내 (2026-11-21 실장님)
+function dNm(d) { return d.name && d.name !== DOC_PH ? d.name : ''; }
+function dNmS(d) { return dNm(d) || '이름 없는 사양서'; }
+function newDoc(name) { var d = { id: uid(), name: name || '', date: new Date().toISOString().slice(0, 10), rows: [docRow('')] }; DOCS.unshift(d); ls.set('pr:doc', d.id); saveDocs(); return d; }
 function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*g|[\d.]+\s*(?:T|㎛|μm))\s*(\(.*\))?\s*$/); return m ? [(m[1] + (m[3] ? ' ' + m[3] : '')).trim(), m[2].replace(/\s/g, '')] : [p || '', '']; }
 function rowTsv(r, i) {
   var pp = splitPaper(r.paper);
@@ -1284,14 +1290,15 @@ function renderDoc() {
   var d = curDoc(), h = '<div class="phd"><b>사양서</b><small>품목을 모아서 MASTER 양식 순서로 복사 · 임시 저장을 눌러야 이 기기에 저장돼요</small></div>';
   // 2026-11-20 실장님: 사양서 여러 개는 인덱스 탭, 이름 · 저장 · 품목 번호 · 선택 품목을 카드 하나로
   if (!d) d = newDoc();
-  var tabs = '<div class="dtabs">' + DOCS.map(function (x) { return '<button data-doc="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '<button id="dNew" class="dtn" aria-label="새 사양서" title="새 사양서"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
+  var tabs = '<div class="dtabs">' + DOCS.map(function (x) { return '<button data-doc="' + x.id + '"' + (x.id === d.id ? ' class="on"' : '') + '>' + esc(dNmS(x)) + '</button>'; }).join('') + '<button id="dNew" class="dtn" aria-label="새 사양서" title="새 사양서"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
   if (!d.rows.length) { d.rows.push(docRow('')); saveDocs(); }
   var sel = dSel(d), n = d.rows.indexOf(sel);
-  h += '<div class="dsw"><div class="dsl">' + tabs;
-  h += '<div class="card dhead"><div class="dh1"><input class="dtitle" id="dName" value="' + esc(d.name) + '" aria-label="사양서 이름"><button type="button" id="dSave">임시 저장</button></div>' +
+  h += tabs + '<div class="dfold"><div class="dsw"><div class="dsl">';
+  h += '<div class="card dhead"><div class="dh1"><input class="dtitle" id="dName" value="' + esc(dNm(d)) + '" placeholder="' + DOC_PH + '" aria-label="사양서 이름"><button type="button" id="dSave">임시 저장</button></div>' +
     '<div class="dh2">만든 날 ' + d.date + ' · <b id="dSaved">' + savedTxt(d) + '</b></div>' +
+    '<label class="dld"><select id="dLoad" aria-label="구성 불러오기"><option value="">구성 불러오기</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label>' +
     '<div class="dh3"><span class="dlb">품목</span><div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + ' title="' + esc(r.item || r.set || r.cat || '품목명 없음') + '">' + (i + 1) + '</button>'; }).join('') + '<button class="add" id="dItem" aria-label="품목 추가" title="품목 추가"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>' +
-    '<label class="dld"><select id="dLoad" aria-label="구성 불러오기"><option value="">구성 불러오기</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label></div>' +
+    '</div>' +
     '<div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || sel.set || sel.cat || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div></div>';
   {
     // 2026-11-20 실장님: 기본 정보 · 크기·페이지 · 용지·인쇄 · 가공·제본 · 정합·포장 묶음마다 박스 따로
@@ -1303,7 +1310,7 @@ function renderDoc() {
     }).join('');
     h += '<div class="acts"><button class="rs" id="dAdd">대표 품목 계산에서 추가</button></div>';
   }
-  h += '</div><div class="dsr" id="dPrev">' + dPrevHtml(d, sel) + '<button class="ddel" id="dDel">이 사양서 삭제</button></div></div>';
+  h += '</div><div class="dsr" id="dPrev">' + dPrevHtml(d, sel) + '<button class="ddel" id="dDel">이 사양서 삭제</button></div></div></div>';
   $('#main').innerHTML = h; bindDoc();
 }
 function bindDocPrev(d) {
@@ -1326,7 +1333,7 @@ function bindDoc() {
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $('#dSave').onclick = function () { commitDocs(); toast('임시 저장했어요 · 이 기기에서 이어 쓸 수 있어요'); };
-  $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
+  $('#dName').onchange = function () { d.name = this.value.trim(); saveDocs(); renderDoc(); };
   bindDocPrev(d);
   var row = function (id) { return d.rows.filter(function (r) { return r.id === id; })[0]; };
   // 글자 칸: 치는 대로 저장 + 오른쪽 미리보기만 새로 그림 (입력 중인 칸은 그대로)
@@ -1349,7 +1356,7 @@ function bindDoc() {
   $('#dItem').onclick = function () { add(docRow('')); };
   var db = $('#dBlank'); if (db) db.onclick = function () { add(docRow('')); };
   bindDel();
-  function bindDel() { $('#dDel').onclick = function () { if (!confirm('‘' + d.name + '’ 사양서를 지울까요? 되돌릴 수 없어요')) return; DOCS.splice(DOCS.indexOf(d), 1); ls.set('pr:doc', DOCS[0] ? DOCS[0].id : ''); commitDocs(); renderDoc(); }; }
+  function bindDel() { $('#dDel').onclick = function () { if (!confirm('‘' + dNmS(d) + '’ 사양서를 지울까요? 되돌릴 수 없어요')) return; DOCS.splice(DOCS.indexOf(d), 1); ls.set('pr:doc', DOCS[0] ? DOCS[0].id : ''); commitDocs(); renderDoc(); }; }
 }
 
 /* ── 자료 (카탈로그 탭별 보기 · 용어 사전) ── */
