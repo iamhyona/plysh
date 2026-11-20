@@ -282,8 +282,8 @@ const ERAS=[['ancient','고대·중세','~1449','블랙레터 · 로마 비문']
 const ERA_IDX=Object.fromEntries(ERAS.map((e,i)=>[e[0],i]));
 const SRC={g:'Google',a:'Adobe',k:'한글 무료'};
 const EH={manual:'원작 연도 보강',desc:'설명 기반',tag:'태그 기반',style:'양식 기반',default:'현대(추정)'};
-const DEF_KO='다람쥐 헌 쳇바퀴에 타고파';
-const DEF_LA='The quick brown fox jumps';
+const DEF_KO='2주년 콘서트 팝업 데뷔 앨범';
+const DEF_LA="2th Anniversary Pop-up MD Concert Season's Greetings";
 const LS=k=>{try{return JSON.parse(localStorage.getItem('spc_'+k))}catch(e){return null}};
 const SS=(k,v)=>{try{localStorage.setItem('spc_'+k,JSON.stringify(v))}catch(e){}};
 const $=s=>document.querySelector(s);
