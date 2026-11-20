@@ -922,6 +922,14 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .pjr { gap:8px; } .pjic { display:flex; gap:6px; flex:none; }
 .pjb { width:34px; height:34px; border-radius:50%; background:var(--chip); color:var(--sub); display:inline-flex; align-items:center; justify-content:center; border:0; padding:0; -webkit-touch-callout:none; user-select:none; }
 .pjb svg { width:17px; height:17px; } .pjb.off { opacity:.3; }
+.pjck.on { background:#191f28; color:#fff; } .pjr.dn .m { opacity:.55; }
+.pjdh { display:flex; align-items:center; gap:6px; width:100%; border:0; background:none; padding:20px 4px 10px; font-size:14px; font-weight:800; color:#191f28; cursor:pointer; font-family:inherit; } .pjdh small { font-size:13px; font-weight:600; color:#8b95a1; margin-right:auto; } .pjdh span { font-size:13px; font-weight:600; color:#4e5968; }
+.pmd { position:relative; margin:0 0 12px; } .pmdb { display:inline-flex; align-items:center; gap:8px; min-height:40px; border:0; background:#fff; border-radius:999px; padding:0 14px 0 16px; font-size:14px; font-weight:600; color:#4e5968; cursor:pointer; font-family:inherit; max-width:100%; } .pmdb span { display:inline-flex; align-items:center; gap:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pmdb i, .pmdl i { width:8px; height:8px; border-radius:50%; flex:none; display:inline-block; } .pmdb svg { width:16px; height:16px; color:#8b95a1; flex:none; }
+.pmdp { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:60; width:min(340px, calc(100vw - 32px)); background:#fff; border-radius:16px; box-shadow:0 8px 28px rgba(0,0,0,.14); padding:12px; box-sizing:border-box; } .pmd.open .pmdp { display:block; }
+.pmdp input[type=search] { width:100%; box-sizing:border-box; border:0; background:#f2f4f6; border-radius:10px; height:40px; padding:0 12px; font-size:14px; outline:0; font-family:inherit; -webkit-appearance:none; }
+.pmdl { max-height:320px; overflow-y:auto; margin:8px 0; } .pmdl label { position:relative; display:flex; align-items:center; gap:10px; min-height:40px; padding:0 6px; border-radius:10px; cursor:pointer; font-size:14px; color:#191f28; } .pmdl label:hover { background:#f2f4f6; } .pmdl input { position:absolute; opacity:0; pointer-events:none; } .pmdl .cb { width:20px; height:20px; border-radius:6px; border:1.5px solid #d1d6db; display:inline-flex; align-items:center; justify-content:center; flex:none; color:transparent; box-sizing:border-box; } .pmdl .cb svg { width:13px; height:13px; } .pmdl input:checked + .cb { background:#191f28; border-color:#191f28; color:#fff; } .pmdl .t { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pmdf { display:flex; gap:8px; } .pmdf button { flex:1; height:40px; border:0; border-radius:10px; background:#f2f4f6; color:#4e5968; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; } .pmdf button[data-fa=close] { background:#191f28; color:#fff; }
+@media (min-width:1024px) { .spf { display:flex; gap:8px; align-items:center; } .spf input { flex:1; min-width:0; height:46px; box-sizing:border-box; } .spf .sps { margin-top:0; flex:none; width:360px; } .spf .sps select { height:46px; } } /* 2026-11-20: PC는 검색창 + 필터 한 줄 */
 .ntbox { background:#fff; border-radius:18px; padding:14px 16px 10px; margin-bottom:12px; }
 .nth { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; } .nth b { font-size:13px; color:var(--sub); }
 .nth button { border:0; background:var(--chip); color:var(--sub); border-radius:50%; width:28px; height:28px; padding:0; display:inline-flex; align-items:center; justify-content:center; } .nth button svg { width:14px; height:14px; margin:0; }
@@ -1064,7 +1072,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wsg.wtop .nth { margin:-6px 0 4px; } .wsg.wtop .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
 @media (max-width:1023px) { .wsg.wtop { grid-template-columns:1fr; } }
 @media (min-width:1024px) { .wcol .wsq { grid-template-columns:repeat(4, minmax(0, 1fr)) !important; } .wsg > .wsc.wclk { grid-template-columns:168px minmax(0, 1fr) !important; gap:28px !important; padding:20px 24px; } .wclk .aclk { width:168px; height:168px; } }
-.wcol { display:flex; flex-direction:column; gap:12px; min-width:0; } .wcol > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
+.wcol { display:flex; flex-direction:column; gap:12px; min-width:0; } @media (min-width:1024px) { .wsg.wtop { align-items:stretch; } .wsg.wtop > .wcol { align-self:stretch; } .wcol > .ntbox { flex:1 1 auto; } } /* 2026-11-20: 오른쪽 두 상자 합 = 시계·달력 높이 */ .wcol > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
 .wsg > .wsc.wclk, .wclk { display:grid; grid-template-columns:120px minmax(0, 1fr); gap:20px; align-items:center; }
 .aclk { width:120px; height:120px; display:block; }
 .clkd { font-size:13px; font-weight:700; color:#4e5968; margin:0 0 8px; }
@@ -1587,7 +1595,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm35';
+var APP_VER = '20261120hm36';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2881,13 +2889,26 @@ document.addEventListener('keydown', function (e) {
 window.addEventListener('resize', function () { if (S.D) { navClose(); navSync(); } });
 $('#rfBtn').onclick = function () { load().then(function () { toast('시트에서 새로 불러왔어요'); }); };
 
+// 2026-11-20 실장님: 프로젝트 칩 줄 → 여러 개 고르는 드롭다운 (안에 검색)
 function filterBar() {
-  var fs = pfs(), all = fs.every(function (f) { return !S.off[f.id]; });
-  return '<div class="tabs2" id="flt"><button data-f="" class="' + (all ? 'on' : '') + '">전체</button>' +
-    fs.map(function (f) { return '<button data-f="' + f.id + '" class="' + (!all && !S.off[f.id] ? 'on' : '') + '"><i style="background:' + f.color + '"></i>' + esc(f.type === 'work' ? '업무일지' : f.name) + '</button>'; }).join('') + '</div>';
+  var fs = pfs(), on = fs.filter(function (f) { return !S.off[f.id]; }), all = on.length === fs.length, nm = function (f) { return f.type === 'work' ? '업무일지' : f.name; };
+  var lab = all ? '프로젝트 전체' : on.length === 1 ? '<i style="background:' + on[0].color + '"></i>' + esc(nm(on[0])) : '프로젝트 ' + on.length + '개';
+  var q = (S.fltQ || '').trim().toLowerCase().replace(/\s+/g, '');
+  return '<div class="pmd' + (S.fltO ? ' open' : '') + '" id="flt"><button type="button" class="pmdb" id="fltB"><span>' + lab + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
+    '<div class="pmdp"><input type="search" id="fltQ" placeholder="프로젝트 검색" value="' + esc(S.fltQ || '') + '"><div class="pmdl">' +
+    fs.filter(function (f) { return !q || nm(f).toLowerCase().replace(/\s+/g, '').indexOf(q) > -1; }).map(function (f) { return '<label><input type="checkbox" data-f="' + f.id + '"' + (S.off[f.id] ? '' : ' checked') + '><span class="cb">' + CKSVG + '</span><i style="background:' + f.color + '"></i><span class="t">' + esc(nm(f)) + '</span></label>'; }).join('') +
+    '</div><div class="pmdf"><button type="button" data-fa="all">전체 선택</button><button type="button" data-fa="close">닫기</button></div></div></div>';
 }
 function bindFilter() {
-  $$('#flt button').forEach(function (b) {
+  var rr = function (keepQ) { ls.set('d4:off', JSON.stringify(S.off)); var y0 = window.scrollY; render(); window.scrollTo(0, y0); if (keepQ) { var qi = $('#fltQ'); if (qi) { qi.focus(); qi.setSelectionRange(qi.value.length, qi.value.length); } } };
+  var bb = $('#fltB'); if (!bb) return;
+  bb.onclick = function (e) { e.stopPropagation(); S.fltO = !S.fltO; $('#flt').classList.toggle('open', S.fltO); if (S.fltO && window.innerWidth >= 1024) { var qi = $('#fltQ'); if (qi) qi.focus(); } };
+  $('#flt .pmdp').onclick = function (e) { e.stopPropagation(); };
+  $('#fltQ').oninput = function () { S.fltQ = this.value; rr(1); };
+  $$('#flt input[type=checkbox]').forEach(function (c) { c.onchange = function () { var id = c.dataset.f; if (c.checked) delete S.off[id]; else S.off[id] = 1; if (pfs().every(function (f) { return S.off[f.id]; })) S.off = {}; rr(); }; });
+  $$('#flt [data-fa]').forEach(function (b) { b.onclick = function () { if (b.dataset.fa === 'all') { S.off = {}; rr(); } else { S.fltO = false; $('#flt').classList.remove('open'); } }; });
+  if (!S.fltDoc) { S.fltDoc = 1; document.addEventListener('click', function () { if (S.fltO) { S.fltO = false; var f = $('#flt'); if (f) f.classList.remove('open'); } }); }
+  $$('#flt button.x-old').forEach(function (b) {
     b.onclick = function () {
       var id = b.dataset.f;
       if (!id) S.off = {};
@@ -4060,6 +4081,8 @@ function clOf(o) {
 }
 function nasOf(o) { var c = clOf(o); if (c) return { u: c, cl: 1 }; var k = pjKey(o.artist, o.title); return ((S.nas && S.nas.rows) || []).filter(function (r) { return pjKey(r.a, r.t) === k && r.u; })[0]; }
 var PJL = [];
+function pjKey(o) { return [o.artist || '', o.title || '', o.year || ''].join('|'); }
+function pjDone() { try { return JSON.parse(ls.get('d4:pjdone') || '{}') || {}; } catch (e) { return {}; } }
 function renderPj() {
   if (!S.SL) { try { S.SL = JSON.parse(ls.get('d4:sl') || 'null'); } catch (e) {} }
   if (!S.SL || !S.slAt) loadSpecs().then(function () { if (S.view === 'pj') renderPj(); }).catch(function () {});
@@ -4073,17 +4096,23 @@ function renderPj() {
     var x = a.g ? (a.g.next ? a.g.next.d : '9998') : '9999', y = b.g ? (b.g.next ? b.g.next.d : '9998') : '9999';
     return x < y ? -1 : x > y ? 1 : (b.year || '').localeCompare(a.year || '') || a.title.localeCompare(b.title, 'ko');
   });
+  // 2026-11-20 실장님: 체크하면 완료된 프로젝트로 (이 기기에 저장)
+  var DN = pjDone(), act = F.filter(function (o) { return !DN[pjKey(o)]; }), fin = F.filter(function (o) { return DN[pjKey(o)]; });
+  F = act.concat(fin);
   PJL = F;
   var h = '<div class="spf"><input id="gQ" type="search" placeholder="아티스트, 프로젝트명 검색" value="' + esc(S.gq) + '">' +
     '<div class="sps"><select id="gY"><option value="">연도 전체</option>' + ys.map(function (y) { return '<option' + (S.gy === y ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select><select id="gA"><option value="">아티스트 전체</option>' + as.map(function (a) { return '<option' + (S.ga === a ? ' selected' : '') + '>' + esc(a) + '</option>'; }).join('') + '</select></div></div>';
-  h += '<div class="bd spl">' + (F.length ? F.map(function (o, i) {
-    var g = o.g, sp = o.sp, nx = g && g.next, nas = nasOf(o);
+  var row = function (o, i) {
+    var g = o.g, sp = o.sp, nx = g && g.next, nas = nasOf(o), dn = !!DN[pjKey(o)];
     var sub = g ? (nx ? dot(nx.d) + ' ' + esc(nx.t) : '남은 일정 없음') : '사양서만 있어요';
-    return '<div class="spi gsi pjr"><button class="m" data-pj="' + i + '">' + artHtml(o) + '<small style="margin:3px 0 0;font-weight:500">' + sub + '</small></button><div class="pjic">' +
+    return '<div class="spi gsi pjr' + (dn ? ' dn' : '') + '"><button class="m" data-pj="' + i + '">' + artHtml(o) + '<small style="margin:3px 0 0;font-weight:500">' + sub + '</small></button><div class="pjic">' +
+      '<button type="button" class="pjb pjck' + (dn ? ' on' : '') + '" data-pjck="' + i + '" aria-label="' + (dn ? '완료 취소' : '완료') + '" title="' + (dn ? '완료 취소' : '완료로 옮기기') + '">' + CKSVG + '</button>' +
       (g ? '<a class="pjb" href="' + esc(g.f.url) + '" target="_blank" rel="noopener" aria-label="제작일정 시트">' + IC_CAL + '</a>' : '<span class="pjb off">' + IC_CAL + '</span>') +
       (sp && sp.url ? '<a class="pjb" href="' + esc(sp.url) + '" target="_blank" rel="noopener" aria-label="사양서 시트">' + IC_DOC + '</a>' : '<span class="pjb off">' + IC_DOC + '</span>') +
       '<button class="pjb' + (nas ? '' : ' off') + '" data-nas="' + i + '" aria-label="프로젝트 Client 폴더">' + IC_DIR + '</button></div></div>';
-  }).join('') : '<div class="empty2">' + (S.SL ? '찾는 프로젝트가 없어요' : '불러오는 중…') + '</div>') + '</div>';
+  };
+  h += '<div class="bd spl">' + (act.length ? act.map(function (o, i) { return row(o, i); }).join('') : '<div class="empty2">' + (S.SL ? (fin.length ? '진행 중인 프로젝트가 없어요' : '찾는 프로젝트가 없어요') : '불러오는 중…') + '</div>') + '</div>';
+  if (fin.length) h += '<button type="button" class="pjdh" id="pjDh">완료된 프로젝트<small>' + fin.length + '</small><span>' + (S.pjDo ? '접기' : '펼치기') + '</span></button>' + (S.pjDo ? '<div class="bd spl pjfin">' + fin.map(function (o, i) { return row(o, act.length + i); }).join('') + '</div>' : '');
   h += '<p class="srcinfo" style="text-align:center">폴더 아이콘은 프로젝트의 SHARE/Client 폴더로 열려요 (폴더가 없으면 길게 눌러 NAS 링크 지정)' + (S.nas && S.nas.url ? ' · <a href="' + esc(S.nas.url) + '" target="_blank" style="color:inherit">NAS 링크 시트</a>' : '') + '</p>';
   var y0 = window.scrollY, foc = document.activeElement && document.activeElement.id === 'gQ';
   $('#main').innerHTML = h; pjSeg(); window.scrollTo(0, y0);
@@ -4091,6 +4120,8 @@ function renderPj() {
   qi.oninput = function () { S.gq = qi.value; renderPj(); };
   $('#gA').onchange = function () { S.ga = this.value; renderPj(); };
   $('#gY').onchange = function () { S.gy = this.value; renderPj(); };
+  var dh = $('#pjDh'); if (dh) dh.onclick = function () { S.pjDo = !S.pjDo; var y0 = window.scrollY; renderPj(); window.scrollTo(0, y0); };
+  $$('[data-pjck]').forEach(function (b) { b.onclick = function () { var o = PJL[+b.dataset.pjck], k = pjKey(o), d = pjDone(); if (d[k]) { delete d[k]; toast('진행 중으로 되돌렸어요'); } else { d[k] = TODAY; toast('완료된 프로젝트로 옮겼어요'); } ls.set('d4:pjdone', JSON.stringify(d)); var y0 = window.scrollY; renderPj(); window.scrollTo(0, y0); }; });
   $$('[data-pj]').forEach(function (b) { b.onclick = function () { var o = PJL[+b.dataset.pj]; if (window.wsOpen) return wsOpen(o); if (o.g) openProj(o.g.f.id); else if (o.sp) { S.sp = o.sp.id; S.st = ''; ls.set('d4:sp', S.sp); S.view = 'spec'; window.scrollTo(0, 0); render(); } }; });
   $$('[data-nas]').forEach(function (b) {
     var o = PJL[+b.dataset.nas], t = null, long = false;
