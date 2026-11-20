@@ -1311,7 +1311,7 @@ html[data-nav] #cvSeg { display:none !important; }
 </header>
 <main id="main"><div class="ld">불러오는 중…</div></main>
 <!-- 검수 메뉴 (2026-11-18): review/ 페이지를 그대로 띄움. 다른 메뉴 갔다 와도 결과 유지 -->
-<div id="rvWrap" class="hide"><iframe id="rvF" title="프리플라이트"></iframe></div>
+<div id="rvWrap" class="hide"><iframe id="rvF" title="검수"></iframe></div>
 <!-- 터잡기 메뉴 (2026-11-19): impose/ 페이지를 그대로 띄움 -->
 <div id="imWrap" class="hide"><iframe id="imF" title="터잡기"></iframe></div>
 <!-- TOOLS 메뉴 (2026-11-19): tools/ 폴더 도구들. 도구마다 iframe 하나 -->
@@ -1545,11 +1545,11 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm6';
+var APP_VER = '20261120hm7';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
-    if (m && m[1] !== APP_VER && !document.querySelector('.bs.open')) location.replace(location.pathname + '?v=' + m[1]);
+    if (m && m[1] !== APP_VER && !document.querySelector('.bs.open')) location.replace(location.pathname + '?v=' + m[1] + location.hash);
   }).catch(function () {});
 }
 document.addEventListener('visibilitychange', function () {
@@ -1943,10 +1943,29 @@ function bindCalc() {
     $$('[data-cpy]').forEach(function (b) { b.onclick = function () { var t = b.dataset.cpy; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('복사했어요 · 사양서에 붙여넣기'); }, function () { prompt('복사해서 쓰세요', t); }); }; });
   }
 }
+/* 지금 보는 화면을 주소(#…)에 남김 (2026-11-20 실장님: 새로고침하면 보던 화면 그대로) → 새로고침·뒤로가기·링크 공유 모두 같은 화면 */
+var RT = { done: 0, pop: 0 };
+function rtKey() {
+  var v = S.view;
+  if (v === 'tk') return S.tk || null;
+  if (v === 'gdoc') return S.gdf ? 'gd:' + S.gdf : null;
+  if (v === 'glist') return 'gl:' + S.gl;
+  if (v === 'space') return 'space:' + S.spk;
+  if (v === 'month') return S.cv === 'proj' ? 'sched' : 'cal';
+  if (v === 'ws') return null;
+  return v || null;
+}
+function rtSync() {
+  if (RT.wait) return; var k = rtKey(); if (!k) return; var h = '#' + encodeURIComponent(k);
+  if (location.hash === h) return;
+  try { history[RT.pop || !location.hash ? 'replaceState' : 'pushState'](null, '', location.pathname + location.search + h); } catch (e) {}
+}
+window.addEventListener('popstate', function () { var k = decodeURIComponent((location.hash || '').slice(1)); if (!k || k === rtKey() || !S.D) return; RT.pop = 1; try { navGo(k); } catch (e) {} RT.pop = 0; });
 function render() {
   if (!S.D) return;
+  if (!RT.done) { RT.done = 1; var hk = decodeURIComponent((location.hash || '').slice(1)); if (hk && hk !== rtKey()) { RT.wait = 1; setTimeout(function () { RT.wait = 0; RT.pop = 1; try { navGo(hk); } catch (e) {} RT.pop = 0; }, 0); } }
   var keep = {}; $$('.tabs2[id]').forEach(function (t) { keep[t.id] = t.scrollLeft; });
-  renderView();
+  renderView(); rtSync();
   $$('.tabs2[id]').forEach(function (t) { if (t.id in keep) t.scrollLeft = keep[t.id]; chipVis(t); });
   // 날짜 글자를 누르면 날짜 고르기 창이 바로 열림 (2026.10.06)
   $$('.dpk').forEach(function (i) { i.addEventListener('click', function () { try { if (i.showPicker) i.showPicker(); } catch (e) {} }); });
@@ -2036,7 +2055,7 @@ var TOOLS = [
     { k: 'die', t: '전개도', s: '박스·봉투·슬리브 전개도 크기와 조립도, .ai 저장', f: 'tools/proof/', pv: 'die' },
     { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
-    { k: 'review', t: '프리플라이트', s: 'PDF·AI 인쇄 전 검수, 사양서 검수', v: 'review' },
+    { k: 'review', t: '검수', s: 'PDF·AI 인쇄 파일 · 사양서', v: 'review' },
     { k: 'checklist', t: '자가점검리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
   { g: '자료', i: [
     { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
@@ -2329,7 +2348,7 @@ $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); wind
 // 정보 구조 시안 (2026-11-19 2차) ─ 오늘 · 프로젝트 · 도구 · 자료 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
 // NAV.s: 't' 위 메뉴 + 펼침 판(기본) · 'w' 왼쪽 메뉴
 var NAV = { s: 'c', pi: 0, pq: '', hv: null };
-// 2026-11-20 실장님 지정: 홈 자주 쓰는 도구 = 퀵 · 프리플라이트 · 로고 · 책등 계산기
+// 2026-11-20 실장님 지정: 홈 자주 쓰는 도구 = 퀵 · 검수 · 로고 · 책등 계산기
 NAV.fav = ['qk', 'review', 'logo', 'spine'];
 try { NAV.rec = JSON.parse(ls.get('d4:wsrec') || '[]'); } catch (e) { NAV.rec = []; }
 var NAV_IC = {
@@ -2361,7 +2380,7 @@ var SPACES = [
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 달력으로' }, { k: 'sched', t: '일정', s: '프로젝트별 일정표' }] }] },
   { k: 'tool', t: '도구', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명', home: 'space:tool', ic: 'tool', g: [
-    { g: '도구', i: [{ k: 'review', t: '프리플라이트', s: '인쇄 파일 · 사양서 검수', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 },
+    { g: '도구', i: [{ k: 'review', t: '검수', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 },
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
   { k: 'lib', t: '도우미', d: '거래처 연락처, 로고, 폰트, 팬톤, 사양 용어', home: 'space:lib', ic: 'ref', g: [
     { g: '도우미', i: [{ k: 'qk', t: '퀵', s: '거래처 · 담당자 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
@@ -2510,7 +2529,7 @@ function renderStart() {
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
-  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵'], ['review', 'chk', '프리플라이트']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵'], ['review', 'chk', '검수']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });

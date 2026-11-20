@@ -391,7 +391,7 @@ function render(R, opt) {
   var c = { r: 0, o: 0, p: 0 }; R.items.forEach(function (x) { c[x.lv]++; });
   var now = new Date(), stamp = now.getFullYear() + '.' + (now.getMonth() + 1) + '.' + now.getDate();
   var h = '<div class="spk">';
-  h += '<div class="spk-mast"><b>PLYSH 프리플라이트</b><span>사양서 검수 · ' + stamp + '</span></div>';
+  h += '<div class="spk-mast"><b>PLYSH 검수</b><span>사양서 검수 · ' + stamp + '</span></div>';
   h += '<p class="spk-eye">사양서 검수 결과</p><h1>' + esc(R.title || R.name) + '</h1>';
   h += '<div class="spk-file">' + esc(R.name) + (R.tab ? ' · 탭 ' + esc(R.tab) : '') + ' · 품목 ' + R.groups + '개 · ' + R.rows + '줄' + (opt.url ? ' · <a href="' + esc(opt.url) + '" target="_blank" rel="noopener">시트 열기</a>' : '') + '</div>';
   h += '<div class="spk-stat">' + ['r', 'o', 'p'].map(function (k) { return '<span class="' + k + '"><b>' + c[k] + '</b>' + LV[k][0] + '</span>'; }).join('') + '<span class="g"><b>' + R.pass.length + '</b>통과</span></div>';
@@ -407,7 +407,7 @@ function render(R, opt) {
     }).join('');
   } else h += '<p class="spk-ok">고칠 곳이 없어요.</p>';
   if (R.pass.length) h += '<h2>통과</h2><div class="spk-pass">' + R.pass.map(function (p) { return '<span>' + esc(p) + '</span>'; }).join('') + '</div>';
-  h += '<div class="spk-foot"><span>PLYSH 프리플라이트 · 사양서 검수</span><span>' + stamp + '</span></div></div>';
+  h += '<div class="spk-foot"><span>PLYSH 검수 · 사양서</span><span>' + stamp + '</span></div></div>';
   return h;
 }
 var CSS = '.spk{background:#fff;color:#191f28;font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;letter-spacing:-0.01em;line-height:1.5;font-size:13px;padding:36px 40px 26px;border-radius:20px}' +
