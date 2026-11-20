@@ -347,6 +347,13 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .cstp b { font-size:17px; font-weight:800; letter-spacing:-0.02em; } .cstp small { font-size:13px; color:var(--mute); }
 .cstp .mseg { margin-left:auto !important; }
 .cai { margin-left:auto; display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:10px; background:#f2f4f6; color:#333d4b; font-size:13px; font-weight:700; cursor:pointer; }
+.cflt { background:#fff; border-radius:16px; padding:16px 18px; } .cfh { font-size:16px; font-weight:800; margin:0 0 12px; } .cflt .cai { margin:0 0 6px; }
+.cfg { margin:14px 0 0; } .cfl { font-size:13px; font-weight:600; color:#4e5968; margin:0 0 8px; } .cfc { display:flex; flex-wrap:wrap; gap:6px; }
+.cfc button { height:34px; padding:0 12px; border:0; border-radius:10px; background:#f2f4f6; color:#4e5968; font:inherit; font-size:13.5px; cursor:pointer; } .cfc button.on { background:#191f28; color:#fff; font-weight:700; }
+.csd { margin:-8px 0 14px !important; }
+@media (min-width:900px) { html.emb .cw3 { grid-template-columns:360px minmax(0,1fr) 200px; } html.emb .cw3 .cflt { order:3; position:sticky; top:12px; background:none; padding:0 0 0 18px; border-left:1px solid #e5e8eb; border-radius:0; }
+  html.emb .cw3 .cin .ig { grid-template-columns:repeat(2, minmax(0,1fr)) !important; }
+  html.emb .cw3 .cfc { display:block; } html.emb .cw3 .cfc button { display:block; width:100%; text-align:left; background:none; margin:0 0 2px; } html.emb .cw3 .cfc button:hover { background:#f2f4f6; } html.emb .cw3 .cfc button.on { background:#191f28; } }
 .cgrp { margin:0 0 4px; } .cgrp .dgr { grid-template-columns:56px 1fr; padding:6px 0; } .cgrp .dgl { font-size:13px; line-height:34px; }
 @media (max-width:560px) { .cgrp .dgr { grid-template-columns:1fr; gap:6px; } .cgrp .dgl { line-height:1.4; } }
 .csub { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:16px 0 10px; padding-top:14px; border-top:1px solid var(--line); } .csub b { font-size:15px; font-weight:700; } .csub small { font-size:12.5px; color:var(--mute); line-height:1.5; }
@@ -610,9 +617,7 @@ function renderCalc() {
   var L = '';
   if (isDie) {
     var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd);
-    L += stp(1, '칼선 형태', '', '<label class="cai"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>사진으로 고르기<input type="file" accept="image/*" id="cImg" hidden></label>') + '<div id="dieAi" class="nt cnt0"></div>' +
-      '<div class="cgrp">' + ['단상자', '패키지', '쇼핑백', '봉투', '책'].map(function (gk) { return '<div class="dgr"><span class="dgl">' + gk + '</span><div class="chips">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>'; }).join('') + '</div>' +
-      '<div class="csub"><b>' + dd.n + '</b><small>' + dd.d + '</small></div>' +
+    L += stp(1, '크기', dd.n) + '<div class="nt cnt0 csd">' + dd.d + '</div>' +
       '<div class="ig">' + Object.keys(dd.in).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
       '<div class="csep"></div>' + stp(2, '수량') + qty + gseg + '<div class="nt cnt0">칼선 모양 그대로 원판에 앉혀요 · 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div>';
   } else if (c.m === 'size') {
@@ -628,7 +633,12 @@ function renderCalc() {
       '<div class="chips">' + CUTS.map(function (n) { return '<button data-cut="' + n + '" class="' + (+c.cut === n ? 'on' : '') + '">' + n + '절</button>'; }).join('') + '</div>';
   }
   L += '<div class="csep"></div>' + mar;
-  h += '<div class="cw2"><div class="card cin">' + L + '</div><div class="cout" id="cRes">' + calcOut(c) + '</div></div>';
+  // 2026-11-21 실장님: 칼선 형태 고르기는 오른쪽 필터로 (PC), 모바일은 맨 위
+  var FL = '';
+  if (isDie) { var dd0 = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0];
+    FL = '<aside class="cflt"><div class="cfh">칼선 형태</div><label class="cai"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>사진으로 고르기<input type="file" accept="image/*" id="cImg" hidden></label><div id="dieAi" class="nt cnt0"></div>' +
+      ['단상자', '패키지', '쇼핑백', '봉투', '책'].map(function (gk) { return '<div class="cfg"><div class="cfl">' + gk + '</div><div class="cfc">' + DIE.filter(function (x) { return x.gr === gk; }).map(function (x) { return '<button data-cd="' + x.id + '"' + (x.id === dd0.id ? ' class="on"' : '') + '>' + x.n + '</button>'; }).join('') + '</div></div>'; }).join('') + '</aside>'; }
+  h += '<div class="cw2' + (isDie ? ' cw3' : '') + '">' + FL + '<div class="card cin">' + L + '</div><div class="cout" id="cRes">' + calcOut(c) + '</div></div>';
   $('#main').innerHTML = h; bindCalc(); pStepBind($('#main'));
 }
 function dieVals(c, dd) { c.dvs = c.dvs || {}; var v = c.dvs[dd.id]; if (!v) { v = c.dvs[dd.id] = JSON.parse(JSON.stringify(dd.in)); } Object.keys(dd.in).forEach(function (k) { if (!isFinite(+v[k]) || v[k] === null) v[k] = dd.in[k]; }); return v; }

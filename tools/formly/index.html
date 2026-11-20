@@ -153,7 +153,8 @@ select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .mat-chip-toggle:hover{border-color:var(--accent);color:var(--accent);}
 
 /* ── PREVIEW ── */
-.pv-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-top:12px;padding:0 14px;}
+.pv-section{background:none;border:0;border-radius:0;margin-top:12px;padding:0;} /* 2026-11-21 실장님: 미리보기 테두리 박스 없앰, 행 구분선만 */
+.pv-lang{max-width:240px;margin:0 0 4px;} .pv-lang select{width:100%;}
 .pv-row{display:flex;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);}
 .pv-row:last-child{border-bottom:none;}
 .pv-key{font-size:var(--t-sm);font-weight:600;color:var(--text3);width:96px;min-width:96px;flex-shrink:0;padding-right:10px;padding-top:1px;letter-spacing:-.01em;}
@@ -2703,9 +2704,10 @@ function renderPreviewModal(){
 }
 function tabPrevBody(p){
   var lang=S.prevLang;
-  var pills=LANGS.map(function(l){
-    return '<button class="lang-pill'+(l.code===lang?' active':'')+'" onclick="S.prevLang=\''+l.code+'\';renderPreviewModal();if(S.tab===\'label\')renderContent()">'+l.label+'</button>';
-  }).join('');
+  // 2026-11-21 실장님: 언어별 보기는 드롭다운으로
+  var pills='<label class="sel-wrap pv-lang"><select class="form-input" aria-label="언어" onchange="S.prevLang=this.value;renderPreviewModal();renderContent()">'+LANGS.map(function(l){
+    return '<option value="'+l.code+'"'+(l.code===lang?' selected':'')+'>'+l.label+'</option>';
+  }).join('')+'</select></label>';
 
   // 항목별 rows
   var rows=p.fields.filter(function(f){return !f.hidden;}).map(function(f){
@@ -2722,7 +2724,7 @@ function tabPrevBody(p){
   // 줄글 텍스트
   var proseText=genTextProse(p,lang);
 
-  return '<div class="lang-pills">'+pills+'</div>'
+  return pills
 
     // ── 항목별 미리보기
     +'<div class="sect-hdr" style="margin-top:17px">항목별 미리보기</div>'
