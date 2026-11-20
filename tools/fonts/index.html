@@ -23,7 +23,7 @@
 <style>
 :root{
   --bg:#f2f4f6;--bg2:#eef0f3;--card:#ffffff;--card2:#f9fafb;--line:#e5e8eb;--line2:#eef0f3;
-  --tx:#191f28;--tx2:#4e5968;--tx3:#8b95a1;--acc:#3182f6;--grn:#00a661;--gold:#d97706;--red:#ef4444;
+  --tx:#191f28;--tx2:#4e5968;--tx3:#8b95a1;--acc:#3182f6;--grn:#3182f6;--gold:#4e5968;--red:#f04452;
   --r:14px;--hdr:56px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -75,7 +75,7 @@ main{max-width:1600px;margin:0 auto;padding:14px 16px 120px}
 .chip.on{background:var(--tx);color:#fff;border-color:var(--tx);font-weight:600}
 .chip .n{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10.5px;opacity:.55;margin-left:4px}
 .chip.sub{font-size:12px;padding:5px 10px}
-.chip.sub.on{background:#e8f3ff;color:#1b64da;border-color:#c9e2ff}
+.chip.sub.on{background:#e8f3ff;color:#3182f6;border-color:#c9e2ff}
 .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
 .seg button{padding:5px 12px;border-radius:999px;font-size:13px;color:var(--tx2);white-space:nowrap}
 .seg button.on{background:var(--card2);color:var(--tx);font-weight:600}
@@ -239,9 +239,13 @@ textarea.inp{height:70px;padding:10px 12px;resize:vertical}
 <script>
 'use strict';
 /* ---------- constants ---------- */
-const MAJOR={serif:'세리프',sans:'산세리프',slab:'슬랩',script:'스크립트',hand:'손글씨',display:'디스플레이',mono:'모노',black:'블랙레터',
+const MAJOR={serif:'세리프',sans:'산세리프',slab:'슬랩세리프',script:'스크립트',hand:'손글씨',display:'디스플레이',mono:'모노',black:'블랙레터',
   kgothic:'한글 고딕',kmyung:'한글 명조',khand:'한글 손글씨',kdisplay:'한글 디스플레이'};
-const MAJOR_ORDER=['kgothic','kmyung','khand','kdisplay','serif','sans','slab','script','hand','display','mono','black'];
+const MAJOR_ORDER=['serif','sans','slab','script','hand','mono','black','display'];
+/* 한글 분류는 같은 양식으로 묶음: 한글 고딕 → 산세리프, 명조 → 세리프, 손글씨 → 손글씨, 디스플레이 → 디스플레이 */
+const KMAP={kgothic:'sans',kmyung:'serif',khand:'hand',kdisplay:'display'};
+function cat(f){ return KMAP[f.m]||f.m; }
+const LANGS=[['ko','한글'],['la','영문'],['ja','일본어'],['zh','중국어'],['cy','키릴'],['gr','그리스']];
 const SUB={venetian:'휴머니스트(베네치안)',garalde:'올드스타일(가랄드)',transitional:'트랜지셔널',didone:'디돈·모던',scotch:'스카치',fatface:'팻페이스',glyphic:'글리픽',wedge:'웨지',softserif:'소프트',contemporary:'컨템퍼러리',
   grotesque:'그로테스크',neogrotesque:'네오그로테스크',geometric:'지오메트릭',humanist:'휴머니스트',rounded:'라운드',superellipse:'슈퍼엘립스',condensed:'컨덴스드',
   clarendon:'클라렌돈',geoslab:'지오메트릭 슬랩',humslab:'휴머니스트 슬랩',typewriter:'타자기',
@@ -280,7 +284,7 @@ const ICON={
 const S={
   tab:'browse', data:[], byId:{}, desc:{},
   q:'', sample:LS('sample')||'', size:LS('size')||40, view:LS('view')||'grid', sort:'rel',
-  src:'all', major:null, subs:new Set(), era:null, mood:null, wt:null, wd:null, opt:LS('opt')||{ko:false,pv:false,vf:false,lat:true,com:false},
+  src:'all', lang:null, major:null, subs:new Set(), era:null, mood:null, wt:null, wd:null, opt:LS('opt')||{ko:false,pv:false,vf:false,lat:true,com:false},
   shown:60, favs:LS('favs')||{}, folders:LS('folders')||['K-POP 로고','본문용','레트로','시즌그리팅'], favMode:LS('favMode')||'folder', favFolder:null,
   cfg:LS('cfg')||{}, queue:LS('queue')||[], kitFams:new Set(LS('kitFams')||[]), adobeOn:!!LS('adobeOn'), akits:[]
 };
@@ -353,7 +357,8 @@ async function refreshKitFams(){
 /* ---------- filtering ---------- */
 function baseFilter(f, skip){
   if(S.src!=='all' && f.s!==S.src) return false;
-  if(skip!=='major' && S.major && f.m!==S.major) return false;
+  if(skip!=='lang' && S.lang && !(f.sc||[]).includes(S.lang)) return false;
+  if(skip!=='major' && S.major && cat(f)!==S.major) return false;
   if(skip!=='major' && S.subs.size && !(f.sb||[]).some(s=>S.subs.has(s))) return false;
   if(skip!=='era' && S.era && f.e!==S.era) return false;
   if(skip!=='mood' && S.mood && !(f.mo||[]).includes(S.mood)) return false;
@@ -389,20 +394,18 @@ function cnt(fn){ let n=0; for(const f of S.data) if(fn(f)) n++; return n; }
 function renderFilters(){
   const el=$('#filters');
   const base=S.data.filter(f=>baseFilter(f,'major'));
-  const mc={}; base.forEach(f=>mc[f.m]=(mc[f.m]||0)+1);
+  const mc={}; base.forEach(f=>mc[cat(f)]=(mc[cat(f)]||0)+1);
   let h=`<div class="chipsrow"><span class="lbl">출처</span><div class="seg" id="srcSeg">`+
     [['all','전체'],['g','Google'],['a','Adobe'],['k','한글 무료']].map(([k,l])=>`<button data-src="${k}" class="${S.src===k?'on':''}">${k!=='all'?`<span class="src-dot s${k}"></span>`:''}${l}</button>`).join('')+
     `</div><button class="chip" id="optBtn" style="margin-left:6px">${ICON.filter.replace('class="i"','class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px"')}옵션${optCount()?' · '+optCount():''}</button></div>`;
+  const lb=S.data.filter(f=>baseFilter(f,'lang')); const lc={}; lb.forEach(f=>(f.sc||[]).forEach(x=>lc[x]=(lc[x]||0)+1));
+  h+=`<div class="chipsrow"><span class="lbl">언어</span><button class="chip ${!S.lang?'on':''}" data-lang="">전체</button>`+LANGS.filter(l=>lc[l[0]]).map(([k,l])=>`<button class="chip ${S.lang===k?'on':''}" data-lang="${k}">${l}<span class="n">${lc[k]}</span></button>`).join('')+`</div>`;
   h+=`<div class="chipsrow"><span class="lbl">분류</span><button class="chip ${!S.major?'on':''}" data-major="">전체</button>`+
     MAJOR_ORDER.filter(m=>mc[m]).map(m=>`<button class="chip ${S.major===m?'on':''}" data-major="${m}">${MAJOR[m]}<span class="n">${mc[m]}</span></button>`).join('')+`</div>`;
   if(S.major){
-    const sc={}; base.filter(f=>f.m===S.major).forEach(f=>(f.sb||[]).forEach(s=>sc[s]=(sc[s]||0)+1));
+    const sc={}; base.filter(f=>cat(f)===S.major).forEach(f=>(f.sb||[]).forEach(s=>sc[s]=(sc[s]||0)+1));
     const subs=Object.keys(sc).filter(s=>SUB[s]&&sc[s]>=2).sort((a,b)=>sc[b]-sc[a]);
-    if(subs.length) h+=`<div class="chipsrow"><span class="lbl">STYLE</span>`+subs.map(s=>`<button class="chip sub ${S.subs.has(s)?'on':''}" data-sub="${s}">${SUB[s]}<span class="n">${sc[s]}</span></button>`).join('')+`</div>`;
-  }
-  if(S.tab==='browse'){
-    const eb=S.data.filter(f=>baseFilter(f,'era')); const ec={}; eb.forEach(f=>ec[f.e]=(ec[f.e]||0)+1);
-    h+=`<div class="chipsrow"><span class="lbl">시대</span><button class="chip ${!S.era?'on':''}" data-era="">전체</button>`+ERAS.filter(e=>ec[e[0]]).map(e=>`<button class="chip ${S.era===e[0]?'on':''}" data-era="${e[0]}">${e[1]}<span class="n">${ec[e[0]]}</span></button>`).join('')+`</div>`;
+    if(subs.length) h+=`<div class="chipsrow"><span class="lbl">세부 양식</span>`+subs.map(s=>`<button class="chip sub ${S.subs.has(s)?'on':''}" data-sub="${s}">${SUB[s]}<span class="n">${sc[s]}</span></button>`).join('')+`</div>`;
   }
   const wb=S.data.filter(f=>baseFilter(f,'wt')); const wc={l:0,h:0,m:0,v:0}; wb.forEach(f=>{ if(f.wl)wc.l++; if(f.wh)wc.h++; if((f.w||1)>=6)wc.m++; if(f.v)wc.v++; });
   h+=`<div class="chipsrow"><span class="lbl">굵기</span><button class="chip ${!S.wt?'on':''}" data-wt="">전체</button>`+[['l','가는 굵기 있음'],['h','굵은 굵기 있음'],['m','굵기 6개 이상'],['v','가변폰트']].map(([k,l])=>`<button class="chip ${S.wt===k?'on':''}" data-wt="${k}">${l}<span class="n">${wc[k]}</span></button>`).join('')+`</div>`;
@@ -411,6 +414,10 @@ function renderFilters(){
   const mb=S.data.filter(f=>baseFilter(f,'mood')); const moc={}; mb.forEach(f=>(f.mo||[]).forEach(m=>moc[m]=(moc[m]||0)+1));
   const moods=Object.keys(moc).filter(m=>moc[m]>=3).sort((a,b)=>moc[b]-moc[a]);
   if(moods.length) h+=`<div class="chipsrow"><span class="lbl">분위기</span><button class="chip ${!S.mood?'on':''}" data-mood="">전체</button>`+moods.map(m=>`<button class="chip ${S.mood===m?'on':''}" data-mood="${esc(m)}">${esc(m)}<span class="n">${moc[m]}</span></button>`).join('')+`</div>`;
+  if(S.tab==='browse'){
+    const eb=S.data.filter(f=>baseFilter(f,'era')); const ec={}; eb.forEach(f=>ec[f.e]=(ec[f.e]||0)+1);
+    h+=`<div class="chipsrow"><span class="lbl">시대</span><button class="chip ${!S.era?'on':''}" data-era="">전체</button>`+ERAS.filter(e=>ec[e[0]]).map(e=>`<button class="chip ${S.era===e[0]?'on':''}" data-era="${e[0]}">${e[1]}<span class="n">${ec[e[0]]}</span></button>`).join('')+`</div>`;
+  }
   el.innerHTML=h;
 }
 function optCount(){ const o=S.opt; return ['ko','pv','vf','com'].filter(k=>o[k]).length + (o.lat?0:1); }
@@ -493,14 +500,14 @@ function renderSaved(){
     const fl=S.favFolder? (S.favFolder==='__none'?['__none']:[S.favFolder]) : [...S.folders,'__none'];
     fl.forEach(x=>{ const g=list.filter(f=>x==='__none'?!(S.favs[f.id].f||[]).length:(S.favs[f.id].f||[]).includes(x)); if(g.length) groups.push([x==='__none'?'미분류':x,g,x]); });
   } else if(S.favMode==='type'){
-    MAJOR_ORDER.forEach(m=>{ const g=list.filter(f=>f.m===m); if(g.length) groups.push([MAJOR[m],g]); });
+    MAJOR_ORDER.forEach(m=>{ const g=list.filter(f=>cat(f)===m); if(g.length) groups.push([MAJOR[m],g]); });
   } else {
     ERAS.forEach(e=>{ const g=list.filter(f=>f.e===e[0]); if(g.length) groups.push([e[1],g]); });
   }
   out.innerHTML=groups.map(([t,g,key])=>{
     let inner;
     if(S.favMode==='folder'){ // sub-group by type inside folder
-      inner=MAJOR_ORDER.map(m=>{ const gg=g.filter(f=>f.m===m); return gg.length?`<h4>${MAJOR[m]} · ${gg.length}</h4><div class="grid ${S.view==='list'?'list':''}">${gg.map(cardHTML).join('')}</div>`:''; }).join('');
+      inner=MAJOR_ORDER.map(m=>{ const gg=g.filter(f=>cat(f)===m); return gg.length?`<h4>${MAJOR[m]} · ${gg.length}</h4><div class="grid ${S.view==='list'?'list':''}">${gg.map(cardHTML).join('')}</div>`:''; }).join('');
     } else inner=`<div class="grid ${S.view==='list'?'list':''}">${g.map(cardHTML).join('')}</div>`;
     const acts= key&&key!=='__none'?`<span class="act"><button class="ib" data-fup="${esc(key)}" title="위로">${ICON.up}</button><button class="ib" data-fren="${esc(key)}" title="이름 변경">${ICON.edit}</button><button class="ib" data-fdel="${esc(key)}" title="폴더 삭제">${ICON.trash}</button></span>`:'';
     return `<div class="fsec"><h3>${S.favMode==='folder'?ICON.folder:''}${esc(t)}<span class="n">${g.length}</span>${acts}</h3>${inner}</div>`;
@@ -654,6 +661,7 @@ document.addEventListener('click',e=>{
   if(d.clear){ const i=$('#'+d.clear); i.value=''; i.dispatchEvent(new Event('input')); return; }
   if(d.t){ S.tab=d.t; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b===t)); if(S.tab!=='era'&&S.tab!=='browse'){} renderFilters(); render(); window.scrollTo(0,0); return; }
   if(d.src!==undefined){ S.src=d.src; S.major=null; S.subs.clear(); renderFilters(); render(); return; }
+  if(d.lang!==undefined){ S.lang=d.lang||null; renderFilters(); render(); return; }
   if(d.major!==undefined){ S.major=d.major||null; S.subs.clear(); renderFilters(); render(); return; }
   if(d.sub){ S.subs.has(d.sub)?S.subs.delete(d.sub):S.subs.add(d.sub); renderFilters(); render(); return; }
   if(d.era!==undefined){ S.era=(S.tab==='era'&&S.era===d.era)?null:(d.era||null); renderFilters(); render(); return; }

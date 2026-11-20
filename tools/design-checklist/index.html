@@ -5,7 +5,7 @@
 <script>/* 승인된 팀원만 (2026-11-19): 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>디자인 사고방지 체크리스트</title>
+<title>자가점검리스트</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300;400;500;700&display=swap');
 
@@ -15,12 +15,12 @@
     --surface2: #f2f4f6;
     --border: #e5e8eb;
     --accent: #3182f6;
-    --danger: #ef4444;
+    --danger: #f04452;
     --text: #191f28;
     --text2: #4e5968;
     --text3: #8b95a1;
     --check-bg: #e8f3ff;
-    --admin: #f59e0b;
+    --admin: #191f28;
     --radius: 12px;
     --tab-h: 56px;
   }
@@ -304,14 +304,38 @@
   html.emb .admin-banner { padding-left:16px; padding-right:16px; }
   html.emb .bottom-bar .complete-btn { background:#191f28; font-size:15px; height:46px; }
   html.emb .section-title { font-size:20px !important; letter-spacing:-0.02em; }
+
+html.emb #app { display:flex; flex-direction:column; }
+html.emb .admin-banner { order:0; } html.emb header { order:1; } html.emb .tabs-wrapper { order:2; } html.emb .content { order:3; } html.emb .bottom-bar { order:4; }
+html.emb header { display:flex; align-items:center; padding:0 16px !important; height:auto; min-height:40px; }
+html.emb .header-right { width:100%; justify-content:space-between; }
+html.emb .stat-pill { background:none; border:0; padding:0; font-size:14px; font-weight:600; color:#4e5968; }
+html.emb .stat-pill strong { color:#191f28; font-weight:800; }
+html.emb .stat-pill strong:last-child { color:#8b95a1; font-weight:600; }
+html.emb .admin-toggle { height:40px; padding:0 16px; border:0; border-radius:12px; background:#fff; color:#4e5968; font-size:14px; font-weight:600; letter-spacing:0; }
+html.emb .tabs-wrapper { padding:12px 16px 0 !important; overflow-x:auto; scrollbar-width:none; }
+html.emb .tabs { background:none !important; padding:0 !important; gap:6px !important; width:auto !important; flex-wrap:nowrap; }
+html.emb .tab { min-height:36px; height:36px !important; padding:0 14px !important; border-radius:999px !important; background:#fff !important; color:#4e5968 !important; font-size:14px; font-weight:600 !important; gap:6px; border:0 !important; }
+html.emb .tab.active { background:#191f28 !important; color:#fff !important; }
+html.emb .tab .tab-badge { font-size:12px; font-weight:600; background:#f2f4f6; color:#8b95a1; border-radius:999px; padding:1px 7px; }
+html.emb .tab.active .tab-badge { background:rgba(255,255,255,.18); color:#fff; }
+html.emb .tab .tab-dot { display:none; }
+html.emb .content-inner { padding-top:16px !important; }
+html.emb .section-header { background:#fff; border-radius:20px; padding:20px; margin-bottom:16px; display:grid; grid-template-columns:1fr auto; column-gap:12px; }
+html.emb .section-title { font-size:20px !important; font-weight:800; grid-column:1; }
+html.emb .section-desc { grid-column:1 / -1; font-size:14px; color:#4e5968; margin-top:4px; }
+html.emb .section-progress { display:contents; }
+html.emb .progress-bar { grid-column:1 / -1; grid-row:3; margin-top:14px; height:6px; border-radius:3px; background:#f2f4f6; }
+html.emb .progress-label { grid-column:2; grid-row:1; align-self:center; font-size:15px; font-weight:700; color:#191f28; }
+
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <div class="logo">CHECKLIST<span> / 디자인 사고방지</span></div>
+    <div class="logo">자가점검리스트</div>
     <div class="header-right">
-      <div class="stat-pill">전체 체크 항목 <strong id="global-done">0</strong>/<strong id="global-total">0</strong></div>
+      <div class="stat-pill">전체 진행 <strong id="global-done">0</strong>/<strong id="global-total">0</strong></div>
       <button class="admin-toggle" id="admin-toggle">편집</button>
     </div>
   </header>

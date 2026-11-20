@@ -199,11 +199,14 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 }
 @media print { body.spking .wrap > *:not(#specRep), body.spking #sheet, body.spking .ov { display:none !important; } body.spking #specRep .spk { padding:0; border-radius:0; } }
 @media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
+
+.drop { border:0 !important; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3e%3crect width='100%25' height='100%25' rx='18' ry='18' fill='none' stroke='%23b0b8c1' stroke-width='3' stroke-dasharray='4%2c 3'/%3e%3c/svg%3e") !important; background-repeat:no-repeat !important; }
+
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h2 class="noprint">PREFLIGHT <span class="mute small" style="font-weight:600">인쇄 전 검수 · PDF · AI · JPG · PNG</span></h2>
+  <h2 class="noprint">프리플라이트 <span class="mute small" style="font-weight:600">인쇄 전 검수 · PDF · AI · JPG · PNG</span></h2>
 
   <div class="card noprint" id="setup">
     <h3 class="sh">검수할 파일</h3>

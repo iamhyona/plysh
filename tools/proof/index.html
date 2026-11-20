@@ -200,6 +200,29 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .dcp { width:100%; height:46px; border:0; border-radius:12px; background:var(--txt); color:#fff; font-size:15px; font-weight:700; margin-top:14px; }
 .dcp2 { width:100%; height:40px; border:0; border-radius:12px; background:var(--chip); color:var(--sub); font-size:14px; font-weight:600; margin-top:8px; }
 .ddel { display:block; margin:4px auto 0; border:0; background:none; color:var(--red); font-size:13px; font-weight:600; padding:8px 12px; }
+
+/* 용어 위계 (2026-11-20): 큰 분류 = 탭, 세부 = 칩 */
+.rtab { display:flex !important; flex-wrap:nowrap; gap:2px !important; width:fit-content; max-width:100%; overflow-x:auto; scrollbar-width:none; background:#e5e8eb; border-radius:12px; padding:3px; margin:0 0 14px !important; }
+.rtab::-webkit-scrollbar { display:none; }
+.rtab button { flex:none; min-height:36px; background:none !important; color:#8b95a1 !important; border-radius:9px !important; padding:0 14px !important; font-size:14px !important; font-weight:700; white-space:nowrap; }
+.rtab button.on { background:#fff !important; color:#191f28 !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.rsub { margin:0 0 10px !important; }
+.rsub button { background:#fff !important; color:#4e5968; font-weight:600; }
+.rsub button.on { background:#191f28 !important; color:#fff !important; }
+
+
+/* 선택 표시 · 점선 (2026-11-20): 파란 실선 대신 진한 회색 1.5px, 점선은 촘촘하고 연하게 */
+.cres.best { box-shadow:inset 0 0 0 1.5px #4e5968 !important; }
+.cbest { background:#191f28 !important; }
+
+
+/* PC 팝업 (2026-11-20) */
+@media (min-width:760px) {
+  #pk { align-items:center !important; padding:24px; }
+  #pk .pkb { border-radius:22px; height:min(80vh, 760px); animation:pkIn .18s ease; }
+}
+@keyframes pkIn { from { opacity:0; transform:scale(.98); } to { opacity:1; transform:none; } }
+
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -1409,8 +1432,8 @@ function ptDetail(c) {
 }
 
 /* ── 시작 ── */
-var LINKS = { doc: ['https://drive.google.com/drive/folders/11nRHl1v00YxiSLaQyQy07cUN8hq8rbY8', '사양서 폴더'], folder: ['https://drive.google.com/drive/folders/1N8iiljha71_Yn7jXVvhiFJ0qNgtwP7mF', 'PROOF 폴더'] };
-function setLink() { var v = S.view === 'one' ? 'list' : S.view, L = v === 'doc' ? LINKS.doc : (v === 'list' || v === 'ref') && CAT.url ? [CAT.url, 'PROOF 사양 카탈로그 시트'] : LINKS.folder; var a = $('#lnk'); a.href = L[0]; a.title = L[1] + ' 열기'; }
+var LINKS = { doc: ['https://drive.google.com/drive/folders/11nRHl1v00YxiSLaQyQy07cUN8hq8rbY8', '사양서 폴더'], folder: ['https://drive.google.com/drive/folders/1N8iiljha71_Yn7jXVvhiFJ0qNgtwP7mF', '자료 폴더'] };
+function setLink() { var v = S.view === 'one' ? 'list' : S.view, L = v === 'doc' ? LINKS.doc : (v === 'list' || v === 'ref') && CAT.url ? [CAT.url, '사양 카탈로그 시트'] : LINKS.folder; var a = $('#lnk'); a.href = L[0]; a.title = L[1] + ' 열기'; }
 var _render = render; render = function () { _render(); setLink(); };
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.add = false; go(b.dataset.v); }; });
 $('#brand').onclick = function () { S.add = false; go('doc'); };

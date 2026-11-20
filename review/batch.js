@@ -724,7 +724,7 @@ function sheetFile(r, no, tot, pid) {
   var GS = groupsOf(r), n = { r: 0, a: 0, o: 0 }, num = {};
   GS.forEach(function (g, i) { g.n = i + 1; n[g.lv]++; g.L.forEach(function (x) { num[x.code] = num[x.code] || []; if (num[x.code].indexOf(g.n) < 0) num[x.code].push(g.n); }); });
   var stats = '<span class="r"><b>' + n.r + '</b>경고</span><span class="a"><b>' + n.a + '</b>주의</span>' + (n.o ? '<span class="o"><b>' + n.o + '</b>조언</span>' : '');
-  var h = '<section class="sheet" id="p' + no + '"><header class="mast"><span class="brand">PLYSH · PREFLIGHT</span><span>' + esc([r.artist, r.title].filter(Boolean).join(' ')) + '</span></header>' +
+  var h = '<section class="sheet" id="p' + no + '"><header class="mast"><span class="brand">PLYSH · 프리플라이트</span><span>' + esc([r.artist, r.title].filter(Boolean).join(' ')) + '</span></header>' +
     '<div class="fhead"><div><p class="fno">품목 ' + no + ' / ' + tot + '</p><h2>' + esc(r.prodName || r.file) + '</h2><p class="file">' + esc(r.file) + '</p></div><div class="stat">' + stats + '</div></div><div class="meta2">' + specMeta(r) + '</div>';
   if (GS.length) {
     h += '<h3 class="sec">요약 <small>번호 누르면 상세로 이동 · 체크하면 완료 표시</small><span class="prog" data-p="' + pid + '"></span></h3><div class="tw"><table class="sum">' + GS.map(function (g) {
@@ -789,7 +789,7 @@ async function printSheet(Rs) {
   Rs = Rs.filter(function (r) { return r && !r.fatal; }); if (!Rs.length) return;
   var w = window.open('', '_blank');
   if (!w) { alert('결과지 창이 막혔어요. 브라우저에서 팝업을 허용해 주세요.'); return; }
-  w.document.write('<!doctype html><meta charset="utf-8"><title>PREFLIGHT 결과지</title><body style="font-family:sans-serif;padding:40px;color:#4e5968">결과지 만드는 중…</body>'); w.document.close();
+  w.document.write('<!doctype html><meta charset="utf-8"><title>프리플라이트 결과지</title><body style="font-family:sans-serif;padding:40px;color:#4e5968">결과지 만드는 중…</body>'); w.document.close();
   for (var ri = 0; ri < Rs.length; ri++) { var rr = Rs[ri]; extraIssues(rr); var GG = groupsOf(rr); for (var gi = 0; gi < GG.length; gi++) { var L0 = firstPerPage(GG[gi].L, 4); for (var li = 0; li < L0.length; li++) await crop(rr, L0[li]); } }
   var d = new Date(), date = d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2) + ' ' + (d.getHours() < 12 ? '오전 ' : '오후 ') + ((d.getHours() + 11) % 12 + 1) + ':' + ('0' + d.getMinutes()).slice(-2);
   var tot = Rs.length, pages = Rs.map(function (r, i) { return sheetFile(r, String(i + 1).padStart(2, '0'), tot, 'f' + (i + 1)); }), T = { r: 0, a: 0, o: 0 };
@@ -797,8 +797,8 @@ async function printSheet(Rs) {
   var art = Rs.map(function (r) { return r.artist; }).filter(Boolean)[0] || '', ai = aiFor(art), en = ai && ai.info['영문명'] || '', title = Rs[0].title || titleOf();
   var sh = SPEC.sheet, surl = sh ? 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' : '';
   var noCopy = Rs.filter(function (r) { return r.issues.some(function (x) { return !x.hidden && x.code === 'nocopy'; }); }).length;
-  var cov = '<section class="sheet cover"><header class="mast"><span class="brand">PLYSH · PREFLIGHT</span><span>검수 결과지</span></header>' +
-    '<div class="title"><h1 class="artist">' + esc(art || 'PREFLIGHT') + (en && en !== art ? ' <span>' + esc(en) + '</span>' : '') + '</h1>' + (title ? '<p class="proj">' + esc(title) + '</p>' : '') + '<p class="lede">검수일 ' + date + '</p></div>' +
+  var cov = '<section class="sheet cover"><header class="mast"><span class="brand">PLYSH · 프리플라이트</span><span>검수 결과지</span></header>' +
+    '<div class="title"><h1 class="artist">' + esc(art || '프리플라이트') + (en && en !== art ? ' <span>' + esc(en) + '</span>' : '') + '</h1>' + (title ? '<p class="proj">' + esc(title) + '</p>' : '') + '<p class="lede">검수일 ' + date + '</p></div>' +
     '<div class="facts"><a class="f" href="#items" data-col=""><span>파일</span><b class="big">' + tot + '개</b></a>' + (sh ? '<a class="f" href="' + esc(surl) + '" target="_blank" rel="noopener"><span>사양서 ↗</span><b>' + esc(sh.name) + '</b></a>' : '') +
     '<a class="f fr" href="#items" data-col="r"><span>경고 ↗</span><b class="r">' + T.r + '건</b></a><a class="f fa" href="#items" data-col="a"><span>주의 ↗</span><b class="a">' + T.a + '건</b></a><a class="f fo" href="#items" data-col="o"><span>조언 ↗</span><b class="o">' + T.o + '건</b></a></div>';
   if (noCopy > 1) cov += '<h2 class="sec">모든 파일 공통</h2><ol class="common one"><li><b>리걸 문구 없는 품목 ' + noCopy + '개 · 필요 여부 확인</b><p>Ⓟ&amp;Ⓒ 표기 있으면 통과 처리</p></li></ol>';
@@ -811,9 +811,9 @@ async function printSheet(Rs) {
   var key = 'rv-sheet:' + [art, title, Rs.map(function (r) { return r.file; }).join('|')].join('#');
   var base = location.href.replace(/[^\/]*([?#].*)?$/, '');
   var css = ''; try { css = await (await fetch(base + 'sheet.css?v=' + SHEET_V)).text(); } catch (e) {}
-  var doc = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PREFLIGHT 결과지 · ' + esc([art, title].filter(Boolean).join(' ')) + '</title>' +
+  var doc = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>프리플라이트 결과지 · ' + esc([art, title].filter(Boolean).join(' ')) + '</title>' +
     '<link rel="stylesheet" media="print" onload="this.media=\'all\'" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"><style>' + css + '</style></head><body data-key="' + esc(key) + '">' +
-    '<div class="bar"><b>PREFLIGHT 결과지</b><span class="tot"></span><button onclick="window.print()">PDF 저장</button><button class="ghost" onclick="rvReset()">체크 초기화</button></div>' +
+    '<div class="bar"><b>프리플라이트 결과지</b><span class="tot"></span><button onclick="window.print()">PDF 저장</button><button class="ghost" onclick="rvReset()">체크 초기화</button></div>' +
     cov + pages.map(function (p) { return p.html; }).join('') + '<script>' + SHEET_JS + '<\/script></body></html>';
   w.document.open(); w.document.write(doc); w.document.close();
 }

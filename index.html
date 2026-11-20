@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --faint:#b0b8c1;
-  --acc:#3182f6; --red:#ef4444; --chip:#f2f4f6; }
+  --acc:#3182f6; --red:#f04452; --chip:#f2f4f6; }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { margin:0; background:var(--bg); color:var(--txt); font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif; font-size:15px; letter-spacing:-0.01em; }
 button, input, select, textarea, optgroup, option { font-family:inherit; letter-spacing:inherit; }
@@ -106,7 +106,7 @@ header { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(
 .wdh, .act5 { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
 .wdh span { text-align:center; font-size:11px; color:var(--mute); padding-bottom:5px; }
 .act5 i { display:block; aspect-ratio:1; border-radius:6px; background:#eef0f3; }
-.act5 i.a1, .legend i.a1 { background:#c7d2fe; } .act5 i.a2, .legend i.a2 { background:#818cf8; } .act5 i.a3, .legend i.a3 { background:#4338ca; }
+.act5 i.a1, .legend i.a1 { background:#d6e6fd; } .act5 i.a2, .legend i.a2 { background:#86b5f9; } .act5 i.a3, .legend i.a3 { background:#3182f6; }
 .act5 i.f { background:#f7f8fa; } .act5 i.td { box-shadow:inset 0 0 0 2px var(--txt); }
 .thumbs { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:14px; border-radius:10px; overflow:hidden; }
 .thumbs img { width:100%; aspect-ratio:1; object-fit:cover; display:block; background:var(--chip); }
@@ -125,7 +125,7 @@ header { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(
 .sri .srd { font-size:13px; font-weight:800; margin-right:6px; } .sri .mood { padding:2px 7px; font-size:11px; background:#fff; }
 .sri p { margin:6px 0 0; font-size:14px; line-height:1.55; color:var(--sub); }
 .sri.go { background:var(--txt); } .sri.go .srd, .sri.go p { color:#fff; }
-.sri mark, .srn2 mark, .lows mark { background:#fff1a8; color:inherit; border-radius:3px; padding:0 1px; }
+.sri mark, .srn2 mark, .lows mark { background:#dbeaff; color:inherit; border-radius:3px; padding:0 1px; }
 .pg.srg { border-radius:12px; } .pg.srg button { aspect-ratio:1; }
 .geo { font-size:12px; color:var(--mute); margin:6px 2px 0; min-height:16px; }
 .fpl { font-size:12px; color:var(--mute); margin-left:8px; } .fpl::before { content:'📍'; margin-right:2px; }
@@ -239,7 +239,7 @@ html.lock { overflow:hidden; }
 .pal button svg { width:18px; height:18px; opacity:0; } .pal button.on svg { opacity:1; }
 .acts { display:flex; gap:8px; margin-top:22px; }
 .acts button { flex:1; border:0; border-radius:14px; padding:16px; font-weight:700; font-size:16px; }
-.save { background:var(--txt); color:#fff; } .del { background:#fef2f2; color:var(--red); flex:0 0 96px !important; }
+.save { background:var(--txt); color:#fff; } .del { background:#fdecec; color:var(--red); flex:0 0 96px !important; }
 .del.sure { flex:0 0 170px !important; background:var(--red); color:#fff; }
 .save:disabled { opacity:.4; }
 textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; padding:14px; font-size:16px; line-height:1.6; min-height:220px; outline:0; resize:none; display:block; }
@@ -374,7 +374,7 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 .rpi .who { flex:none; font-size:12px; font-weight:800; color:var(--sub); min-width:42px; }
 .rpi .who.pj { min-width:0; max-width:40%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--mute); }
 .rpi .tx { flex:1; min-width:0; word-break:keep-all; }
-.rpi .wt, .rpvt em.w { flex:none; font-style:normal; font-size:11px; font-weight:800; color:#f59e0b; background:#fef3dc; border-radius:6px; padding:1px 6px; }
+.rpi .wt, .rpvt em.w { flex:none; font-style:normal; font-size:11px; font-weight:800; color:#f04452; background:#fdecec; border-radius:6px; padding:1px 6px; }
 .rpl { display:block; width:100%; text-align:left; border:0; background:var(--chip); border-radius:12px; padding:9px 12px; margin-top:8px; font-size:12px; line-height:1.7; color:var(--sub); }
 .rpl small { display:block; font-size:11px; font-weight:800; color:var(--mute); }
 .rpl span { display:block; font-weight:700; color:var(--txt); } .rpl span i { display:inline-block; width:7px; height:7px; border-radius:2px; margin-right:6px; vertical-align:1px; }
@@ -384,7 +384,7 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 .rphp div { display:flex; gap:10px; font-size:13px; padding:3px 0; } .rphp b { flex:none; min-width:46px; } .rphp span { color:var(--sub); font-weight:600; }
 .rpm { display:block; width:5px; height:5px; border-radius:50%; background:#8b95a1; margin:2px auto 0; }
 .tmsum { display:flex; flex-wrap:wrap; gap:12px; align-items:center; background:#fff; border-radius:16px; padding:12px 16px; margin-bottom:10px; font-size:13px; color:var(--sub); font-weight:600; }
-.tmsum b { color:var(--txt); font-size:15px; } .tmsum b.w { color:#f59e0b; }
+.tmsum b { color:var(--txt); font-size:15px; } .tmsum b.w { color:#f04452; }
 .tmsum button { margin-left:auto; border:0; background:var(--txt); color:#fff; border-radius:999px; font-size:12px; font-weight:700; padding:7px 12px; }
 .tm { background:#fff; border-radius:20px; padding:16px 18px; margin-bottom:10px; }
 .tmh { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; } .tmh b { font-size:17px; } .tmh small { font-size:12px; color:var(--mute); font-weight:600; }
@@ -420,8 +420,8 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 .kc { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
 .kc span { font-size:11px; font-weight:700; border-radius:999px; padding:3px 9px; }
 .more { border:0; background:var(--chip); border-radius:12px; width:100%; padding:11px; font-weight:700; color:var(--sub); margin-top:10px; font-size:14px; }
-.dd { display:inline-flex; align-items:center; justify-content:center; min-width:46px; border-radius:8px; font-size:12px; font-weight:800; padding:3px 6px; background:#fff0f3; color:#e1306c; }
-.dd.soon { background:#e1306c; color:#fff; }
+.dd { display:inline-flex; align-items:center; justify-content:center; min-width:46px; border-radius:8px; font-size:12px; font-weight:800; padding:3px 6px; background:#fdecec; color:#f04452; }
+.dd.soon { background:#f04452; color:#fff; }
 .sec { font-size:18px; font-weight:800; margin:22px 4px 10px; display:flex; align-items:baseline; gap:8px; }
 .sec small { font-size:12px; color:var(--mute); font-weight:600; }
 .hd .ib { width:36px; height:36px; }
@@ -631,7 +631,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .cst small { display:block; font-size:11px; color:var(--mute); font-weight:600; } .cst b { display:block; font-size:22px; font-weight:800; letter-spacing:-0.02em; margin-top:4px; white-space:nowrap; } .cst b i { font-style:normal; font-size:12px; color:var(--sub); margin:0 1px; font-weight:700; }
 .cst em { display:block; font-style:normal; font-size:11px; color:var(--mute); margin-top:2px; } .cst.sm { margin:12px 0 0; } .cst.sm b { font-size:18px; }
 .csv { display:block; width:100%; height:auto; margin:2px 0 6px; } .cds { font-size:12px; color:var(--mute); }
-.cwarn, .cok { margin-top:10px; font-size:13px; border-radius:12px; padding:10px 12px; line-height:1.5; } .cwarn { background:#fff4e5; color:#b45309; } .cok { background:#e8f7ee; color:#1f9d55; }
+.cwarn, .cok { margin-top:10px; font-size:13px; border-radius:12px; padding:10px 12px; line-height:1.5; } .cwarn { background:#fdecec; color:#f04452; } .cok { background:#e8f3ff; color:#3182f6; }
 .cpy { margin-top:12px; width:100%; border:0; border-radius:12px; background:var(--txt); color:#fff; font-weight:700; font-size:14px; padding:12px 0; }
 .cfit { margin-top:12px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; } .cfit small { width:100%; font-size:12px; color:var(--mute); font-weight:600; } .cfit button { border:0; background:var(--chip); border-radius:999px; padding:7px 12px; font-size:13px; font-weight:600; color:var(--sub); }
 .cset summary { list-style:none; cursor:pointer; margin:0; } .cset summary::-webkit-details-marker { display:none; }
@@ -658,10 +658,10 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .tdadd .tdi { flex:1; min-width:0; height:38px; border:0; background:var(--chip); border-radius:10px; padding:0 11px; font-size:15px; outline:0; }
 .tdadd .tdb { flex:none; height:38px; border:0; background:var(--txt); color:#fff; border-radius:10px; padding:0 12px; font-size:13px; font-weight:700; }
 .tdadd .tdstar { flex:none; width:38px; height:38px; border:0; background:var(--chip); border-radius:10px; font-size:16px; color:#c9ced4; }
-.tdadd .tdstar[aria-pressed=true] { background:#fef3dc; color:#f59e0b; }
-.rpi.imp:not(.done) { background:#fff7e8; border-radius:10px; }
+.tdadd .tdstar[aria-pressed=true] { background:#fdecec; color:#f04452; }
+.rpi.imp:not(.done) { background:#fff5f5; border-radius:10px; }
 .rpi.imp:not(.done) .tx { font-weight:800; }
-.rpi .star { font-style:normal; color:#f59e0b; margin-right:4px; }
+.rpi .star { font-style:normal; color:#f04452; margin-right:4px; }
 .rpi.done .star { color:var(--faint); }
 .rpi.tmp { opacity:.55; }
 .bd.memo .bdh b { color:var(--txt); }
@@ -673,7 +673,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .tddh { display:flex; align-items:baseline; gap:6px; font-size:13px; font-weight:800; color:var(--sub); margin:14px 0 4px; padding-top:10px; border-top:1px solid #f2f4f6; }
 .tddh:first-child { margin-top:6px; padding-top:0; border-top:0; }
 .tddh small { color:var(--faint); font-size:12px; font-weight:700; margin-left:auto; }
-.rpvt em.ow { flex:none; font-style:normal; font-size:11px; font-weight:800; color:var(--acc); background:#e8f1ff; border-radius:6px; padding:1px 6px; }
+.rpvt em.ow { flex:none; font-style:normal; font-size:11px; font-weight:800; color:var(--acc); background:#e8f3ff; border-radius:6px; padding:1px 6px; }
 .tdpj { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:800; color:var(--txt); margin:10px 0 2px; }
 .tdpj:first-child { margin-top:4px; }
 .tdpj i { width:7px; height:7px; border-radius:2px; flex:none; }
@@ -760,8 +760,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .qkc h4 em { font-style:normal; font-size:11px; font-weight:700; color:var(--mute); background:var(--chip); border-radius:6px; padding:2px 6px; }
 .qkc .ad { font-size:12px; color:var(--mute); margin-top:4px; line-height:1.45; }
 /* 퀵 주소 빨간 글씨 (2026-11-09): ※ 줄 · **글자** */
-.qkr { color:#e5484d; }
-.qklb .nt { font-size:11px; font-weight:700; line-height:1.45; color:#e5484d; margin-top:10px; }
+.qkr { color:#f04452; }
+.qklb .nt { font-size:11px; font-weight:700; line-height:1.45; color:#f04452; margin-top:10px; }
 .qkp { display:flex; align-items:center; gap:8px; border-top:1px solid #f2f4f6; padding:10px 0; margin-top:8px; }
 .qkp + .qkp { margin-top:0; }
 .qkp .nm { flex:1; min-width:0; font-size:14px; }
@@ -795,8 +795,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
   .lbh .ad { font-size:32pt; font-weight:800; line-height:1.35; }
   .lbh .co { font-size:32pt; font-weight:800; line-height:1.35; }
   .lbh .ct { font-size:24pt; font-weight:500; line-height:1.4; margin-top:7mm; }
-  .lbh .nt { font-size:15pt; font-weight:700; line-height:1.45; margin-top:8mm; color:#e5484d; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  .lbh .qkr { color:#e5484d; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .lbh .nt { font-size:15pt; font-weight:700; line-height:1.45; margin-top:8mm; color:#f04452; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .lbh .qkr { color:#f04452; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .lbh .fr { font-size:10pt; font-weight:600; letter-spacing:.18em; margin-top:12mm; color:#555; }
   .lbh .fra { font-size:9pt; font-weight:500; margin-top:1.5mm; color:#555; }
   .lbh2 { top:148mm; }
@@ -847,8 +847,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wlwt .t { font-size:12.5px; font-weight:700; color:var(--mute); margin-bottom:2px; } .wlwt .t small { font-weight:500; color:var(--faint); margin-left:4px; }
 .wlwt .wl0 { font-size:13px; color:var(--mute); padding:6px 0; }
 .wlw2 { display:flex; justify-content:space-between; align-items:baseline; padding:6px 0; font-size:14px; color:var(--sub); font-variant-numeric:tabular-nums; }
-.wlw2 b { font-weight:700; color:var(--txt); } .wlw2 b.x40 { color:#e8590c; } .wlw2 b.x52 { color:#e03131; }
-.wlw2 b em { font-style:normal; font-size:11.5px; font-weight:700; margin-left:6px; padding:2px 7px; border-radius:999px; background:#fff1e5; }
+.wlw2 b { font-weight:700; color:var(--txt); } .wlw2 b.x40 { color:#191f28; } .wlw2 b.x52 { color:#f04452; }
+.wlw2 b em { font-style:normal; font-size:11.5px; font-weight:700; margin-left:6px; padding:2px 7px; border-radius:999px; background:#e5e8eb; }
 .wlw2 b.x52 em { background:#fdecec; }
 .wlsb { border:0; background:var(--chip); border-radius:999px; padding:5px 10px; font-size:13px; font-weight:600; color:var(--sub); }
 .wlsb:disabled { background:none; padding-left:0; padding-right:0; cursor:default; }
@@ -856,8 +856,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wlwk { display:flex; flex-wrap:wrap; gap:5px; padding:0 0 10px; margin-top:-2px; }
 .wlwk .w { background:var(--chip); border-radius:8px; padding:4px 8px; font-size:12px; color:var(--sub); font-weight:600; white-space:nowrap; }
 .wlwk .w b { color:#191f28; font-weight:700; margin-left:4px; }
-.wlwk .w.x40 { background:#fff4e6; color:#e8590c; } .wlwk .w.x40 b { color:#e8590c; }
-.wlwk .w.x52 { background:#ffe3e3; color:#e03131; } .wlwk .w.x52 b { color:#e03131; }
+.wlwk .w.x40 { background:#e5e8eb; color:#191f28; } .wlwk .w.x40 b { color:#191f28; }
+.wlwk .w.x52 { background:#fdecec; color:#f04452; } .wlwk .w.x52 b { color:#f04452; }
 .wlwk .wl0 { font-size:12px; color:var(--faint); }
 .wlap { border:0; border-radius:999px; padding:5px 11px; font-size:12.5px; font-weight:700; background:var(--chip); color:var(--sub); margin-left:auto; }
 .wlap.on { background:#e8f3ff; color:#3182f6; }
@@ -1162,11 +1162,37 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #gQ { height:46px; border-radius:12px; }
 .tdj, .tdi, .tdb { height:40px !important; min-height:40px; }
 #wkF { min-height:36px; }
-#exS.save { height:46px; border-radius:12px; }
+#exS.save { height:52px; border-radius:14px; font-size:16px; }
+.cpy { min-height:52px; height:auto; border-radius:14px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 .ntbox, .exbox, .bd, .wlc, .mcal { padding:20px !important; border-radius:20px !important; }
 .tkc { border-radius:16px !important; }
 .spi { padding:16px !important; }
 a.lgd, #wlQ { min-height:36px; display:inline-flex; align-items:center; }
+html[data-nav] #cvSeg { display:none !important; }
+
+/* 선택 표시 · 점선 (2026-11-20): 파란 실선 대신 진한 회색 1.5px, 점선은 촘촘하고 연하게 */
+.cres.best { box-shadow:inset 0 0 0 1.5px #4e5968 !important; }
+.cbest { background:#191f28 !important; }
+.bd.tdd.td { box-shadow:inset 0 0 0 1.5px #4e5968 !important; }
+.pdrop, .expic, .wlform0 { border:0 !important; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3e%3crect width='100%25' height='100%25' rx='16' ry='16' fill='none' stroke='%23b0b8c1' stroke-width='3' stroke-dasharray='4%2c 3'/%3e%3c/svg%3e") !important; background-repeat:no-repeat !important; }
+.qeadd, .emptyb, .tdea input { border:0 !important; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3e%3crect width='100%25' height='100%25' rx='12' ry='12' fill='none' stroke='%23b0b8c1' stroke-width='3' stroke-dasharray='4%2c 3'/%3e%3c/svg%3e") !important; background-repeat:no-repeat !important; }
+
+
+/* PC 팝업 (2026-11-20): 아래 시트 대신 화면 가운데 창 */
+@media (min-width:760px) {
+  .bs { top:50%; bottom:auto; left:50% !important; right:auto; margin:0; width:min(560px, calc(100vw - 48px)); max-height:86vh; border-radius:24px;
+    padding:24px 24px 24px; transform:translate(-50%, -48%) scale(.98); opacity:0; transition:transform .2s ease, opacity .2s ease, visibility .2s; }
+  .bs.open { transform:translate(-50%, -50%); opacity:1; }
+  .bs .grab, .bs .bsh-grab, .bs > .hdl, .bs .bsh > i { display:none; }
+}
+@media (min-width:1024px) { html[data-nav="w"] .bs { left:calc(50% + var(--sw) / 2) !important; } }
+
+
+/* 닫기 버튼 통일 (2026-11-20): 40px 검정 원 + 흰 ✕ */
+.bsx { width:40px !important; height:40px !important; background:var(--txt) !important; color:#fff !important; margin-top:0; }
+.bsx svg { width:18px; height:18px; stroke-width:2.6; }
+#nfm .nx { width:40px !important; height:40px !important; }
+#nfm .nx svg { width:18px; height:18px; }
 </style>
 </head>
 <body>
@@ -1200,15 +1226,15 @@ a.lgd, #wlQ { min-height:36px; display:inline-flex; align-items:center; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="todo">TO DO LIST</button><button data-v="wl">WORK LOG</button><button data-v="pj">PROJECT</button><button data-v="qk">QUICK</button><button data-v="tools" type="button">TOOLS</button><button data-v="exp">EXPENSE</button><button data-v="guide" id="navGuide" type="button">GUIDE</button>
+    <button data-v="todo">할 일</button><button data-v="wl">근태 작성</button><button data-v="pj">프로젝트</button><button data-v="qk">퀵</button><button data-v="tools" type="button">도구</button><button data-v="exp">지출결의</button><button data-v="guide" id="navGuide" type="button">안내</button>
   </nav>
   <div id="tkBar" class="tabs2 hide"></div>
 </header>
 <main id="main"><div class="ld">불러오는 중…</div></main>
 <!-- 검수 메뉴 (2026-11-18): review/ 페이지를 그대로 띄움. 다른 메뉴 갔다 와도 결과 유지 -->
-<div id="rvWrap" class="hide"><iframe id="rvF" title="PREFLIGHT"></iframe></div>
+<div id="rvWrap" class="hide"><iframe id="rvF" title="프리플라이트"></iframe></div>
 <!-- 터잡기 메뉴 (2026-11-19): impose/ 페이지를 그대로 띄움 -->
-<div id="imWrap" class="hide"><iframe id="imF" title="IMPOSE"></iframe></div>
+<div id="imWrap" class="hide"><iframe id="imF" title="터잡기"></iframe></div>
 <!-- TOOLS 메뉴 (2026-11-19): tools/ 폴더 도구들. 도구마다 iframe 하나 -->
 <div id="tkWrap" class="hide"></div>
 <button class="fab" id="fab" aria-label="일정 추가"></button>
@@ -1327,7 +1353,7 @@ a.lgd, #wlQ { min-height:36px; display:inline-flex; align-items:center; }
 </div>
 <!-- WORK LOG: 출퇴근·야근·야근식사·외근·야근택시 -->
 <div class="bs" id="wl">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><h3 style="flex:1;margin:0">WORK LOG</h3></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><h3 style="flex:1;margin:0">근태 작성</h3></div>
   <div class="fl" style="margin-top:0">디자이너</div><div class="chips" id="wlP2"></div>
   <div id="wlDay"></div>
   <div class="wlform0" id="wlForm0">위에서 디자이너를 고르면 이 날 기록을 쓰거나 고칠 수 있어요.</div>
@@ -1367,7 +1393,7 @@ a.lgd, #wlQ { min-height:36px; display:inline-flex; align-items:center; }
 </div>
 </div>
 <div class="bs" id="wlx">
-  <h3>WORK LOG 빠른 입력</h3>
+  <h3>근태 빠른 입력</h3>
   <div class="frow" style="margin-top:0"><div class="f"><label>기본 날짜 (글에 날짜가 없을 때)</label><input id="wlxD" type="date"></div></div>
   <textarea class="dx" id="wlxT" style="margin-top:12px;min-height:160px" placeholder="대충 적어도 돼요. 카톡 내용 붙여넣기도 OK&#10;&#10;혜선 9:50 출근 23시 퇴근 야식 이시 희원 택시 23400&#10;주영 10시 출근 7시 퇴근"></textarea>
   <label class="wlxpic"><input type="file" id="wlxImg" accept="image/*" multiple hidden><span id="wlxPic">카톡 캡처 올리기</span></label>
@@ -1376,7 +1402,7 @@ a.lgd, #wlQ { min-height:36px; display:inline-flex; align-items:center; }
   <div class="acts"><button class="save" id="wlxGo">읽기</button><button class="save hide" id="wlxS">모두 저장</button></div>
 </div>
 <div class="bs" id="wl1">
-  <h3>WORK LOG 한 줄 쓰기</h3>
+  <h3>근태 한 줄 쓰기</h3>
   <div class="chips" id="wl1P"></div>
   <div class="frow" style="margin-top:12px"><div class="f"><label>날짜</label><input id="wl1D" type="date"></div></div>
   <div class="frow" style="margin-top:12px"><div class="f"><label>한 줄로 적기</label><input id="wl1T" maxlength="120" placeholder="예) 09:00/21:00 (저녁 30분) 사유 크래비티 시안" autocomplete="off"></div></div>
@@ -1415,8 +1441,8 @@ function full(s) { return s + '(' + W[P(s).getDay()] + ')'; }
 function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 var TODAY = F(new Date());
 // 구분별 색 (제작일정 시트 색 규칙과 같은 계열)
-var KIND = { '디자인': '#3182f6', '리터칭': '#16a34a', '소속사': '#6b7684', '데드라인': '#e1306c', '공식': '#ef4444', '업무': '#8b5cf6', '휴가': '#f59e0b' };
-var KIND_BG = { '디자인': '#e8f1ff', '리터칭': '#e6f6ec', '소속사': '#f0f2f4', '데드라인': '#fde8ef', '공식': '#fdecec', '업무': '#f1ebfe', '휴가': '#fef3dc' };
+var KIND = { '디자인': '#3182f6', '리터칭': '#4e5968', '소속사': '#8b95a1', '데드라인': '#f04452', '공식': '#191f28', '업무': '#6b7684', '휴가': '#c9cdd2' };
+var KIND_BG = { '디자인': '#e8f3ff', '리터칭': '#eceef1', '소속사': '#f2f4f6', '데드라인': '#fdecec', '공식': '#e5e8eb', '업무': '#f2f4f6', '휴가': '#f6f7f9' };
 var PROJ_K = ['디자인', '리터칭', '소속사', '데드라인', '공식'], WORK_K = ['업무', '휴가'];
 var PCOL = ['#6f9fe8', '#e08aa6', '#6dba8f', '#e2aa5e', '#a092e0', '#5fb4d4', '#e48f80', '#6cbcb2', '#c08fd8', '#e7a173'];
 var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', tk: ls.get('d4:tk') || '', y: +TODAY.slice(0, 4), m: +TODAY.slice(5, 7), ws: sunOf(TODAY),
@@ -1932,7 +1958,7 @@ var TOOLS = [
     { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
   { g: '검수', i: [
     { k: 'review', t: '프리플라이트', s: 'PDF·AI 인쇄 전 검수, 사양서 검수', v: 'review' },
-    { k: 'checklist', t: '디자인 사고방지 체크리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
+    { k: 'checklist', t: '자가점검리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
   { g: '자료', i: [
     { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
     { k: 'pt', t: '팬톤 가이드', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
@@ -2106,8 +2132,8 @@ var EMB_TIDY = '/* PLYSH 안에서 열림: 제목은 PLYSH 페이지 머리가 �
   + 'html, body { font-family:"Pretendard Variable", Pretendard, -apple-system, sans-serif; }'
   + 'html.emb main { padding-top:0 !important; } .wrap { padding-top:0 !important; } #fxBar { padding-top:0 !important; } .emb-segw { padding-top:0 !important; }'
   + 'html.emb #lnk { display:none !important; } html.emb header .header-right { padding-top:0 !important; } html.emb body > #app > header, html.emb body > header { padding-top:0 !important; } .hbar { height:auto !important; padding-top:0 !important; padding-bottom:8px !important; }'
-  + '/* 공통 치수 2026-11-20 */.card { padding:20px !important; border-radius:20px !important; }.chips button, .rtab button, .rsub button, .fam button, .pkt button, .cfit button, .gs button.chip { min-height:36px; display:inline-flex; align-items:center; }.inp { min-height:40px !important; border-radius:12px !important; }input.inp, select.inp { height:40px !important; }.ib { min-height:40px !important; border-radius:12px !important; }#pick.pick, #demo.pick { min-height:40px; }#go.go, .cp, #page-reset, .complete-btn { min-height:46px !important; height:46px !important; border-radius:12px !important; }.chip { min-height:36px !important; }#sort, .vbtn { height:36px !important; border-radius:12px !important; }.rbtn { height:36px !important; }a.lgd { min-height:36px; }.today-btn { border-radius:12px !important; }.admin-toggle { min-height:32px; border-radius:12px !important; }html.emb .emb-seg > * { min-height:36px; padding:0 14px !important; } .tabs > button, .seg > button { min-height:36px; } .lbcard { padding:20px !important; }';
-var GD_TIDY = ':root { --accent:#3182f6 !important; --ok:#16a34a !important; --ng:#ef4444 !important; --ink:#191f28 !important; --muted:#4e5968 !important; --line:#e5e8eb !important; }'
+  + '/* 공통 치수 2026-11-20 */.card { padding:20px !important; border-radius:20px !important; }.chips button, .rtab button, .rsub button, .fam button, .pkt button, .cfit button, .gs button.chip { min-height:36px; display:inline-flex; align-items:center; }.inp { min-height:40px !important; border-radius:12px !important; }input.inp, select.inp { height:40px !important; }.ib { min-height:40px !important; border-radius:12px !important; }#pick.pick, #demo.pick { min-height:40px; }#go.go, .cp, .cpy, label.cpy, .dcp, .copy-btn:not(.secondary), #page-reset, .complete-btn { min-height:52px !important; height:auto !important; display:flex !important; align-items:center; justify-content:center; padding-top:0 !important; padding-bottom:0 !important; border-radius:14px !important; font-size:16px !important; font-weight:700 !important; }.chip { min-height:36px !important; }#sort, .vbtn { height:36px !important; border-radius:12px !important; }.rbtn { height:36px !important; }a.lgd { min-height:36px; }.today-btn { border-radius:12px !important; }.admin-toggle { min-height:32px; border-radius:12px !important; }html.emb .emb-seg > * { min-height:36px; padding:0 14px !important; } .tabs > button, .seg > button { min-height:36px; } .lbcard { padding:20px !important; } #pkX, .pkh button, #ovX, #vX, [data-close], .modal-close { width:40px !important; height:40px !important; min-width:40px; min-height:40px; flex:none; border-radius:50% !important; background:#191f28 !important; color:#fff !important; border:0 !important; display:flex !important; align-items:center; justify-content:center; font-size:20px !important; font-weight:700; line-height:1 !important; padding:0 !important; cursor:pointer; } [data-close] svg, .modal-close svg { color:#fff; stroke:#fff; width:18px; height:18px; }';
+var GD_TIDY = ':root { --accent:#3182f6 !important; --ok:#3182f6 !important; --ng:#f04452 !important; --ink:#191f28 !important; --muted:#4e5968 !important; --line:#e5e8eb !important; }'
   + '.toc, header .eyebrow, header h1, header .lede { display:none !important; } header { padding-bottom:20px !important; gap:6px !important; }'
   + '[data-toc].has-toc { display:block !important; max-width:none !important; }'
   + '.wrap { max-width:none !important; padding:24px 36px 56px !important; }'
@@ -2170,14 +2196,14 @@ var SPACES = [
   { k: 'me', t: '개인', d: '할 일, 근태, 지출결의를 한곳에서', home: 'todo', ic: 'todo', g: [
     { g: '개인', i: [{ k: 'todo', t: '할 일', s: '오늘 · 이번 주 할 일과 팀 공지' }, { k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
-    { g: '프로젝트', i: [{ k: 'pj', t: '프로젝트', s: '아티스트 · 연도로 찾기' }, { k: 'month', t: '일정', s: '모든 프로젝트 일정 달력' }] }] },
+    { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 달력으로' }, { k: 'sched', t: '일정', s: '프로젝트별 일정표' }] }] },
   { k: 'tool', t: '도구', d: '검수, 사양서 · 라벨 작성, 인쇄 계산, 파일명', home: 'space:tool', ic: 'tool', g: [
     { g: '도구', i: [{ k: 'review', t: '프리플라이트', s: '인쇄 파일 · 사양서 검수', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 },
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
   { k: 'lib', t: '자료실', d: '거래처 연락처, 로고, 폰트, 팬톤, 사양 용어', home: 'space:lib', ic: 'ref', g: [
     { g: '자료실', i: [{ k: 'qk', t: '퀵', s: '거래처 · 담당자 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
-  { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 사고방지 체크리스트', home: 'space:design', ic: 'pen', g: [
-    { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더 및 파일 가이드라인' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '디자인 사고방지 체크리스트', tool: 1 }] }] },
+  { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'pen', g: [
+    { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더 및 파일 가이드라인' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
     { g: '행정안내', i: [{ k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }] }] }
 ];
@@ -2186,7 +2212,7 @@ SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i.forEach(function 
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i = g.i.map(function (x) { if (typeof x !== 'string') { if (x.tool && !x.s) x.s = tl(x.k).s; return x; } var t = tl(x); return { k: x, t: t.t, s: t.s, tool: 1 }; }); }); });
 function spItems(sp) { var L = []; sp.g.forEach(function (g) { g.i.forEach(function (x) { L.push(x); }); }); return L; }
 var WS_TOOLS = { doc: 1, filename: 1, review: 1, spine: 1, cut: 1, die: 1, impose: 1 };
-function navCur() { var v = S.view; if (v === 'space') return 'space:' + S.spk; if (v === 'glist') return 'gl:' + S.gl;
+function navCur() { var v = S.view; if (v === 'space') return 'space:' + S.spk; if (v === 'month') return S.cv === 'proj' ? 'sched' : 'cal'; if (v === 'glist') return 'gl:' + S.gl;
   if (v === 'gdoc') { var k = 'gd:' + S.gdf, gi = -1; GUIDE_GROUPS.forEach(function (g, i) { if (g.i.some(function (d) { return d.f === S.gdf; })) gi = i; }); return (gi > 0 && S.gdf !== 'folder-file.html') ? 'gl:' + gi : k; } if (v === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === v; })[0]; return t ? t.k : v; }
 function inWs() { if (!S.ws) return false; var c = navCur(); return S.view === 'ws' || (S.view === 'spec' && S.sp && S.sp === S.ws.sp) || !!WS_TOOLS[c]; }
 function spOf() {
@@ -2203,6 +2229,7 @@ function navGo(k) {
   if (k === 'guide') { S.spk = 'design'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'tools') { S.spk = 'tool'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
+  if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'sched' ? 'proj' : 'cal'; ls.set('d4:cv', S.cv); k = 'month'; }
   S.view = k; if (k !== 'refs' && k !== 'start') ls.set('d4:view', k); window.scrollTo(0, 0); render();
 }
 function navClose() { document.documentElement.style.overflow = ''; ['#npl', '#nmg', '#nbd', '#nfm', '#nfb'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
@@ -2262,7 +2289,7 @@ function renderStart() {
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort).slice(0, 7);
   var PL = pjMerged(), R = NAV.rec.length ? NAV.rec.slice(0, 4) : PL.slice(0, 4).map(wsFrom);
   var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small>오늘 할 일 ' + Td.filter(function (x) { return !x.c; }).length + '개 · 이번 주 마감 ' + E.length + '건</small></div>' +
-    '<div class="wsg"><div class="wsc"><h3>이번 주 마감<button type="button" data-ng="month">일정</button></h3>' +
+    '<div class="wsg"><div class="wsc"><h3>이번 주 마감<button type="button" data-ng="sched">일정</button></h3>' +
     (E.length ? E.map(function (e) { return '<button type="button" class="wsr" data-wf="' + e.f + '"><span class="dd' + (e.d === TODAY ? ' td' : '') + '">' + dot(e.d).slice(3) + '</span><span class="pn">' + esc(e.file.short) + '</span><span class="tx">' + esc(e.t) + '</span></button>'; }).join('') : '<div class="emp">이번 주 마감이 없어요</div>') + '</div>' +
     '<div class="wsc"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
@@ -2357,7 +2384,7 @@ function sideHtml() {
       if (!on) return h;
       h += '<div class="sx">';
       if (sp.k === 'proj') {
-        h += '<button type="button" class="si' + (cur === 'pj' && !inWs() ? ' on' : '') + '" data-ng="pj">프로젝트</button><button type="button" class="si' + (cur === 'month' ? ' on' : '') + '" data-ng="month">일정</button>';
+        h += [['pj', '목록'], ['cal', '달력'], ['sched', '일정']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { return '<button type="button" class="si' + (x.k === cur && !inWs() ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
@@ -2375,7 +2402,7 @@ function crumbHtml() {
   return esc(sp.t) + sep + '<b>' + esc(it ? it.t : cur === 'spec' ? '사양서' : sp.t) + '</b>';
 }
 var PG_DESC = {
-  todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', spec: '프로젝트 사양서',
+  todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '46전 788×1091 · 국전 636×939 · 결(종목/횡목) 반영', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
@@ -3445,7 +3472,7 @@ function renderTodo() {
   var R = tdRows(function (x) { return x.k === '데일리' && x.d >= rg[0] && x.d <= rg[1]; });
   var TPER = [['d', '일'], ['w', '주'], ['m', '월'], ['r', '기간']];
   var segH = '<div class="aseg sw" id="tdSeg">' + TPER.map(function (o) { return '<button data-p="' + o[0] + '" class="' + (o[0] === p ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') +
-    (S.D.tdUrl ? '<a class="tdshi" href="' + esc(S.D.tdUrl) + '" target="_blank" rel="noopener" aria-label="TODO 시트 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></a>' : '') + '</div>';
+    (S.D.tdUrl ? '<a class="tdshi" href="' + esc(S.D.tdUrl) + '" target="_blank" rel="noopener" aria-label="할 일 시트 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></a>' : '') + '</div>';
   var h = p === 'r'
     ? '<div class="hm2 hm2a"><label class="hmt">' + rgTitle(rg[0], rg[1]) + '</label>' + segH + '</div><div class="rgrow">' + rgDw('tdF', rg[0], '시작일') + '<i>~</i>' + rgDw('tdT', rg[1], '종료일') + '</div>'
     : (function () { var cur = TODAY >= rg[0] && TODAY <= rg[1]; return '<div class="hm2 hm2a"><label class="hmt">' + perTitle(p, rg) + '<input type="date" class="dpk" id="tdSegD" value="' + S.tdd + '"></label>' + segH +
