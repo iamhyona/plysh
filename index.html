@@ -776,11 +776,10 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .qkh::after { content:''; position:absolute; right:2px; top:6px; width:7px; height:7px; border-right:2px solid var(--mute); border-bottom:2px solid var(--mute); transform:rotate(45deg); transition:transform .15s; }
 .qkc.open .qkh::after { transform:rotate(-135deg); top:10px; }
 .qkn { margin-left:auto; margin-right:22px; font-size:12px; font-weight:600; color:var(--mute); }
-.kqc { background:#fff; border-radius:16px; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; max-width:560px; margin:0 auto; }
-.kqi { width:56px; height:56px; border-radius:50%; background:#f2f4f6; display:flex; align-items:center; justify-content:center; color:#191f28; margin-bottom:4px; } .kqi svg { width:28px; height:28px; }
-.kqc b { font-size:18px; font-weight:700; } .kqc p { margin:0 0 8px; font-size:14px; line-height:1.6; color:#4e5968; word-break:keep-all; }
-.kqb { display:flex; align-items:center; justify-content:center; width:100%; max-width:320px; height:52px; border-radius:14px; background:#191f28; color:#fff !important; font-size:16px; font-weight:700; text-decoration:none !important; }
-.kqs { width:100%; max-width:320px; height:44px; border:0; border-radius:12px; background:#f2f4f6; color:#4e5968; font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.kqr { display:flex; align-items:center; gap:16px; background:#fff; border-radius:16px; padding:16px 20px; margin:0 0 16px; }
+.kqt { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; } .kqt b { font-size:15px; font-weight:700; color:#191f28; } .kqt span { font-size:13px; line-height:1.5; color:#8b95a1; word-break:keep-all; }
+.kqb { flex:none; display:inline-flex; align-items:center; justify-content:center; height:44px; padding:0 20px; border-radius:12px; background:#191f28; color:#fff !important; font-size:15px; font-weight:700; text-decoration:none !important; white-space:nowrap; }
+@media (max-width:600px) { .kqr { flex-direction:column; align-items:stretch; gap:12px; padding:16px; } .kqb { width:100%; } }
 /* 퀵 카드 (2026-11-20 실장님): 태그 · 인원은 줄바꿈 금지, 이름은 단어 단위로 줄바꿈, 닫힌 카드 높이는 가장 긴 카드에 맞춤 */
 .qkc h4 em, .qkn, .qki { flex:none; white-space:nowrap; } .qkt { flex:0 1 auto; word-break:keep-all; overflow-wrap:anywhere; } .qkc .ad { word-break:keep-all; overflow-wrap:anywhere; }
 .qkc:not(.open) { min-height:var(--qkch, 0); }
@@ -1310,7 +1309,7 @@ html[data-nav] #cvSeg { display:none !important; }
     </div>
   </div>
   <nav id="nav">
-    <button data-v="todo">할 일</button><button data-v="wl">근태 작성</button><button data-v="pj">프로젝트</button><button data-v="qk">연락처</button><button data-v="tools" type="button">도구</button><button data-v="exp">지출결의</button><button data-v="guide" id="navGuide" type="button">안내</button>
+    <button data-v="todo">할 일</button><button data-v="wl">근태 작성</button><button data-v="pj">프로젝트</button><button data-v="qk">퀵 배차하기</button><button data-v="tools" type="button">도구</button><button data-v="exp">지출결의</button><button data-v="guide" id="navGuide" type="button">안내</button>
   </nav>
   <div id="tkBar" class="tabs2 hide"></div>
 </header>
@@ -1550,7 +1549,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm8';
+var APP_VER = '20261120hm9';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2344,9 +2343,9 @@ function renderView() {
   toolBar(); navSync(); pgSync(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'kq' || S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, kq: renderKq, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, ws: renderWs, refs: renderRefs, space: function () { renderSpace(S.spk || 'tool'); }, gdoc: renderGdoc, glist: renderGlist })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, kq: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, ws: renderWs, refs: renderRefs, space: function () { renderSpace(S.spk || 'tool'); }, gdoc: renderGdoc, glist: renderGlist })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
@@ -2388,7 +2387,7 @@ var SPACES = [
     { g: '도구', i: [{ k: 'review', t: '검수', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'doc', t: '지류 사양서 작성', tool: 1 }, { k: 'formly', t: '상품 라벨 생성', s: '상품 사양서와 라벨 문구', tool: 1 },
       { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '절수 계산기', tool: 1 }, { k: 'die', t: '전개도', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'filename', t: '파일명 생성', tool: 1 }] }] },
   { k: 'lib', t: '도우미', d: '거래처 연락처, 로고, 폰트, 팬톤, 사양 용어', home: 'space:lib', ic: 'ref', g: [
-    { g: '도우미', i: [{ k: 'qk', t: '연락처', s: '거래처 · 담당자 연락처' }, { k: 'kq', t: '퀵배차하기', s: '카카오 T 퀵으로 배차' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
+    { g: '도우미', i: [{ k: 'qk', t: '퀵 배차하기', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'ref', t: '용어', tool: 1 }] }] },
   { k: 'design', t: '디자인작업안내', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'pen', g: [
     { g: '디자인작업안내', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '행정안내', d: '사무실 이용, 행정 업무, 업무 시스템 안내', home: 'space:admin', ic: 'office', g: [
@@ -2534,7 +2533,7 @@ function renderStart() {
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
     '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
-  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '연락처'], ['review', 'chk', '검수']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵 배차하기'], ['review', 'chk', '검수']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
@@ -2647,7 +2646,7 @@ var PG_DESC = {
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '46전 788×1091 · 국전 636×939 · 결(종목/횡목) 반영', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
-  qk: '거래처 · 담당자 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '용지 · 후가공 · 제본 용어와 결 · 책등 기준',
+  qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '용지 · 후가공 · 제본 용어와 결 · 책등 기준',
   checklist: '컨펌 요청 전 단계별 자가 점검' };
 function pgInfo() {
   var v = S.view; if (v === 'start' || inWs()) return null;
@@ -4405,12 +4404,9 @@ if (S.tok) { var c0 = cached(); if (c0) { setData(c0); render(); } load(); dvBad
 /* 퀵배차하기 (2026-11-20 실장님): 카카오 T 퀵 주문 화면. 카카오는 다른 사이트 안에 자기 화면(로그인 포함)을 띄우는 걸 막아서
    앱 안에 넣을 수 없음 → 같은 탭 하나(kakaoquick)로만 열리게 하고, 배차에 필요한 연락처를 바로 옆에서 볼 수 있게 안내 */
 var KQ_URL = 'https://quick.kakaomobility.com/orders/quick';
-function renderKq() {
-  $('#main').innerHTML = '<div class="kqc"><div class="kqi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></div>' +
-    '<b>카카오 T 퀵으로 배차하기</b><p>카카오는 보안 때문에 다른 사이트 안에서 주문 화면과 로그인을 열 수 없게 막아 두었어요.<br>아래 단추를 누르면 카카오 T 퀵 주문 화면이 열려요. 다시 눌러도 같은 탭 하나에서 열려요.</p>' +
-    '<a class="kqb" href="' + KQ_URL + '" target="kakaoquick" rel="noopener">카카오 T 퀵 주문 열기</a>' +
-    '<button type="button" class="kqs" data-ng="qk">주소·연락처 찾기</button></div>';
-  bindGo($('#main'));
+function kqHtml() { // 퀵 배차하기 맨 위: 카카오 T 퀵 주문 (2026-11-20 실장님: 연락처와 합침)
+  return '<div class="kqr"><div class="kqt"><b>카카오 T 퀵으로 배차</b><span>카카오는 다른 사이트 안에서 주문·로그인을 열 수 없게 막아 두어서 새 탭(늘 같은 탭 하나)에서 열려요</span></div>' +
+    '<a class="kqb" href="' + KQ_URL + '" target="kakaoquick" rel="noopener">카카오 T 퀵 주문 열기</a></div>';
 }
 /* ───── QUICK (2026-10-19): 퀵 연락처 시트 '연락처' 탭 · 쇼핑백 라벨 인쇄 ───── */
 var QKK = ['소속사', '거래처', '인쇄소', '장소'];
@@ -4427,9 +4423,10 @@ function qkRich(t) { return String(t || '').split(/\n/).map(function (l) { var h
 function qkSeoul(t) { t = String(t || ''); return /\n/.test(t) ? t : t.replace(/서울특별시/g, '서울시'); }
 function renderQk() {
   var D = S.qk;
-  if (!D) { $('#main').innerHTML = '<div class="ld">연락처 불러오는 중…</div>'; qkLoad().then(function () { if (S.view === 'qk') render(); }, function (e) { if (S.view === 'qk') $('#main').innerHTML = '<div class="ld">' + esc(errMsg(e)) + '</div>'; }); return; }
+  if (S.view === 'kq') S.view = 'qk';
+  if (!D) { $('#main').innerHTML = kqHtml() + '<div class="ld">연락처 불러오는 중…</div>'; qkLoad().then(function () { if (S.view === 'qk') render(); }, function (e) { if (S.view === 'qk') $('#main').innerHTML = '<div class="ld">' + esc(errMsg(e)) + '</div>'; }); return; }
   var k = ls.get('d4:qkk') || '', q = S.qkq || '';
-  var h = '<label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="qkQ" type="search" placeholder="업체 · 담당자 · 주소 검색" value="' + esc(q) + '"></label>';
+  var h = kqHtml() + '<label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="qkQ" type="search" placeholder="업체 · 담당자 · 주소 검색" value="' + esc(q) + '"></label>';
   h += '<div class="tabs2" id="qkK"><button data-k="" class="' + (k ? '' : 'on') + '">전체</button>' + QKK.map(function (x) { return '<button data-k="' + x + '" class="' + (k === x ? 'on' : '') + '">' + x + '</button>'; }).join('') + '</div>';
   h += '<div id="qkL"></div>';
   $('#main').innerHTML = h;
