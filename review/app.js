@@ -29,7 +29,7 @@ function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
 var libsP = null;
 function libs() {
-  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120e'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
+  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120f'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
   return libsP;
 }
 var faceP = null;
@@ -48,7 +48,7 @@ function prog(t, p, s) { if (ABORT) { var e = new Error('중지했어요'); e.ab
 var R = null; // 보고서
 function issue(o) { o.id = R.issues.length + 1; R.issues.push(o); return o; }
 
-function newR(name, size, meta) { return { file: name, size: size, WO: meta.WO, kind: meta.kind, prod: meta.prod, prodName: meta.prodName || '', artist: meta.artist || '', spec: meta.spec || '', rulesText: meta.rulesText, issues: [], pages: [], imgs: [], faces: [], notes: [], fonts: [], dups: [], repeats: [], rules: [], people: [] }; }
+function newR(name, size, meta) { return { file: name, size: size, WO: meta.WO, cover: !!meta.cover, kind: meta.kind, prod: meta.prod, prodName: meta.prodName || '', artist: meta.artist || '', spec: meta.spec || '', rulesText: meta.rulesText, issues: [], pages: [], imgs: [], faces: [], notes: [], fonts: [], dups: [], repeats: [], rules: [], people: [] }; }
 function fatal(name, msg, sub) { return { file: name, fatal: msg, fatalSub: sub || '', issues: [], pages: [] }; }
 async function analyzePdf(file, meta) {
   var WO = meta.WO, lab = meta.label || file.name;
@@ -443,7 +443,10 @@ function pageChecks(P) {
   if (rv) add('warn', 'print', 'rgbvec', 'RGB 색이 남아 있어요 (도형·글자)', rv + '곳', '색상 견본을 CMYK로 바꿔 주세요.', P.rgb.boxes.filter(function (b, i) { return i < 30; }));
   // 재단선 · 맞춤표는 원래 레지스트레이션이라 재단선 바깥은 빼고, 재단 안쪽 디자인에 쓰인 것만 알림
   var regIn = P.reg.filter(function (b) { var T = P.trim, e = 0.3 * MM; return b && b[0] < T[2] - e && b[2] > T[0] + e && b[1] < T[3] - e && b[3] > T[1] + e; });
-  if (regIn.length) add('err', 'print', 'reg', '재단 안쪽에 레지스트레이션 색', regIn.length + '곳', '재단 표시 외에는 K100 또는 리치블랙으로 바꿔 주세요.', regIn);
+  // 가는 선(칼선·접는선·가이드)은 주의, 면·글자는 경고 (2026-11-20 실장님)
+  var regLine = regIn.filter(function (b) { return b.line; }), regArt = regIn.filter(function (b) { return !b.line; });
+  if (regArt.length) add('err', 'print', 'reg', '재단 안쪽에 레지스트레이션 색 (면·글자)', regArt.length + '곳', 'K100 또는 리치블랙으로 바꾸기', regArt);
+  if (regLine.length) add('warn', 'print', 'regline', '칼선·가이드선이 레지스트레이션 색', regLine.length + '곳', '칼선·접는선이면 별색 + 오버프린트로 바꾸기, 가이드선이면 지우기', regLine);
   if (P.annots) add('warn', 'print', 'annot', '메모·주석이 남아 있어요', P.annots + '개', '인쇄될 수 있으니 지우고 다시 내보내 주세요.');
   // 칠·선
   var kOP = [], tacB = [], tacE = [], kBig = [], rbOff = [], wOP = [], sOP = [], hair = [], h0 = [], t4 = [], finOff = [], wThin = [], finThin = [], lt5 = [], lt10 = [], opCol = [];
@@ -612,8 +615,19 @@ function whiteText(P, wt, add) {
     '잉크가 번져 글자가 막힐 수 있어요. 굵기를 한 단계 올리거나 흰색 획 0.1~0.2pt를 더해 주세요' + (hits.some(function (h) { return h.rich; }) ? '. 리치블랙 바탕이면 글자 주변만 K100으로 바꾸는 것도 방법이에요.' : '.'), hits.map(function (h) { return h.t.vis; }));
 }
 
+// 포토북 표지: 안쪽면(마지막 페이지, 2p 이상일 때)의 책등 쪽 — 책등과 그 양옆 풀칠 영역이 비어 있어야 함
+function coverGlue(P, add) {
+  if (R.bookPages < 2 || P.lp.indexOf(R.bookPages) < 0) return; // 1p짜리 표지(바깥면만)·바깥면 페이지는 보지 않음
+  var T = P.trim, g = SET.glue * MM, cx = (T[0] + T[2]) / 2, W = R.WO || {};
+  var sp = W.pages && W.cal ? Math.ceil(W.pages / 2) * W.cal * MM : 0; // 사양서 쪽수·종이 두께로 책등 추정, 모르면 가운데만
+  var strip = [cx - sp / 2 - g, T[1], cx + sp / 2 + g, T[3]];
+  var r = toPx(P, strip), cnt = 0, tot = 0;
+  for (var y = r[1] + 1; y < r[3] - 1; y += 2) for (var xx = r[0] + 1; xx < r[2] - 1; xx += 1) { tot++; if (!isW(pix(P, xx, y))) cnt++; }
+  if (tot && cnt / tot > 0.01) add('err', 'bind', 'glue', '표지 안쪽면 책등 쪽에 그림이 있어요', '책등' + (sp ? '(약 ' + f1(mm(sp)) + 'mm)' : '') + '과 양옆 ' + SET.glue + 'mm는 풀칠돼서 가려져요 · 칠해진 비율 ' + Math.round(cnt / tot * 100) + '%', '이 영역은 비우기', [strip], { top: true });
+}
 // 포토북 첫·끝 페이지: 제본 쪽 3mm 풀칠 영역 비우기 + 그 영역 뺀 나머지에서 가운데 정렬
 function glueCheck(P, add) {
+  if (R.cover) return coverGlue(P, add); // 표지 파일은 바깥면이 아니라 안쪽면 책등 쪽을 봄 (2026-11-20 실장님)
   var first = P.lp.indexOf(1) > -1, last = P.lp.indexOf(R.bookPages) > -1;
   if (!first && !last) return;
   var T = P.trim, g = SET.glue * MM;
@@ -681,7 +695,8 @@ function docChecks() {
     var bb = null; P.strokes.forEach(function (o) { if (!o.ink.spots) return; for (var s in o.ink.spots) if (/die|cut|thomson|칼선|도무송|톰슨/i.test(s)) bb = bb ? [Math.min(bb[0], o.box[0]), Math.min(bb[1], o.box[1]), Math.max(bb[2], o.box[2]), Math.max(bb[3], o.box[3])] : o.box.slice(); });
     if (!bb) return;
     var T = P.trim, dx = mm((bb[0] + bb[2]) / 2 - (T[0] + T[2]) / 2), dy = mm((bb[1] + bb[3]) / 2 - (T[1] + T[3]) / 2);
-    var outside = bb[0] < T[0] - 0.5 || bb[2] > T[2] + 0.5 || bb[1] < T[1] - 0.5 || bb[3] > T[3] + 0.5;
+    var tol = MM; // 선 두께·곡선 때문에 0.1~0.3mm 넘는 건 정상 (2026-11-20 실장님)
+    var outside = bb[0] < T[0] - tol || bb[2] > T[2] + tol || bb[1] < T[1] - tol || bb[3] > T[3] + tol;
     issue({ page: P.i, sev: outside ? 'warn' : 'info', cat: 'print', code: 'dieinfo', title: outside ? '칼선이 재단 영역 밖으로 나가요' : '칼선 위치', detail: '칼선 크기 ' + f1(mm(bb[2] - bb[0])) + '×' + f1(mm(bb[3] - bb[1])) + 'mm · 가운데에서 가로 ' + f1(dx) + 'mm, 세로 ' + f1(dy) + 'mm', fix: outside ? '칼선이 재단선 안에 있는지, 칼선 기준 도련 3mm가 있는지 확인해 주세요.' : '', boxes: [bb], sus: true });
   });
   // 이미지 임베드 안내

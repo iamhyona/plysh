@@ -492,7 +492,7 @@
         if (k.spots) for (var s in k.spots) P.spots[s] = (P.spots[s] || 0) + 1;
         if (k.rgb) { P.rgb[kind === 'fill' && o.shade ? 'shade' : kind]++; if (P.rgb.boxes.length < 40 && o.vis && !empty(o.vis)) P.rgb.boxes.push(o.vis); }
         if (k.lab) P.lab++;
-        if (k.reg && P.reg.length < 400 && o.vis) P.reg.push(o.vis);
+        if (k.reg && P.reg.length < 400 && o.vis) { var rb = o.vis.slice(), rw = rb[2] - rb[0], rh = rb[3] - rb[1]; rb.line = kind === 'stroke' || (kind === 'fill' && Math.min(rw, rh) < 0.6 * 72 / 25.4); P.reg.push(rb); } // 선(칼선·가이드)과 면·글자 구분
       });
     }
     var it = new Interp(doc, emit, opt); it.pageNo = i;

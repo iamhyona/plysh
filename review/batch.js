@@ -480,7 +480,7 @@ async function run() {
   RS = []; CURR = null; $('#results').hidden = true; RV.show(null); drawChecklist(null);
   var jobs = [], imgG = {};
   Q.forEach(function (q) {
-    var meta = { WO: woOf(q), kind: q.kind, prod: q.prod, prodName: q.prodName || CLS_NAME[q.prod], artist: q.artist, spec: SPEC.items[q.item] ? SPEC.items[q.item].raw : '', title: titleOf(), rulesText: [rulesFor(q.artist), titleRule(titleOf())].filter(Boolean).join('\n\n') };
+    var meta = { WO: woOf(q), cover: /표지|커버|cover/i.test(q.file.name + ' ' + (q.prodName || '')) || !!(SPEC.items[q.item] && SPEC.items[q.item].cover), kind: q.kind, prod: q.prod, prodName: q.prodName || CLS_NAME[q.prod], artist: q.artist, spec: SPEC.items[q.item] ? SPEC.items[q.item].raw : '', title: titleOf(), rulesText: [rulesFor(q.artist), titleRule(titleOf())].filter(Boolean).join('\n\n') };
     if (q.kind === 'img') { var k = q.prod + '|' + q.prodName + '|' + q.artist + '|' + q.item; if (!imgG[k]) { imgG[k] = { img: true, files: [], meta: meta, st: 'wait' }; jobs.push(imgG[k]); } imgG[k].files.push(q.file); }
     else jobs.push({ file: q.file, meta: meta, st: 'wait' });
   });
@@ -549,7 +549,7 @@ var CHECK = [
     ['같은 품목 이미지끼리 크기·색 모드 통일', ['imgsize', 'imgmix'], function (r) { return r.isImg && r.n > 1; }]
   ]],
   ['색 · 잉크', [
-    ['쓰인 별색 · 의도치 않은 별색', ['spot', 'reg'], PDFONLY],
+    ['쓰인 별색 · 의도치 않은 별색', ['spot', 'reg', 'regline'], PDFONLY],
     ['잉크 총량 (TAC)', ['tac', 'tac2'], PDFONLY],
     ['흑백 디자인: CMYK 치우침 · 빠진 판 · 농도', ['grayskew', 'graynok', 'grayplate', 'graymix', 'graylow', 'grayimg'], PDFONLY],
     ['리치블랙 C30 M20 Y20 K100', ['richblack', 'richblack2'], PDFONLY],
@@ -571,7 +571,7 @@ var CHECK = [
   ['제본 · 접지', [
     ['페이지 수 (제본 방식 · 사양서)', ['pages2', 'pages4', 'pagecount'], isBook],
     ['접히는 곳·제본 안쪽에 얼굴·글자', ['guttertext', 'gutterface', 'gutteradv'], isBook],
-    ['포토북 첫·끝 페이지 풀칠 3mm · 가운데 정렬', ['glue', 'gluecenter'], function (r) { return r.prod === 'photobook' || r.WO && r.WO.bind === 'layflat'; }]
+    ['포토북 첫·끝 페이지 풀칠 3mm · 가운데 정렬 (표지는 안쪽면 책등 쪽)', ['glue', 'gluecenter'], function (r) { return r.prod === 'photobook' || r.WO && r.WO.bind === 'layflat'; }]
   ]],
   ['사진 · 인물', [
     ['중복 사진', ['dup', 'dupnear']],
@@ -763,7 +763,7 @@ function sheetFile(r, no, tot, pid) {
   var bcs = r.issues.filter(function (x) { return !x.hidden && (x.code === 'bcok' || x.code === 'bcfail'); });
   if (bcs.length || BOXRE.test((r.prodName || '') + ' ' + r.file)) {
     h += '<h3 class="sec">바코드 인식 결과 <small>파일에서 실제 스캔</small></h3><div class="tw"><table class="bc">' + (bcs.length ? bcs.map(function (x) {
-      var b = x.bc; return '<tr><th>' + esc(pgList(r, [x])) + '</th><td>' + (b ? esc(b.fmt.replace(/_/g, '-') + ' · ' + b.text + ' · ' + b.w.toFixed(1) + '×' + b.h.toFixed(1) + 'mm' + (b.chk === null ? '' : b.chk ? ' · 체크 숫자 맞음' : ' · 체크 숫자 틀림')) : '<span class="pend">' + esc(tStmt(x.title) + ' · ' + tStmt(x.detail)) + '</span>') + '</td></tr>';
+      var b = x.bc; return '<tr><th>' + esc(pgList(r, [x])) + '</th><td>' + (b ? esc(b.fmt.replace(/_/g, '-') + ' · ' + b.text + ' · ' + (b.w ? b.w.toFixed(1) + '×' + b.h.toFixed(1) + 'mm' : '페이지 전체에서 읽음') + (b.chk === null ? '' : b.chk ? ' · 체크 숫자 맞음' : ' · 체크 숫자 틀림')) : '<span class="pend">' + esc(tStmt(x.title) + ' · ' + tStmt(x.detail)) + '</span>') + '</td></tr>';
     }).join('') : '<tr><th>결과</th><td class="pend">바코드를 찾지 못함</td></tr>') + '</table></div>';
   }
   // 검사 항목
