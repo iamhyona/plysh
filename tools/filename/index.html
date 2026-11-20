@@ -98,6 +98,27 @@
   html.emb .copy-btn { background:#191f28; border-radius:12px; height:46px; font-size:15px; }
   html.emb .emb-r > .result-box { margin-top:0; }
   @media (max-width:759px) { html.emb .emb-r > .result-box { margin-top:20px; } }
+
+/* 공통 입력 폼 (2026-11-20, 지류 사양서 작성과 같은 모양) */
+html.emb .form-input, html.emb .form-input.sm, html.emb .date-display { height:46px !important; min-height:46px; background-color:#f2f4f6 !important; border:0 !important; border-radius:12px !important; font-size:15px !important; padding:0 14px !important; color:#191f28; box-shadow:none !important; }
+html.emb .form-input:focus { background-color:#fff !important; box-shadow:inset 0 0 0 2px #3182f6 !important; }
+html.emb .form-input::placeholder { color:#b0b8c1; }
+
+html.emb #tab-content { background:#fff; border-radius:20px; padding:20px; }
+html.emb #tab-content > p:first-child { font-size:13px !important; color:#8b95a1 !important; margin:0 0 16px !important; word-break:break-all; }
+html.emb .form-group { display:grid; grid-template-columns:108px minmax(0, 1fr); column-gap:10px; align-items:center; margin-bottom:8px; }
+html.emb .form-group > * { grid-column:2; }
+html.emb .form-group > .form-label { grid-column:1; grid-row:1 / span 3; align-self:center; font-size:14px; font-weight:600; letter-spacing:-0.01em; text-transform:none; color:#4e5968; margin:0; line-height:1.35; }
+html.emb .input-hint { font-size:12.5px; margin:4px 0 0 2px; min-height:0; }
+html.emb .input-hint:empty { display:none; }
+html.emb .form-row { gap:6px; }
+html.emb .today-btn { height:46px; border:0 !important; border-radius:12px; background:#191f28 !important; color:#fff !important; font-size:13px; font-weight:700; padding:0 16px; }
+html.emb #tab-content label[style] { border:0 !important; background:#f2f4f6 !important; border-radius:12px !important; min-height:46px; padding:0 14px !important; }
+html.emb #tab-content label[style] span { font-size:15px !important; color:#191f28 !important; }
+html.emb .result-label { font-size:13px; letter-spacing:0; text-transform:none; font-weight:600; color:#8b95a1; }
+html.emb .history-item { border:0; border-radius:12px; min-height:46px; }
+@media (max-width:380px) { html.emb .form-group { grid-template-columns:1fr; } html.emb .form-group > .form-label { grid-column:1; grid-row:auto; margin-bottom:6px; } html.emb .form-group > * { grid-column:1; } }
+
 </style>
 </head>
 <body>

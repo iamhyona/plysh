@@ -156,7 +156,7 @@ html.emb .phd { padding-right:44px; }
 }
 /* 탭 버튼 통일 (2026-11-20): 모든 .seg = 회색 바탕 + 흰 켜진 칸, 높이 40 · 작은 탭 36 */
 .seg { display:flex !important; width:100%; background:#e5e8eb !important; border-radius:12px; padding:3px; gap:2px; margin:0 0 12px; }
-.seg button { flex:1; display:flex; align-items:center; justify-content:center; min-height:40px; border:0; background:none; border-radius:9px; padding:0 14px; font-size:14px; font-weight:700; line-height:1.3; letter-spacing:-0.01em; color:#8b95a1; box-shadow:none; }
+.seg button { flex:1; display:flex; align-items:center; justify-content:center; min-height:36px; border:0; background:none; border-radius:9px; padding:0 14px; font-size:14px; font-weight:700; line-height:1.3; letter-spacing:-0.01em; color:#8b95a1; box-shadow:none; }
 .seg button.on { background:#fff !important; color:#191f28 !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
 .seg.sm { display:inline-flex !important; width:fit-content; max-width:100%; overflow-x:auto; scrollbar-width:none; }
 .seg.sm button { flex:none; min-height:36px; font-size:13px; padding:0 14px; }
@@ -195,6 +195,8 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .dpv b { display:flex; align-items:center; font-size:15px; font-weight:700; } .dpv b small { margin-left:6px; font-size:13px; font-weight:600; color:var(--mute); }
 .dpv p { margin:4px 0 0 29px; font-size:13px; color:var(--sub); line-height:1.5; }
 .dpv .miss { margin:4px 0 0 29px; font-size:12.5px; color:#e8590c; font-weight:600; }
+.dinw { display:flex; gap:6px; } .dinw .din { flex:1; min-width:0; }
+.dlk { flex:none; border:0; background:var(--txt); color:#fff; border-radius:12px; padding:0 14px; font-size:13px; font-weight:700; white-space:nowrap; }
 .dcp { width:100%; height:46px; border:0; border-radius:12px; background:var(--txt); color:#fff; font-size:15px; font-weight:700; margin-top:14px; }
 .dcp2 { width:100%; height:40px; border:0; border-radius:12px; background:var(--chip); color:var(--sub); font-size:14px; font-weight:600; margin-top:8px; }
 .ddel { display:block; margin:4px auto 0; border:0; background:none; color:var(--red); font-size:13px; font-weight:600; padding:8px 12px; }
@@ -980,7 +982,7 @@ function dPrevHtml(d, sel) {
   if (!d.rows.length) h += '<div class="empty2">품목을 넣으면 여기에 시트 순서대로 보여요</div>';
   h += d.rows.map(function (r, i) {
     var m = dMiss(r), q = dEmpty(r.q) ? '' : ' <small>' + esc(r.q) + '부</small>';
-    return '<div class="dpv' + (sel && r.id === sel.id ? ' on' : '') + '" data-sel="' + r.id + '"><b><em class="no">' + (i + 1) + '</em>' + esc(r.item || '이름 없는 품목') + q + '</b>' +
+    return '<div class="dpv' + (sel && r.id === sel.id ? ' on' : '') + '" data-sel="' + r.id + '"><b><em class="no">' + (i + 1) + '</em>' + esc(r.item || '품목명 없음') + q + '</b>' +
       (dLine(r) ? '<p>' + esc(dLine(r)) + '</p>' : '') + (m.length ? '<div class="miss">빈칸 · ' + esc(m.join(', ')) + '</div>' : '') + '</div>';
   }).join('');
   if (d.rows.length) h += '<button class="dcp" id="dCopy">시트에 붙여넣기용 복사 (' + d.rows.length + '행)</button><button class="dcp2" id="dCopyH">제목 줄까지 같이 복사</button><div class="nt c">사양서 시트의 ‘대분류’ 첫 칸을 누르고 붙여넣으면 칸마다 들어가요</div>';
@@ -988,7 +990,8 @@ function dPrevHtml(d, sel) {
 }
 function dFieldHtml(r, f) {
   var k = f[0], v = r[k], a = 'data-dr="' + r.id + '" data-k="' + k + '"', c;
-  if (PICK[k]) c = '<button type="button" class="dpk" data-pick="' + k + '" ' + a + '>' + (dEmpty(v) ? '<i>' + (k === 'item' ? '품목 고르기' : '고르기 · 없으면 비워 두기') + '</i>' : '<span>' + esc(v) + '</span>') + '</button>';
+  if (k === 'item') c = '<div class="dinw"><input class="din" ' + a + ' value="' + esc(v || '') + '" placeholder="품목명 쓰기 · 예: 엽서"><button type="button" class="dlk" data-pick="item" ' + a + '>목록에서 고르기</button></div>';
+  else if (PICK[k]) c = '<button type="button" class="dpk" data-pick="' + k + '" ' + a + '>' + (dEmpty(v) ? '<i>' + (k === 'item' ? '품목 고르기' : '고르기 · 없으면 비워 두기') + '</i>' : '<span>' + esc(v) + '</span>') + '</button>';
   else if (k === 'etc') c = '<textarea class="din" rows="2" ' + a + ' placeholder="' + esc(f[2] || '') + '">' + esc(v || '') + '</textarea>';
   else c = '<input class="din" ' + a + ' value="' + esc(v || '') + '" placeholder="' + esc(f[2] || '') + '">';
   return '<div class="dfr"><label>' + f[1] + '</label>' + c + '</div>';
@@ -999,12 +1002,12 @@ function renderDoc() {
   if (!d) { $('#main').innerHTML = h + docTplHtml(); bindDoc(); return; }
   var sel = dSel(d);
   h += '<div class="dsw"><div class="dsl">';
-  h += '<div class="card"><div class="f"><label>사양서 이름</label><input id="dName" value="' + esc(d.name) + '"></div><div class="nt">만든 날 ' + d.date + ' · 이 기기에 저장돼요</div></div>';
-  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em>' + esc(r.item || '이름 없는 품목') + '</button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button></div>';
+  h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="nt" style="margin:10px 0 0 118px">만든 날 ' + d.date + ' · 이 기기에 저장돼요</div></div>';
+  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button></div>';
   if (!sel) h += docTplHtml();
   else {
     var n = d.rows.indexOf(sel);
-    h += '<div class="card"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '이름 없는 품목') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '>↑</button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '>↓</button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div>';
+    h += '<div class="card"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '>↑</button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '>↓</button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div>';
     h += DSEC.map(function (sc) {
       var x = '<div class="dsc"><div class="dst">' + sc[0] + '</div>' + sc[1].map(function (f) { return dFieldHtml(sel, f); }).join('');
       if (sc[0] === '크기 · 페이지' && sel.flat && !sel.book) x += '<div class="dfr"><label>결</label><select class="din" data-dr="' + sel.id + '" data-k="gn">' + ['', 'v', 'h'].map(function (g) { return '<option value="' + g + '"' + ((sel.gn || '') === g ? ' selected' : '') + '>' + GN_LB[g] + '</option>'; }).join('') + '</select></div>';
@@ -1012,7 +1015,7 @@ function renderDoc() {
       return x + '</div>';
     }).join('');
     h += '</div>';
-    h += '<div class="acts"><button class="rs" id="dAdd">대표 품목 계산에서 추가</button><button class="rs" id="dBlank">+ 빈 품목</button></div>';
+    h += '<div class="acts"><button class="rs" id="dAdd">대표 품목 계산에서 추가</button></div>';
   }
   h += '</div><div class="dsr" id="dPrev">' + dPrevHtml(d, sel) + '<button class="ddel" id="dDel">이 사양서 삭제</button></div></div>';
   $('#main').innerHTML = h; bindDoc();
@@ -1032,13 +1035,14 @@ function bindDoc() {
     saveDocs(); renderDoc(); toast(t.t + ' 기본 구성을 넣었어요');
   }; });
   if (!d) return;
-  var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); };
+  var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };
   bindDocPrev(d);
   var row = function (id) { return d.rows.filter(function (r) { return r.id === id; })[0]; };
   // 글자 칸: 치는 대로 저장 + 오른쪽 미리보기만 새로 그림 (입력 중인 칸은 그대로)
   $$('.din[data-dr]').forEach(function (i) {
-    var up = function () { var r = row(i.dataset.dr); r[i.dataset.k] = i.value; saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel(); };
+    var up = function () { var r = row(i.dataset.dr); r[i.dataset.k] = i.value; saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
+      if (i.dataset.k === 'item') { var t = i.value || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); } };
     i.oninput = up; i.onchange = function () { up(); if (/^(gn|size|q)$/.test(i.dataset.k)) renderDoc(); };
   });
   $$('[data-pick][data-dr]').forEach(function (i) { i.onclick = function () { var r = row(i.dataset.dr); openPick(i.dataset.pick, r[i.dataset.k], function (x) {
@@ -1048,14 +1052,7 @@ function bindDoc() {
   $$('[data-dup]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dup), c = JSON.parse(JSON.stringify(r)); c.id = uid(); d.rows.splice(d.rows.indexOf(r) + 1, 0, c); ls.set('pr:dsel', c.id); saveDocs(); renderDoc(); toast('복제했어요'); }; });
   $$('[data-del]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.del); if (!confirm('‘' + (r.item || '이 품목') + '’을 지울까요?')) return; var i = d.rows.indexOf(r); d.rows.splice(i, 1); var nx = d.rows[Math.min(i, d.rows.length - 1)]; ls.set('pr:dsel', nx ? nx.id : ''); saveDocs(); renderDoc(); }; });
   var da = $('#dAdd'); if (da) da.onclick = function () { S.add = true; go('list'); };
-  $('#dItem').onclick = function () {
-    openPick('item', '', function (name) {
-      if (!name || name === '-') return;
-      var it = itemRow(name), t = it && it[6] && tpl(it[6]);
-      if (t) { S.id = t.id; S.add = true; ls.set('pr:id', t.id); CUR = null; toast('자동 계산 템플릿이 있어요 · 크기 넣고 추가 눌러요'); return go('one'); }
-      add(docRow(name)); toast(name + ' 추가했어요');
-    });
-  };
+  $('#dItem').onclick = function () { add(docRow('')); };
   var db = $('#dBlank'); if (db) db.onclick = function () { add(docRow('')); };
   bindDel();
   function bindDel() { $('#dDel').onclick = function () { if (!confirm('‘' + d.name + '’ 사양서를 지울까요? 되돌릴 수 없어요')) return; DOCS.splice(DOCS.indexOf(d), 1); ls.set('pr:doc', DOCS[0] ? DOCS[0].id : ''); saveDocs(); renderDoc(); }; }

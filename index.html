@@ -182,7 +182,7 @@ html[data-nav] #tkBar { display:none !important; }
 .spr { display:grid; gap:6px; margin:0 0 4px; } .spr > div { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:baseline; font-size:14px; } .spr span { font-weight:700; } .spr small { color:var(--mute); font-size:12.5px; } .spr b { font-weight:700; }
 .spsvg { width:100%; height:auto; display:block; margin:0 0 12px; } .spn { font-size:12px; color:var(--mute); line-height:1.6; margin:4px 4px 0; }
 @media (max-width:360px) { .tkl { grid-template-columns:1fr; } }
-.card { background:var(--card); border-radius:20px; padding:22px 20px; margin-bottom:12px; }
+.card { background:var(--card); border-radius:20px; padding:20px; margin-bottom:12px; }
 .ct { font-size:17px; font-weight:700; margin:0 0 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .ct small { font-size:13px; font-weight:500; color:var(--mute); }
 .ct a { color:var(--acc); font-size:13px; font-weight:600; text-decoration:none; }
@@ -304,7 +304,7 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 /* ───── SCHEDULE ───── */
 .tabs2 { display:flex; gap:6px; overflow-x:auto; margin:0 -16px 12px; padding:0 16px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .tabs2::-webkit-scrollbar { display:none; }
-.tabs2 button { flex:none; border:0; background:#fff; border-radius:999px; padding:8px 13px; font-size:13px; font-weight:600; color:var(--sub); display:flex; align-items:center; gap:6px; }
+.tabs2 button { flex:none; min-height:36px; border:0; background:#fff; border-radius:999px; padding:0 14px; font-size:13.5px; font-weight:600; color:var(--sub); display:flex; align-items:center; gap:6px; }
 .tabs2 button.on { background:var(--txt); color:#fff; }
 .tabs2 button i { width:8px; height:8px; border-radius:50%; display:block; }
 .legend2 { display:flex; flex-wrap:wrap; gap:4px 10px; font-size:11px; color:var(--mute); margin:0 4px 10px; }
@@ -1153,6 +1153,20 @@ html[data-nav="t"] #nsub.has { display:flex; }
   #nfb.open { opacity:1; visibility:visible; transition:opacity .3s, visibility 0s; }
 }
 @media (min-width:1024px) { #nfb { display:none; } }
+
+/* 공통 치수 2026-11-20: 큰 46 · 보통 40 · 칩 36 · 아이콘 원형 32 / 모서리 12 · 칩 999 · 큰 박스 20 · 작은 칸 14 / 박스 안쪽 20 */
+#ntAdd, .tded, #tdmP, #tdmN, #wlPv, #wlNx, #nP, #nN, #mFold { width:32px; height:32px; min-height:32px; }
+.aseg button, .seg.sm button { min-height:36px; }
+.pjb { min-height:36px; }
+#gY, #gA { height:36px; }
+#gQ { height:46px; border-radius:12px; }
+.tdj, .tdi, .tdb { height:40px !important; min-height:40px; }
+#wkF { min-height:36px; }
+#exS.save { height:46px; border-radius:12px; }
+.ntbox, .exbox, .bd, .wlc, .mcal { padding:20px !important; border-radius:20px !important; }
+.tkc { border-radius:16px !important; }
+.spi { padding:16px !important; }
+a.lgd, #wlQ { min-height:36px; display:inline-flex; align-items:center; }
 </style>
 </head>
 <body>
@@ -2091,7 +2105,8 @@ var EMB_TIDY = '/* PLYSH 안에서 열림: 제목은 PLYSH 페이지 머리가 �
   + '.phd:not(:has(.bk)) { display:none !important; } .hbar > .logo { display:none !important; }'
   + 'html, body { font-family:"Pretendard Variable", Pretendard, -apple-system, sans-serif; }'
   + 'html.emb main { padding-top:0 !important; } .wrap { padding-top:0 !important; } #fxBar { padding-top:0 !important; } .emb-segw { padding-top:0 !important; }'
-  + 'html.emb #lnk { display:none !important; } html.emb header .header-right { padding-top:0 !important; } html.emb body > #app > header, html.emb body > header { padding-top:0 !important; } .hbar { height:auto !important; padding-top:0 !important; padding-bottom:8px !important; }';
+  + 'html.emb #lnk { display:none !important; } html.emb header .header-right { padding-top:0 !important; } html.emb body > #app > header, html.emb body > header { padding-top:0 !important; } .hbar { height:auto !important; padding-top:0 !important; padding-bottom:8px !important; }'
+  + '/* 공통 치수 2026-11-20 */.card { padding:20px !important; border-radius:20px !important; }.chips button, .rtab button, .rsub button, .fam button, .pkt button, .cfit button, .gs button.chip { min-height:36px; display:inline-flex; align-items:center; }.inp { min-height:40px !important; border-radius:12px !important; }input.inp, select.inp { height:40px !important; }.ib { min-height:40px !important; border-radius:12px !important; }#pick.pick, #demo.pick { min-height:40px; }#go.go, .cp, #page-reset, .complete-btn { min-height:46px !important; height:46px !important; border-radius:12px !important; }.chip { min-height:36px !important; }#sort, .vbtn { height:36px !important; border-radius:12px !important; }.rbtn { height:36px !important; }a.lgd { min-height:36px; }.today-btn { border-radius:12px !important; }.admin-toggle { min-height:32px; border-radius:12px !important; }html.emb .emb-seg > * { min-height:36px; padding:0 14px !important; } .tabs > button, .seg > button { min-height:36px; } .lbcard { padding:20px !important; }';
 var GD_TIDY = ':root { --accent:#3182f6 !important; --ok:#16a34a !important; --ng:#ef4444 !important; --ink:#191f28 !important; --muted:#4e5968 !important; --line:#e5e8eb !important; }'
   + '.toc, header .eyebrow, header h1, header .lede { display:none !important; } header { padding-bottom:20px !important; gap:6px !important; }'
   + '[data-toc].has-toc { display:block !important; max-width:none !important; }'
