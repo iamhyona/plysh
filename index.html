@@ -615,6 +615,21 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 #flt button i, #pjc button i { display:block !important; width:7px; height:7px; border-radius:50%; flex:none; }
 .ckw { display:flex; align-items:center; gap:10px; }
 .ckw > .it { flex:1; min-width:0; }
+/* 일정 날짜 묶음 (2026-11-20): PC = 왼쪽 날짜 칸 + 오른쪽 일정 카드 여러 칸, 모바일 = 날짜 제목 아래 한 줄씩 */
+.pdx { padding-top:6px; padding-bottom:6px; }
+.pdg { border-top:1px solid #f2f4f6; padding:14px 0; } .pdg:first-child { border-top:0; }
+.pdd { font-size:15px; font-weight:800; color:var(--txt); margin:0 0 8px 2px; display:flex; align-items:baseline; gap:6px; letter-spacing:-0.01em; }
+.pdd small { font-size:12px; font-weight:600; color:var(--mute); }
+.pdg.td .pdd, .pdg.td .pdd small { color:var(--acc); }
+.pdg.nw { border-top:2px solid var(--acc); }
+.pdl { display:grid; grid-template-columns:1fr; gap:8px; }
+.pdl .ckw { background:var(--bg); border-radius:14px; padding:4px 14px 4px 12px; }
+.pdl .ckw > .it { border-top:0; padding:10px 0; }
+@media (min-width:1024px) {
+  .pdg { display:grid; grid-template-columns:76px minmax(0, 1fr); gap:16px; align-items:start; }
+  .pdd { flex-direction:column; gap:2px; margin:6px 0 0 4px; }
+  .pdl { grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); }
+}
 .ckw .ck { flex:none; width:22px; height:22px; border-radius:50%; border:2px solid #d1d6db; background:#fff; padding:0; display:flex; align-items:center; justify-content:center; color:transparent; }
 .ckw .ck svg { width:13px; height:13px; }
 .ckw.done .ck { background:var(--acc); border-color:var(--acc); color:#fff; }
@@ -2807,14 +2822,18 @@ function pjListProj() {
 function inL(d) { var g = S.lrg; return !g || (d >= g[0] && d <= g[1]); }
 function pjListAll(p) {
   var L = (p ? (p.f ? S.D.events.filter(function (e) { return e.f === p.f.id; }) : []) : S.D.events.filter(function (e) { return e.file.type === 'proj'; })).filter(function (e) { return inL(e.d); });
-  var h = '', cur = '', first = true;
+  var h = '', cur = '', cd = '', first = true;
   L.forEach(function (e) {
     var mm = e.d.slice(0, 7);
-    if (mm !== cur) { h += (cur ? '</div>' : '') + '<div class="mh">' + mm.replace('-', '.') + '</div><div class="day list">'; cur = mm; }
-    if (first && e.d >= TODAY) { h += '<div class="pjnow">오늘 이후</div>'; first = false; }
-    h += ckItem(e, true);
+    if (mm !== cur) { h += (cur ? '</div></div></div>' : '') + '<div class="mh">' + mm.replace('-', '.') + '</div><div class="day list pdx">'; cur = mm; cd = ''; }
+    if (e.d !== cd) { // 날짜마다 한 묶음: 왼쪽 날짜 · 오른쪽 일정 카드 (2026-11-20 실장님 "1열 말고 더 좋은 방법")
+      if (cd) h += '</div></div>'; cd = e.d;
+      var nw = first && e.d >= TODAY; if (nw) first = false;
+      h += '<div class="pdg' + (e.d === TODAY ? ' td' : '') + (nw ? ' nw' : '') + '"><div class="pdd">' + (+e.d.slice(5, 7)) + '.' + (+e.d.slice(8, 10)) + '<small>' + '일월화수목금토'.charAt(P(e.d).getDay()) + (e.d === TODAY ? ' · 오늘' : '') + '</small></div><div class="pdl">';
+    }
+    h += ckItem(e, false);
   });
-  if (cur) h += '</div>';
+  if (cur) h += '</div></div></div>';
   if (!h) h = '<div class="day"><div class="empty2">일정이 없어요</div></div>';
   if (p && p.f) h += '<a class="more" style="display:block;text-align:center;text-decoration:none;margin-top:12px" href="' + esc(p.f.url) + '" target="_blank">시트에서 열기</a>';
   return h;
