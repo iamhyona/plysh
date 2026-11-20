@@ -99,7 +99,7 @@ function tagOf(t) { return !t ? '' : t === 'r' ? '<em class="r">대략</em>' : t
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 function svgOf(S) {
   if (!S.length) return '<div class="empty">왼쪽에서 크기를 고르면 실제 비율대로 보여요</div>';
-  var W = 640, pad = 8, lab = 18, h = '';
+  var W = Math.max(300, Math.min(640, (window.innerWidth || 640) - (window.innerWidth < 900 ? 80 : 0))), pad = 8, lab = 18, h = ''; // 폰에서도 이름표 글자가 작아지지 않게 화면 너비에 맞춤
   if (ST.mode === 'over') {
     var mw = Math.max.apply(null, S.map(function (x) { return x.w; })), mh = Math.max.apply(null, S.map(function (x) { return x.h; })), k = Math.min((W - pad * 2) / mw, 520 / mh), H = mh * k + pad * 2;
     // 큰 것부터 그려서 작은 것이 위에 · 왼쪽 아래 모서리 맞춤
@@ -117,16 +117,32 @@ function svgOf(S) {
     });
     return '<svg viewBox="0 0 ' + W + ' ' + H.toFixed(0) + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + h + '</svg>';
   }
-  // 나란히: 같은 비율로 한 줄씩 채우기
-  var gap = 16, mh2 = Math.max.apply(null, S.map(function (x) { return x.h; })), tw = S.reduce(function (s, x) { return s + x.w; }, 0);
-  var k2 = Math.min((W - pad * 2 - gap * (S.length - 1)) / tw, 460 / mh2), x0 = pad, H2 = mh2 * k2 + pad * 2 + lab + 4;
-  S.forEach(function (x) {
-    var c = colOf(x.k), w = x.w * k2, hh = x.h * k2, y = pad + (mh2 * k2 - hh);
-    h += '<rect x="' + x0.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" fill="' + c + '" fill-opacity=".1" stroke="' + c + '" stroke-width="2" rx="1"/>' +
-      '<text x="' + (x0 + w / 2).toFixed(1) + '" y="' + (pad + mh2 * k2 + lab).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + c + '">' + esc(x.n) + '</text>';
-    x0 += w + gap;
+  // 나란히: 같은 비율. 한 줄에 다 들어가면 한 줄, 좁으면 여러 줄로 줄바꿈 (2026-11-20 실장님)
+  var gap = 16, rg = 14, HMAX = 560, avail = W - pad * 2;
+  var tw = function (n) { return String(n).length * 12.5 + 8; };
+  var mw = Math.max.apply(null, S.map(function (x) { return x.w; })), mh = Math.max.apply(null, S.map(function (x) { return x.h; }));
+  function pack(k) {
+    var R = [], cur = [], cw = 0;
+    S.forEach(function (x) { var sw = Math.max(x.w * k, tw(x.n)); if (cur.length && cw + gap + sw > avail) { R.push(cur); cur = []; cw = 0; } cw += (cur.length ? gap : 0) + sw; cur.push({ x: x, sw: sw }); });
+    if (cur.length) R.push(cur);
+    var H = pad * 2 + R.reduce(function (t, r) { return t + Math.max.apply(null, r.map(function (o) { return o.x.h * k; })) + lab + 4; }, 0) + rg * (R.length - 1);
+    return { R: R, H: H };
+  }
+  var lo = 0.0005, hi = Math.min(avail / mw, 460 / mh), best = pack(lo), bk = lo;
+  for (var it = 0; it < 32; it++) { var mid = (lo + hi) / 2, P = pack(mid); if (P.H <= HMAX) { lo = mid; best = P; bk = mid; } else hi = mid; }
+  var P2 = pack(hi); if (P2.H <= HMAX) { best = P2; bk = hi; }
+  var y0 = pad;
+  best.R.forEach(function (r) {
+    var rh = Math.max.apply(null, r.map(function (o) { return o.x.h * bk; })), rw = r.reduce(function (t, o, i) { return t + o.sw + (i ? gap : 0); }, 0), x0 = pad + (avail - rw) / 2;
+    r.forEach(function (o) {
+      var x = o.x, c = colOf(x.k), w = x.w * bk, hh = x.h * bk, cx = x0 + o.sw / 2, y = y0 + rh - hh;
+      h += '<rect x="' + (cx - w / 2).toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" fill="' + c + '" fill-opacity=".1" stroke="' + c + '" stroke-width="2" rx="1"/>' +
+        '<text x="' + cx.toFixed(1) + '" y="' + (y0 + rh + lab).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + c + '">' + esc(x.n) + '</text>';
+      x0 += o.sw + gap;
+    });
+    y0 += rh + lab + 4 + rg;
   });
-  return '<svg viewBox="0 0 ' + W + ' ' + H2.toFixed(0) + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + h + '</svg>';
+  return '<svg viewBox="0 0 ' + W + ' ' + Math.ceil(best.H) + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + h + '</svg>';
 }
 function render() {
   var S = selected(), h = '<div class="phd"><b>용지 크기</b><small>규격 용지와 생활 속 인쇄물 크기를 실제 비율대로 겹쳐 보거나 나란히 비교해요</small></div><div class="wrap"><div class="card">';
@@ -157,6 +173,7 @@ function render() {
   document.getElementById('clr').onclick = function () { ST.sel = []; save(); render(); };
 }
 render();
+var _iw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === _iw) return; _iw = window.innerWidth; clearTimeout(window._rz); window._rz = setTimeout(render, 150); });
 </script>
 </body>
 </html>
