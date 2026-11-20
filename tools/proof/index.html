@@ -298,6 +298,15 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .pgs { display:inline-block; margin-right:12px; } .pgs .pch button { height:32px; padding:0 12px; font-size:13px; }
 .ptcnt { font-size:13px; font-weight:600; color:#8b95a1; margin:4px 2px 10px; }
 .ptm { margin-bottom:16px !important; }
+/* 사양 표 (2026-11-20 실장님: 표마다 열이 안 맞음) → 첫 칸·값 칸 너비 고정, 왼쪽부터 같은 격자 */
+.pbR .ptb, .ptb { table-layout:fixed; width:auto !important; min-width:0 !important; }
+.ptb th, .ptb td { width:68px; min-width:68px; max-width:68px; box-sizing:border-box; padding:7px 4px !important; }
+.ptb th:first-child, .ptb td.rl { width:92px; min-width:92px; max-width:92px; padding-left:0 !important; padding-right:8px !important; white-space:normal; word-break:keep-all; }
+.pfh { margin:22px 0 0 !important; } .pfh:first-of-type { margin-top:16px !important; } .pcl { margin-top:8px; }
+@media (min-width:900px) { .ptb th, .ptb td { width:68px; min-width:68px; max-width:68px; } .ptb th:first-child, .ptb td.rl { width:120px; min-width:120px; max-width:120px; } }
+/* 카드가 좁으면(옆 목록 때문에) 설명 위·표 아래로 쌓고, 넓을 때만 두 칸 */
+.pcard { container-type:inline-size; }
+@container (max-width:719px) { .pblk { display:block !important; } .pbR { margin-top:12px !important; } }
 @media (min-width:900px) {
   .ptwrap { display:grid; grid-template-columns:minmax(0, 1fr) 184px; gap:32px; align-items:start; }
   .ptmain { order:1; } .ptside { order:2; margin:0; position:sticky; top:12px; max-height:calc(100vh - 24px); overflow-y:auto; scrollbar-width:none; padding:4px 0 24px 24px; border-left:1px solid #e5e8eb; }
@@ -672,7 +681,7 @@ function paperPick(tab) {
       shown = fk ? vars.filter(function (v) { return cfam(v, k) === fk; }) : [];
     }
     if (vars.length > 1 && shown.length) h += '<div class="pcl pcs">' + shown.map(function (v) { return '<span data-pg="' + esc(tab + k) + '" data-pgv="' + esc(v) + '"' + (v === cur ? ' class="on"' : '') + '>' + dotOf(v, k) + esc(v) + '</span>'; }).join('') + '</div>';
-    if (cur !== '' || vars.length === 1) h += '<div class="gs">' + rs.filter(function (r) { return String(r[2] || '') === cur; }).map(function (r) { return '<button data-pv="' + esc(r[0]) + '" data-pn="' + esc(tab) + '"><b>' + (r[3] ? r[3] + '<i>g</i>' : '규격') + '</b>' + (r[4] ? '<small>' + r[4] + '㎛' + (/추정/.test(r[7]) ? '~' : '') + '</small>' : '') + '</button>'; }).join('') + '</div>';
+    if (cur !== '' || vars.length === 1) h += '<div class="gs">' + rs.filter(function (r) { return String(r[2] || '') === cur; }).map(function (r) { return '<button data-pv="' + esc(r[0]) + '" data-pn="' + esc(tab) + '"><b>' + (r[3] ? r[3] + '<i>g</i>' : '규격') + '</b>' + (r[4] ? '<small>' + r[4] + '㎛' + '</small>' : '') + '</button>'; }).join('') + '</div>';
     else h += '<div class="nt">' + (vars.length > 12 && !shown.length ? '색 계열 → 색 → 평량 순서로 골라요' : '색을 먼저 골라요') + '</div>';
     return h + '</div>';
   }).join('');
@@ -697,10 +706,27 @@ var CAT = {"T": {"용지_일반지": [["표준 표기", "지종", "컬러·세�
 var CAT_KEEP = { '용지_일반지': ['스노우지', '아트지', '백색 모조지', '미색 모조지'], '용지_고급지': ['아르떼', '앙상블 E-Class'], '용지_색지': ['매직칼라', '밍크지'], '용지_판지': ['로얄 아이보리', '아이보리', '백판지', '코트판지', '갱판지'] };
 var CAT_DROP = { '코팅_기계코팅': ['기계 코팅 (OP · 농도 %)'], '톰슨_목형': ['펀칭'] };
 var CAT_ADD = { '톰슨_목형': [{ after: '톰슨 (완칼 + 반칼)', row: ['부식 목형 (부식칼)', '부식판 · Etched Die', '얇은 철판을 약품으로 깎아(부식) 칼날을 만든 목형. 일반 목형(합판에 띠칼을 구부려 박음)으로 어려운 작고 복잡한 모양도 정밀하게 자름.', '스티커·라벨 등 작은 반칼에 주로 씀 · 큰 모양·두꺼운 판지는 일반 목형'] }] };
+var CAT_MIX = '용지_일반·고급지';
+var MINK_C = ['백색', '아이보리', '크림', '계란색', '백회', '미스티 그레이', '은회', '샌드 (회황)', '프레리 더스트 (황회)', '커피', '흑색 (특)'];
+var MINK_G = [110, 120, 150, 180, 200, 250, 300, 350];
 function trimCat(C) {
   Object.keys(CAT_KEEP).forEach(function (n) { var t = C.T[n]; if (!t || !t[1]) return; var out = []; CAT_KEEP[n].forEach(function (k) { t[1].forEach(function (r) { if (String(r[1]).trim() === k) out.push(r); }); }); if (out.length) t[1] = out; });
   Object.keys(CAT_DROP).forEach(function (n) { var t = C.T[n]; if (t && t[1]) t[1] = t[1].filter(function (r) { return CAT_DROP[n].indexOf(String(r[0]).trim()) < 0; }); });
   Object.keys(CAT_ADD).forEach(function (n) { var t = C.T[n]; if (!t || !t[1]) return; CAT_ADD[n].forEach(function (a) { if (t[1].some(function (r) { return String(r[0]).trim() === a.row[0]; })) return; var i = -1; t[1].forEach(function (r, j) { if (String(r[0]).trim() === a.after) i = j; }); t[1].splice(i < 0 ? t[1].length : i + 1, 0, a.row.slice()); }); });
+  // 2026-11-20 실장님: 밍크지 컬러 채움 (삼화페이퍼 밍크지 페이지 기준 11색 · 평량은 색마다 다를 수 있음), 매직칼라 평량 안내
+  var sk = C.T['용지_색지'];
+  if (sk && sk[1]) {
+    sk[1] = sk[1].filter(function (r) { return String(r[1]).trim() !== '밍크지'; });
+    MINK_C.forEach(function (c) { MINK_G.forEach(function (g) { sk[1].push(['밍크지 ' + c + ' / ' + g + 'g (삼화제지)', '밍크지', c, g, '', '삼화제지', '삼화제지 민무늬 색지. 싸바리·패키지·면지·간지.', '색마다 나오는 평량이 다를 수 있음 · 주문 전 삼화 견본·대리점 확인', '']); }); });
+    sk[1].forEach(function (r) { if (String(r[1]).trim() === '매직칼라') r[7] = '공식 평량 범위 45~400g (한솔 페이퍼몰) · 120g 외는 주문품이 많아 업체 확인'; });
+  }
+  // 2026-11-20 실장님: 펄·메탈·엠보 분류는 빼고, 일반지와 고급지는 한 분류로
+  var T2 = {}; Object.keys(C.T).forEach(function (n) {
+    if (n === '용지_펄·메탈·엠보' || n === '용지_고급지') return;
+    if (n === '용지_일반지') { var g = C.T['용지_고급지'], t = C.T[n]; T2[CAT_MIX] = [t[0], (t[1] || []).concat(g && g[1] ? g[1] : [])]; return; }
+    T2[n] = C.T[n];
+  });
+  C.T = T2;
   return C;
 }
 trimCat(CAT);
@@ -767,7 +793,7 @@ function pkValue() {
 }
 function rowDesc(n, r, q) {
   var a, t = '';
-  if (/^용지/.test(n)) { a = [r[6], r[4] ? '두께 ' + r[4] + '㎛' + (/추정/.test(r[7]) ? '~' : '') : ''].filter(Boolean).join(' · '); t = r[7]; }
+  if (/^용지/.test(n)) { a = [r[6], r[4] ? '두께 ' + r[4] + '㎛' : ''].filter(Boolean).join(' · '); t = r[7]; }
   else if (/^품목/.test(n)) { var di = hcol(n, /^설명/); a = [r[2], r[3], r[4]].filter(Boolean).join(' · '); t = di > 0 ? r[di] : ''; }
   else { var I = info(n, r); a = [I.a, I.d].filter(Boolean).join(' · '); t = I.t; }
   return (q ? '<em class="pkg">' + esc(sub(n)) + '</em>' : '') + (a ? '<small>' + esc(a) + '</small>' : '') + (t ? '<small class="tip">' + esc(t) + '</small>' : '');
@@ -1198,7 +1224,7 @@ var REFG = ['용지', '인쇄', '코팅', '박', '가공', '톰슨', '조립', '
 function uniq(a) { var o = []; a.forEach(function (x) { if (o.indexOf(x) < 0) o.push(x); }); return o; }
 function paperBlock(name, rs) {
   var r0 = rs[0], vars = uniq(rs.map(function (r) { return String(r[2] || ''); })), gs = uniq(rs.map(function (r) { return +r[3] || 0; })).sort(function (a, b) { return a - b; });
-  var cell = function (r) { return r ? '<td data-cp="' + esc(r[0]) + '">' + (r[4] ? r[4] + (/추정/.test(r[7]) ? '<i>~</i>' : '') : '●') + '</td>' : '<td class="x">–</td>'; };
+  var cell = function (r) { return r ? '<td data-cp="' + esc(r[0]) + '">' + (r[4] ? r[4] : '●') + '</td>' : '<td class="x">–</td>'; };
   var find = function (v, g) { return rs.filter(function (r) { return String(r[2] || '') === v && (+r[3] || 0) === g; })[0]; };
   var sameW = vars.every(function (v) { return gs.every(function (g) { return !!find(v, g) === !!find(vars[0], g); }); });
   var h = '<div class="pbh"><b>' + esc(name) + '</b>' + (r0[5] ? '<em>' + esc(r0[5]) + '</em>' : '<em class="gen">일반 · 업체 선택</em>') + (vars.length > 1 ? '<small>' + vars.length + '종</small>' : '') + '</div>';
@@ -1267,7 +1293,7 @@ function renderRef() {
       } else if (k === '용지') {
         var G = grp(rows, 1);
         h += '<div class="card pcard">' + G.map(function (g, i) { return '<div id="pb' + i + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('') + '</div>';
-        h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용 · ~는 추정) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
+        h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
       } else {
         h += '<div class="card glc">' + rows.map(function (r) { return glossEntry(st, r); }).join('') + (rows.length ? '' : '<div class="empty2">비어 있어요 · 시트의 ‘' + esc(st) + '’ 탭에 행을 추가하세요</div>') + '</div>';
         h += '<div class="nt c">굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요</div>';
