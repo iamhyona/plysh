@@ -924,7 +924,28 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .pjb svg { width:17px; height:17px; } .pjb.off { opacity:.3; }
 .pjck.on { background:#191f28; color:#fff; } .pjr.dn .m { opacity:.55; }
 .pjdh { display:flex; align-items:center; gap:6px; width:100%; border:0; background:none; padding:20px 4px 10px; font-size:14px; font-weight:800; color:#191f28; cursor:pointer; font-family:inherit; } .pjdh small { font-size:13px; font-weight:600; color:#8b95a1; margin-right:auto; } .pjdh span { font-size:13px; font-weight:600; color:#4e5968; }
-.pmd { position:relative; margin:0 0 12px; } .pjtb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 12px; } .pjtb .pmd { margin:0; } .pjtb .aseg { margin:0; } .pmdb { display:inline-flex; align-items:center; gap:8px; min-height:40px; border:0; background:#fff; border-radius:999px; padding:0 14px 0 16px; font-size:14px; font-weight:600; color:#4e5968; cursor:pointer; font-family:inherit; max-width:100%; } .pmdb span { display:inline-flex; align-items:center; gap:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pmdb i, .pmdl i { width:8px; height:8px; border-radius:50%; flex:none; display:inline-block; } .pmdb svg { width:16px; height:16px; color:#8b95a1; flex:none; }
+.pmd { position:relative; margin:0 0 12px; } .pjtb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 12px; } .pjtb .pmd { margin:0; } .pjtb .aseg { margin:0; }
+.pgw { background:var(--card); border-radius:20px; padding:8px 0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.pgt { border-collapse:separate; border-spacing:0; font-size:13px; }
+.pgt th, .pgt td { border-bottom:1px solid var(--line); vertical-align:top; padding:8px 6px; text-align:left; }
+.pgt tbody tr:last-child > * { border-bottom:0; } .pgt td:last-child, .pgt th:last-child { padding-right:16px; }
+.pgt .pgn { position:sticky; left:0; z-index:2; background:var(--card); width:120px; min-width:120px; max-width:120px; padding:10px 10px 10px 16px; font-weight:700; color:var(--txt); }
+.pgt .pgn i { float:left; width:4px; height:30px; border-radius:2px; margin-right:8px; }
+.pgt .pgn span { display:block; line-height:1.35; word-break:keep-all; overflow-wrap:anywhere; }
+.pgt .pgd { min-width:96px; width:96px; font-weight:700; color:var(--sub); white-space:nowrap; }
+.pgt .pgd b { display:block; font-size:14px; color:var(--txt); }
+.pgt .pgd small { display:block; font-size:12px; font-weight:500; color:var(--mute); margin-top:2px; }
+.pgt .pgd.sun b, .pgt .pgd.sun small { color:var(--red); } .pgt .pgd.sat b, .pgt .pgd.sat small { color:var(--acc); }
+.pgt .pgd.td b, .pgt .pgd.td small { color:var(--acc); }
+.pgt td.td, .pgt .pgd.td { background:#f5f9ff; }
+.pge { display:flex; align-items:flex-start; gap:6px; border-radius:8px; padding:6px 8px 6px 6px; margin:0 0 4px; background:color-mix(in srgb, var(--pc) 14%, #fff); border-left:3px solid var(--pc); }
+.pge:last-child { margin-bottom:0; }
+.pgk { flex:0 0 18px; width:18px; height:18px; margin-top:0; padding:0; border:1.5px solid var(--faint); border-radius:50%; background:#fff; color:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.pgk svg { width:11px; height:11px; }
+.pgx { flex:1 1 auto; min-width:0; text-align:left; border:0; background:none; padding:0; font:inherit; font-size:12px; font-weight:600; line-height:18px; color:var(--txt); cursor:pointer; word-break:keep-all; overflow-wrap:anywhere; }
+.pge.done { opacity:.5; } .pge.done .pgx { text-decoration:line-through; color:var(--mute); }
+.pge.done .pgk { background:var(--pc); border-color:var(--pc); color:#fff; }
+@media (min-width:1024px) { .pgt .pgn { width:166px; min-width:166px; max-width:166px; } .pgt .pgd { min-width:110px; width:110px; } } .pmdb { display:inline-flex; align-items:center; gap:8px; min-height:40px; border:0; background:#fff; border-radius:999px; padding:0 14px 0 16px; font-size:14px; font-weight:600; color:#4e5968; cursor:pointer; font-family:inherit; max-width:100%; } .pmdb span { display:inline-flex; align-items:center; gap:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pmdb i, .pmdl i { width:8px; height:8px; border-radius:50%; flex:none; display:inline-block; } .pmdb svg { width:16px; height:16px; color:#8b95a1; flex:none; }
 .pmdp { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:60; width:min(340px, calc(100vw - 32px)); background:#fff; border-radius:16px; box-shadow:0 8px 28px rgba(0,0,0,.14); padding:12px; box-sizing:border-box; } .pmd.open .pmdp { display:block; }
 .pmdp input[type=search] { width:100%; box-sizing:border-box; border:0; background:#f2f4f6; border-radius:10px; height:40px; padding:0 12px; font-size:14px; outline:0; font-family:inherit; -webkit-appearance:none; }
 .pmdl { max-height:320px; overflow-y:auto; margin:8px 0; } .pmdl label { position:relative; display:flex; align-items:center; gap:10px; min-height:40px; padding:0 6px; border-radius:10px; cursor:pointer; font-size:14px; color:#191f28; } .pmdl label:hover { background:#f2f4f6; } .pmdl input { position:absolute; opacity:0; pointer-events:none; } .pmdl .cb { width:20px; height:20px; border-radius:6px; border:1.5px solid #d1d6db; display:inline-flex; align-items:center; justify-content:center; flex:none; color:transparent; box-sizing:border-box; } .pmdl .cb svg { width:13px; height:13px; } .pmdl input:checked + .cb { background:#191f28; border-color:#191f28; color:#fff; } .pmdl .t { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -3139,6 +3160,25 @@ function pjListProj() {
   }).join('');
   return g || '<div class="day"><div class="empty2">일정이 없어요</div></div>';
 }
+// 2026-11-20 실장님 A안: 날짜별 = 프로젝트가 줄(고정), 날짜가 칸. 일정이 있는 날만 칸으로
+function pjGrid() {
+  var P = projList().filter(function (q) { return q.f && !S.off[q.f.id]; }), ids = {};
+  P.forEach(function (q) { ids[q.f.id] = 1; });
+  var E = S.D.events.filter(function (e) { return ids[e.f] && inL(e.d); });
+  P = P.filter(function (q) { return E.some(function (e) { return e.f === q.f.id; }); });
+  if (!P.length) return '<div class="day"><div class="empty2">일정이 없어요</div></div>';
+  var D = []; E.forEach(function (e) { if (D.indexOf(e.d) < 0) D.push(e.d); }); D.sort();
+  var hd = function (d) { var hl = hol(d), w = P2(d).getDay(); return '<th class="pgd' + (d === TODAY ? ' td' : '') + (w === 0 || hl ? ' sun' : w === 6 ? ' sat' : '') + '" data-gd="' + d + '"><b>' + (+d.slice(5, 7)) + '.' + (+d.slice(8, 10)) + '</b><small>' + W[w] + (d === TODAY ? ' · 오늘' : '') + '</small></th>'; };
+  function P2(d) { return new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)); }
+  return '<div class="pgw"><table class="pgt"><thead><tr><th class="pgn"></th>' + D.map(hd).join('') + '</tr></thead><tbody>' +
+    P.map(function (q) {
+      return '<tr><th class="pgn"><i style="background:' + q.color + '"></i><span>' + esc(q.name) + '</span></th>' + D.map(function (d) {
+        return '<td class="' + (d === TODAY ? 'td' : '') + '">' + E.filter(function (e) { return e.f === q.f.id && e.d === d; }).map(function (e) {
+          return '<div class="pge' + (evDone(e) ? ' done' : '') + '" data-ekrow="' + esc(evKey(e)) + '" style="--pc:' + q.color + '"><button class="pgk" data-eck="' + esc(e.id) + '" aria-label="완료">' + CKSVG + '</button><button class="pgx" data-e="' + esc(e.id) + '">' + esc(e.t) + '</button></div>';
+        }).join('') + '</td>';
+      }).join('') + '</tr>';
+    }).join('') + '</tbody></table></div>';
+}
 // LIST 기간 안인지
 function inL(d) { var g = S.lrg; return !g || (d >= g[0] && d <= g[1]); }
 function pjListAll(p) {
@@ -3215,11 +3255,12 @@ function renderProject() {
       '<div class="arw">' + (cur ? '' : '<button class="tod" id="nT">오늘</button>') + '<button id="lP" aria-label="이전">' + IC_L + '</button><button id="lN" aria-label="다음">' + IC_R + '</button></div></div>'; })();
   // 2026-11-20 실장님: 프로젝트 칩 줄 → 보기(날짜별·프로젝트별·디자이너별) + 프로젝트 여러 개 고르는 드롭다운(검색), 달력과 같은 선택
   var MODES = [['d', '날짜별'], ['p', '프로젝트별']].concat(tm ? [['w', '디자이너별']] : []), md = S.pjm || ls.get('d4:pjm') || 'd'; if (!MODES.some(function (x) { return x[0] === md; })) md = 'd'; S.pjm = md;
-  var body = tm ? (md === 'p' ? pjTeamProj() : md === 'w' ? pjTeam(null) : pjTeamDate()) : (md === 'p' ? pjListProj() : pjList(null));
+  var body = tm ? (md === 'p' ? pjTeamProj() : md === 'w' ? pjTeam(null) : pjTeamDate()) : (md === 'p' ? pjListProj() : pjGrid());
   var h = top + '<div class="seg" id="pSeg"><button data-m="sched" class="' + (tm ? '' : 'on') + '">제작일정</button><button data-m="team" class="' + (tm ? 'on' : '') + '">팀 업무</button></div>' +
     '<div class="pjtb"><div class="aseg" id="pjM">' + MODES.map(function (x) { return '<button data-m="' + x[0] + '" class="' + (x[0] === md ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' + filterBar() + '</div>' +
     '<div class="pjs1">' + body + '</div>';
   $('#main').innerHTML = h; bindItems(); bindRep(); bindEvCk(); bindFilter();
+  var gw = $('.pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
   $$('#lSeg button').forEach(function (b) { b.onclick = function () { S.lp = b.dataset.p; ls.set('d4:lp', S.lp); render(); }; });
   if ($('#lSegD')) $('#lSegD').onchange = function () { if (this.value) { S.ld = this.value; render(); } };
   if ($('#lF')) { $('#lF').onchange = function () { if (this.value) { S.lf = this.value; ls.set('d4:lf', S.lf); render(); } }; $('#lT').onchange = function () { if (this.value) { S.lt = this.value; ls.set('d4:lt', S.lt); render(); } }; }
