@@ -392,7 +392,7 @@
       var vy = Math.sqrt(trm[2] * trm[2] + trm[3] * trm[3]), size = Math.abs(fs) * vy;
       var fill = gs.Tr === 0 || gs.Tr === 2 || gs.Tr === 4 || gs.Tr === 6, stroke = gs.Tr === 1 || gs.Tr === 2 || gs.Tr === 5 || gs.Tr === 6;
       if (f.seen) f.seen.pages.add(this.pageNo);
-      this.emit('text', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, size: size, font: f, ink: fill ? inks(gs.fcs, gs.fc) : null, sink: stroke ? inks(gs.scs, gs.sc) : null, op: gs.op, OP: gs.OP, sw: gs.lw * scaleOf(gs.ctm), chars: chars, layer: this.layer(mc), Tr: gs.Tr });
+      this.emit('text', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, size: size, font: f, ink: fill ? inks(gs.fcs, gs.fc) : null, sink: stroke ? inks(gs.scs, gs.sc) : null, op: gs.op, OP: gs.OP, sw: gs.lw * scaleOf(gs.ctm), chars: chars, layer: this.layer(mc), Tr: gs.Tr, mir: (trm[0] * trm[3] - trm[1] * trm[2]) < 0 });
     }
     return mul([1, 0, 0, 1, tx, 0], Tm);
   };

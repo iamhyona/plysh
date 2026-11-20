@@ -240,6 +240,26 @@ function textChecks(R, rules) {
       perPage('rulecase', 'err', '대소문자가 팀 표기와 달라요: ' + f, '“' + f + '”(으)로 맞춰 주세요.', hits, function (L) { return uniq(L.map(function (h) { return '“' + h.s + '”'; })).join(', ') + ' ' + L.length + '곳'; });
     });
   });
+  // 7-2) 팀 기본 표기법 (자가점검리스트 › 표기법체크, 2026-11-20)
+  var STD = [
+    ['CREDITS', /\bCREDIT\b/gi], ['1st · 2nd · 3rd', /\b(?:1(?:th|nd|rd)|2(?:th|st|rd)|3(?:th|st|nd))\b/gi], ['TRACK LIST', /\bTRACKLIST\b/gi],
+    ['PHOTOCARD', /\bPHOTO\s+CARDS?\b/gi], ['PHOTO BOOK', /\bPHOTOBOOKS?\b/gi], ['RANDOM N OUT OF NN', /\bRANDOM\s+\d+\s*(?:OF|\/)\s*\d+/gi],
+    ['POSTCARD', /\bPOST\s+CARDS?\b/gi], ['Digipack', /\bDigi\s+Pack\b/gi], ['Jewel Case', /\bJewelcase\b/gi], ['Mini Album', /\bMINI ALBUM\b/g],
+    ['Folded Poster', /\bFolding\s+Poster\b/gi], ['Double-Sided Poster', /\bDouble\s+Sided?\s+Poster\b|\bDouble-Side\s+Poster\b/gi],
+    ['Image Card', /\bImagecards?\b/gi], ['Sticker Set', /\bStickersets?\b/gi], ['CD-R', /\bCDR\b/gi]
+  ];
+  STD.forEach(function (d) {
+    var hits = []; all.forEach(function (s) { var re = new RegExp(d[1].source, d[1].flags), m; while ((m = re.exec(s.t))) hits.push({ P: s.P, b: subBox(s, m.index, m[0].length), s: m[0] }); });
+    perPage('stdterm', 'warn', '팀 표기법과 달라요: ' + d[0], '권장 “' + d[0] + '”', hits, function (L) { return uniq(L.map(function (h) { return '“' + h.s + '”'; })).join(', ') + ' ' + L.length + '곳'; });
+  });
+  // 7-3) 수량 표기 통일 (1EA · 1 EA · 1ea · 1PCS 섞임)
+  var qf = {}; all.forEach(function (s) { var re = /\d(\s*)(EA|Ea|ea|PCS|Pcs|pcs|SET|Set|set)\b/g, m; while ((m = re.exec(s.t))) { var k = (m[1] ? '숫자 띄고 ' : '숫자 붙여 ') + m[2]; (qf[k] = qf[k] || []).push({ P: s.P, b: subBox(s, m.index, m[0].length), s: s.t.slice(Math.max(0, m.index - 3), m.index + m[0].length) }); } });
+  var qk = Object.keys(qf).sort(function (x, y) { return qf[y].length - qf[x].length; });
+  if (qk.length > 1) qk.slice(1).forEach(function (k) { perPage('qtyunit', 'warn', '수량 표기 방식이 섞여 있어요', '권장 문서 대부분과 같은 “' + qk[0] + '” (' + qf[qk[0]].length + '곳)', qf[k], function (L) { return k + ' ' + L.length + '곳 · ' + L.slice(0, 3).map(function (h) { return '“' + h.s + '”'; }).join(', '); }); });
+  // 7-4) 치수 소수점 자릿수 통일 (55.5mm 와 55.50mm 섞임)
+  var dp = {}; all.forEach(function (s) { var re = /\d+\.(\d+)\s*(mm|cm)\b/g, m; while ((m = re.exec(s.t))) { var n = m[1].length; (dp[n] = dp[n] || []).push({ P: s.P, b: subBox(s, m.index, m[0].length), s: m[0] }); } });
+  var dk = Object.keys(dp).sort(function (x, y) { return dp[y].length - dp[x].length; });
+  if (dk.length > 1) dk.slice(1).forEach(function (k) { perPage('decmix', 'adv', '치수 소수점 자릿수가 섞여 있어요', '권장 반올림 기준을 하나로 (대부분 소수점 ' + dk[0] + '자리)', dp[k], function (L) { return '소수점 ' + k + '자리 ' + L.length + '곳 · ' + uniq(L.map(function (h) { return h.s; })).slice(0, 4).join(', '); }); });
   // 8) 멤버 이름 영문/한글 혼용 (페이지마다 다른 언어)
   rules.members.forEach(function (r) {
     if (r.forms.length < 2) return;

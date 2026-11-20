@@ -8,7 +8,7 @@ var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e)
 function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
 
 // ── 검수 기준 ──
-var DEF = { ppi: 250, bleed: 3, safe: 3, minText: 4, smallText: 12, small4c: 7, tacWarn: 300, tacErr: 320, hair: 0.1, thin4c: 0.3, blackArea: 900, whiteText: 10, glue: 3, gutterSaddle: 5 };
+var DEF = { ppi: 250, bleed: 3, safe: 3, minText: 4, smallText: 12, small4c: 7, tacWarn: 300, tacErr: 320, hair: 0.15, thin4c: 0.3, blackArea: 900, whiteText: 10, glue: 3, gutterSaddle: 5 };
 var SET_LABEL = { ppi: '이미지 최소 해상도', bleed: '도련', safe: '재단선 안쪽 안전 여백', minText: '이 크기 이하 글자는 조언', smallText: 'K100 텍스트(오버프린트확인)', small4c: '4도 혼합 금지 글자', tacWarn: '잉크 총량 확인', tacErr: '잉크 총량 오류', hair: '너무 얇은 선', thin4c: '4도 혼합 얇은 선', blackArea: '리치블랙 권장 면적', whiteText: '흰 글자 주의 크기', glue: '포토북 풀칠 영역', gutterSaddle: '중철 접지 안쪽 여백' };
 // 단위는 입력칸 안 오른쪽에 (2026-11-20 실장님: 라벨에 단위 넣지 않기)
 var SET_UNIT = { ppi: 'ppi', bleed: 'mm', safe: 'mm', minText: 'pt', smallText: 'pt 미만', small4c: 'pt 미만', tacWarn: '%', tacErr: '%', hair: 'pt 이하', thin4c: 'pt 미만', blackArea: 'mm²', whiteText: 'pt 미만', glue: 'mm', gutterSaddle: 'mm' };
@@ -29,7 +29,7 @@ function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
 var libsP = null;
 function libs() {
-  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261118a'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
+  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120d'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
   return libsP;
 }
 var faceP = null;
@@ -64,6 +64,7 @@ async function analyzePdf(file, meta) {
     plib = await PDFLib.PDFDocument.load(buf.slice(), { ignoreEncryption: true, updateMetadata: false, throwOnInvalidObject: false });
   } catch (e) { return fatal(file.name, '파일을 여는 중 문제가 생겼어요', String(e && e.message || e)); }
   var doc = PRV.open(plib), n = pdfjs.numPages;
+  R.offLayers = []; try { var NM = PDFLib.PDFName, ocp = plib.catalog.lookup(NM.of('OCProperties')), dd = ocp && ocp.lookup(NM.of('D')), off = dd && dd.lookup(NM.of('OFF')); if (off && off.size) for (var oi = 0; oi < off.size(); oi++) { var og = off.lookup(oi), on = og && og.lookup && og.lookup(NM.of('Name')); R.offLayers.push(on && on.decodeText ? on.decodeText() : '이름 없음'); } } catch (e) {}
   R.n = n;
   var wantFaces = WO.bind !== 'none' || /photobook|photocard|book|calendar/.test(meta.prod);
   var faceOK = false;
@@ -436,7 +437,10 @@ function pageChecks(P) {
   if (regIn.length) add('err', 'print', 'reg', '재단 안쪽에 레지스트레이션 색', regIn.length + '곳', '재단 표시 외에는 K100 또는 리치블랙으로 바꿔 주세요.', regIn);
   if (P.annots) add('warn', 'print', 'annot', '메모·주석이 남아 있어요', P.annots + '개', '인쇄될 수 있으니 지우고 다시 내보내 주세요.');
   // 칠·선
-  var kOP = [], tacB = [], tacE = [], kBig = [], rbOff = [], wOP = [], sOP = [], hair = [], h0 = [], t4 = [], finOff = [];
+  var kOP = [], tacB = [], tacE = [], kBig = [], rbOff = [], wOP = [], sOP = [], hair = [], h0 = [], t4 = [], finOff = [], wThin = [], finThin = [], lt5 = [], lt10 = [], opCol = [];
+  // 옅은 농도 (자가점검리스트: 5% 이하 ❌, 10% 주의) — 가장 진한 판도 그 이하면 인쇄에서 거의 안 보이거나 얼룩져요
+  var lite = function (k, b) { if (!k || k.rgb || k.lab || k.white || k.reg || k.pattern || k.none || !b) return; var mx = Math.max(k.c, k.m, k.y, k.k); if (k.spots) { var fin = false; for (var s in k.spots) { if (PRV.isFin(s)) fin = true; mx = Math.max(mx, k.spots[s]); } if (fin) return; } if (mx <= 0.005) return; if (mx <= 0.05 + 1e-4) lt5.push({ b: b, k: k }); else if (mx <= 0.10 + 1e-4) lt10.push({ b: b, k: k }); };
+  var isFinK = function (k) { if (k && k.spots) for (var s in k.spots) if (PRV.isFin(s)) return s; return ''; };
   P.fills.forEach(function (f) {
     var k = f.ink, b = f.vis; if (!b || PRV.empty(b) || !overlaps(b, P.crop)) return;
     if (!k.spots && !k.rgb && !k.reg && !f.shade) {
@@ -449,12 +453,16 @@ function pageChecks(P) {
     }
     if (k.white && f.op) wOP.push(b);
     if (k.spots) for (var s in k.spots) if (PRV.isFin(s) && !f.op) finOff.push({ b: b, n: s });
+    if (!f.shade) lite(k, b);
+    if (f.op && !k.k100 && !k.white && !k.rgb && !isFinK(k) && !f.shade) opCol.push({ b: b, k: k });
   });
   P.strokes.forEach(function (o) {
     var k = o.ink, b = pad(o.vis || o.box, 1); if (PRV.empty(o.vis) || !overlaps(o.box, P.crop)) return;
     var fin = false; if (k.spots) for (var s in k.spots) if (PRV.isFin(s)) { fin = true; if (!o.op) finOff.push({ b: b, n: s }); }
-    if (fin) return;
+    if (fin) { if (o.w0 !== 0 && o.w < 0.5 - 1e-4) finThin.push({ b: b, w: o.w, n: isFinK(k) }); return; }
     if (k.white && o.op) wOP.push(b);
+    if (k.white && o.w0 !== 0 && o.w < 0.3 - 1e-4) wThin.push({ b: b, w: o.w });
+    lite(k, b);
     if (!o.op && (k.spots || k.pure) && !k.white) (k.k100 ? kOP : sOP).push({ b: b, k: k });
     if (o.w0 === 0) h0.push(b); else if (o.w <= SET.hair + 1e-4) hair.push({ b: b, w: o.w });
     else if (o.w < SET.thin4c && k.inkN > 1) t4.push({ b: b, w: o.w });
@@ -505,9 +513,14 @@ function pageChecks(P) {
   if (h0.length) add('err', 'print', 'hair0', '두께 0인 선이 있어요', h0.length + '개 · 인쇄기마다 다르게 나오거나 안 나와요.', '0.25pt 이상으로 바꿔 주세요.', h0);
   if (hair.length) add('warn', 'print', 'hair', SET.hair + 'pt 이하 얇은 선', hair.length + '개 (가장 얇은 ' + f1(Math.min.apply(null, hair.map(function (h) { return h.w; }))) + 'pt)', '0.25pt 이상을 권장해요.', hair.map(function (h) { return h.b; }));
   t4 = t4.filter(function (t) { var T = P.trim, e = 0.3 * MM, b = t.b; return b[0] < T[2] - e && b[2] > T[0] + e && b[1] < T[3] - e && b[3] > T[1] + e; });
+  if (wThin.length) add('warn', 'print', 'whitethin', '흰 선이 0.3pt보다 얇아요', wThin.length + '개 (가장 얇은 ' + f1(Math.min.apply(null, wThin.map(function (h) { return h.w; }))) + 'pt)', '권장 역상(흰) 선 0.3pt 이상. 얇으면 잉크에 묻혀 끊겨 보여요', wThin.map(function (h) { return h.b; }));
+  if (finThin.length) add('warn', 'print', 'finthin', '후가공 선이 0.5pt보다 얇아요: ' + uniq(finThin.map(function (h) { return h.n; })).join(', '), finThin.length + '개 (가장 얇은 ' + f1(Math.min.apply(null, finThin.map(function (h) { return h.w; }))) + 'pt)', '권장 박·형압 선 0.5pt 이상. 얇으면 박이 끊기거나 눌림이 안 나와요 (칼선은 해당 없음)', finThin.map(function (h) { return h.b; }));
+  if (lt5.length) add('warn', 'print', 'lite5', '5% 이하 옅은 색', lt5.length + '곳 · ' + uniq(lt5.map(function (t) { return inkTxt(t.k); })).slice(0, 3).join(', '), '권장 10% 이상. 5% 이하는 인쇄에서 거의 안 나오거나 얼룩져요', lt5.map(function (t) { return t.b; }));
+  if (lt10.length) add('adv', 'print', 'lite10', '10% 이하 옅은 색', lt10.length + '곳 · ' + uniq(lt10.map(function (t) { return inkTxt(t.k); })).slice(0, 3).join(', '), '권장 종이·인쇄 방식에 따라 흐리게 나올 수 있어요. 교정으로 확인', lt10.map(function (t) { return t.b; }));
+  if (opCol.length) add('adv', 'print', 'opcolor', 'K100이 아닌 색에 오버프린트가 켜져 있어요', opCol.length + '곳 · ' + uniq(opCol.map(function (t) { return inkTxt(t.k); })).slice(0, 3).join(', '), '권장 의도한 게 아니면 끄기. 아래 색과 섞여 색이 바뀌어요 (오버프린트 미리보기로 확인)', opCol.map(function (t) { return t.b; }));
   if (t4.length) add('warn', 'print', 'thin4c', '4도 혼합 얇은 선', t4.length + '개 · 판이 조금만 어긋나도 선이 번져 보여요.', '얇은 선은 한 가지 색(예: K100)으로 바꿔 주세요.', t4.map(function (t) { return t.b; }));
   // 글자
-  var tiny = [], skop = [], s4 = [], live = [], wt = [], wOPt = [];
+  var tiny = [], skop = [], s4 = [], live = [], wt = [], wOPt = [], finTx = [], mirT = [];
   P.texts.forEach(function (t) {
     var b = t.vis; if (!b || PRV.empty(b) || !overlaps(b, P.crop)) return;
     live.push(b);
@@ -517,11 +530,16 @@ function pageChecks(P) {
     if (!k.rgb && !k.spots && k.inkN > 1 && ((k.k > 0.8 && t.size < SET.smallText) || t.size < SET.small4c)) s4.push({ b: b, t: t });
     if (k.white && !t.op) wt.push(t);
     if (k.white && t.op) wOPt.push(b);
+    var fn = isFinK(k); if (fn && t.size < 7 - 0.05) finTx.push({ b: b, t: t, n: fn });
+    if (t.mir) mirT.push(b);
+    if (!fn) lite(k, b);
   });
   if (aiFinal && live.length) add('err', 'print', 'outline', '아웃라인 안 된 글자가 남아 있어요', live.length + '덩어리 · ' + list(live.map(function (b) { return snippet(P, b); })), '문자 > 윤곽선 만들기(Ctrl/Cmd+Shift+O) 해 주세요.', live.slice(0, 40));
   if (tiny.length) add('adv', 'print', 'tiny', '작은 글자', '폰트 크기 ' + f1(Math.min.apply(null, tiny.map(function (x) { return x.t.size; }))) + 'pt · ' + tiny.length + '곳 · ' + list(tiny.map(function (x) { return snippet(P, x.b); })), '권장 6pt 이상. 작게 둘 리걸 문구는 K100 단색', tiny.map(function (x) { return x.b; }));
   if (skop.length) add('warn', 'print', 'smallk', '작은 검정 글자에 오버프린트가 꺼져 있어요', skop.length + '곳 · ' + list(skop.map(function (x) { return snippet(P, x.b); })), SET.smallText + 'pt 미만 검정 글자는 K100 + 중복 인쇄로 해야 바탕과 어긋나도 테두리가 안 생겨요.', skop.map(function (x) { return x.b; }));
   if (s4.length) add('warn', 'print', 'small4c', '작은 글자가 4도 혼합 색이에요', s4.length + '곳 · ' + uniq(s4.map(function (x) { return inkTxt(x.t.ink); })).slice(0, 2).join(', '), '판이 어긋나면 번져 보여요. 작은 글자는 한 가지 색(검정은 K100)으로 바꿔 주세요.', s4.map(function (x) { return x.b; }));
+  if (finTx.length) add('warn', 'print', 'fintext', '후가공 글자가 7pt보다 작아요: ' + uniq(finTx.map(function (x) { return x.n; })).join(', '), '가장 작은 ' + f1(Math.min.apply(null, finTx.map(function (x) { return x.t.size; }))) + 'pt · ' + finTx.length + '곳 · ' + list(finTx.map(function (x) { return snippet(P, x.b); })), '권장 박·형압 글자 7pt 이상. 작으면 획이 뭉치거나 끊겨요', finTx.map(function (x) { return x.b; }));
+  if (mirT.length) add('warn', 'print', 'mirror', '좌우·상하가 뒤집힌 글자', mirT.length + '곳 · ' + list(mirT.map(function (b) { return snippet(P, b); })), '권장 의도한 반전(투명 스티커 뒷면 등)이 아니면 반전 풀기', mirT);
   whiteText(P, wt, add);
   if (wOPt.length) add('err', 'print', 'whiteopt', '흰 글자에 오버프린트가 켜져 있어요', wOPt.length + '곳 · ' + list(wOPt.map(function (b) { return snippet(P, b); })) + ' · 인쇄하면 글자가 사라져요.', '글자 칠 중복 인쇄를 꺼 주세요.', wOPt);
   // 포토북 첫·끝 페이지 풀칠
@@ -620,6 +638,7 @@ function docChecks() {
   if (R.gNote) add('info', 'bind', 'gutteradv', '제본 안쪽 여백 제안', R.gNote, '', { top: false });
   // 서체
   var ne = R.fonts.filter(function (f) { return !f.embedded && f.type !== 'Type3'; });
+  if (R.offLayers && R.offLayers.length) add('warn', 'print', 'offlayer', '꺼진(숨긴) 레이어가 있어요: ' + R.offLayers.slice(0, 6).join(', '), R.offLayers.length + '개', '권장 필요 없는 레이어는 지우고 다시 내보내기. 출력 환경에 따라 인쇄될 수 있어요');
   if (ne.length) add('err', 'print', 'fontembed', '파일에 포함되지 않은 서체', ne.map(function (f) { return f.name + (f.pages.length ? ' (' + f.pages.map(function (p) { return p + 1; }).join(', ') + 'p)' : ''); }).join(', '), 'PDF 내보내기에서 서체 포함(100%)이 되게 하거나 아웃라인 해 주세요.');
   // 별색
   var spots = {}; R.pages.forEach(function (P) { for (var s in P.spots) (spots[s] = spots[s] || []).push(P.i + 1); });
@@ -628,6 +647,7 @@ function docChecks() {
   Object.keys(spots).forEach(function (s) { (PRV.isFin(s) ? fin : other).push(s); });
   if (other.length) add('warn', 'print', 'spot', '별색이 쓰였어요: ' + other.join(', '), other.map(function (s) { return s + ' → ' + spots[s].slice(0, 12).join(',') + '쪽'; }).join(' · '), '의도한 별색(팬톤 인쇄)이 아니면 CMYK로 바꿔 주세요.', { pages: uniq([].concat.apply([], other.map(function (s) { return spots[s]; }))) });
   if (fin.length) add('info', 'print', 'spotfin', '후가공 판: ' + fin.join(', '), fin.map(function (s) { return s + ' → ' + spots[s].slice(0, 12).join(',') + '쪽'; }).join(' · '), '판 이름이 인쇄소 요청과 같은지 확인해 주세요.');
+  var finKo = fin.filter(function (s) { return /[가-힣]/.test(s); }); if (finKo.length) add('adv', 'print', 'finname', '후가공 판 이름이 한글이에요: ' + finKo.join(', '), '', '권장 영문 명칭 (예: Foil_Gold, Emboss, Die_Cut). 인쇄소 프로그램에서 한글 이름이 깨질 수 있어요');
   // 후가공 판 레이어 분리
   var finLayers = {}, artLayers = {};
   R.pages.forEach(function (P) {
