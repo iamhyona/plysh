@@ -1046,6 +1046,17 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wsg.wtop > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
 .wsg.wtop .nth { margin:-6px 0 4px; } .wsg.wtop .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
 @media (max-width:1023px) { .wsg.wtop { grid-template-columns:1fr; } }
+@media (min-width:1024px) { .wcol .wsq { grid-template-columns:repeat(4, minmax(0, 1fr)) !important; } .wsg > .wsc.wclk { grid-template-columns:168px minmax(0, 1fr) !important; gap:28px !important; padding:20px 24px; } .wclk .aclk { width:168px; height:168px; } }
+.wcol { display:flex; flex-direction:column; gap:12px; min-width:0; } .wcol > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
+.wsg > .wsc.wclk, .wclk { display:grid; grid-template-columns:120px minmax(0, 1fr); gap:20px; align-items:center; }
+.aclk { width:120px; height:120px; display:block; }
+.clkd { font-size:13px; font-weight:700; color:#4e5968; margin:0 0 8px; }
+.hcal { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; text-align:center; font-size:12px; font-variant-numeric:tabular-nums; }
+.hcal i { font-style:normal; font-size:11px; font-weight:600; color:#8b95a1; padding-bottom:4px; } .hcal i.su, .hcal span.su { color:#f04452; } .hcal i.sa, .hcal span.sa { color:#3182f6; }
+.hcal span { position:relative; font-size:12px !important; padding:0 !important; background:none; height:26px; line-height:26px; border-radius:8px; color:#333d4b; font-weight:500; }
+.hcal span.ctd { background:#191f28; color:#fff !important; font-weight:700; }
+.hcal span.cev:after { content:''; position:absolute; left:50%; bottom:2px; width:4px; height:4px; margin-left:-2px; border-radius:50%; background:#3182f6; } .hcal span.ctd.cev:after { background:#fff; }
+@media (max-width:1023px) { .wsg > .wsc.wclk, .wclk { grid-template-columns:112px minmax(0, 1fr); gap:16px; } .aclk { width:112px; height:112px; } .hcal span { height:24px; line-height:24px; } }
 /* 일·주·월·기간 고르기 (2026-11-20 실장님: 원이 타원으로 찌그러짐) → 어디서나 회색 트랙 세그먼트, 글자 폭과 상관없이 같은 너비 */
 .aseg, .aseg.sw { background:#e5e8eb !important; border-radius:12px; padding:3px; gap:2px; }
 .aseg button, .aseg.sw button { min-width:48px; height:34px; min-height:34px !important; padding:0 12px !important; border-radius:9px !important; background:none !important; color:#8b95a1 !important; font-size:13px; font-weight:700; box-shadow:none; }
@@ -1534,7 +1545,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm5';
+var APP_VER = '20261120hm6';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2472,6 +2483,21 @@ function wxFetch() {
     }, seoul); else seoul();
   } catch (e) { seoul(); }
 }
+/* 홈 시계 + 이달 달력 (2026-11-20 시안) */
+function calCard(E) {
+  var t = P(TODAY), y = t.getFullYear(), m = t.getMonth(), first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate(), ev = {};
+  S.D.events.forEach(function (e) { if (e.file.type === 'proj') ev[e.d] = 1; });
+  var c = '<div class="hcal">' + '일월화수목금토'.split('').map(function (w, i) { return '<i class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</i>'; }).join('');
+  for (var i = 0; i < first; i++) c += '<span></span>';
+  for (var d = 1; d <= days; d++) { var k = y + '-' + ('0' + (m + 1)).slice(-2) + '-' + ('0' + d).slice(-2), wd = (first + d - 1) % 7; c += '<span class="' + (k === TODAY ? 'ctd ' : '') + (wd === 0 ? 'su ' : wd === 6 ? 'sa ' : '') + (ev[k] ? 'cev' : '') + '">' + d + '</span>'; }
+  var tk = ''; for (var j = 0; j < 12; j++) tk += '<line x1="50" y1="7" x2="50" y2="11" stroke="#b0b8c1" stroke-width="2" stroke-linecap="round" transform="rotate(' + j * 30 + ' 50 50)"/>';
+  var face = '<svg class="aclk" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#f9fafb" stroke="#e5e8eb" stroke-width="1.5"/>' + tk +
+    '<line id="chH" x1="50" y1="50" x2="50" y2="28" stroke="#191f28" stroke-width="4" stroke-linecap="round"/><line id="chM" x1="50" y1="50" x2="50" y2="17" stroke="#191f28" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<line id="chS" x1="50" y1="58" x2="50" y2="14" stroke="#f04452" stroke-width="1.2" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="#191f28"/><circle cx="50" cy="50" r="1.4" fill="#f04452"/></svg>';
+  return '<div class="wsc wclk">' + face + '<div class="mcw"><div class="clkd">' + (m + 1) + '월</div>' + c + '</div></div></div>';
+}
+var CLK_T = 0;
+function clkTick() { clearTimeout(CLK_T); var hH = document.getElementById('chH'); if (!hH) return; var n = new Date(), sec = n.getSeconds(), mi = n.getMinutes() + sec / 60, hr = n.getHours() % 12 + mi / 60; hH.setAttribute('transform', 'rotate(' + hr * 30 + ' 50 50)'); document.getElementById('chM').setAttribute('transform', 'rotate(' + mi * 6 + ' 50 50)'); document.getElementById('chS').setAttribute('transform', 'rotate(' + sec * 6 + ' 50 50)'); CLK_T = setTimeout(clkTick, 1000 - n.getMilliseconds()); }
 function renderStart() {
   var d = P(TODAY), wk = '일월화수목금토'.charAt(d.getDay()), end = addD(TODAY, 7);
   var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && e.d >= TODAY && e.d <= end; }).slice(0, 10);
@@ -2485,7 +2511,7 @@ function renderStart() {
     '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
   var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['qk', 'qk', '퀵'], ['review', 'chk', '프리플라이트']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
-  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop">' + ntHtml() + toolsCard + '</div>'); bindGo($('#main')); bindNt();
+  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
 }
