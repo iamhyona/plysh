@@ -1239,13 +1239,13 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
   #nfm .col { border-top:1px solid var(--line); padding-top:14px; }
   #nfm .col > b { font-size:20px; } #nfm .col > p { min-height:0; margin-bottom:6px; }
   /* 모바일 전체 메뉴 = 오른쪽에서 밀려 나오는 패널, 뒤 화면은 살짝 보이게 (2026-11-20) */
-  #nfm { display:block; left:auto; width:min(74vw, 320px); transform:translateX(100%); visibility:hidden; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; box-shadow:-8px 0 30px rgba(0,0,0,.08); overscroll-behavior:contain; }
+  #nfm { display:block; left:auto; width:min(64vw, 280px); transform:translateX(100%); visibility:hidden; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; box-shadow:-8px 0 30px rgba(0,0,0,.08); overscroll-behavior:contain; }
   #nfm.open { transform:none; visibility:visible; transition:transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
   #nfm .top { flex-wrap:wrap; gap:10px; } #nfm .top b { font-size:16px; } #nfm .fq { order:3; flex:1 0 100%; height:40px; }
   #nfm .cols { padding:10px 20px 48px; gap:6px; }
   #nfm .top { padding-left:20px; padding-right:16px; }
   #nfm .col { padding-top:16px; padding-bottom:6px; }
-  #nfm .col > b { font-size:23px !important; margin-bottom:8px; }
+  #nfm .col > b { font-size:13px !important; font-weight:700; color:var(--faint); letter-spacing:0; margin-bottom:4px; } /* 대메뉴는 중메뉴보다 작은 구역 이름 (2026-11-20 실장님) */
   #nfm .col button.lk { font-size:18px; padding:9px 0; line-height:1.4; }
   #nfb { position:fixed; inset:0; z-index:41; background:rgba(25,31,40,.38); opacity:0; visibility:hidden; transition:opacity .3s, visibility 0s linear .3s; }
   #nfb.open { opacity:1; visibility:visible; transition:opacity .3s, visibility 0s; }
@@ -1584,7 +1584,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm21';
+var APP_VER = '20261120hm22';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
