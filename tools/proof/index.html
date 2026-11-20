@@ -256,7 +256,8 @@ textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:
 .dit button { max-width:340px; padding:0 18px 0 8px !important; overflow:visible; }
 .dit button span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .dit button.add { padding:0 18px !important; }
-.dit button.dld { margin-left:auto; background:none !important; box-shadow:inset 0 0 0 1.5px #d1d6db; color:#4e5968 !important; } .dit button.dld.on { background:#191f28 !important; box-shadow:none; color:#fff !important; }
+.dit .dld { margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#4e5968; white-space:nowrap; }
+.dit .dld select { height:40px; max-width:220px; padding:0 32px 0 14px; border:0; border-radius:12px; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; -webkit-appearance:none; appearance:none; font:inherit; font-size:14px; font-weight:700; color:#191f28; cursor:pointer; text-overflow:ellipsis; }
 /* 단위는 입력칸 안 오른쪽에 (2026-11-20) */ .ifx { position:relative; display:block; } .ifx input { padding-right:52px !important; } .ifx em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:14px; font-weight:600; color:#8b95a1; pointer-events:none; white-space:nowrap; }
 /* 용어 (2026-11-20 실장님 "모바일 기준 같고 정리가 안 돼 보여"):
    종이는 카드 하나에 줄로 · 참고는 옅게 · PC는 왼쪽 분류 목록 + 오른쪽 내용, 종이 줄은 왼쪽 설명 / 오른쪽 평량표 */
@@ -1091,7 +1092,7 @@ function renderDoc() {
   var sel = dSel(d);
   h += '<div class="dsw"><div class="dsl">';
   h += '<div class="card"><div class="dfr" style="margin:0"><label>사양서 이름</label><input class="din" id="dName" value="' + esc(d.name) + '"></div><div class="nt" style="margin:10px 0 0 118px">만든 날 ' + d.date + ' · 이 기기에 저장돼요</div></div>';
-  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><button class="add dld" id="dLoad">구성 불러오기</button></div>';
+  h += '<div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + '><em>' + (i + 1) + '</em><span>' + esc(r.item || '품목명 없음') + '</span></button>'; }).join('') + '<button class="add" id="dItem">+ 품목 추가</button><label class="dld">구성 불러오기<select id="dLoad"><option value="">선택</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label></div>';
   {
     var n = d.rows.indexOf(sel);
     h += '<div class="card"><div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '>↑</button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '>↓</button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div>';
@@ -1123,13 +1124,7 @@ function bindDoc() {
     t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
     saveDocs(); renderDoc(); toast(t.t + ' 구성을 불러왔어요');
   }
-  var lb = $('#dLoad'); if (lb) lb.onclick = function () { // 구성 불러오기 = 팝업 (2026-11-20 실장님)
-    var el = $('#pk'), close = function () { el.style.display = 'none'; el.innerHTML = ''; document.body.style.overflow = ''; };
-    el.innerHTML = '<div class="pkb pkb-s"><div class="pkh"><b>자주 쓰는 구성 불러오기</b><button id="pkX" aria-label="닫기">×</button></div><div class="pks"><p class="pkn">고르면 품목이 이 사양서에 더해져요. 비어 있는 품목은 바뀌어요</p><div class="dtg">' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<button class="tc" data-tpl="' + t.k + '"><b>' + esc(t.t) + '</b><span>' + esc(t.s) + '</span></button>'; }).join('') + '</div></div></div>';
-    el.style.display = 'flex'; document.body.style.overflow = 'hidden';
-    $('#pkX').onclick = close; el.onclick = function (e) { if (e.target === el) close(); };
-    $$('#pk [data-tpl]').forEach(function (b) { b.onclick = function () { close(); tplLoad(b.dataset.tpl); }; });
-  };
+  var lb = $('#dLoad'); if (lb) lb.onchange = function () { var k = lb.value; lb.value = ''; if (k) tplLoad(k); }; // 구성 불러오기 = 드롭다운 (2026-11-20 실장님: 상품 라벨 생성의 언어 선택처럼)
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $('#dName').onchange = function () { d.name = this.value.trim() || d.name; saveDocs(); renderDoc(); };

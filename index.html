@@ -143,8 +143,9 @@ nav button.on { color:var(--txt); border-bottom-color:var(--txt); }
 main { max-width:calc(var(--fw) + 32px); margin:0 auto; padding:14px 16px calc(110px + env(safe-area-inset-bottom)); }
 #rvWrap, #imWrap, #tkWrap { max-width:calc(var(--fw) + 32px); margin:0 auto; }
 /* 도구 안 팝업이 열린 동안: 도구 화면을 브라우저 전체로 (2026-11-20) */
-iframe.fmon { position:fixed !important; inset:0 !important; top:0 !important; left:0 !important; width:100vw !important; height:100vh !important; height:100dvh !important; max-width:none !important; z-index:2000 !important; border-radius:0 !important; }
-html.fmlock, html.fmlock body { overflow:hidden; } #rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
+iframe.fmon { position:relative; z-index:2000 !important; } /* 팝업 열린 동안: 크기·위치 그대로, 앞으로만 */
+#fmDim { position:fixed; z-index:1999; pointer-events:none; } #fmCat { position:fixed; inset:0; z-index:1998; }
+#rvF, #imF, #tkWrap iframe { display:block; width:100%; border:0; background:var(--bg); }
 /* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw 1024px, 양옆 여백 40px 이상) 안에서 헤더·메뉴·본문·도구가 같은 폭.
    1024px 이상: 카드 목록 = 여러 열, 입력 + 결과 = 왼쪽 입력 · 오른쪽 결과, 달력·표·검수 = 틀 폭 전체, 아래 시트(팝업) = 560px 가운데 */
 :root { --fw:560px; }
@@ -1035,6 +1036,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 @media (min-width:1024px) { .wsc.wfull .wpc { grid-template-columns:repeat(4, minmax(0, 1fr)); } }
 .wday { font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:4px 0 14px; }
 .wday small { font-size:14px; color:var(--mute); font-weight:600; margin-left:8px; }
+.wwx { display:inline-flex; align-items:center; gap:5px; vertical-align:3px; color:#4e5968 !important; } .wwx svg { width:18px; height:18px; flex:none; } .wwx b { font-weight:700; color:#191f28; }
 .wfl { display:flex; flex-direction:column; gap:6px; }
 .wfl a, .wfl button { display:flex; align-items:center; gap:10px; border:0; background:var(--bg); border-radius:12px; padding:11px 12px; font-size:13.5px; font-weight:600; color:var(--txt); text-decoration:none; text-align:left; }
 .wfl .nvi { color:var(--mute); }
@@ -1532,7 +1534,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm4';
+var APP_VER = '20261120hm5';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2246,27 +2248,52 @@ function fsInner() { if (!FS.w) return 0; var cs = getComputedStyle(FS.w); retur
 function fsSync() { var f = FS.f; if (!f || FS.lock || f.classList.contains('fmon')) return; try { var win = f.contentWindow, y = fsInner(); if (Math.abs(win.scrollY - y) > 1) { FS.lock = 1; win.scrollTo(0, y); FS.lock = 0; } } catch (e) {} }
 window.addEventListener('scroll', fsSync, { passive: true });
 setInterval(fsTick, 400);
-/* 도구 안 팝업 (2026-11-20 실장님 "팝업은 화면 가운데, 어둡게는 화면 전체"):
-   도구(iframe) 안에서 팝업·시트가 열리면 그동안 도구 화면을 브라우저 화면 전체로 넓힌다 → 팝업이 화면 정가운데, 어두운 막이 화면 전체.
-   팝업 찾기: 도구 화면 네 귀퉁이에 화면을 거의 다 덮는 position:fixed 막이 있거나 <dialog open> 이 있으면 열린 것으로 본다. */
-function fmOpen(d) {
+/* 도구 안 팝업 (2026-11-20 실장님 "팝업 열 때 뒤 화면 레이아웃 절대 변하지 않음, 전체 딤, 정중앙"):
+   도구(iframe) 크기·위치는 그대로 두고, 바깥(메뉴·머리)은 같은 색 막으로 어둡게(#fmDim: 도구 칸만 뚫린 그림자),
+   도구 안 팝업 상자는 브라우저 화면 정가운데로 옮긴다(translate). 바깥 막을 누르면 도구 팝업 막을 누른 것과 같다.
+   팝업 찾기: 도구 화면 네 귀퉁이 중 3곳 이상을 덮는 position:fixed 막. */
+function fmFind(d) {
   try {
-    if (d.querySelector('dialog[open]')) return true;
-    var w = d.defaultView, vw = w.innerWidth, vh = w.innerHeight;
-    return [[3, 3], [vw - 3, 3], [3, vh - 3], [vw - 3, vh - 3]].filter(function (pt) {
+    var w = d.defaultView, vw = w.innerWidth, vh = w.innerHeight, hit = null;
+    var n = [[3, 3], [vw - 3, 3], [3, vh - 3], [vw - 3, vh - 3]].filter(function (pt) {
       var e = d.elementFromPoint(pt[0], pt[1]);
-      while (e && e !== d.body && e !== d.documentElement) { var cs = w.getComputedStyle(e); if (cs.position === 'fixed' && cs.visibility !== 'hidden' && +cs.opacity > 0.05) { var r = e.getBoundingClientRect(); if (r.width >= vw * 0.9 && r.height >= vh * 0.9) return true; } e = e.parentElement; }
+      while (e && e !== d.body && e !== d.documentElement) { var cs = w.getComputedStyle(e); if (cs.position === 'fixed' && cs.visibility !== 'hidden' && cs.display !== 'none' && +cs.opacity > 0.05) { var r = e.getBoundingClientRect(); if (r.width >= vw * 0.9 && r.height >= vh * 0.9) { hit = e; return true; } } e = e.parentElement; }
       return false;
-    }).length >= 3;
-  } catch (x) { return false; }
+    }).length;
+    return n >= 3 ? hit : null;
+  } catch (x) { return null; }
+}
+function fmBox(el) { var b = null, a = 0; [].forEach.call(el.children, function (c) { var r = c.getBoundingClientRect(), s = r.width * r.height; if (s > a) { a = s; b = c; } }); return b; }
+function fmPlace(f, el) {
+  var r = f.getBoundingClientRect(), d = $('#fmDim'), cs = getComputedStyle(f);
+  d.style.left = r.left + 'px'; d.style.top = r.top + 'px'; d.style.width = r.width + 'px'; d.style.height = r.height + 'px'; d.style.borderRadius = cs.borderRadius;
+  var bg = el.ownerDocument.defaultView.getComputedStyle(el).backgroundColor; d.style.boxShadow = '0 0 0 300vmax ' + (bg && bg !== 'rgba(0, 0, 0, 0)' ? bg : 'rgba(0,0,0,.5)');
+  var b = fmBox(el); if (!b) return;
+  var cur = (b.style.translate || '0px 0px').split(' '), ox = parseFloat(cur[0]) || 0, oy = parseFloat(cur[1]) || 0, q = b.getBoundingClientRect();
+  var br = { left: q.left - ox, right: q.right - ox, top: q.top - oy, bottom: q.bottom - oy, width: q.width, height: q.height }, ih = el.ownerDocument.defaultView.innerHeight, m = 8;
+  var cl = function (v, lo, hi) { return hi < lo ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)); };
+  var dx = cl(innerWidth / 2 - (r.left + br.left + br.width / 2), m - br.left, r.width - m - br.right);
+  var dy = br.bottom >= ih - 1 ? 0 : cl(innerHeight / 2 - (r.top + br.top + br.height / 2), m - br.top, r.height - m - br.bottom);
+  var v = Math.abs(dx) > 1 || Math.abs(dy) > 1 ? Math.round(dx) + 'px ' + Math.round(dy) + 'px' : '';
+  if ((b.style.translate || '') !== v && Math.abs(Math.round(dx) - ox) + Math.abs(Math.round(dy) - oy) > 1) b.style.translate = v;
+  f._fmB = b;
 }
 function fmCheck(f) {
   var d; try { d = f.contentDocument; } catch (x) { return; } if (!d || !f.offsetParent && !f.classList.contains('fmon')) return;
-  var on = fmOpen(d), was = f.classList.contains('fmon');
-  if (on === was) return;
-  var win = d.defaultView;
-  if (on) { var r = f.getBoundingClientRect(); f._fmY = win.scrollY; f._fmT = r.top; f.classList.add('fmon'); document.documentElement.classList.add('fmlock'); try { win.scrollTo(0, Math.max(0, f._fmY - r.top)); } catch (x) {} }
-  else { f.classList.remove('fmon'); document.documentElement.classList.remove('fmlock'); try { win.scrollTo(0, f._fmY || 0); } catch (x) {} if (FS.f === f) { FS.h = 0; fsTick(); } }
+  var el = fmFind(d), was = f.classList.contains('fmon');
+  if (el) {
+    if (!was) {
+      f.classList.add('fmon'); f._fmEl = el;
+      var dim = document.createElement('div'); dim.id = 'fmDim'; document.body.appendChild(dim);
+      var cat = document.createElement('div'); cat.id = 'fmCat'; document.body.appendChild(cat);
+      cat.onclick = function () { var t = f._fmEl; if (t) t.dispatchEvent(new MouseEvent('click', { bubbles: true })); setTimeout(function () { fmCheck(f); }, 50); };
+      cat.addEventListener('wheel', function (e) { e.preventDefault(); }, { passive: false }); cat.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+    }
+    f._fmEl = el; fmPlace(f, el);
+  } else if (was) {
+    f.classList.remove('fmon'); if (f._fmB) { f._fmB.style.translate = ''; f._fmB = null; } f._fmEl = null;
+    ['fmDim', 'fmCat'].forEach(function (id) { var x = document.getElementById(id); if (x) x.parentNode.removeChild(x); });
+  }
 }
 function fmWatch(f, d) {
   if (d._fmw) return; d._fmw = 1; var t = 0;
@@ -2408,12 +2435,49 @@ function renderWs() {
 }
 
 /* ── 오늘 (첫 화면) ── */
+/* 홈 날짜 옆 날씨 (2026-11-20 실장님): Open-Meteo(키 없음) · 기본 서울 · 위치 권한이 이미 허용돼 있으면 현재 위치 · 30분 캐시 · 실패하면 조용히 숨김 */
+var WX_ICON = {
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="#8b95a1" stroke-width="2" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/></svg>',
+  rain: '<svg viewBox="0 0 24 24" fill="none" stroke="#3182f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 5.5 4.3 4.3 0 0 0 7 14z" stroke="#8b95a1"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3"/></svg>',
+  snow: '<svg viewBox="0 0 24 24" fill="none" stroke="#8b95a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 5.5 4.3 4.3 0 0 0 7 14z"/><path d="M8 18h.01M12 20h.01M16 18h.01" stroke-width="3"/></svg>',
+  fog: '<svg viewBox="0 0 24 24" fill="none" stroke="#8b95a1" stroke-width="2" stroke-linecap="round"><path d="M4 9h16M4 13h16M6 17h12"/></svg>'
+};
+function wxName(c) {
+  if (c === 0) return ['맑음', 'sun']; if (c <= 2) return ['구름 조금', 'sun']; if (c === 3) return ['흐림', 'cloud']; if (c <= 48) return ['안개', 'fog'];
+  if (c <= 67 || (c >= 80 && c <= 82)) return ['비', 'rain']; if (c <= 77 || c === 85 || c === 86) return ['눈', 'snow']; return ['뇌우', 'rain'];
+}
+function wxHtml() {
+  var w = null; try { w = JSON.parse(ls.get('d4:wx') || 'null'); } catch (e) {}
+  if (!w || Date.now() - w.at > 30 * 60000) wxFetch();
+  if (!w) return '';
+  var n = wxName(w.c); return WX_ICON[n[1]] + n[0] + ' <b>' + Math.round(w.t) + '°</b>';
+}
+var WX_BUSY = 0;
+function wxFetch() {
+  if (WX_BUSY) return; WX_BUSY = 1;
+  var go = function (la, lo) {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + la + '&longitude=' + lo + '&current=temperature_2m,weather_code&timezone=auto')
+      .then(function (r) { return r.json(); }).then(function (j) {
+        var c = j && j.current; if (!c || typeof c.temperature_2m !== 'number') return;
+        ls.set('d4:wx', JSON.stringify({ t: c.temperature_2m, c: c.weather_code, at: Date.now() }));
+        var el = document.querySelector('.wwx'); if (el) el.innerHTML = wxHtml();
+      }).catch(function () {}).then(function () { WX_BUSY = 0; });
+  };
+  var seoul = function () { go(37.5665, 126.978); };
+  try {
+    if (navigator.permissions && navigator.geolocation) navigator.permissions.query({ name: 'geolocation' }).then(function (p) {
+      if (p.state === 'granted') navigator.geolocation.getCurrentPosition(function (pos) { go(pos.coords.latitude.toFixed(3), pos.coords.longitude.toFixed(3)); }, seoul, { timeout: 5000, maximumAge: 1800000 });
+      else seoul();
+    }, seoul); else seoul();
+  } catch (e) { seoul(); }
+}
 function renderStart() {
   var d = P(TODAY), wk = '일월화수목금토'.charAt(d.getDay()), end = addD(TODAY, 7);
   var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && e.d >= TODAY && e.d <= end; }).slice(0, 10);
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort).slice(0, 7);
   var PL = pjMerged(), R = NAV.rec.slice(0, 8), RN = R.map(function (r) { return r.name; }); PL.map(wsFrom).forEach(function (r) { if (R.length < 8 && RN.indexOf(r.name) < 0) { R.push(r); RN.push(r.name); } });
-  var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small>오늘 할 일 ' + Td.filter(function (x) { return !x.c; }).length + '개 · 이번 주 마감 ' + E.length + '건</small></div>' +
+  var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small class="wwx">' + wxHtml() + '</small></div>' +
     '<div class="wsg"><div class="wsc"><h3>이번 주 마감<button type="button" data-ng="sched">일정</button></h3>' +
     (E.length ? E.map(function (e) { return '<button type="button" class="wsr" data-wf="' + e.f + '"><span class="dd' + (e.d === TODAY ? ' td' : '') + '">' + dot(e.d).slice(3) + '</span><span class="pn">' + esc(e.file.short) + '</span><span class="tx">' + esc(e.t) + '</span></button>'; }).join('') : '<div class="emp">이번 주 마감이 없어요</div>') + '</div>' +
     '<div class="wsc"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
