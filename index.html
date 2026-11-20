@@ -1619,7 +1619,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm45';
+var APP_VER = '20261120hm46';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2183,7 +2183,7 @@ function renderTk() {
   f._pv = t.pv || ''; if (f._ok) tkGo(f);
   rvSize(); window.scrollTo(0, 0);
 }
-function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) f.contentWindow.plyshGo(f._pv); } catch (e) {} }
+function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) { if (f._pv === 'ref' && NAV.refHome && f.contentWindow.plyshRefHome) { NAV.refHome = 0; f.contentWindow.plyshRefHome(); } f.contentWindow.plyshGo(f._pv); } } catch (e) {} }
 // 도구 안에서 화면을 옮기면(예: 지류 품목 → 사양서에 담기) 위 칩도 같이 바뀜
 window.plyshSync = function (file, pv) {
   var t = TOOL_LIST.filter(function (x) { return x.f === file && x.pv === pv; })[0];
@@ -2496,6 +2496,7 @@ function spOf() {
 function navGo(k) {
   navClose(); S.ws = null;
   if (TOOL_OLD[k]) k = TOOL_OLD[k]; // 예전 메뉴 키 (전개도 생성기 → 종이연수·칼선)
+  if (k === 'ref') NAV.refHome = 1; // 용어사전 메뉴를 누르면 늘 첫 화면(분류 카드)
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
   if (k.indexOf('gd:') === 0) { S.gdf = k.slice(3); S.view = 'gdoc'; window.scrollTo(0, 0); return render(); }
   if (k.indexOf('gl:') === 0) { S.gl = +k.slice(3); S.view = 'glist'; window.scrollTo(0, 0); return render(); }
