@@ -1091,6 +1091,17 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .spg h4 { margin:18px 0 8px; font-size:12px; color:var(--faint); font-weight:700; letter-spacing:.04em; }
 .spg h4:first-child { margin-top:4px; }
 .spg .tkl { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:10px; }
+
+/* 소메뉴 (왼쪽 메뉴 3단계) */
+.s3 { margin:2px 0 6px; padding-left:40px; }
+.s3 .s3h { display:block; font-size:12px; font-weight:700; color:var(--faint); padding:8px 12px 2px; }
+.s3 button { display:flex; align-items:center; gap:8px; width:100%; min-height:34px; border:0; background:none; text-align:left; padding:0 12px; border-radius:10px; font:inherit; font-size:14px; font-weight:500; color:var(--mute); cursor:pointer; position:relative; }
+.s3 button:before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:2px; border-radius:1px; background:var(--line); }
+.s3 button:hover { background:var(--bg); color:var(--sub); }
+.s3 button.on { color:var(--txt); font-weight:700; } .s3 button.on:before { background:var(--txt); }
+.s3 button small { margin-left:auto; font-size:11.5px; font-weight:600; color:var(--faint); }
+#nfm .s3 { padding-left:12px; }
+html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid-template-columns:minmax(0, 1fr) !important; }
 /* ── W: 왼쪽 메뉴 ── */
 #nsd, #ntb { display:none; }
 @media (min-width:1024px) {
@@ -1562,7 +1573,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261120hm15';
+var APP_VER = '20261120hm16';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2625,6 +2636,57 @@ function megaOpen(k) {
   m.innerHTML = megaHtml(sp); bindGo(m); m.classList.add('open'); $('#nbd').classList.add('open'); NAV.hv = k;
   $$('#nsp button').forEach(function (b) { b.classList.toggle('hv', b.dataset.sp === k); });
 }
+
+/* 소메뉴 (2026-11-20 실장님): 필터가 아닌 하위 구분은 왼쪽 메뉴에 대메뉴 > 중메뉴 > 소메뉴로.
+   지금 열린 중메뉴 아래에 그 화면의 구분(안내 문서 목차, 용어사전 분류, 자가점검리스트 분류)을 펼쳐 보여 준다.
+   PC는 왼쪽 메뉴, 모바일은 전체 메뉴(서랍) 안. PC에서는 화면 안 오른쪽 색인을 숨긴다. 필터(팬톤·폰트)는 오른쪽 그대로 */
+function subFrame(tk) { var t = TOOL_LIST.filter(function (x) { return x.k === tk; })[0]; return t && t.f ? $('#tkWrap iframe[data-f="' + t.f + '"]') : null; }
+function subItems() {
+  var L = [];
+  try {
+    if (S.view === 'gdoc' && NAV.gdL && NAV.gdFr) {
+      var nav = $('#gdToc'), on = nav ? [].indexOf.call($$('a', nav), $('a.on', nav)) : -1;
+      NAV.gdL.forEach(function (x, i) { L.push({ t: x.t, on: i === on, go: function () { var a = $$('#gdToc a')[i]; if (a) a.onclick(); } }); });
+    } else if (S.view === 'tk' && S.tk === 'ref') {
+      var f = subFrame(S.tk), d = f && f.contentDocument; if (!d) return L;
+      if (S.tk === 'ref') {
+        $$('.rnav .rtab > *', d).forEach(function (e) {
+          if (e.classList.contains('rph')) L.push({ h: e.textContent.trim() });
+          else if (e.tagName === 'BUTTON' && !e.classList.contains('rdm')) { var sm = e.querySelector('small'); L.push({ t: (sm ? e.firstChild.textContent : e.textContent).trim(), n: sm ? sm.textContent : '', on: e.classList.contains('on'), go: function () { e.click(); } }); }
+        });
+        if (L.length && !L.some(function (x) { return x.on; }) && d.querySelector('.rnav .rdm.on')) { /* 디자인 첫 칸 */ }
+      } else {
+        $$('#tabs .tab', d).forEach(function (e) { var b = e.querySelector('.tab-badge'); L.push({ t: [].filter.call(e.childNodes, function (c) { return c.nodeType === 3; }).map(function (c) { return c.textContent; }).join('').trim(), n: b ? b.textContent : '', on: e.classList.contains('active'), go: function () { e.click(); } }); });
+      }
+    }
+  } catch (e) {}
+  return L;
+}
+var SUB = { sig: '' };
+function subHide(on) { // PC에서 화면 안 색인 숨기기
+  [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }']].forEach(function (x) {
+    var f = subFrame(x[0]), d; try { d = f && f.contentDocument; } catch (e) { d = null; } if (!d || !d.head) return;
+    var st = d.getElementById('s3hide'); if (on && !st) { st = d.createElement('style'); st.id = 's3hide'; st.textContent = '@media (min-width:900px) { ' + x[1] + ' }'; d.head.appendChild(st); } else if (!on && st) st.remove();
+  });
+  document.documentElement.classList.toggle('s3pc', !!on);
+}
+function subPaint(box, cur, cls) {
+  if (!box) return; $$('.s3', box).forEach(function (e) { e.remove(); });
+  var L = subItems(), on = $(cls + '.on', box); if (!L.length || !on) return;
+  var w = document.createElement('div'); w.className = 's3';
+  w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '"' + (x.on ? ' class="on"' : '') + '>' + esc(x.t) + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
+  on.parentNode.insertBefore(w, on.nextSibling);
+  $$('[data-s3]', w).forEach(function (b) { b.onclick = function () { var x = L[+b.dataset.s3]; if (x && x.go) x.go(); if (box.id === 'nfm') navClose(); setTimeout(subTick, 60); }; });
+}
+function subTick() {
+  var sd = document.getElementById('nsd'), pc = !!(sd && sd.offsetWidth);
+  var L = subItems(), sig = S.view + '|' + (S.tk || '') + '|' + L.map(function (x) { return (x.h || x.t) + (x.n || '') + (x.on ? '*' : ''); }).join(',');
+  subHide(pc && (S.view === 'tk' && S.tk === 'ref' || S.view === 'gdoc') && L.length > 0);
+  if (sig === SUB.sig && (!sd || !L.length || $('.s3', sd))) return; SUB.sig = sig;
+  if (sd) subPaint(sd, null, '.si');
+  var fm = document.getElementById('nfm'); if (fm && fm.classList.contains('open')) subPaint(fm, null, '.lk');
+}
+setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
@@ -2633,7 +2695,7 @@ function fullMenu() {
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
   document.documentElement.style.overflow = 'hidden';
-  requestAnimationFrame(function () { requestAnimationFrame(function () { f.classList.add('open'); bd.classList.add('open'); }); });
+  requestAnimationFrame(function () { requestAnimationFrame(function () { f.classList.add('open'); bd.classList.add('open'); subPaint(f, null, '.lk'); }); });
 }
 function sideHtml() {
   var cur = navCur(), sk = spOf();
@@ -2711,7 +2773,7 @@ function navSync() {
   hdr.onmouseleave = function (ev) { if (NAV.hv && !(ev.relatedTarget && $('#nmg').contains(ev.relatedTarget))) navClose(); };
   if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
-    sd.innerHTML = sideHtml(); bindGo(sd); $('.sfs', sd).onclick = function () { navPal(); };
+    sd.innerHTML = sideHtml(); bindGo(sd); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
     var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도우미'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
