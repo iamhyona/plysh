@@ -435,6 +435,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .dpa { display:flex; align-items:center; gap:6px; margin:10px 0 0 29px; flex-wrap:wrap; } .dpe { font-size:12px; color:#3182f6; font-weight:700; margin-right:auto; }
 .dpa button { height:32px; min-width:34px; padding:0 12px; border:0; border-radius:9px; background:#fff; color:var(--sub); font:inherit; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; } .dpa button[disabled] { opacity:.35; cursor:default; } .dpa button.del { color:#e5484d; }
 .dpadd { width:100%; height:44px; margin:8px 0 4px; border:1.5px dashed #d1d6db; border-radius:12px; background:none; color:var(--sub); font:inherit; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; } .dpadd:hover { background:var(--chip); }
+.dldx { display:block; margin:0 0 12px; } .dldx select { width:100%; height:46px; padding:0 38px 0 16px; border:0; border-radius:12px; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 16px center; -webkit-appearance:none; appearance:none; font:inherit; font-size:15px; font-weight:600; color:#191f28; cursor:pointer; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -905,6 +906,13 @@ function sub(n) { var i = n.indexOf('_'); return i < 0 ? n : n.slice(i + 1); }
 function rowsOf(n) { return ((CAT.T[n] || [])[1] || []).filter(function (r) { return r[0] !== '' && r[0] != null; }); }
 function papers() { return [].concat.apply([], tabsOf(['용지']).map(rowsOf)); }
 // 칸 → 고를 수 있는 탭 · 고르는 방식 (one 하나만 · many 여러 개 ' / '로 이어붙임 · print 방식+도수+별색)
+var PK_CTX = null;
+function accOk(n, b) {
+  b = String(b || ''); var hb = /양장 \(|노출 양장|사철/.test(b);
+  if (n === '부속_헤드밴드') return hb;
+  if (n === '부속_가름끈') return hb || /PUR|반양장/.test(b);
+  return true;
+}
 var PICK = {
   item: { n: '세부 품목', tabs: function () { return tabsOf(['품목']); }, mode: 'one' },
   paper: { n: '용지', tabs: function () { return tabsOf(['용지']); }, mode: 'one' },
@@ -916,7 +924,9 @@ var PICK = {
   cut: { n: '톰슨·재단·타공', tabs: function () { return tabsOf(['톰슨']).filter(function (n) { return n !== '톰슨_접지'; }); }, mode: 'many' },
   fold: { n: '접지', tabs: function () { return ['톰슨_접지'].filter(function (n) { return CAT.T[n]; }); }, mode: 'many' },
   glue: { n: '합지·접착', tabs: function () { return tabsOf(['조립']); }, mode: 'many' },
-  bind: { n: '제본·부속', tabs: function () { return tabsOf(['제본', '부속']); }, mode: 'many' },
+  // 2026-11-21 실장님: 제본 / 부속 따로 · 부속은 고른 제본에 맞는 것만 (헤드밴드는 양장·사철, 가름끈은 양장·사철·PUR·반양장)
+  bind: { n: '제본', tabs: function () { return tabsOf(['제본']); }, mode: 'many' },
+  acc: { n: '부속', tabs: function () { return tabsOf(['부속']).filter(function (n) { return accOk(n, (PK_CTX || {}).bind); }); }, mode: 'many' },
   pack: { n: '포장', tabs: function () { return tabsOf(['포장']); }, mode: 'many' }
 };
 /* 열 이름으로 찾기 (시트에서 열 순서가 바뀌어도 OK) */
@@ -1205,7 +1215,7 @@ function sheetHint(r, v) {
   var q = (v && v.q) || 0, need = r.flat ? Math.ceil(q * ((v && v.k) || 1) * r.flat[2] / bs.n * 1.05) : Math.ceil(r.book[2] / (bs.n * 2) * q * 1.05);
   return '<div class="sh"><b>' + bs.P.n + '</b> ' + (r.book ? bs.n + '판걸이 (1장 ' + bs.n * 2 + 'p)' : bs.n + '개 걸이') + ' · 로스 ' + Math.round(bs.loss * 100) + '%' + (q ? ' · 전지 약 ' + fmtN(need) + '장 (' + fmtN(need / 500, 2) + '연)' : '') + (r.gn || r.book ? ' · ' + GN_LB[r.book ? 'v' : r.gn] : '') + '</div>';
 }
-var FLD = [['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['pack', '포장', 'dl-pack']];
+var FLD = [['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['acc', '부속', ''], ['pack', '포장', 'dl-pack']];
 function renderOne() {
   var t = tpl(S.id); if (!t) return go('list');
   if (!CUR || CUR.id !== t.id) { var st = stateOf(t); CUR = { id: t.id, v: st.v, R: st.R }; }
@@ -1261,7 +1271,7 @@ function bindOne(t) {
   function bindOut() {
     var setv = function (i, x) { var R = CUR.R; R[+i.dataset.r] = R[+i.dataset.r] || {}; R[+i.dataset.r][i.dataset.k] = x; redraw(); };
     $$('#out select[data-r]').forEach(function (i) { i.onchange = function () { setv(i, i.value); }; });
-    $$('#out [data-pick][data-r]').forEach(function (i) { i.onclick = function () { var R = CUR.R[+i.dataset.r] || {}; openPick(i.dataset.pick, R[i.dataset.k] || (i.textContent === '고르기' ? '' : i.textContent), function (x) { setv(i, x); }); }; });
+    $$('#out [data-pick][data-r]').forEach(function (i) { i.onclick = function () { var R = CUR.R[+i.dataset.r] || {}; PK_CTX = R; openPick(i.dataset.pick, R[i.dataset.k] || (i.textContent === '고르기' ? '' : i.textContent), function (x) { setv(i, x); }); }; });
   }
 }
 
@@ -1284,7 +1294,7 @@ function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*
 function rowTsv(r, i) {
   var pp = splitPaper(r.paper);
   var Q = dQty(r), qa = Q.has ? fmtN(Q.s) : r.q, qb = Q.has ? ((Q.p + Q.d) ? fmtN(Q.p + Q.d) + ' / ' + fmtN(Q.t) : '') : r.gift;
-  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, dJn([r.fin, r.emb]), dJn([r.cut, r.fold, r.glue]), r.bind, r.mat, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
+  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, dJn([r.fin, r.emb]), dJn([r.cut, r.fold, r.glue]), dJn([r.bind, r.acc]), r.mat, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
 }
 function dJn(a) { var v = a.filter(function (x) { return !dEmpty(x); }); return v.length ? v.join(' / ') : (a[0] == null ? '' : a[0]); }
 var DF = [['item', '세부 품목', ''], ['set', '중분류', ''], ['cat', '대분류', ''], ['q', '제작수량', ''], ['gift', '증정 / 총 제작', ''], ['size', '판형', ''], ['pg', '페이지', ''],
@@ -1311,7 +1321,7 @@ var DSEC = [
   ['품목', [['cls', '품목']]],
   ['크기 · 페이지', [['size', '판형', '가로×세로(×높이) mm'], ['pg', '페이지', '예: 24p · 표지 4p']]],
   ['용지 · 인쇄', [['paper', '용지'], ['print', '인쇄'], ['coat', '코팅']]],
-  ['가공 · 제본', [['fin', '박'], ['emb', '형압 · 에폭시'], ['cut', '톰슨 · 재단 · 타공'], ['fold', '접지'], ['glue', '합지 · 접착'], ['bind', '제본 · 부속']]],
+  ['가공 · 제본', [['fin', '박'], ['emb', '형압 · 에폭시'], ['cut', '톰슨 · 재단 · 타공'], ['fold', '접지'], ['glue', '합지 · 접착'], ['bind', '제본'], ['acc', '부속']]],
   // 2026-11-20 실장님: 정합(구성품 맞춰 넣기)과 포장(개별 · 외부 포장)을 따로
   ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]],
   ['수량', [['qs', '판매용 수량', '예: 1,000'], ['qp', '홍보용 수량', '예: 20'], ['qdp', '불량대응용 수량'], ['qt', '총 제작 수량']]]];
@@ -1332,7 +1342,7 @@ function dEmpty(v) { v = String(v == null ? '' : v).trim(); return !v || v === '
 function dSel(d) { var id = ls.get('pr:dsel'); return d.rows.filter(function (r) { return r.id === id; })[0] || d.rows[0] || null; }
 function dMiss(r) { var m = DNEED.filter(function (f) { return f[0] === 'qs' ? !dQty(r).s : dEmpty(r[f[0]]); }).map(function (f) { return f[1]; }); if (r.cat === '책자' && dEmpty(r.pg)) m.push('페이지'); return m; }
 function dLine(r) {
-  return [r.size, r.pg, r.paper, r.print, r.coat, r.fin, r.emb, r.cut, r.fold, r.glue, r.bind].filter(function (x) { return !dEmpty(x); }).join(' · ');
+  return [r.size, r.pg, r.paper, r.print, r.coat, r.fin, r.emb, r.cut, r.fold, r.glue, r.bind, r.acc].filter(function (x) { return !dEmpty(x); }).join(' · ');
 }
 function dPrevHtml(d, sel) {
   var h = '<div class="card"><div class="ct">사양서 미리보기<small>' + d.rows.length + '개 품목 · 시트 순서</small></div>';
@@ -1367,9 +1377,9 @@ function renderDoc() {
   if (!d.rows.length) { d.rows.push(docRow('')); saveDocs(); }
   var sel = dSel(d), n = d.rows.indexOf(sel);
   h += tabs + '<div class="dfold"><div class="dsw"><div class="dsl">';
+  h += '<label class="dld dldx"><select id="dLoad" aria-label="구성 불러오기"><option value="">구성 불러오기</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label>';
   h += '<div class="card dhead"><div class="dh1"><input class="dtitle" id="dName" value="' + esc(dNm(d)) + '" placeholder="' + DOC_PH + '" aria-label="사양서 이름"><button type="button" id="dSave">임시 저장</button></div>' +
     '<div class="dh2">만든 날 ' + d.date + ' · <b id="dSaved">' + savedTxt(d) + '</b></div>' +
-    '<label class="dld"><select id="dLoad" aria-label="구성 불러오기"><option value="">구성 불러오기</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label>' +
     '</div>';
   {
     // 2026-11-20 실장님: 기본 정보 · 크기·페이지 · 용지·인쇄 · 가공·제본 · 정합·포장 묶음마다 박스 따로
@@ -1422,7 +1432,7 @@ function bindDoc() {
       if (i.dataset.k === 'item' && /\//.test(i.value)) { var pp = i.value.split('/').map(function (x) { return x.trim(); }).filter(Boolean); if (pp[0]) r.cat = pp[0]; if (pp[1]) r.set = pp.slice(1).join(' / '); saveDocs(); renderDoc(); toast('대분류 ' + (pp[0] || '') + (pp[1] ? ' · 중분류 ' + pp.slice(1).join(' / ') : '') + '로 넣었어요'); return; }
       if (/^(gn|size)$/.test(i.dataset.k)) renderDoc(); };
   });
-  $$('[data-pick][data-dr]').forEach(function (i) { i.onclick = function () { var r = row(i.dataset.dr); openPick(i.dataset.pick, r[i.dataset.k], function (x) {
+  $$('[data-pick][data-dr]').forEach(function (i) { i.onclick = function () { var r = row(i.dataset.dr); PK_CTX = r; openPick(i.dataset.pick, r[i.dataset.k], function (x) {
     if (i.dataset.k === 'item' && x && x !== '-') { var it = itemRow(x); if (it) { if (dEmpty(r.cat)) r.cat = it[1]; if (dEmpty(r.size)) r.size = it[2]; if (dEmpty(r.paper)) r.paper = it[3]; if (dEmpty(r.print)) r.print = it[4]; if (dEmpty(r.coat)) r.coat = it[5] || '-'; } }
     r[i.dataset.k] = x; saveDocs(); renderDoc(); }); }; });
   var da = $('#dAdd'); if (da) da.onclick = function () { S.add = true; go('list'); };
