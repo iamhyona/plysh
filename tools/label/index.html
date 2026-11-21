@@ -174,7 +174,7 @@ textarea.form-input{line-height:1.6;}
 <div id="app">
   <header>
     <div class="logo">LABEL<span> / 상품 라벨 생성기</span></div>
-    <button class="header-edit-btn" id="global-defaults-btn">⚙ 기본정보</button>
+    <button class="header-edit-btn" id="global-defaults-btn">기본정보</button>
   </header>
   <!-- 비밀번호 모달 -->
   <div class="modal-overlay" id="pw-modal">
@@ -194,7 +194,7 @@ textarea.form-input{line-height:1.6;}
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">기본정보 편집 <span>— 언어별 수정 가능</span></div>
-        <button class="modal-close" id="defaults-modal-close">✕</button>
+        <button class="modal-close" id="defaults-modal-close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
       <div class="modal-body">
         <div class="def-lang-tabs" id="def-lang-tabs">
@@ -264,6 +264,7 @@ textarea.form-input{line-height:1.6;}
   </div>
   <div class="content">
     <div class="content-inner">
+      <div style="background:#fff;border-radius:16px;padding:14px 16px;margin:0 0 14px;font-size:13.5px;line-height:1.55;color:#4e5968">상품 라벨 생성기는 <b style="color:#191f28">PLYSH TOOLS › 상품 사양서 · 라벨</b>의 '라벨' 칸으로 합쳤어요 (2026.11.19). 이 페이지는 예전 입력 확인용으로만 남겨 둬요. <a href="../../" style="color:#3182f6;font-weight:600;text-decoration:none">PLYSH 열기</a></div>
       <!-- TAB 2 -->
       <div id="tab-bulk" class="tab-panel active">
         <div id="bulk-cards"></div>
@@ -281,9 +282,9 @@ textarea.form-input{line-height:1.6;}
             <button class="lang-sel-btn" data-lang="zhTW">중국어 (번체)</button>
           </div>
         </div>
-        <div style="border-top:1px solid var(--border);margin:24px 0 0"></div><button class="gen-btn" id="bulk-gen-btn" style="margin-top:16px">▶ 라벨 생성</button>
+        <div style="border-top:1px solid var(--border);margin:24px 0 0"></div><button class="gen-btn" id="bulk-gen-btn" style="margin-top:16px">라벨 생성</button>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
-          <button class="action-btn" id="bulk-excel-btn" style="justify-content:center;height:44px">↓ CSV 저장</button>
+          <button class="action-btn" id="bulk-excel-btn" style="justify-content:center;height:44px">CSV 저장</button>
           <button class="action-btn" id="bulk-copy-all-btn" style="justify-content:center;height:44px">전체 복사</button>
         </div>
         <div class="warn-box" id="bulk-warn"><span id="bulk-warn-msg"></span></div>
@@ -347,7 +348,7 @@ textarea.form-input{line-height:1.6;}
             <div class="form-group" style="margin:0"><label class="form-label">재질명</label><input type="text" class="form-input sm" id="c-mat-zhTW" value="U"></div>
           </div>
         </div>
-        <button class="gen-btn" id="fetch-btn">↺ 시트에서 불러와 생성</button>
+        <button class="gen-btn" id="fetch-btn">시트에서 불러와 생성</button>
         <div class="status-line" id="s-status"></div>
         <div id="s-results"></div>
       </div>
@@ -851,7 +852,7 @@ function addBulkRow(){
   var ll=getLangLabel();
   var div=document.createElement('div');
   div.className='bulk-card'; div.id=id;
-  var inner='<div class="bulk-card-header"><span class="bulk-card-num">PRODUCT '+bic+'</span><button class="bulk-card-del" data-target="'+id+'">✕</button></div>';
+  var inner='<div class="bulk-card-header"><span class="bulk-card-num">PRODUCT '+bic+'</span><button class="bulk-card-del" data-target="'+id+'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
   inner+='<div class="bulk-section-label" style="color:var(--accent);border-bottom-color:rgba(49,130,246,.25)">국문</div>';
   inner+='<div class="bulk-field"><label style="color:#9c9c9c">전체 품목명</label><input type="text" class="form-input sm" data-role="name" placeholder="예: 아크릴 키링"><div class="suggest-box" id="sug-name-'+bic+'"></div></div>';
   inner+='<div class="bulk-field"><label style="color:#9c9c9c">세부 구성품명</label><input type="text" class="form-input sm" data-role="item" placeholder="예: 포토카드"><div class="suggest-box" id="sug-item-'+bic+'"></div></div>';
@@ -966,7 +967,7 @@ function getBulkRows(){
 
 document.getElementById('bulk-gen-btn').addEventListener('click',function(){
   var rows=getBulkRows();
-  if(!rows.length){showToast('⚠ 데이터를 입력해주세요');return;}
+  if(!rows.length){showToast('데이터를 입력해 주세요');return;}
   var resultEl=document.getElementById('bulk-result');
   resultEl.innerHTML=''; resultEl.style.display='block';
   var grouped={}, order=[];
@@ -1005,18 +1006,18 @@ document.getElementById('bulk-gen-btn').addEventListener('click',function(){
       var badge='<span class="lang-badge lang-'+lang+'">'+LANG_BADGE_LABEL[lang]+'</span>';
       div.innerHTML='<div class="result-item-head"><span class="result-item-name">'+badge+eh(displayName)+'</span><button class="copy-one-btn" id="'+bid+'">복사</button></div>'+
         '<div class="result-item-preview">'+buildPreviewWithDef(displayName,trItemsForBuild,g.date,lang,def)+
-        '<button class="raw-toggle" id="rt-'+idx+'">▸ 원문 텍스트</button><div class="raw-text" id="rr-'+idx+'">'+eh(text)+'</div></div>';
+        '<button class="raw-toggle" id="rt-'+idx+'">원문 보기</button><div class="raw-text" id="rr-'+idx+'">'+eh(text)+'</div></div>';
       resultEl.appendChild(div);
       (function(ct,ci2){
         document.getElementById('brc'+ci2).addEventListener('click',function(){
           navigator.clipboard.writeText(ct).then(function(){
-            var b=document.getElementById('brc'+ci2);b.textContent='✓복사됨';b.classList.add('copied');
+            var b=document.getElementById('brc'+ci2);b.textContent='복사됨';b.classList.add('copied');
             setTimeout(function(){b.textContent='복사';b.classList.remove('copied');},2000);showToast('복사됨!');
           });
         });
         document.getElementById('rt-'+ci2).addEventListener('click',function(){
           var el=document.getElementById('rr-'+ci2);el.classList.toggle('open');
-          this.textContent=el.classList.contains('open')?'▾ 원문 텍스트':'▸ 원문 텍스트';
+          this.textContent=el.classList.contains('open')?'원문 접기':'원문 보기';
         });
       })(text,idx);
     });
@@ -1032,7 +1033,7 @@ document.getElementById('bulk-copy-all-btn').addEventListener('click',function()
 
 document.getElementById('bulk-excel-btn').addEventListener('click',function(){
   var rows=getBulkRows();
-  if(!rows.length){showToast('⚠ 데이터를 입력해주세요');return;}
+  if(!rows.length){showToast('데이터를 입력해 주세요');return;}
   var langName=bulkLangs.map(function(l){return LANG_NAMES[l]||l;}).join('_');
   var headers=['전체 품목명','전체 품목명('+langName+')','세부 구성품명','세부 구성품명('+langName+')','사이즈','종수','재질','재질('+langName+')'];
   var csvRows=[headers];
@@ -1068,7 +1069,7 @@ document.getElementById('s-url-apply-btn').addEventListener('click',function(){
   if(!val){showToast('URL 또는 ID를 입력해주세요');return;}
   var id=extractSheetId(val);
   window._customSheetId=id;
-  document.getElementById('s-url-status').textContent='✓ ID 적용됨: '+id;
+  document.getElementById('s-url-status').textContent='ID 적용됨: '+id;
   document.getElementById('s-url-status').style.color='var(--accent)';
   showToast('시트 ID 적용됨!');
 });
@@ -1172,19 +1173,19 @@ document.getElementById('fetch-btn').addEventListener('click',async function(){
         var headName=lang==='ko'?eh(name):(displayName!==name?eh(name)+' / '+eh(displayName):eh(name));
         div.innerHTML='<div class="result-item-head"><span class="result-item-name">'+badge+headName+'</span><button class="copy-one-btn" id="'+bid+'">복사</button></div>'+
           '<div class="result-item-preview">'+buildPreviewWithDef(displayName,trItems,d,lang,def)+
-          '<button class="raw-toggle" id="rt-btn-'+idx+'">▸ 원문 텍스트</button>'+
+          '<button class="raw-toggle" id="rt-btn-'+idx+'">원문 보기</button>'+
           '<div class="raw-text" id="'+rid+'">'+eh(label)+'</div></div>';
         results.appendChild(div);
         (function(cLabel,cBid,cRid,cIdx){
           document.getElementById(cBid).addEventListener('click',function(){
             navigator.clipboard.writeText(cLabel).then(function(){
-              var b=document.getElementById(cBid);b.textContent='✓복사됨';b.classList.add('copied');
+              var b=document.getElementById(cBid);b.textContent='복사됨';b.classList.add('copied');
               setTimeout(function(){b.textContent='복사';b.classList.remove('copied');},2000);showToast('복사됨!');
             });
           });
           document.getElementById('rt-btn-'+cIdx).addEventListener('click',function(){
             var el=document.getElementById(cRid);el.classList.toggle('open');
-            this.textContent=el.classList.contains('open')?'▾ 원문 텍스트':'▸ 원문 텍스트';
+            this.textContent=el.classList.contains('open')?'원문 접기':'원문 보기';
             if(el.classList.contains('open')) setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
           });
         })(label,bid,rid,idx);
@@ -1193,7 +1194,7 @@ document.getElementById('fetch-btn').addEventListener('click',async function(){
     status.textContent=order.length+'개 제품 완료';
     document.getElementById(caId).addEventListener('click',function(){
       navigator.clipboard.writeText(allLabels.join('\n\n')).then(function(){
-        var b=document.getElementById(caId);b.textContent='✓ 전체 복사됨';b.classList.add('copied');
+        var b=document.getElementById(caId);b.textContent='전체 복사됨';b.classList.add('copied');
         setTimeout(function(){b.textContent='전체 복사';b.classList.remove('copied');},2500);showToast('전체 복사됨!');
       });
     });

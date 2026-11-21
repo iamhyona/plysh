@@ -394,7 +394,7 @@ function syncUI() {
   [['#sBind', O.bind], ['#sSheet', O.sheet], ['#sMode', O.mode], ['#sSig', String(O.sig)]].forEach(function (a) { $$(a[0] + ' button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === a[1]); }); });
   var book = O.bind === 'perfect' || O.bind === 'saddle';
   $('#coverWrap').classList.toggle('hide', !book);
-  $('#sigL').classList.toggle('hide', !book); $('#sSig').classList.toggle('hide', !book);
+  $('#sigL').classList.toggle('hide', !book); $('#sSig').classList.toggle('hide', !book); $('#sigL').parentNode.classList.toggle('hide', !book);
   $$('#sMode button')[1].disabled = O.bind === 'simplex';
   if (O.bind === 'simplex' && O.mode === 'wt') { O.mode = 'sw'; $$('#sMode button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === 'sw'); }); }
   $('#cover').checked = !!O.cover;

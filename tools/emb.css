@@ -1,0 +1,20 @@
+/* PLYSH TOOLS 안에서 열린 도구 공통 모양 (2026-11-19)
+   - 도구 자체 로고·머리줄·바닥글은 숨김 (PLYSH 위 메뉴와 칩이 대신함) → .emb-hide
+   - 도구 안 탭은 PLYSH 세그먼트 모양 → .emb-seg (켜진 칸 .active 또는 .on)
+   - 폭: 화면 꽉(좌우 16px), PC(1024px 이상)는 틀 960px(양옆 여백 40px 이상). 입력 + 결과는 왼쪽 입력 · 오른쪽 결과 (.emb-io 안 .emb-r)
+   - 글꼴 Pretendard, 입력칸 높이 46px · 글자 16px (아이폰 확대 방지), 모서리 12px, 그림자 없음 */
+html.emb .emb-hide { display:none !important; }
+html.emb, html.emb body { font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; }
+html.emb .emb-segw { background:none !important; border:0 !important; padding:14px 16px 2px; max-width:none; margin:0; overflow:visible; }
+html.emb .emb-seg { display:flex; width:fit-content; max-width:100%; background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; border:0; overflow-x:auto; scrollbar-width:none; min-width:0; }
+html.emb .emb-seg::-webkit-scrollbar { display:none; }
+html.emb .emb-seg > * { flex:none; display:flex; align-items:center; height:auto; border:0 !important; background:none; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; letter-spacing:-0.01em; color:#8b95a1; cursor:pointer; white-space:nowrap; }
+html.emb .emb-seg > .active, html.emb .emb-seg > .on { background:#fff; color:#191f28; }
+html.emb .emb-in { max-width:none !important; margin:0 auto; }
+/* PLYSH UI 기준 (2026-11-20): 주 버튼 = 검정, 보조 버튼 = 흰 바탕 회색 글씨(테두리 없음), 위험 = 빨간 글씨, 켜진 칩 = 검정, 파랑은 강조 · 링크 · 선택 표시에만 */
+html.emb { --accent:#3182f6; --danger:#ef4444; --text:#191f28; --text2:#4e5968; --text3:#8b95a1; --border:#e5e8eb; --bg:#f2f4f6; }
+@media (min-width:760px) {
+  html.emb .emb-io { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:16px; align-items:start; }
+  html.emb .emb-io > * { grid-column:1; }
+  html.emb .emb-io > .emb-r { grid-column:2; grid-row:1 / span 40; position:sticky; top:12px; }
+}

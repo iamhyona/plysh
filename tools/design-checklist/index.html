@@ -5,7 +5,7 @@
 <script>/* 승인된 팀원만 (2026-11-19): 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>디자인 사고방지 체크리스트</title>
+<title>자가점검리스트</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300;400;500;700&display=swap');
 
@@ -15,12 +15,12 @@
     --surface2: #f2f4f6;
     --border: #e5e8eb;
     --accent: #3182f6;
-    --danger: #ef4444;
+    --danger: #f04452;
     --text: #191f28;
     --text2: #4e5968;
     --text3: #8b95a1;
     --check-bg: #e8f3ff;
-    --admin: #f59e0b;
+    --admin: #191f28;
     --radius: 12px;
     --tab-h: 56px;
   }
@@ -206,6 +206,7 @@
     background:linear-gradient(transparent, var(--bg) 30%);
     display:flex; gap:10px; pointer-events:none;
   }
+  .bottom-bar .page-reset, .bottom-bar .complete-btn, .ia-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
   .bottom-bar .page-reset {
     pointer-events:all; flex:1; height:48px; border:1px solid var(--border);
     background:var(--surface); color:var(--text2); font-size:13px;
@@ -279,8 +280,11 @@
     .check-item { padding:14px 18px; }
     .check-text { font-size:14px; }
     .section-title { font-size:26px; }
-    .check-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    /* 2026-11-20 실장님: PC는 항목을 2열로 (묶음은 위아래로 쌓고, 묶음 안 항목이 2열) */
+    .check-grid { display:grid; grid-template-columns:1fr; gap:24px; }
     .check-grid .check-group { margin-bottom:0; }
+    .check-list { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; align-items:stretch; }
+    .check-list .check-item { height:100%; box-sizing:border-box; }
     .admin-banner { padding:8px 32px; }
   }
   @media (min-width:1200px) {
@@ -289,19 +293,79 @@
   }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
+<link rel="stylesheet" href="../emb.css">
+<style>
+  /* PLYSH TOOLS 안 (2026-11-19): 로고 숨기고 머리줄·탭을 배경 없이, 본문 폭은 PLYSH 틀에 맞춤 */
+  html.emb header { background:none; border:0; height:auto; padding:14px 16px 0; }
+  html.emb header .logo { display:none; } html.emb .header-right { margin-left:auto; }
+  html.emb .tabs-wrapper { background:none; border:0; padding:10px 16px 0; scroll-snap-type:none; }
+  html.emb .tabs { background:#e5e8eb; border-radius:12px; padding:3px; gap:2px; width:fit-content; }
+  html.emb .tab { height:auto; padding:8px 12px; border:0; border-radius:10px; font-weight:700; }
+  html.emb .tab.active { background:#fff; }
+  html.emb .content-inner { max-width:none !important; padding:20px 16px 100px !important; }
+  html.emb .bottom-bar { max-width:none !important; left:0 !important; right:0; transform:none !important; padding:12px 16px 20px !important; }
+  html.emb .admin-banner { padding-left:16px; padding-right:16px; }
+  html.emb .bottom-bar .complete-btn { background:#191f28; font-size:15px; height:46px; }
+  html.emb .section-title { font-size:20px !important; letter-spacing:-0.02em; }
+
+html.emb #app { display:flex; flex-direction:column; }
+html.emb .admin-banner { order:0; } html.emb header { order:1; } html.emb .tabs-wrapper { order:2; } html.emb .content { order:3; } html.emb .bottom-bar { order:4; }
+html.emb header { display:flex; align-items:center; padding:0 16px !important; height:auto; min-height:40px; }
+html.emb .header-right { width:100%; justify-content:space-between; }
+html.emb .stat-pill { background:none; border:0; padding:0; font-size:14px; font-weight:600; color:#4e5968; }
+html.emb .stat-pill strong { color:#191f28; font-weight:800; }
+html.emb .stat-pill strong:last-child { color:#8b95a1; font-weight:600; }
+html.emb .admin-toggle { height:40px; padding:0 16px; border:0; border-radius:12px; background:#fff; color:#4e5968; font-size:14px; font-weight:600; letter-spacing:0; }
+html.emb .tabs-wrapper { padding:12px 16px 0 !important; overflow-x:auto; scrollbar-width:none; }
+html.emb .tabs { background:none !important; padding:0 !important; gap:6px !important; width:auto !important; flex-wrap:nowrap; }
+html.emb .tab { min-height:36px; height:36px !important; padding:0 14px !important; border-radius:999px !important; background:#fff !important; color:#4e5968 !important; font-size:14px; font-weight:600 !important; gap:6px; border:0 !important; }
+html.emb .tab.active { background:#191f28 !important; color:#fff !important; }
+html.emb .tab .tab-badge { font-size:12px; font-weight:600; background:#f2f4f6; color:#8b95a1; border-radius:999px; padding:1px 7px; }
+html.emb .tab.active .tab-badge { background:rgba(255,255,255,.18); color:#fff; }
+html.emb .tab .tab-dot { display:none; }
+html.emb .content-inner { padding-top:16px !important; }
+html.emb .section-header { background:#fff; border-radius:20px; padding:20px; margin-bottom:16px; display:grid; grid-template-columns:1fr auto; column-gap:12px; }
+html.emb .section-title { font-size:20px !important; font-weight:800; grid-column:1; }
+html.emb .section-desc { grid-column:1 / -1; font-size:14px; color:#4e5968; margin-top:4px; }
+html.emb .section-progress { display:contents; }
+html.emb .progress-bar { grid-column:1 / -1; grid-row:3; margin-top:14px; height:6px; border-radius:3px; background:#f2f4f6; }
+html.emb .progress-label { grid-column:2; grid-row:1; align-self:center; font-size:15px; font-weight:700; color:#191f28; }
+
+/* 분류 목록 = 오른쪽 색인 (2026-11-20 실장님: 색인·필터는 늘 오른쪽, 왼쪽은 주 메뉴와 겹침) */
+@media (min-width:900px) {
+  html.emb #app { display:grid; grid-template-columns:minmax(0, 1fr) 200px; column-gap:8px; align-items:start; align-content:start; height:auto; min-height:100dvh; }
+  html.emb header { grid-column:1 / -1; grid-row:1; } html.emb .admin-banner { grid-column:1 / -1; grid-row:2; }
+  html.emb .content { grid-column:1; grid-row:3; overflow:visible; }
+  html.emb .tabs-wrapper { grid-column:2; grid-row:3; position:sticky; top:12px; overflow:visible; padding:16px 16px 24px 0 !important; }
+  html.emb .tabs { display:flex; flex-direction:column; gap:2px !important; border-left:1px solid #e5e8eb; padding-left:16px !important; }
+  html.emb .tab { width:100%; height:40px !important; justify-content:space-between; border-radius:10px !important; background:none !important; padding:0 12px !important; white-space:nowrap; }
+  html.emb .tab:hover { background:#e9ecef !important; }
+  html.emb .tab.active { background:#191f28 !important; color:#fff !important; }
+  html.emb .tab .tab-badge, html.emb .tab.active .tab-badge { background:none !important; padding:0; margin-left:auto; }
+  html.emb .tab.done .tab-badge { color:#00a861; }
+  html.emb .content-inner { padding-right:0 !important; }
+  html.emb .bottom-bar { grid-column:1; grid-row:4; }
+}
+/* 2026-11-20 실장님: 하단 바가 마지막 항목을 가리고 목록보다 넓음 → 화면에 붙는(fixed) 대신 목록 칸 맨 아래에 따라 붙게(sticky). 문서 길이에 바 높이가 들어가서 끝까지 내리면 마지막 항목이 다 보임 */
+html.emb .bottom-bar { position:sticky !important; bottom:0; left:auto !important; right:auto !important; transform:none !important; width:auto; padding:12px 0 16px !important; margin:0 16px; z-index:5; }
+html.emb .content-inner { padding-bottom:8px !important; }
+html.emb body { height:auto !important; min-height:100%; overflow:visible !important; } /* 몸통이 화면 높이로 잘려 끝까지 안 내려가던 문제 */
+@media (min-width:900px) { html.emb .bottom-bar { margin:0 0 0 16px; } }
+</style>
 </head>
 <body>
 <div id="app">
   <header>
-    <div class="logo">CHECKLIST<span> / 디자인 사고방지</span></div>
+    <div class="logo">자가점검리스트</div>
     <div class="header-right">
-      <div class="stat-pill">전체 체크 항목 <strong id="global-done">0</strong>/<strong id="global-total">0</strong></div>
-      <button class="admin-toggle" id="admin-toggle">EDIT</button>
+      <div class="stat-pill">전체 진행 <strong id="global-done">0</strong>/<strong id="global-total">0</strong></div>
+      <button class="admin-toggle" id="admin-toggle">편집</button>
     </div>
   </header>
 
   <div class="admin-banner" id="admin-banner">
-    <span class="admin-banner-text">✦ 편집 모드 — 항목을 추가·수정·삭제하거나 드래그로 순서를 바꿀 수 있어요</span>
+    <span class="admin-banner-text">편집 모드 — 항목을 추가·수정·삭제하거나 드래그로 순서를 바꿀 수 있어요</span>
     <div class="admin-banner-actions">
       <button class="ab-btn add-tab" id="add-tab-btn">+ 새 탭</button>
     </div>
@@ -314,8 +378,8 @@
   <div class="content" id="content"></div>
 
   <div class="bottom-bar" id="bottom-bar" style="display:none">
-    <button class="page-reset" id="page-reset">↩ 초기화</button>
-    <button class="complete-btn" id="complete-btn">✓ 완료 처리</button>
+    <button class="page-reset" id="page-reset"><svg class="pic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/></svg>초기화</button>
+    <button class="complete-btn" id="complete-btn"><svg class="pic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>완료 처리</button>
   </div>
 
   <!-- MODAL -->
@@ -333,6 +397,8 @@
 </div>
 
 <script>
+/* 이모지 쓰지 않기 (2026-11-20 실장님): 저장된 항목 글자에 남은 이모지도 화면에서는 빼고 보여 줌 */
+function noEmo(t) { return String(t || '').replace(/[\u{1F300}-\u{1FAFF}]\uFE0F?\s*/gu, '').replace(/\s*\(([^()]*?)\s*\u274C\)/g, ' ($1 아님)').replace(/\s*\u274C/g, ' 금지'); }
 // ── DATA ──
 const DEFAULT_DATA = {
   "자가체크": {
@@ -372,23 +438,23 @@ const DEFAULT_DATA = {
   "표기법체크": {
     desc:"자주 혼용되는 앨범/굿즈/인쇄 표기법을 최종 점검",
     items:[
-      {id:"k1",cat:"표기법",text:"🟢 CREDITS (CREDIT ❌)"},
-      {id:"k2",cat:"표기법",text:"🟢 1st / 2nd / 3rd"},
-      {id:"k3",cat:"표기법",text:"🟢 TRACK LIST (TRACKLIST ❌)"},
-      {id:"k4",cat:"표기법",text:"🟢 PHOTOCARD (PHOTO CARD ❌)"},
-      {id:"k5",cat:"표기법",text:"🟢 PHOTO BOOK (PHOTOBOOK ❌)"},
-      {id:"k6",cat:"표기법",text:"🟢 RANDOM N OUT OF NN"},
-      {id:"k7",cat:"표기법",text:"🟢 POSTCARD (POST CARD ❌)"},
-      {id:"k8",cat:"표기법",text:"🟢 Digipack (Digi Pack ❌)"},
-      {id:"k9",cat:"표기법",text:"🟢 Jewel Case (Jewelcase ❌)"},
-      {id:"k10",cat:"표기법",text:"🟢 Mini Album (MINI ALBUM ❌)"},
-      {id:"k11",cat:"표기법",text:"🟢 Folded Poster (Folding Poster ❌)"},
-      {id:"k12",cat:"표기법",text:"🟢 Double-Sided Poster (Double Side Poster ❌)"},
-      {id:"k13",cat:"표기법",text:"🟢 Image Card (Imagecard ❌)"},
-      {id:"k14",cat:"표기법",text:"🟢 Sticker Set (Stickerset ❌)"},
-      {id:"k15",cat:"표기법",text:"🟢 The 1st Mini Album (1th Mini Album ❌)"},
-      {id:"k16",cat:"표기법",text:"🟢 The 2nd Album (2th Album ❌)"},
-      {id:"k17",cat:"표기법",text:"🟢 CD-R (CDR ❌)"},
+      {id:"k1",cat:"표기법",text:"CREDITS (CREDIT 아님)"},
+      {id:"k2",cat:"표기법",text:"1st / 2nd / 3rd"},
+      {id:"k3",cat:"표기법",text:"TRACK LIST (TRACKLIST 아님)"},
+      {id:"k4",cat:"표기법",text:"PHOTOCARD (PHOTO CARD 아님)"},
+      {id:"k5",cat:"표기법",text:"PHOTO BOOK (PHOTOBOOK 아님)"},
+      {id:"k6",cat:"표기법",text:"RANDOM N OUT OF NN"},
+      {id:"k7",cat:"표기법",text:"POSTCARD (POST CARD 아님)"},
+      {id:"k8",cat:"표기법",text:"Digipack (Digi Pack 아님)"},
+      {id:"k9",cat:"표기법",text:"Jewel Case (Jewelcase 아님)"},
+      {id:"k10",cat:"표기법",text:"Mini Album (MINI ALBUM 아님)"},
+      {id:"k11",cat:"표기법",text:"Folded Poster (Folding Poster 아님)"},
+      {id:"k12",cat:"표기법",text:"Double-Sided Poster (Double Side Poster 아님)"},
+      {id:"k13",cat:"표기법",text:"Image Card (Imagecard 아님)"},
+      {id:"k14",cat:"표기법",text:"Sticker Set (Stickerset 아님)"},
+      {id:"k15",cat:"표기법",text:"The 1st Mini Album (1th Mini Album 아님)"},
+      {id:"k16",cat:"표기법",text:"The 2nd Album (2th Album 아님)"},
+      {id:"k17",cat:"표기법",text:"CD-R (CDR 아님)"},
     ]
   },
   "이미지체크": {
@@ -437,7 +503,7 @@ const DEFAULT_DATA = {
       {id:"m23",cat:"컬러(인쇄)",text:"불필요한 별색 및 미사용 컬러 스와치에서 삭제"},
       {id:"m24",cat:"컬러(인쇄)",text:"사용한 컬러 스와치 지정 확인"},
       {id:"m25",cat:"컬러(인쇄)",text:"총 잉크량 TAC 확인"},
-      {id:"m26",cat:"컬러(인쇄)",text:"5% 이하 농도 ❌, 10% 농도 주의"},
+      {id:"m26",cat:"컬러(인쇄)",text:"5% 이하 농도 금지, 10% 농도 주의"},
     ]
   },
   "레이아웃체크": {
@@ -625,7 +691,7 @@ function renderTabs() {
     const checks = checkState[name] || {};
     const total = SHEETS[name].items.length;
     const done  = Object.values(checks).filter(Boolean).length;
-    if (done > 0) tab.classList.add('has-checks');
+    if (done > 0) tab.classList.add('has-checks'); if (total && done === total) tab.classList.add('done');
 
     const editBtn = `<button class="tab-edit-btn" data-tab="${name}" title="탭 편집">⋯</button>`;
     tab.innerHTML = `<span class="tab-dot"></span>${name}<span class="tab-badge">${done}/${total}</span>${editBtn}`;
@@ -686,9 +752,9 @@ function renderContent() {
     group.innerHTML = `
       <div class="check-group-header">
         <div class="check-group-label">${cat}</div>
-        <button class="group-edit-btn group-rename-btn" data-cat="${cat}">✎ 이름</button>
+        <button class="group-edit-btn group-rename-btn" data-cat="${cat}">이름 수정</button>
         <button class="group-edit-btn group-add-btn" data-cat="${cat}">+ 항목</button>
-        <button class="group-edit-btn group-delete-btn" data-cat="${cat}">✕ 삭제</button>
+        <button class="group-edit-btn group-delete-btn" data-cat="${cat}">삭제</button>
       </div>`;
 
     // bind group buttons
@@ -749,11 +815,11 @@ function buildItemEl(item, list, checks) {
         <path d="M1 5l3.5 3.5L11 1" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <span class="check-text">${item.text}</span>
+    <span class="check-text">${noEmo(item.text)}</span>
     <div class="item-actions">
-      <button class="ia-btn ia-edit" title="이름 수정">✎</button>
-      <button class="ia-btn ia-move" title="탭 이동">⇄</button>
-      <button class="ia-btn ia-del" title="삭제">✕</button>
+      <button class="ia-btn ia-edit" title="이름 수정"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
+      <button class="ia-btn ia-move" title="탭 이동"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M4 8h15l-3-3M20 16H5l3 3"/></svg></button>
+      <button class="ia-btn ia-del" title="삭제"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>`;
 
   // check toggle — only when not clicking action buttons or drag handle
@@ -1047,7 +1113,7 @@ document.getElementById('complete-btn').addEventListener('click', () => {
   if (!checkState[activeTab]) checkState[activeTab] = {};
   SHEETS[activeTab].items.forEach(i => { checkState[activeTab][i.id] = true; });
   saveState(); render();
-  showToast('✓ ' + activeTab + ' 완료!');
+  showToast(activeTab + ' 완료');
 });
 
 // ── TOAST ──

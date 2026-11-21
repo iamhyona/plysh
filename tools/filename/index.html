@@ -5,13 +5,13 @@
 <script>/* 승인된 팀원만 (2026-11-19): 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>파일명 생성기</title>
+<title>폴더·파일명 생성기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300;400;500;700&display=swap');
 
   :root {
     --bg: #f2f4f6; --surface: #ffffff; --surface2: #f2f4f6;
-    --border: #e5e8eb; --accent: #3182f6; --danger: #ef4444;
+    --border: #e5e8eb; --accent: #3182f6; --danger: #f04452;
     --text: #191f28; --text2: #4e5968; --text3: #8b95a1;
   }
 
@@ -68,7 +68,7 @@
   .history-section { margin-top:24px; }
   .history-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
   .clear-btn { font-size:11px; color:var(--text3); cursor:pointer; background:none; border:none; font-family:'Pretendard Variable',Pretendard,sans-serif; transition:color .2s; }
-  .clear-btn:hover { color:#ff5f5f; }
+  .clear-btn:hover { color:#f04452; }
   .history-list { display:flex; flex-direction:column; gap:4px; }
   .history-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:all .15s; }
   .history-item:hover { border-color:var(--accent); }
@@ -88,22 +88,55 @@
   }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
+<link rel="stylesheet" href="../emb.css">
+<style>
+  html.emb #app { height:auto; overflow:visible; } html.emb .content { overflow:visible; }
+  html.emb .content-inner { padding:14px 16px 100px; }
+  html.emb .form-input { height:46px; font-size:16px; border-radius:12px; border:0; }
+  html.emb .result-box { border:0; border-radius:20px; }
+  html.emb .copy-btn { background:#191f28; border-radius:12px; height:46px; font-size:15px; }
+  html.emb .emb-r > .result-box { margin-top:0; }
+  @media (max-width:759px) { html.emb .emb-r > .result-box { margin-top:20px; } }
+
+/* 공통 입력 폼 (2026-11-20, 지류 사양서 작성과 같은 모양) */
+html.emb .form-input, html.emb .form-input.sm, html.emb .date-display { height:46px !important; min-height:46px; background-color:#f2f4f6 !important; border:0 !important; border-radius:12px !important; font-size:15px !important; padding:0 14px !important; color:#191f28; box-shadow:none !important; }
+html.emb .form-input:focus { background-color:#fff !important; box-shadow:inset 0 0 0 2px #3182f6 !important; }
+html.emb .form-input::placeholder { color:#b0b8c1; }
+
+html.emb #tab-content { background:#fff; border-radius:20px; padding:20px; }
+html.emb #tab-content > p:first-child { font-size:13px !important; color:#8b95a1 !important; margin:0 0 16px !important; word-break:break-all; }
+html.emb .form-group { display:grid; grid-template-columns:108px minmax(0, 1fr); column-gap:10px; align-items:center; margin-bottom:8px; }
+html.emb .form-group > * { grid-column:2; }
+html.emb .form-group > .form-label { grid-column:1; grid-row:1 / span 3; align-self:center; font-size:14px; font-weight:600; letter-spacing:-0.01em; text-transform:none; color:#4e5968; margin:0; line-height:1.35; }
+html.emb .input-hint { font-size:12.5px; margin:4px 0 0 2px; min-height:0; }
+html.emb .input-hint:empty { display:none; }
+html.emb .form-row { gap:6px; }
+html.emb .today-btn { height:46px; border:0 !important; border-radius:12px; background:#191f28 !important; color:#fff !important; font-size:13px; font-weight:700; padding:0 16px; }
+html.emb #tab-content label[style] { border:0 !important; background:#f2f4f6 !important; border-radius:12px !important; min-height:46px; padding:0 14px !important; }
+html.emb #tab-content label[style] span { font-size:15px !important; color:#191f28 !important; }
+html.emb .result-label { font-size:13px; letter-spacing:0; text-transform:none; font-weight:600; color:#8b95a1; }
+html.emb .history-item { border:0; border-radius:12px; min-height:46px; }
+@media (max-width:380px) { html.emb .form-group { grid-template-columns:1fr; } html.emb .form-group > .form-label { grid-column:1; grid-row:auto; margin-bottom:6px; } html.emb .form-group > * { grid-column:1; } }
+
+</style>
 </head>
 <body>
 <div id="app">
-  <header>
-    <div class="logo">FILENAME<span> / 파일명 생성기</span></div>
+  <header class="emb-hide">
+    <div class="logo">FILENAME<span> / 폴더·파일명 생성기</span></div>
   </header>
-  <div class="tabs-wrapper">
-    <div class="tabs">
+  <div class="tabs-wrapper emb-segw">
+    <div class="tabs emb-seg">
       <div class="tab active" data-tab="file">파일명</div>
       <div class="tab" data-tab="folder">작업폴더명</div>
       <div class="tab" data-tab="subdir">하위폴더명</div>
     </div>
   </div>
   <div class="content">
-    <div class="content-inner">
+    <div class="content-inner emb-in emb-io">
       <div id="tab-content"></div>
+      <div class="emb-r">
       <div class="result-box">
         <div class="result-label">생성된 이름</div>
         <div class="result-text empty" id="result-text">항목을 입력하면 자동으로 생성돼요</div>
@@ -115,6 +148,7 @@
           <button class="clear-btn" id="clear-history">전체 삭제</button>
         </div>
         <div class="history-list" id="history-list"></div>
+      </div>
       </div>
     </div>
   </div>
@@ -537,7 +571,7 @@ document.getElementById('copy-btn').addEventListener('click', () => {
   if (!text || document.getElementById('result-text').classList.contains('empty')) return;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copy-btn');
-    btn.textContent = '✓ 복사됨!'; btn.classList.add('copied');
+    btn.textContent = '복사됨'; btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '복사하기'; btn.classList.remove('copied'); }, 2000);
     history.unshift({ text, tab: TABS[activeTab].label, time: Date.now() });
     if (history.length > 20) history = history.slice(0,20);

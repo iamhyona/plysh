@@ -14,7 +14,7 @@
   function mm(pt) { return pt / MM; }
 
   // ── 후가공(별색) 이름 판별 ──
-  var FIN_RE = /(die|cut|kiss|thomson|dieline|crease|fold|perf|score|foil|hot.?stamp|stamp|emboss|deboss|varnish|spot.?uv|uv|epoxy|glitter|white|laser|hologram|칼선|도무송|톰슨|재단|접지|오시|미싱|타공|박|금박|은박|홀로그램|형압|엠보|에폭시|부분.?코팅|코팅|화이트|백색|글리터|투명|레이저)/i;
+  var FIN_RE = /(die|cut|kiss|knife|trim|contour|crop|guide|커팅|칼\s*선|칼라인|재단선|thomson|dieline|crease|fold|perf|score|foil|hot.?stamp|stamp|emboss|deboss|varnish|spot.?uv|uv|epoxy|glitter|white|laser|hologram|칼선|도무송|톰슨|재단|접지|오시|미싱|타공|박|금박|은박|홀로그램|형압|엠보|에폭시|부분.?코팅|코팅|화이트|백색|글리터|투명|레이저)/i;
   var REG_NAMES = { All: 1, all: 1 };
   var PROC = { Cyan: 0, Magenta: 1, Yellow: 2, Black: 3 };
 
@@ -350,7 +350,8 @@
     var vis = gs.clip ? isect(box, gs.clip) : box;
     if (fill) {
       var fi = this.patInks(gs, true);
-      this.emit('fill', { box: box, vis: vis, ink: fi, op: gs.op, ca: gs.ca, layer: this.layer(mc), segs: fi.spots ? segs.slice() : null });
+      var rect = segs.length >= 3 && segs.length <= 5 && segs.every(function (s) { return Math.abs(s[0] - s[2]) < 0.05 || Math.abs(s[1] - s[3]) < 0.05; }); // 네모 칠 (가림 판정용)
+      this.emit('fill', { box: box, vis: vis, ink: fi, op: gs.op, ca: gs.ca, rect: rect, layer: this.layer(mc), segs: fi.spots ? segs.slice() : null });
     }
     if (stroke) {
       var si = this.patInks(gs, false), w = gs.lw * scaleOf(gs.ctm), hw = Math.max(w / 2, 0.25), sb = [box[0] - hw, box[1] - hw, box[2] + hw, box[3] + hw];
@@ -392,7 +393,7 @@
       var vy = Math.sqrt(trm[2] * trm[2] + trm[3] * trm[3]), size = Math.abs(fs) * vy;
       var fill = gs.Tr === 0 || gs.Tr === 2 || gs.Tr === 4 || gs.Tr === 6, stroke = gs.Tr === 1 || gs.Tr === 2 || gs.Tr === 5 || gs.Tr === 6;
       if (f.seen) f.seen.pages.add(this.pageNo);
-      this.emit('text', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, size: size, font: f, ink: fill ? inks(gs.fcs, gs.fc) : null, sink: stroke ? inks(gs.scs, gs.sc) : null, op: gs.op, OP: gs.OP, sw: gs.lw * scaleOf(gs.ctm), chars: chars, layer: this.layer(mc), Tr: gs.Tr });
+      this.emit('text', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, size: size, font: f, ink: fill ? inks(gs.fcs, gs.fc) : null, sink: stroke ? inks(gs.scs, gs.sc) : null, op: gs.op, OP: gs.OP, sw: gs.lw * scaleOf(gs.ctm), chars: chars, layer: this.layer(mc), Tr: gs.Tr, mir: (trm[0] * trm[3] - trm[1] * trm[2]) < 0 });
     }
     return mul([1, 0, 0, 1, tx, 0], Tm);
   };
@@ -426,7 +427,7 @@
     var key = ref instanceof PDFRef ? ref.toString() : null, hash = null;
     if (key) { if (this.doc.imgHash.has(key)) hash = this.doc.imgHash.get(key); else { var raw = s.contents || (s.getContents && s.getContents()); hash = raw ? hashBytes(raw) : key; this.doc.imgHash.set(key, hash); } }
     var smask = !!get('SMask') || gs.smask;
-    this.emit('image', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, pw: w, ph: h, ppiX: wIn ? w / wIn : 0, ppiY: hIn ? h / hIn : 0, mask: isMask, cs: cs, ink: cs ? inks(cs, []) : null, filter: fname, ref: key, hash: hash, smask: smask, layer: this.layer(mc), rot: Math.abs(m[1]) > 1e-3 || Math.abs(m[2]) > 1e-3, ctm: m.slice() });
+    this.emit('image', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, pw: w, ph: h, ppiX: wIn ? w / wIn : 0, ppiY: hIn ? h / hIn : 0, mask: isMask, cs: cs, ink: cs ? inks(cs, []) : null, filter: fname, ref: key, hash: hash, smask: smask, op: gs.op, ca: gs.ca, layer: this.layer(mc), rot: Math.abs(m[1]) > 1e-3 || Math.abs(m[2]) > 1e-3, ctm: m.slice() });
   };
 
   Interp.prototype.inlineImage = function (lx, gs, res, mc) {
@@ -481,7 +482,9 @@
       fills: [], strokes: [], texts: [], images: [], spots: {}, rgb: { fill: 0, stroke: 0, text: 0, image: 0, shade: 0, boxes: [] }, lab: 0, reg: [], truncated: false, opCount: 0
     };
     var keepF = 0;
+    var seqN = 0;
     function emit(kind, o) {
+      o.seq = ++seqN; // 그려지는 순서 (위에 덮였는지 판정)
       if (kind === 'image') { P.images.push(o); }
       else if (kind === 'text') { if (P.texts.length < 6000) P.texts.push(o); }
       else if (kind === 'stroke') { if (P.strokes.length < 30000) P.strokes.push(o); }
@@ -492,7 +495,7 @@
         if (k.spots) for (var s in k.spots) P.spots[s] = (P.spots[s] || 0) + 1;
         if (k.rgb) { P.rgb[kind === 'fill' && o.shade ? 'shade' : kind]++; if (P.rgb.boxes.length < 40 && o.vis && !empty(o.vis)) P.rgb.boxes.push(o.vis); }
         if (k.lab) P.lab++;
-        if (k.reg && P.reg.length < 400 && o.vis) P.reg.push(o.vis);
+        if (k.reg && P.reg.length < 400 && o.vis) { var rb = o.vis.slice(), rw = rb[2] - rb[0], rh = rb[3] - rb[1]; rb.seq = o.seq; rb.line = kind === 'stroke' || (kind === 'fill' && Math.min(rw, rh) < 0.6 * 72 / 25.4); P.reg.push(rb); } // 선(칼선·가이드)과 면·글자 구분
       });
     }
     var it = new Interp(doc, emit, opt); it.pageNo = i;

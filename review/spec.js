@@ -498,7 +498,7 @@ function render(R, opt) {
   var c = { r: 0, o: 0, p: 0 }; R.items.forEach(function (x) { c[x.lv]++; });
   var now = new Date(), stamp = now.getFullYear() + '.' + (now.getMonth() + 1) + '.' + now.getDate();
   var h = '<div class="spk">';
-  h += '<div class="spk-mast"><b>PLYSH PREFLIGHT</b><span>사양서 검수 · ' + stamp + '</span></div>';
+  h += '<div class="spk-mast"><b>PLYSH 검수</b><span>사양서 검수 · ' + stamp + '</span></div>';
   h += '<p class="spk-eye">사양서 검수 결과</p><h1>' + esc(R.title || R.name) + '</h1>';
   h += '<div class="spk-file">' + esc(R.name) + (R.tab ? (/^PDF/.test(R.tab) ? ' · ' : ' · 탭 ') + esc(R.tab) : '') + ' · 품목 ' + R.groups + '개 · ' + R.rows + '줄' + (opt.url ? ' · <a href="' + esc(opt.url) + '" target="_blank" rel="noopener">시트 열기</a>' : '') + '</div>' + (R.notice ? '<div class="spk-file" style="margin-top:4px">' + esc(R.notice) + '</div>' : '');
   h += '<div class="spk-stat">' + ['r', 'o', 'p'].map(function (k) { return '<span class="' + k + '"><b>' + c[k] + '</b>' + LV[k][0] + '</span>'; }).join('') + '<span class="g"><b>' + R.pass.length + '</b>통과</span></div>';
@@ -514,7 +514,7 @@ function render(R, opt) {
     }).join('');
   } else h += '<p class="spk-ok">고칠 곳이 없어요.</p>';
   if (R.pass.length) h += '<h2>통과</h2><div class="spk-pass">' + R.pass.map(function (p) { return '<span>' + esc(p) + '</span>'; }).join('') + '</div>';
-  h += '<div class="spk-foot"><span>PLYSH PREFLIGHT · 사양서 검수</span><span>' + stamp + '</span></div></div>';
+  h += '<div class="spk-foot"><span>PLYSH 검수 · 사양서</span><span>' + stamp + '</span></div></div>';
   return h;
 }
 var CSS = '.spk{background:#fff;color:#191f28;font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;letter-spacing:-0.01em;line-height:1.5;font-size:13px;padding:36px 40px 26px;border-radius:20px}' +
@@ -530,7 +530,7 @@ var CSS = '.spk{background:#fff;color:#191f28;font-family:"Pretendard Variable",
   '.spk-h{display:flex;gap:8px;align-items:center;margin:2px 0 8px}.spk-h b{font-size:14.5px;flex:1}.spk-cb{display:flex;align-items:center;gap:5px;font-size:12px;color:#4e5968;white-space:nowrap;cursor:pointer}' +
   '.spk-cb input{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:1.5px solid #8b95a1;border-radius:4px;margin:0;background:#fff;cursor:pointer;display:grid;place-content:center}.spk-cb input:checked::after{content:"";width:9px;height:5px;border:solid #191f28;border-width:0 0 2px 2px;transform:rotate(-45deg) translate(1px,-1px)}' +
   '.spk dl{display:grid;grid-template-columns:40px 1fr;gap:3px 10px;margin:0}.spk dt{font-size:11px;color:#4e5968;padding-top:2px}.spk dd{margin:0}.spk dd ul{margin:0;padding-left:15px}.spk dd.fx{font-weight:500}' +
-  '.spk-pass{display:flex;flex-wrap:wrap;gap:6px}.spk-pass span{background:#e7f8f1;color:#0c8a62;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600}.spk-pass span::before{content:"✓ "}' +
+  '.spk-pass{display:flex;flex-wrap:wrap;gap:6px}.spk-pass span{background:#e7f8f1;color:#0c8a62;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600}.spk-pass span::before{content:none}' +
   '.spk-ok{font-size:15px;font-weight:700;color:#0c8a62}.spk-foot{display:flex;justify-content:space-between;font-size:10px;color:#4e5968;border-top:1px solid #e5e8eb;margin-top:28px;padding-top:8px}' +
   '@media (max-width:560px){.spk{padding:22px 16px}.spk h1{font-size:21px}.spk-sum td:nth-child(3){display:none}.spk-sum th:nth-child(3){display:none}}';
 

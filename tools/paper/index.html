@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>/* 승인된 팀원만 (2026-11-19): 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>용지 크기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script>try { if (window.self !== window.top) document.documentElement.classList.add('emb'); } catch (e) { document.documentElement.classList.add('emb'); }</script>
+<style>
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --faint:#b0b8c1; --chip:#f2f4f6; --acc:#3182f6; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { background:var(--bg); color:var(--txt); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; letter-spacing:-0.01em; }
+main { max-width:1040px; margin:0 auto; padding:20px 16px 80px; }
+html.emb main { padding-top:6px; }
+.phd { margin:0 0 20px; } .phd b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; } .phd small { display:block; margin-top:6px; font-size:14px; color:#6b7684; line-height:1.5; }
+html.emb .phd { display:none; } html.emb .view { position:static; }
+.wrap { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+@media (min-width:900px) { .wrap { grid-template-columns:360px minmax(0,1fr); align-items:start; } .view { position:sticky; top:12px; } }
+.card { background:var(--card); border-radius:20px; padding:22px 20px; }
+.tools { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 18px; }
+.seg { display:flex; background:#e9ecef; border-radius:12px; padding:3px; }
+.seg button { border:0; background:none; height:36px; padding:0 14px; border-radius:9px; font:inherit; font-size:14px; font-weight:600; color:#6b7684; cursor:pointer; }
+.seg button.on { background:#fff; color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.clr { margin-left:auto; border:0; background:none; font:inherit; font-size:14px; font-weight:600; color:var(--mute); cursor:pointer; }
+.grp { margin:0 0 22px; } .grp:last-child { margin-bottom:0; }
+.gh { display:flex; align-items:center; gap:8px; margin:0 0 10px; } .gh b { font-size:16px; font-weight:800; } .gh small { font-size:13px; color:var(--mute); }
+.gh .seg { margin-left:auto; } .gh .seg button { height:30px; padding:0 10px; font-size:13px; }
+.items { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.it { display:flex; align-items:center; gap:10px; min-height:52px; padding:8px 12px; border:0; border-radius:12px; background:var(--chip); text-align:left; font:inherit; cursor:pointer; min-width:0; }
+.it i { flex:none; width:12px; height:12px; border-radius:4px; border:2px solid var(--faint); }
+.it span { min-width:0; } .it b { display:block; font-size:14px; font-weight:700; line-height:1.35; word-break:keep-all; } .it small { display:block; font-size:12px; color:var(--mute); margin-top:1px; }
+.it.on { background:#fff; box-shadow:inset 0 0 0 2px var(--c); } .it.on i { background:var(--c); border-color:var(--c); }
+.it em { font-style:normal; font-size:11px; font-weight:700; color:#e8590c; margin-left:4px; } .it em.r { color:#8b71d0; } .it em.e { color:#8b95a1; }
+.sec { margin:0 0 16px; } .sec b { display:block; font-size:19px; font-weight:800; letter-spacing:-0.02em; } .sec small { display:block; margin-top:6px; font-size:13px; color:var(--mute); line-height:1.55; }
+.sec.l { margin-top:34px; padding-top:26px; border-top:1px solid var(--line); }
+.tools .all { border:0; background:var(--chip); height:34px; padding:0 14px; border-radius:10px; font:inherit; font-size:14px; font-weight:700; color:var(--txt); cursor:pointer; }
+.tools .clr { margin-left:0; } .tools .cnt { margin-right:auto; }
+.ga { border:0; background:none; font:inherit; font-size:13px; font-weight:600; color:var(--acc); cursor:pointer; padding:4px 0 4px 6px; flex:none; }
+.gh .seg + .ga { margin-left:4px; } .gh small + .ga, .gh b + .ga { margin-left:auto; }
+.view .vh { display:flex; align-items:center; gap:10px; margin:0 0 14px; flex-wrap:wrap; } .view .vh b { font-size:16px; font-weight:800; }
+.view .vh .seg { margin-left:auto; }
+.stage { background:#f7f8fa; border-radius:14px; padding:16px; }
+.stage svg { display:block; width:100%; height:auto; }
+.leg { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px 14px; margin:16px 0 0; }
+.leg div { display:flex; align-items:center; gap:8px; font-size:14px; } .leg i { flex:none; width:12px; height:12px; border-radius:3px; } .leg b { font-weight:700; } .leg span { color:var(--sub); margin-left:auto; font-variant-numeric:tabular-nums; }
+.nt { font-size:13px; color:var(--mute); line-height:1.6; margin:14px 0 0; }
+.fab { position:fixed; left:50%; bottom:calc(16px + env(safe-area-inset-bottom)); transform:translateX(-50%); border:0; background:#191f28; color:#fff; height:46px; padding:0 22px; border-radius:23px; font:inherit; font-size:15px; font-weight:700; box-shadow:0 4px 14px rgba(0,0,0,.18); cursor:pointer; z-index:5; }
+@media (min-width:900px) { .fab { display:none; } }
+.empty { padding:60px 0; text-align:center; color:var(--mute); font-size:14px; }
+@media (max-width:420px) { .items { grid-template-columns:minmax(0,1fr) minmax(0,1fr); } .it { padding:8px 10px; } }
+</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+/* 용지 크기 (2026-11-20 실장님): 각종 용지 규격을 실제 비율대로 겹쳐 보거나 나란히 보기. 값은 표준 규격, 업계 관례 값은 '관례' 표시 */
+var G = [
+  { k: 'a', t: 'A 계열', s: 'ISO 216 · KS', i: [['A0', 841, 1189], ['A1', 594, 841], ['A2', 420, 594], ['A3', 297, 420], ['A4', 210, 297], ['A5', 148, 210], ['A6', 105, 148], ['A7', 74, 105]] },
+  { k: 'b', t: 'B 계열', s: '', sw: 1, i: {
+    jis: [['B0', 1030, 1456], ['B1', 728, 1030], ['B2', 515, 728], ['B3', 364, 515], ['B4', 257, 364], ['B5', 182, 257], ['B6', 128, 182]],
+    iso: [['B0', 1000, 1414], ['B1', 707, 1000], ['B2', 500, 707], ['B3', 353, 500], ['B4', 250, 353], ['B5', 176, 250], ['B6', 125, 176]] } },
+  { k: 'bk', t: '책 판형', s: '국내 출판 관례 크기', i: [['국판', 148, 210], ['신국판', 152, 225], ['46판', 128, 188, 1], ['크라운판', 176, 248], ['46배판', 188, 257], ['국배판', 210, 297]] },
+  { k: 'fs', t: '전지', s: '인쇄용 원지', i: [['46전', 788, 1091], ['국전', 636, 939]] },
+  { k: 'cd', t: '카드 · 엽서', s: '', i: [['엽서', 100, 148], ['명함', 90, 50], ['포토카드', 55, 85, 1], ['신용카드', 85.6, 54], ['여권', 125, 88]] },
+  // ---- 생활 속 인쇄물: 표준이 아닌 값은 관례(업계에서 흔히 쓰는 값) · 대략(제품마다 다름) · 예시(정해진 크기 없음) 표시
+  { k: 'np', sec: '생활 속 인쇄물', t: '신문', s: '', i: [['대판', 391, 545, 1], ['베를리너판', 323, 470, 1], ['타블로이드', 272, 391, 1]] },
+  { k: 'mg', t: '잡지', s: '', i: [['패션지 국내판', 230, 300, 'r'], ['미국판 패션지', 203, 276, 'r'], ['일반 월간지', 188, 257, 1]] },
+  { k: 'nv', t: '소설책 · 교과서', s: '', i: [['문고판', 105, 148, 1], ['소설 46판', 128, 188, 1], ['소설 신국판', 152, 225, 1], ['세계문학 전집', 132, 225, 'r'], ['교과서', 188, 257, 'r']] },
+  { k: 'dn', t: '다이어리 · 노트', s: '', i: [['몰스킨 포켓', 90, 140], ['몰스킨 라지', 130, 210], ['몰스킨 XL', 190, 250], ['트래블러스 레귤러', 110, 210], ['트래블러스 패스포트', 89, 124], ['호보니치 오리지널', 105, 148], ['로이텀 미디엄', 145, 210]] },
+  { k: 'cl', t: '달력', s: '', i: [['탁상 달력', 210, 148, 'e'], ['벽걸이 달력', 364, 515, 'e']] },
+  { k: 'fl', t: '전단지', s: '', i: [['A4 전단', 210, 297], ['16절 전단', 197, 272, 1], ['8절 전단', 272, 394, 1]] },
+  { k: 'ev', t: '봉투', s: '', i: [['소봉투', 220, 105, 1], ['중봉투', 260, 190, 1], ['대봉투', 330, 245, 1]] },
+  { k: 'sb', t: '쇼핑백', s: '앞면 기준', i: [['쇼핑백 소', 220, 280, 'e'], ['쇼핑백 중', 300, 400, 'e'], ['쇼핑백 대', 400, 500, 'e']] },
+  { k: 'al', t: '앨범 · 음반', s: '', i: [['CD 케이스', 142, 125], ['LP 재킷', 315, 315, 1], ['7인치 싱글', 180, 180, 'r']] },
+  { k: 'ph', t: '사진', s: '', i: [['반명함 사진', 30, 40], ['여권 사진', 35, 45], ['4×6 사진', 102, 152], ['인스탁스 미니', 54, 86]] },
+  { k: 'ms', t: '메모 · 우표 · 지폐', s: '', i: [['포스트잇 정사각', 76, 76], ['포스트잇 미니', 51, 38], ['포스트잇 3×5', 76, 127], ['우표', 26, 30, 'r'], ['오만원권', 154, 68], ['만원권', 148, 68], ['천원권', 136, 68]] }];
+var NOTE = { '46판': '127×188로 쓰는 곳도 있어요', '포토카드': '굿즈 업계 관례 크기 · 업체마다 조금씩 달라요',
+  '대판': '조선일보 · 동아일보 등 종합일간지 크기', '베를리너판': '중앙일보가 2009년부터 쓰는 판형', '타블로이드': '대판의 절반 · 교차로 같은 생활정보지, 무가지에서 많이 써요. 하이컷 실제 크기는 확인 필요',
+  '패션지 국내판': '바자 · 엘르 · 보그 국내판 기준 대략값 · 호마다 조금씩 달라요', '미국판 패션지': '미국판 보그 기준 대략값', '일반 월간지': '46배판을 많이 써요',
+  '세계문학 전집': '민음사 세계문학전집 기준 대략값', '교과서': '학년 · 과목마다 46배판, 국배판 등으로 달라요', '문고판': 'A6와 같은 크기',
+  '트래블러스 레귤러': '트래블러스 노트 리필 크기 · 커버는 조금 더 커요', '트래블러스 패스포트': '트래블러스 노트 리필 크기', '호보니치 오리지널': 'A6 크기', '로이텀 미디엄': 'A5보다 폭이 3mm 좁아요',
+  '탁상 달력': '정해진 크기가 없어요 · A5 가로 예시', '벽걸이 달력': '정해진 크기가 없어요 · B3 예시',
+  '16절 전단': '46전지를 16등분한 크기', '8절 전단': '46전지를 8등분한 크기',
+  '소봉투': '편지 · 고지서용 규격 봉투', '중봉투': 'A4 두 번 접어 넣는 크기', '대봉투': 'A4를 접지 않고 넣는 서류 봉투',
+  '쇼핑백 소': '정해진 크기가 없어요 · 업체마다 달라요', '쇼핑백 중': '정해진 크기가 없어요 · 업체마다 달라요', '쇼핑백 대': '정해진 크기가 없어요 · 업체마다 달라요',
+  'LP 재킷': '12인치 LP 기준', '7인치 싱글': '재킷 대략값', '신용카드': '주민등록증 · 교통카드도 같은 크기 (ISO/IEC 7810 ID-1)', '여권': 'ISO/IEC 7810 ID-3',
+  '반명함 사진': '3×4cm', '우표': '도안마다 크기가 달라요 · 보통 우표 대략값' };
+var COL = ['#3182f6', '#f04452', '#00a86b', '#ff7300', '#8b71d0', '#ff6fae', '#0aa5b8', '#c08a00', '#4e5968', '#e8590c'];
+var ST = { sel: ['A4', 'A5', '국판', '신국판'], mode: 'over', bset: 'jis' };
+try { var o = JSON.parse(localStorage.getItem('pp:st') || 'null'); if (o) ST = Object.assign(ST, o); } catch (e) {}
+function save() { try { localStorage.setItem('pp:st', JSON.stringify(ST)); } catch (e) {} }
+function items(g) { return g.sw ? g.i[ST.bset] : g.i; }
+function key(g, x) { return g.sw ? 'B' + (ST.bset === 'iso' ? 'i' : 'j') + ':' + x[0] : x[0]; }
+function all() { var L = []; G.forEach(function (g) { items(g).forEach(function (x) { L.push({ k: key(g, x), n: g.sw ? x[0] + (ST.bset === 'iso' ? ' (ISO)' : ' (JIS)') : x[0], w: x[1], h: x[2], warn: x[3] }); }); }); return L; }
+function selected() { var A = all(); return ST.sel.map(function (k) { return A.filter(function (x) { return x.k === k; })[0]; }).filter(Boolean); }
+function colOf(k) { var i = ST.sel.indexOf(k); return COL[i % COL.length]; }
+function tagOf(t) { return !t ? '' : t === 'r' ? '<em class="r">대략</em>' : t === 'e' ? '<em class="e">예시</em>' : '<em>관례</em>'; }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function svgOf(S) {
+  if (!S.length) return '<div class="empty">왼쪽에서 크기를 고르면 실제 비율대로 보여요</div>';
+  var W = Math.max(300, Math.min(640, (window.innerWidth || 640) - (window.innerWidth < 900 ? 80 : 0))), pad = 8, lab = 18, h = ''; // 폰에서도 이름표 글자가 작아지지 않게 화면 너비에 맞춤
+  if (ST.mode === 'over') {
+    var mw = Math.max.apply(null, S.map(function (x) { return x.w; })), mh = Math.max.apply(null, S.map(function (x) { return x.h; })), k = Math.min((W - pad * 2) / mw, 520 / mh), H = mh * k + pad * 2;
+    // 큰 것부터 그려서 작은 것이 위에 · 왼쪽 아래 모서리 맞춤
+    // 같은 크기는 한 사각형으로 합치고 이름을 함께 표시
+    var M = [];
+    S.forEach(function (x) { var m = M.filter(function (z) { return z.w === x.w && z.h === x.h; })[0]; if (m) m.n += ' · ' + x.n; else M.push({ k: x.k, n: x.n, w: x.w, h: x.h }); });
+    var P = [];
+    M.sort(function (a, b) { return b.w * b.h - a.w * a.h; }).forEach(function (x) {
+      var c = colOf(x.k), w = x.w * k, hh = x.h * k, y = H - pad - hh, ty = y + 16, tx = pad + w - 6;
+      // 이름표가 겹치면 아래로 내림
+      for (var i = 0; i < 20 && P.some(function (q) { return Math.abs(q[1] - ty) < 16 && Math.abs(q[0] - tx) < 160; }); i++) ty += 16;
+      P.push([tx, ty]);
+      h += '<rect x="' + pad + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" fill="' + c + '" fill-opacity=".07" stroke="' + c + '" stroke-width="2"/>' +
+        '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="end" font-size="13" font-weight="700" fill="' + c + '" paint-order="stroke" stroke="#fff" stroke-width="3">' + esc(x.n) + '</text>';
+    });
+    return '<svg viewBox="0 0 ' + W + ' ' + H.toFixed(0) + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + h + '</svg>';
+  }
+  // 나란히: 같은 비율. 한 줄에 다 들어가면 한 줄, 좁으면 여러 줄로 줄바꿈 (2026-11-20 실장님)
+  var gap = 16, rg = 14, HMAX = 560, avail = W - pad * 2;
+  var tw = function (n) { return String(n).length * 12.5 + 8; };
+  var mw = Math.max.apply(null, S.map(function (x) { return x.w; })), mh = Math.max.apply(null, S.map(function (x) { return x.h; }));
+  function pack(k) {
+    var R = [], cur = [], cw = 0;
+    S.forEach(function (x) { var sw = Math.max(x.w * k, tw(x.n)); if (cur.length && cw + gap + sw > avail) { R.push(cur); cur = []; cw = 0; } cw += (cur.length ? gap : 0) + sw; cur.push({ x: x, sw: sw }); });
+    if (cur.length) R.push(cur);
+    var H = pad * 2 + R.reduce(function (t, r) { return t + Math.max.apply(null, r.map(function (o) { return o.x.h * k; })) + lab + 4; }, 0) + rg * (R.length - 1);
+    return { R: R, H: H };
+  }
+  var lo = 0.0005, hi = Math.min(avail / mw, 460 / mh), best = pack(lo), bk = lo;
+  for (var it = 0; it < 32; it++) { var mid = (lo + hi) / 2, P = pack(mid); if (P.H <= HMAX) { lo = mid; best = P; bk = mid; } else hi = mid; }
+  var P2 = pack(hi); if (P2.H <= HMAX) { best = P2; bk = hi; }
+  var y0 = pad;
+  best.R.forEach(function (r) {
+    var rh = Math.max.apply(null, r.map(function (o) { return o.x.h * bk; })), rw = r.reduce(function (t, o, i) { return t + o.sw + (i ? gap : 0); }, 0), x0 = pad + (avail - rw) / 2;
+    r.forEach(function (o) {
+      var x = o.x, c = colOf(x.k), w = x.w * bk, hh = x.h * bk, cx = x0 + o.sw / 2, y = y0 + rh - hh;
+      h += '<rect x="' + (cx - w / 2).toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" fill="' + c + '" fill-opacity=".1" stroke="' + c + '" stroke-width="2" rx="1"/>' +
+        '<text x="' + cx.toFixed(1) + '" y="' + (y0 + rh + lab).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + c + '">' + esc(x.n) + '</text>';
+      x0 += o.sw + gap;
+    });
+    y0 += rh + lab + 4 + rg;
+  });
+  return '<svg viewBox="0 0 ' + W + ' ' + Math.ceil(best.H) + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + h + '</svg>';
+}
+function render() {
+  var S = selected(), h = '<div class="phd"><b>용지 크기</b><small>규격 용지와 생활 속 인쇄물 크기를 실제 비율대로 겹쳐 보거나 나란히 비교해요</small></div><div class="wrap"><div class="card">';
+  h += '<div class="tools"><b class="cnt" style="font-size:13px;color:#8b95a1;align-self:center">' + S.length + '개 고름</b><button class="all" id="all">전체 선택</button><button class="clr" id="clr">모두 해제</button></div>';
+  h += '<div class="sec"><b>규격 용지</b><small>국제 · 국내 표준 규격과 출판 관례 크기예요</small></div>';
+  h += G.map(function (g) {
+    var gk = items(g).map(function (x) { return key(g, x); }), gon = gk.every(function (k) { return ST.sel.indexOf(k) >= 0; });
+    return (g.sec ? '<div class="sec l"><b>' + g.sec + '</b><small>실제로 이런 크기로 만들어지고 있어요. 관례는 업계에서 흔히 쓰는 값, 대략은 제품마다 조금씩 다른 값, 예시는 정해진 크기가 없는 값이에요.</small></div>' : '') + '<div class="grp"><div class="gh"><b>' + g.t + '</b>' + (g.s ? '<small>' + g.s + '</small>' : '') +
+      (g.sw ? '<div class="seg" id="bset"><button data-b="jis" class="' + (ST.bset === 'jis' ? 'on' : '') + '">JIS · 국내</button><button data-b="iso" class="' + (ST.bset === 'iso' ? 'on' : '') + '">ISO</button></div>' : '') + '<button class="ga" data-g="' + g.k + '">' + (gon ? '해제' : '전체') + '</button></div>' +
+      '<div class="items">' + items(g).map(function (x) { var k = key(g, x), on = ST.sel.indexOf(k) >= 0; return '<button class="it' + (on ? ' on' : '') + '" data-k="' + esc(k) + '" style="--c:' + (on ? colOf(k) : '#b0b8c1') + '"><i></i><span><b>' + esc(x[0]) + tagOf(x[3]) + '</b><small>' + x[1] + '×' + x[2] + 'mm</small></span></button>'; }).join('') + '</div></div>';
+  }).join('');
+  h += '</div><div class="card view" id="view"><div class="vh"><b>실제 비율</b><div class="seg" id="mode"><button data-m="over" class="' + (ST.mode === 'over' ? 'on' : '') + '">겹쳐 보기</button><button data-m="side" class="' + (ST.mode === 'side' ? 'on' : '') + '">나란히</button></div></div>' +
+    '<div class="stage">' + svgOf(S) + '</div>' +
+    (S.length ? '<div class="leg">' + S.map(function (x) { return '<div><i style="background:' + colOf(x.k) + '"></i><b>' + esc(x.n) + '</b><span>' + x.w + ' × ' + x.h + 'mm</span></div>'; }).join('') + '</div>' : '') +
+    '<div class="nt">겹쳐 보기는 왼쪽 아래 모서리를 맞춰서 그려요. 국내 인쇄에서 B4 · B5라고 하면 보통 JIS 크기예요.' + S.filter(function (x) { return NOTE[x.n]; }).map(function (x) { return '<br>' + esc(x.n) + ': ' + NOTE[x.n]; }).join('') + '</div></div></div>';
+  h += S.length ? '<button class="fab" id="fab">비교 보기 · ' + S.length + '개</button>' : '';
+  document.getElementById('main').innerHTML = h;
+  var fb = document.getElementById('fab'); if (fb) fb.onclick = function () { document.querySelector('.view').scrollIntoView({ behavior: 'smooth' }); };
+  [].forEach.call(document.querySelectorAll('[data-k]'), function (b) { b.onclick = function () { var k = b.dataset.k, i = ST.sel.indexOf(k); if (i >= 0) ST.sel.splice(i, 1); else ST.sel.push(k); save(); render(); }; });
+  [].forEach.call(document.querySelectorAll('#mode button'), function (b) { b.onclick = function () { ST.mode = b.dataset.m; save(); render(); }; });
+  [].forEach.call(document.querySelectorAll('#bset button'), function (b) { b.onclick = function () { ST.bset = b.dataset.b; save(); render(); }; });
+  function gkeys(g) { return items(g).map(function (x) { return key(g, x); }); }
+  [].forEach.call(document.querySelectorAll('.ga'), function (b) { b.onclick = function () {
+    var g = G.filter(function (z) { return z.k === b.dataset.g; })[0], ks = gkeys(g), on = ks.every(function (k) { return ST.sel.indexOf(k) >= 0; });
+    if (on) ST.sel = ST.sel.filter(function (k) { return ks.indexOf(k) < 0; }); else ks.forEach(function (k) { if (ST.sel.indexOf(k) < 0) ST.sel.push(k); });
+    save(); render(); }; });
+  document.getElementById('all').onclick = function () { G.forEach(function (g) { gkeys(g).forEach(function (k) { if (ST.sel.indexOf(k) < 0) ST.sel.push(k); }); }); save(); render(); };
+  document.getElementById('clr').onclick = function () { ST.sel = []; save(); render(); };
+}
+render();
+var _iw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === _iw) return; _iw = window.innerWidth; clearTimeout(window._rz); window._rz = setTimeout(render, 150); });
+</script>
+</body>
+</html>

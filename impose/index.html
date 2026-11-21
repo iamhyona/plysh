@@ -99,6 +99,41 @@ details.more summary { cursor:pointer; font-size:13.5px; font-weight:700; color:
   .sides { grid-template-columns:1fr 1fr; }
   .paper { box-shadow:none; }
 }
+
+.drop { border:0 !important; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3e%3crect width='100%25' height='100%25' rx='18' ry='18' fill='none' stroke='%23b0b8c1' stroke-width='3' stroke-dasharray='4%2c 3'/%3e%3c/svg%3e") !important; background-repeat:no-repeat !important; }
+
+
+/* 간격 · 행간 정리 (2026-11-20 실장님): 항목 사이 24 · 이름→칸 10 · 칩 간격 8 · 입력칸 46 */
+#opts.card { padding:24px !important; }
+.set { gap:0 48px; }
+.fl { font-size:14px !important; font-weight:700; color:var(--sub); margin:28px 0 12px !important; line-height:1.4; }
+.set > div > .fl:first-child { margin-top:0 !important; }
+.seg { gap:8px !important; }
+.seg button { min-height:40px; padding:0 16px !important; font-size:14px !important; }
+.chk { margin-top:14px !important; gap:10px !important; font-size:14px !important; line-height:1.5; align-items:flex-start; }
+.chk + .chk { margin-top:10px !important; }
+.chk input { width:20px !important; height:20px !important; margin-top:1px !important; flex:none; }
+.row { gap:10px !important; }
+.seg + .row { margin-top:12px !important; }
+.inp { height:46px; width:120px !important; border:0 !important; border-radius:12px !important; background:var(--chip) !important; padding:0 14px !important; font-size:15px; }
+.inp:focus { outline:none; background:#fff !important; box-shadow:0 0 0 2px var(--acc); }
+.u { font-size:14px !important; }
+details.more summary { margin-top:28px !important; font-size:14px !important; }
+details.more .row { margin-top:12px !important; }
+details.more .row .u:first-child { width:130px !important; }
+.note { margin-top:28px !important; padding-top:20px; border-top:1px solid #f2f4f6; font-size:13px !important; line-height:1.7 !important; color:var(--mute); }
+@media (max-width:760px) { .set > div + div > .fl:first-child { margin-top:28px !important; } }
+
+/* 옵션을 항목마다 박스로 (2026-11-20 실장님: 다른 도구처럼) */
+#opts { background:none !important; padding:0 !important; box-shadow:none !important; }
+.ogrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+@media (max-width:760px) { .ogrid { grid-template-columns:1fr; } }
+.ogrid > .og { margin:0 !important; padding:24px !important; }
+.ogrid > .og:last-child:nth-child(odd) { grid-column:1 / -1; }
+.og > .fl:first-child { margin-top:0 !important; }
+.onote { margin:12px 4px 0 !important; padding:0 !important; border:0 !important; }
+/* 단위는 입력칸 안 오른쪽에 (2026-11-20) */
+.ifx { position:relative; flex:none; width:120px; display:block; } .ifx .inp { width:100% !important; height:46px !important; padding-right:44px !important; } .ifx em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:14px; font-weight:600; color:#8b95a1; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -119,45 +154,49 @@ details.more summary { cursor:pointer; font-size:13.5px; font-weight:700; color:
     </div>
   </div>
 
-  <div class="card noprint" id="opts">
-    <div class="set">
-      <div>
+  <div class="noprint" id="opts">
+    <div class="ogrid">
+      <div class="card og">
         <div class="fl">제본</div>
         <div class="seg" id="sBind">
           <button data-v="perfect" class="on">무선</button><button data-v="saddle">중철</button><button data-v="duplex">낱장 양면</button><button data-v="simplex">낱장 단면</button>
         </div>
         <label class="chk" id="coverWrap"><input type="checkbox" id="cover"> PDF 앞뒤 2p씩은 표지 (표1·표2 / 표3·표4)로 따로 앉히기</label>
         <label class="chk"><input type="checkbox" id="spread"> 펼침면(스프레드) PDF라서 반으로 나눠 쓰기</label>
-
+      </div>
+      <div class="card og">
+        <div class="fl">인쇄 방식</div>
+        <div class="seg" id="sMode"><button data-v="sw" class="on">앞뒤 다른 판</button><button data-v="wt">돌려찍기 (앞뒤 같은 판)</button></div>
+      </div>
+      <div class="card og">
         <div class="fl">판 크기</div>
         <div class="seg" id="sSheet">
           <button data-v="kj" class="on">국전</button><button data-v="kh">국반절</button><button data-v="k4">국4절</button><button data-v="sj">46전</button><button data-v="sh">46반절</button><button data-v="s4">46 4절</button><button data-v="cu">직접 입력</button>
         </div>
-        <div class="row" style="margin-top:8px"><input class="inp" id="shW" inputmode="decimal"><span class="u">×</span><input class="inp" id="shH" inputmode="decimal"><span class="u">mm</span></div>
+        <div class="row" style="margin-top:8px"><span class="ifx"><input class="inp" id="shW" inputmode="decimal"><em>mm</em></span><span class="u">×</span><span class="ifx"><input class="inp" id="shH" inputmode="decimal"><em>mm</em></span></div>
       </div>
-      <div>
-        <div class="fl">인쇄 방식</div>
-        <div class="seg" id="sMode"><button data-v="sw" class="on">앞뒤 다른 판</button><button data-v="wt">돌려찍기 (앞뒤 같은 판)</button></div>
+      <div class="card og">
         <div class="fl" id="sigL">1대 페이지 수</div>
         <div class="seg" id="sSig"><button data-v="0" class="on">자동 (16p까지)</button><button data-v="4">4p</button><button data-v="8">8p</button><button data-v="16">16p</button><button data-v="32">32p</button></div>
-
+      </div>
+      <div class="card og">
         <div class="fl">완성 크기 (재단 크기)</div>
-        <div class="row"><input class="inp" id="pgW" inputmode="decimal"><span class="u">×</span><input class="inp" id="pgH" inputmode="decimal"><span class="u">mm</span><span class="u" id="pgFrom"></span></div>
+        <div class="row"><span class="ifx"><input class="inp" id="pgW" inputmode="decimal"><em>mm</em></span><span class="u">×</span><span class="ifx"><input class="inp" id="pgH" inputmode="decimal"><em>mm</em></span><span class="u" id="pgFrom"></span></div>
         <details class="more">
           <summary>여백 설정</summary>
-          <div class="row" style="margin-top:10px"><span class="u" style="width:120px">페이지 사이 간격</span><input class="inp" id="gap" value="6" inputmode="decimal"><span class="u">mm</span></div>
-          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">물림 (아래쪽)</span><input class="inp" id="grip" value="12" inputmode="decimal"><span class="u">mm</span></div>
-          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">나머지 가장자리</span><input class="inp" id="edge" value="6" inputmode="decimal"><span class="u">mm</span></div>
+          <div class="row" style="margin-top:10px"><span class="u" style="width:120px">페이지 사이 간격</span><span class="ifx"><input class="inp" id="gap" value="6" inputmode="decimal"><em>mm</em></span></div>
+          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">물림 (아래쪽)</span><span class="ifx"><input class="inp" id="grip" value="12" inputmode="decimal"><em>mm</em></span></div>
+          <div class="row" style="margin-top:8px"><span class="u" style="width:120px">나머지 가장자리</span><span class="ifx"><input class="inp" id="edge" value="6" inputmode="decimal"><em>mm</em></span></div>
         </details>
       </div>
     </div>
-    <p class="note">거래 인쇄소 기준이 아니라 일반적인 접지 방식(4p·8p·16p·32p 직각 접지) 기준이에요. 인쇄소마다 터잡기가 다를 수 있으니 최종은 인쇄소 터잡기 교정지로 한 번 더 확인해 주세요.</p>
+    <p class="note onote">거래 인쇄소 기준이 아니라 일반적인 접지 방식(4p·8p·16p·32p 직각 접지) 기준이에요. 인쇄소마다 터잡기가 다를 수 있으니 최종은 인쇄소 터잡기 교정지로 한 번 더 확인해 주세요.</p>
   </div>
 
   <div id="out"></div>
 </div>
 
-<div class="ov" id="ov"><div class="box"><div class="bh"><span id="ovT"></span><button id="ovX" type="button" aria-label="닫기">✕</button></div><div id="ovB"></div></div></div>
+<div class="ov" id="ov"><div class="box"><div class="bh"><span id="ovT"></span><button id="ovX" type="button" aria-label="닫기"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="ovB"></div></div></div>
 
 <script>
 var LIBS = {
