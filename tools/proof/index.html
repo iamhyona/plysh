@@ -187,7 +187,7 @@ html.emb .phd { padding-right:44px; }
 .card.dsc { padding:22px 18px 16px; margin-bottom:16px; } .card.dsc .dst { margin:0 0 14px; } .card.dhd { margin-bottom:16px; padding:16px 18px; }
 .dfr { display:grid; grid-template-columns:108px minmax(0, 1fr); align-items:center; gap:10px; margin-bottom:8px; }
 .dfr > label { font-size:14px; font-weight:600; color:var(--sub); line-height:1.35; }
-.din, .dpk { display:block; width:100%; min-height:46px; border:0; background:var(--chip); border-radius:12px; padding:0 14px; font-size:15px; color:var(--txt); text-align:left; outline:0; -webkit-appearance:none; appearance:none; }
+.din, .dpk, .dpkc { display:block; width:100%; min-height:46px; border:0; background:var(--chip); border-radius:12px; padding:0 14px; font-size:15px; color:var(--txt); text-align:left; outline:0; -webkit-appearance:none; appearance:none; }
 .din::placeholder { color:var(--faint); }
 textarea.din { padding:12px 14px; min-height:76px; resize:vertical; line-height:1.5; }
 .din:focus { background:#fff; box-shadow:inset 0 0 0 2px var(--acc); }
@@ -1453,7 +1453,7 @@ function formOf(r) { return r.form || (r.book ? '책자' : r.die || r.pkg ? '패
 // 2026-11-21 실장님: 패키지는 큰 분류(조립식 · 골판지 · 싸바리 · 봉투) → 그 안에서 세부 형태. 조립식 4가지 = 칼선 단상자 4종
 function pkgGroups() {
   var dn = function (g) { return DIE.filter(function (x) { return x.gr === g; }).map(function (x) { return x.n; }); };
-  return [['조립식 박스', dn('단상자')], ['골판지 박스', ['A형 박스 (일반 택배형)', '가로 G형 박스', 'P형 박스 (뚜껑 일체)']],
+  return [['조립식 박스', dn('단상자')], ['골판지 박스', ['가로 G형 박스', 'A형 박스 (일반 택배형)', 'P형 박스 (뚜껑 일체)']],
     ['싸바리 박스', ['싸바리 박스 (천지)', '싸바리 자석 박스', '서랍 박스', '북 케이스', '하도메 박스']], ['봉투', dn('봉투')],
     ['그 밖의 패키지', ['슬리브 박스', '쇼핑백', '틴케이스']]];
 }
@@ -1464,7 +1464,7 @@ function dFieldHtml(r, f) {
     return '<div class="dfr"><label>' + f[1] + '</label><div class="chips dfm">' + FORMS.map(function (x) { return '<button type="button" data-form="' + x + '" data-dr="' + r.id + '"' + (fm === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div>' +
       (pr.length > 1 ? '<div class="dfr"><label>구성</label><div><span class="seg dbk">' + pr.map(function (x) { return '<button type="button" data-bkgo="' + x.id + '"' + (x === r ? ' class="on"' : '') + '>' + esc(x.part || x.item) + '</button>'; }).join('') + '</span><div class="dpgh">표지 · 내지는 따로 품목이 돼요. 크기 · 제본 · 수량은 같이 바뀌어요</div></div></div>' : ''); }
   if (k === 'pkg') { if (fm !== '패키지') return ''; var cur = String(v || ''), pc = pkcOf(r), G = pkgGroups(), g = G.filter(function (x) { return x[0] === pc; })[0];
-    var h1 = '<div class="dfr"><label>패키지 분류</label><div class="chips dfm">' + G.map(function (x) { return '<button type="button" data-pkc="' + esc(x[0]) + '" data-dr="' + r.id + '"' + (x[0] === pc ? ' class="on"' : '') + '>' + esc(x[0]) + '</button>'; }).join('') + '</div></div>';
+    var h1 = '<div class="dfr"><label>패키지 분류</label><select class="dsel dpkc" data-dr="' + r.id + '"><option value="">고르기</option>' + G.map(function (x) { return '<option' + (x[0] === pc ? ' selected' : '') + '>' + esc(x[0]) + '</option>'; }).join('') + '</select></div>';
     if (!g) return h1;
     var opts = g[1].slice(); if (cur && opts.indexOf(cur) < 0) opts.unshift(cur);
     return h1 + '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" ' + a + '><option value="">고르기</option>' + opts.map(function (n) { return '<option' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>'; }
@@ -1555,7 +1555,7 @@ function bindDoc() {
     else bkSync(d, r, 'form');
     saveDocs(); renderDoc(); }; });
   $$('[data-cv]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dr); r[b.dataset.cv] = b.dataset.cvv; if (b.dataset.cv === 'cvp' && b.dataset.cvv === '8' && !r.wg) r.wg = '접착'; r.pg = cvPg(r); saveDocs(); renderDoc(); }; });
-  $$('[data-pkc]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dr); if (pkcOf(r) !== b.dataset.pkc) { r.pkc = b.dataset.pkc; r.pkg = ''; } saveDocs(); renderDoc(); }; });
+  $$('.dpkc').forEach(function (b) { b.onchange = function () { var r = row(b.dataset.dr); if (pkcOf(r) !== b.value) { r.pkc = b.value; r.pkg = ''; } saveDocs(); renderDoc(); }; });
   $$('[data-bkgo]').forEach(function (b) { b.onclick = function () { ls.set('pr:dsel', b.dataset.bkgo); renderDoc(); }; });
   $$('.din[data-dr]').forEach(function (i) {
     if (i.dataset.k === 'size') i.addEventListener('input', function () { var v = i.value, n = v.replace(/(\d)\s*[xX*＊×]\s*/g, '$1×'); if (n !== v) { var c = Math.max(0, i.selectionStart - (v.length - n.length)); i.value = n; i.setSelectionRange(c, c); } }); // 2026-11-21 실장님: 알파벳 x 쓰면 × 로
