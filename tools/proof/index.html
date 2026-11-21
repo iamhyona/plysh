@@ -452,7 +452,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .pki small, .pki small.tip, .gl .tip, .glc .gl .tip, .pblk .tip, .dpgh { display:block; font-size:13px !important; line-height:1.55 !important; color:var(--sub) !important; background:none !important; padding:0 !important; border-radius:0 !important; margin-top:3px !important; font-weight:400 !important; }
 .pki small.tip:before, .gl .tip:before, .glc .gl .tip:before, .pblk .tip:before { content:"참고 · " !important; font-weight:600 !important; color:var(--sub) !important; }
 .gl .tip.op:before, .glc .gl .tip.op:before { content:"펼침 · " !important; }
-.gl .glex { display:inline-flex; align-items:center; gap:5px; margin-top:8px; font-size:13px; font-weight:600; color:var(--acc); text-decoration:none; } .gl .glex:hover { text-decoration:underline; }
+.gl .glimg { margin:12px 0 0; } .gl .glimg img { display:block; width:100%; max-width:360px; height:200px; object-fit:contain; background:#f2f4f6; border-radius:10px; } .gl .glimg figcaption { margin-top:6px; font-size:12px; color:var(--mute); }
 /* 2026-11-21 실장님: 용어 표현 위계 통일 (사양서 고르기 창 · 용어사전 같게) — 이름 15/700 · 별칭 13/400 연회색 같은 줄 · 설명 · 정보 · 참고 13/400 */
 .pki b { display:inline !important; font-size:15px !important; font-weight:700 !important; } .pki .pal, .glt i { font-style:normal !important; font-size:13px !important; font-weight:400 !important; color:var(--mute) !important; margin-left:6px; } .glt i { margin-left:0; }
 .pki .pkg { margin-left:6px; } .pki small:first-of-type { margin-top:5px !important; } .glt b { font-size:15px !important; font-weight:700 !important; }
@@ -1909,13 +1909,32 @@ function glossEntry0(n, r, showTab) {
   h += (I.a ? '<i>' + esc(I.a) + '</i>' : '') + (showTab ? '<em>' + esc(n.replace('_', ' › ').replace(/^제본도감/, '제본').replace(/^박도감/, '박').replace(/^접지도감/, '톰슨')) + '</em>' : '') + '</div>' + (I.d ? '<p>' + esc(I.d) + '</p>' : '') + (I.t ? '<p class="tip' + (/^제본도감/.test(n) ? ' op' : '') + '">' + esc(I.t) + '</p>' : '') + glExLink(n, v);
   return h + '</div>';
 }
-/* 제본·접지: 그림 대신 실제 예시 이미지 검색으로 연결 */
-var GL_EX_SKIP = /^(펼침 크기|접지 완성 크기|접지선|오시|산접기)/;
+/* 제본·접지: 용어마다 정확한 예시 사진 한 장 (위키미디어 커먼즈, 자유 이용 라이선스 · 출처 표시) */
+var GL_IMG = {
+  "무선 제본": ["Buchbindung 01 (fcm).jpg", "Frank C. Müller", "CC BY-SA 4.0"],
+  "콥틱 제본": ["Coptic flat.jpg", "Ratbasket", "CC BY 2.5"],
+  "도자도 제본": ["Two Faced by Emma Jane Hogbin revisited - capa con capa - dos-à-dos.png", "Emma Jane Hogbin", "CC BY 2.0"],
+  "브라델 제본": ["Cartonnage à la Bradel.jpg", "Colporteur", "CC BY-SA 3.0"],
+  "코일 제본": ["Image acca.jpg", "Sadeghkarimpour", "CC BY-SA 4.0"],
+  "트윈링": ["Encadernação Wire-o.JPG", "Anarcovirus", "CC BY-SA 3.0"],
+  "콤 제본": ["Comb bind examples.JPG", "Digitalgadget", "퍼블릭 도메인"],
+  "디스크 제본": ["Cahier Atoma.jpg", "Ibu", "CC BY-SA 4.0"],
+  "6공 바인더": ["Personal organizer with metallic ring binder.jpg", "Old Photo Profile", "CC BY 2.0"],
+  "클립 제본": ["Binder clip (32267518724).jpg", "goblinbox", "CC BY 2.0"],
+  "선풍엽": ["Dragon Scale Binding Edition Dream of the Red Chamber.png", "Love&peaceforever", "CC BY-SA 4.0"],
+  "일본식 사침 선장": ["Fukurotoji1.JPG", "Hinonbey", "CC0"],
+  "절첩장": ["Aubin Tonalamatl.jpg", "Ian Mursell", "퍼블릭 도메인"],
+  "3단 접지 (C접지)": ["Letterfold.svg", "Aatu Dorochenko", "CC BY-SA 4.0"],
+  "3단 병풍접지 (Z접지)": ["Concertina.svg", "Aatu Dorochenko", "CC BY-SA 4.0"],
+  "병풍접지 (n단)": ["Concertina.svg", "Aatu Dorochenko", "CC BY-SA 4.0"],
+  "대문접지 (중앙 반접지 없음)": ["Gate-fold.svg", "Aatu Dorochenko", "CC BY-SA 4.0"],
+  "십자접지": ["Crossfold.svg", "Aatu Dorochenko", "CC BY-SA 4.0"]
+};
 function glExLink(n, v) {
-  if (!/^(제본도감|접지도감)/.test(n) || GL_EX_SKIP.test(v)) return '';
-  var k = v.replace(/\s*\([^)]*\)/g, '').trim(), m = nmOf(v), e = m && m[0] ? String(m[0]) : '';
-  var q = k + (/제본|장$|바인딩|바인더|접지|스티치/.test(k) ? '' : (/^제본/.test(n) ? ' 제본' : ' 접지')) + (e ? ' ' + e : '');
-  return '<a class="glex" href="https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>예시 이미지 보기</a>';
+  if (!/^(제본도감|접지도감)/.test(n)) return '';
+  var g = GL_IMG[v]; if (!g) return '';
+  var f = encodeURIComponent(g[0].replace(/ /g, '_')), pg = 'https://commons.wikimedia.org/wiki/File:' + f;
+  return '<figure class="glimg"><a href="' + pg + '" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/' + f + '?width=640" alt="' + esc(v) + ' 예시"></a><figcaption>사진 ' + esc(g[1]) + ' · ' + esc(g[2]) + ' · 위키미디어 커먼즈</figcaption></figure>';
 }
 /* 용어사전 디자인 파트 */
 var DTERMS = {"글자": [["커닝", "Kerning", "특정 두 글자 사이 간격만 따로 조절하는 것. AV, To, 숫자 1처럼 틈이 벌어져 보이는 짝을 좁혀 고르게 보이게 해요.", "제목·로고처럼 큰 글자에서 꼭 확인. 인디자인은 Alt(Option)+←/→"], ["트래킹", "Tracking · 자간", "선택한 글자 전체의 간격을 한꺼번에 넓히거나 좁히는 것. 커닝은 두 글자, 트래킹은 범위 전체.", "한글 본문은 보통 -10~-30 정도로 살짝 좁혀요. 작은 글자는 너무 좁히지 않기"], ["행간", "Leading", "줄과 줄 사이 간격. 보통 글자 크기의 150~180%를 기준으로 잡아요 (10pt → 15~18pt).", "줄이 길수록 행간을 넉넉히. 캡션처럼 짧은 글은 좁혀도 돼요"], ["베이스라인", "Baseline", "글자들이 올라앉는 보이지 않는 기준선. 크기·서체가 달라도 이 선이 맞으면 한 줄로 정돈돼 보여요.", "다른 서체를 섞을 때는 베이스라인 이동(Shift)으로 높이를 맞춰요"], ["엑스하이트", "x-height", "소문자 x의 높이. 같은 pt라도 엑스하이트가 크면 글자가 더 커 보여요.", "영문 서체를 고를 때 한글과 크기감이 맞는지 이걸로 판단"], ["세리프 / 산세리프", "Serif / Sans-serif", "획 끝에 삐침(세리프)이 있으면 세리프(명조 계열), 없으면 산세리프(고딕 계열).", "본문은 읽기 편한 쪽, 제목은 분위기에 맞춰"], ["굵기", "Weight", "Thin·Light·Regular·Medium·Bold·Black처럼 획 두께 단계. 숫자로 100~900.", "가짜 굵게(B 단추) 말고 서체에 있는 굵기를 써요 — 인쇄에서 뭉개질 수 있어요"], ["위도우 · 오펀", "Widow · Orphan", "문단 마지막 한두 글자가 혼자 다음 줄(위도우)이나 다음 단·페이지 맨 위(오펀)로 떨어진 것.", "글자 수를 조금 고치거나 트래킹을 살짝 바꿔서 정리"], ["단락 정렬", "Alignment", "왼끝 맞춤·가운데·오른끝·양끝 맞춤. 양끝 맞춤은 줄마다 글자 간격이 달라져 구멍이 생길 수 있어요.", "한글 본문 양끝 맞춤은 마지막 줄 왼쪽 맞춤과 함께"], ["들여쓰기 · 내어쓰기", "Indent · Hanging indent", "문단 첫 줄을 안으로 넣는 것(들여쓰기), 첫 줄만 밖으로 빼는 것(내어쓰기). 목록·번호에 내어쓰기를 써요.", "스페이스로 맞추지 말고 문단 설정으로"], ["합자", "Ligature", "fi, fl처럼 붙어 다니는 글자 짝을 하나로 이어 그린 모양.", "영문 본문 서체에서 켜고 끄기 확인"], ["포인트 · 급수", "pt · Q", "글자 크기 단위. 1pt ≈ 0.353mm, 1급(Q) = 0.25mm.", "인쇄 최소 크기는 보통 5~6pt"]], "레이아웃": [["그리드", "Grid", "지면을 일정한 칸(단·줄)으로 나눈 보이지 않는 틀. 요소를 그 칸에 맞추면 페이지끼리도 정돈돼요.", "포토북·카탈로그처럼 페이지가 많을수록 먼저 정하기"], ["마진", "Margin", "판면(내용이 들어가는 영역) 바깥 여백. 위·아래·안쪽·바깥쪽 따로 정해요.", "제본 쪽(안쪽)은 무선·PUR이면 더 넉넉히"], ["여백 · 화이트 스페이스", "White space", "아무것도 없는 빈 공간. 비워 두는 것만으로 강조·호흡·고급감을 만들어요.", "채우고 싶어도 덜어내기"], ["단 · 거터", "Column · Gutter", "글을 세로로 나눈 칸(단)과 단 사이 간격(거터). 펼침면 가운데 접히는 부분을 거터라고도 불러요.", "펼침면 거터에는 얼굴·중요한 글자 두지 않기"], ["판면", "Type area", "마진 안쪽, 실제 내용이 들어가는 영역.", "페이지 번호·머리글은 보통 판면 밖에"], ["정렬", "Align", "요소의 왼쪽·가운데·오른쪽·위·아래 선을 맞추는 것. 눈으로 맞추지 말고 정렬 기능·안내선으로.", "이미지 테두리 말고 글자 획 기준으로 맞춰야 할 때도 있어요(광학 정렬)"], ["위계", "Hierarchy", "제목·부제·본문·캡션처럼 정보의 중요도를 크기·굵기·색으로 나눠 보여 주는 것.", "단계는 3~4개 안에서"], ["안내선 · 재단선", "Guide · Trim", "작업용 보이지 않는 선(안내선)과 실제로 잘리는 선(재단선).", "도련 3mm · 재단선 안쪽 3mm 안전 여백"], ["마스터 페이지", "Master page", "여러 페이지에 공통으로 들어가는 요소(번호·로고·그리드)를 한 번에 관리하는 페이지.", "페이지 번호는 마스터에서 자동 번호로"]], "색": [["RGB", "Red Green Blue", "빛의 3원색. 화면용 색. 인쇄하면 CMYK로 바뀌면서 형광·쨍한 색이 탁해져요.", "인쇄 파일 최종본은 CMYK"], ["CMYK", "Cyan Magenta Yellow Black", "인쇄 잉크 4색. 망점을 섞어 색을 만들어요.", "총 잉크량(TAC)은 보통 300% 안쪽"], ["별색", "Spot color · 팬톤", "미리 조색한 잉크 한 가지를 따로 찍는 색. 4도로 안 나오는 형광·메탈·정확한 브랜드 색에 써요.", "별색 수만큼 판이 늘어나요 · 사양서에 별색 번호 적기"], ["리치블랙", "Rich black", "K100에 C·M·Y를 조금 섞은 더 깊은 검정. 넓은 검정 면에 써요.", "작은 글자는 리치블랙 말고 K100만"], ["오버프린트", "Overprint", "아래 색을 지우지 않고 위에 겹쳐 찍는 설정. K100 글자에 켜면 틈(핀트 어긋남)이 안 보여요.", "흰색에 켜면 사라져요 — 흰 글자 오버프린트 금지"], ["색상 · 채도 · 명도", "Hue · Saturation · Brightness", "색의 종류(빨강·파랑), 선명한 정도, 밝은 정도.", "톤을 맞출 때는 채도·명도를 먼저 맞춰요"], ["톤", "Tone", "명도와 채도를 합쳐 본 색의 분위기(밝은 톤, 딥 톤, 파스텔 톤).", "같은 톤끼리 묶으면 다른 색도 잘 어울려요"], ["색 프로파일", "Color profile", "색을 어떤 기준으로 해석할지 정한 설정(sRGB, Japan Color 2001 Coated 등).", "인쇄소 권장 프로파일 확인"], ["망점 · 선수", "Halftone · LPI", "인쇄에서 색을 만드는 작은 점과 그 촘촘함(인치당 줄 수). 오프셋은 보통 175lpi.", "이미지는 실제 크기에서 300ppi 정도면 충분"]], "파일": [["해상도", "PPI · DPI", "이미지 1인치에 들어가는 픽셀 수. 인쇄는 실제 크기에서 300ppi, 최소 250ppi 이상 권장.", "웹 이미지(72ppi)를 키워 쓰면 깨져요"], ["벡터 · 비트맵", "Vector · Bitmap", "벡터는 점과 선을 수식으로 그려 키워도 깨지지 않고(.ai, .svg), 비트맵은 픽셀이라 키우면 깨져요(.jpg, .png, .psd).", "로고·칼선은 벡터로"], ["아웃라인", "Create outlines", "글자를 도형으로 바꾸는 것. 폰트가 없어도 모양이 그대로지만 글자 수정이 안 돼요.", "최종 .ai는 아웃라인 · 원본은 따로 보관"], ["임베드 · 링크", "Embed · Link", "이미지를 파일 안에 넣는 것(임베드)과 바깥 파일을 연결만 하는 것(링크).", "전달 전 패키지로 링크 파일 같이 모으기"], ["패키지", "Package", "인디자인·일러스트 파일과 쓰인 이미지·폰트를 한 폴더로 모으는 기능.", "인쇄소·외주 전달 전에 꼭"], ["도련", "Bleed", "재단할 때 하얀 선이 보이지 않게 재단선 밖으로 3mm 더 늘려 두는 영역.", "배경·사진은 도련까지 채우기"], ["대지 · 아트보드", "Artboard", "일러스트레이터에서 작업하는 한 장의 지면.", "대지 크기 = 재단 크기로"], ["PDF/X", "PDF/X-1a · X-4", "인쇄용으로 정해진 PDF 규격. 폰트 포함·색 설정이 고정돼요.", "인쇄소가 원하는 규격으로 내보내기"], ["레이어", "Layer", "요소를 층으로 나눠 관리하는 기능. 칼선·후가공은 별도 레이어로.", "레이어 이름을 칼선·박·형압처럼 분명하게"]]};
