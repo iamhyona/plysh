@@ -1965,9 +1965,27 @@ function refCats(p) {
 }
 function refCur(p) { var L = refCats(p), v = ls.get(p === '지류' ? 'pr:ref2' : 'pr:refsub:' + p); return L.indexOf(v) < 0 ? L[0] : v; }
 function refTab(g) { return g === '제본' ? '제본도감' : g === '박' ? '박도감' : g; }
+// 2026-11-22 실장님: 용어사전에서는 숫자만 다른 항목(1공·2공, 오시 1줄·2줄, 1R·3R …)을 개념 하나로. 사양서 고르기 목록은 그대로
+var REF_MERGE = [
+  [/^톰슨_귀도리$/, /^모서리 라운딩 \d+R$/, '모서리 라운딩', '귀도리', '모서리를 둥글게 자름. 반지름(R, mm)으로 크기를 부름. 포토카드는 보통 3R.', '사양서에는 반지름 함께 기재 (예 3R)'],
+  [/^톰슨_오시$/, /^오시 (\d+줄|\(n줄\))$/, '오시', '누름선 · Crease', '접는 자리에 눌러 선을 만들어 깨끗하게 접히게 함.', '200g 이상은 오시 필수 · 사양서에는 줄 수 기재'],
+  [/^톰슨_미싱/, /^미싱선 (\d+줄|\(n줄\))$/, '미싱선', 'Perforation', '점선으로 칼집을 내 손으로 뜯을 수 있게 함. 티켓·쿠폰.', '사양서에는 줄 수 기재'],
+  [/^톰슨_타공$/, /^([1-5]공|원형 타공.*)$/, '타공', '구멍 뚫기', '종이에 둥근 구멍을 뚫음. 구멍 수에 따라 1공·2공처럼 부름.', '사양서에는 구멍 수 · 지름 · 위치 기재'],
+  [/^부속_가름끈$/, /^가름끈 (\d+줄 |\(n줄)/, '가름끈 (3mm · 색 지정)', 'Ribbon Marker', '책에 붙이는 책갈피 끈.', '길이 = 책 높이 + 여유 · 사양서에는 줄 수 기재']
+];
+function refRows(n) {
+  var R = rowsOf(n), M = REF_MERGE.filter(function (m) { return m[0].test(n); }); if (!M.length) return R;
+  var out = [], done = {}, di = hcol(n, /^설명/), ti = hcol(n, /주의/), ai = hcol(n, /별칭/);
+  R.forEach(function (r) {
+    var m = M.filter(function (m) { return m[1].test(String(r[0]).trim()); })[0];
+    if (!m) return out.push(r); if (done[m[2]]) return; done[m[2]] = 1;
+    var x = r.slice(); x[0] = m[2]; if (ai > 0) x[ai] = m[3]; if (di > 0) x[di] = m[4]; if (ti > 0) x[ti] = m[5]; out.push(x);
+  });
+  return out;
+}
 function refCnt(p, g) {
   if (p === '디자인') return DTERMS[g].length; if (p === 'MD') return MTERMS[g].length;
-  return g === '결·책등' ? 0 : [].concat.apply([], tabsOf([refTab(g)]).map(function (n) { return rowsOf(n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n); })).length;
+  return g === '결·책등' ? 0 : [].concat.apply([], tabsOf([refTab(g)]).map(function (n) { return refRows(n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n); })).length;
 }
 function refDs(p, g) {
   var nm = function (r) { return String(r).replace(/\s*\([^)]*\)/g, ''); };
@@ -1983,7 +2001,7 @@ function renderRef() {
   h += '<input id="rQ" class="pkq rq" placeholder="용어 검색 (한글 · 영문 · 한자 · 일본어)" value="' + esc(S.rq || '') + '">';
   var hit = function (r) { return (r.join(' ') + ' ' + (nmOf(r[0]) || []).join(' ')).toLowerCase().indexOf(q) >= 0; };
   if (q) {
-    var hits = [].concat.apply([], Object.keys(CAT.T).filter(function (n) { return n.indexOf('제본_') !== 0 && n.indexOf('박_') !== 0 && n !== '톰슨_접지' && n.indexOf('굿즈_') !== 0; }).map(function (n) { return rowsOf(n).filter(hit).map(function (r) { return [n, r]; }); }));
+    var hits = [].concat.apply([], Object.keys(CAT.T).filter(function (n) { return n.indexOf('제본_') !== 0 && n.indexOf('박_') !== 0 && n !== '톰슨_접지' && n.indexOf('굿즈_') !== 0; }).map(function (n) { return refRows(n).filter(hit).map(function (r) { return [n, r]; }); }));
     var dh = [];
     Object.keys(MTERMS).forEach(function (c) { MTERMS[c].forEach(function (r) { if (hit(r.slice(1))) dh.push(mEntry(r, c)); }); });
     Object.keys(DTERMS).forEach(function (c) { DTERMS[c].forEach(function (r) { if (hit(r)) dh.push(dEntry(r, c, '디자인')); }); });
@@ -2009,10 +2027,10 @@ function renderRef() {
     } else {
       var tabs = tabsOf([refTab(k)]).map(function (n) { return n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n; }), st = ls.get('pr:refsub:' + k); if (tabs.indexOf(st) < 0) st = tabs[0];
       var flat = k === '코팅'; // 코팅은 세부 분류 없이 쭉 나열 (2026-11-20 실장님)
-      if (!flat) h += '<div class="chips rsub">' + tabs.map(function (n) { return '<button data-rs="' + esc(n) + '"' + (n === st ? ' class="on"' : '') + '>' + esc(sub(n)) + '<small>' + rowsOf(n).length + '</small></button>'; }).join('') + '</div>';
-      var rows = rowsOf(st);
+      if (!flat) h += '<div class="chips rsub">' + tabs.map(function (n) { return '<button data-rs="' + esc(n) + '"' + (n === st ? ' class="on"' : '') + '>' + esc(sub(n)) + '<small>' + refRows(n).length + '</small></button>'; }).join('') + '</div>';
+      var rows = refRows(st);
       if (flat) {
-        h += '<div class="card glc">' + [].concat.apply([], tabs.map(function (n) { return rowsOf(n).map(function (r) { return glossEntry(n, r); }); })).join('') + '</div>';
+        h += '<div class="card glc">' + [].concat.apply([], tabs.map(function (n) { return refRows(n).map(function (r) { return glossEntry(n, r); }); })).join('') + '</div>';
         h += '<div class="nt c">굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요</div>';
       } else if (k === '용지') {
         var G = grp(rows, 1);
