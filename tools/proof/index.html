@@ -392,7 +392,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .dtabs .dtn { width:38px; padding:0; display:flex; align-items:center; justify-content:center; background:transparent; color:var(--sub); }
 .dfold { background:#e4e8ee; border-radius:0 18px 18px 18px; padding:16px; margin:0 0 8px; } /* 폴더: 탭 + 사양 전체 한 덩어리 */
 .dfold .card { margin-bottom:12px; } .dfold .dsr .card { margin-bottom:12px; }
-.card.dhead { padding:20px 20px 0 !important; margin-bottom:12px; }
+.card.dhead { padding:20px !important; margin-bottom:12px; }
 .dtitle::placeholder { color:#b0b8c1; font-weight:700; }
 .dh1 { display:flex; align-items:center; gap:10px; }
 .dtitle { flex:1; min-width:0; border:0; background:var(--chip); border-radius:12px; font:inherit; font-size:17px; font-weight:700; letter-spacing:-0.02em; color:var(--txt); height:46px; padding:0 14px; outline:0; -webkit-appearance:none; appearance:none; } /* 2026-11-21 실장님: 이름도 다른 칸처럼 회색 입력 칸 */
@@ -432,6 +432,9 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .cflt .cfl { display:none; } .cflt .cfg { margin-top:6px; } /* 종류는 맨 위 드롭다운에서 고르므로 묶음 제목 숨김 */
 .csel { display:block; margin:0 0 12px; } .csel select { width:100%; height:46px; padding:0 40px 0 14px; border:0; border-radius:12px; background:var(--chip) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; -webkit-appearance:none; appearance:none; font:inherit; font-size:15px; font-weight:600; color:var(--txt); cursor:pointer; outline:0; }
 .cdz { margin:0 0 12px !important; } .cout > .card.clf { margin-bottom:12px !important; } .cdz b { font-size:19px !important; }
+.dpa { display:flex; align-items:center; gap:6px; margin:10px 0 0 29px; flex-wrap:wrap; } .dpe { font-size:12px; color:#3182f6; font-weight:700; margin-right:auto; }
+.dpa button { height:32px; min-width:34px; padding:0 12px; border:0; border-radius:9px; background:#fff; color:var(--sub); font:inherit; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; } .dpa button[disabled] { opacity:.35; cursor:default; } .dpa button.del { color:#e5484d; }
+.dpadd { width:100%; height:44px; margin:8px 0 4px; border:1.5px dashed #d1d6db; border-radius:12px; background:none; color:var(--sub); font:inherit; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; } .dpadd:hover { background:var(--chip); }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -906,9 +909,13 @@ var PICK = {
   item: { n: '세부 품목', tabs: function () { return tabsOf(['품목']); }, mode: 'one' },
   paper: { n: '용지', tabs: function () { return tabsOf(['용지']); }, mode: 'one' },
   print: { n: '인쇄', tabs: function () { return tabsOf(['인쇄']); }, mode: 'print' },
-  coat: { n: '코팅', tabs: function () { return tabsOf(['코팅']).filter(function (n) { return !/실크|부분/.test(n); }); }, mode: 'many', j: ' + ', side: ['단면', '양면'] },
-  fin: { n: '특수가공', tabs: function () { return tabsOf(['박', '가공']).concat(tabsOf(['코팅']).filter(function (n) { return /실크|부분/.test(n); })); }, mode: 'many', each: ['앞면', '뒷면', '양면'] },
-  cut: { n: '톰슨·접지·가공', tabs: function () { return tabsOf(['톰슨', '조립']); }, mode: 'many' },
+  // 2026-11-21 실장님: 실크코팅은 코팅으로 · 특수가공은 박 / 형압·에폭시 따로 · 톰슨·재단·타공 / 접지 / 합지·접착 따로
+  coat: { n: '코팅', tabs: function () { return tabsOf(['코팅']); }, mode: 'many', j: ' + ', side: ['단면', '양면'] },
+  fin: { n: '박', tabs: function () { return tabsOf(['박']); }, mode: 'many', each: ['앞면', '뒷면', '양면'] },
+  emb: { n: '형압·에폭시', tabs: function () { return tabsOf(['가공']); }, mode: 'many', each: ['앞면', '뒷면', '양면'] },
+  cut: { n: '톰슨·재단·타공', tabs: function () { return tabsOf(['톰슨']).filter(function (n) { return n !== '톰슨_접지'; }); }, mode: 'many' },
+  fold: { n: '접지', tabs: function () { return ['톰슨_접지'].filter(function (n) { return CAT.T[n]; }); }, mode: 'many' },
+  glue: { n: '합지·접착', tabs: function () { return tabsOf(['조립']); }, mode: 'many' },
   bind: { n: '제본·부속', tabs: function () { return tabsOf(['제본', '부속']); }, mode: 'many' },
   pack: { n: '포장', tabs: function () { return tabsOf(['포장']); }, mode: 'many' }
 };
@@ -1277,8 +1284,9 @@ function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*
 function rowTsv(r, i) {
   var pp = splitPaper(r.paper);
   var Q = dQty(r), qa = Q.has ? fmtN(Q.s) : r.q, qb = Q.has ? ((Q.p + Q.d) ? fmtN(Q.p + Q.d) + ' / ' + fmtN(Q.t) : '') : r.gift;
-  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, r.fin, r.cut, r.bind, r.mat, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
+  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, dJn([r.fin, r.emb]), dJn([r.cut, r.fold, r.glue]), r.bind, r.mat, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
 }
+function dJn(a) { var v = a.filter(function (x) { return !dEmpty(x); }); return v.length ? v.join(' / ') : (a[0] == null ? '' : a[0]); }
 var DF = [['item', '세부 품목', ''], ['set', '중분류', ''], ['cat', '대분류', ''], ['q', '제작수량', ''], ['gift', '증정 / 총 제작', ''], ['size', '판형', ''], ['pg', '페이지', ''],
   ['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['mat', '정합', ''], ['pack', '포장', 'dl-pack'], ['etc', '기타 전달 사항', '']];
 var OPEN = {};
@@ -1303,7 +1311,7 @@ var DSEC = [
   ['품목', [['cls', '품목']]],
   ['크기 · 페이지', [['size', '판형', '가로×세로(×높이) mm'], ['pg', '페이지', '예: 24p · 표지 4p']]],
   ['용지 · 인쇄', [['paper', '용지'], ['print', '인쇄'], ['coat', '코팅']]],
-  ['가공 · 제본', [['fin', '특수가공'], ['cut', '톰슨 · 접지 · 가공'], ['bind', '제본']]],
+  ['가공 · 제본', [['fin', '박'], ['emb', '형압 · 에폭시'], ['cut', '톰슨 · 재단 · 타공'], ['fold', '접지'], ['glue', '합지 · 접착'], ['bind', '제본 · 부속']]],
   // 2026-11-20 실장님: 정합(구성품 맞춰 넣기)과 포장(개별 · 외부 포장)을 따로
   ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]],
   ['수량', [['qs', '판매용 수량', '예: 1,000'], ['qp', '홍보용 수량', '예: 20'], ['qdp', '불량대응용 수량'], ['qt', '총 제작 수량']]]];
@@ -1324,7 +1332,7 @@ function dEmpty(v) { v = String(v == null ? '' : v).trim(); return !v || v === '
 function dSel(d) { var id = ls.get('pr:dsel'); return d.rows.filter(function (r) { return r.id === id; })[0] || d.rows[0] || null; }
 function dMiss(r) { var m = DNEED.filter(function (f) { return f[0] === 'qs' ? !dQty(r).s : dEmpty(r[f[0]]); }).map(function (f) { return f[1]; }); if (r.cat === '책자' && dEmpty(r.pg)) m.push('페이지'); return m; }
 function dLine(r) {
-  return [r.size, r.pg, r.paper, r.print, r.coat, r.fin, r.cut, r.bind].filter(function (x) { return !dEmpty(x); }).join(' · ');
+  return [r.size, r.pg, r.paper, r.print, r.coat, r.fin, r.emb, r.cut, r.fold, r.glue, r.bind].filter(function (x) { return !dEmpty(x); }).join(' · ');
 }
 function dPrevHtml(d, sel) {
   var h = '<div class="card"><div class="ct">사양서 미리보기<small>' + d.rows.length + '개 품목 · 시트 순서</small></div>';
@@ -1332,8 +1340,10 @@ function dPrevHtml(d, sel) {
   h += d.rows.map(function (r, i) {
     var m = dMiss(r), Q = dQty(r), q = Q.t ? ' <small>총 ' + fmtN(Q.t) + '부</small>' : '';
     return '<div class="dpv' + (sel && r.id === sel.id ? ' on' : '') + '" data-sel="' + r.id + '"><b><em class="no">' + (i + 1) + '</em>' + esc(r.item || r.set || r.cat || '품목명 없음') + q + '</b>' +
-      (dLine(r) ? '<p>' + esc(dLine(r)) + '</p>' : '') + (m.length ? '<div class="miss">빈칸 · ' + esc(m.join(', ')) + '</div>' : '') + '</div>';
+      (dLine(r) ? '<p>' + esc(dLine(r)) + '</p>' : '') + (m.length ? '<div class="miss">빈칸 · ' + esc(m.join(', ')) + '</div>' : '') +
+      (sel && r.id === sel.id ? '<div class="dpa"><span class="dpe">지금 왼쪽에서 고치는 품목</span><button data-mv="' + r.id + '" data-d="-1" aria-label="위로"' + (i ? '' : ' disabled') + '><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + r.id + '" data-d="1" aria-label="아래로"' + (i < d.rows.length - 1 ? '' : ' disabled') + '><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + r.id + '">복제</button><button data-del="' + r.id + '" class="del">삭제</button></div>' : '') + '</div>';
   }).join('');
+  h += '<button class="dpadd" id="dItem"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>품목 추가</button>';
   if (d.rows.length) h += '<button class="dcp" id="dCopy">시트에 붙여넣기용 복사 (' + d.rows.length + '행)</button><button class="dcp2" id="dCopyH">제목 줄까지 같이 복사</button><div class="nt c">사양서 시트의 ‘대분류’ 첫 칸을 누르고 붙여넣으면 칸마다 들어가요</div>';
   return h + '</div>';
 }
@@ -1360,9 +1370,7 @@ function renderDoc() {
   h += '<div class="card dhead"><div class="dh1"><input class="dtitle" id="dName" value="' + esc(dNm(d)) + '" placeholder="' + DOC_PH + '" aria-label="사양서 이름"><button type="button" id="dSave">임시 저장</button></div>' +
     '<div class="dh2">만든 날 ' + d.date + ' · <b id="dSaved">' + savedTxt(d) + '</b></div>' +
     '<label class="dld"><select id="dLoad" aria-label="구성 불러오기"><option value="">구성 불러오기</option>' + DOC_TPL.filter(function (t) { return t.k !== 'one'; }).map(function (t) { return '<option value="' + t.k + '">' + esc(t.t) + ' · ' + esc(t.s) + '</option>'; }).join('') + '</select></label>' +
-    '<div class="dh3"><span class="dlb">품목</span><div class="dit">' + d.rows.map(function (r, i) { return '<button data-sel="' + r.id + '"' + (sel && r.id === sel.id ? ' class="on"' : '') + ' title="' + esc(r.item || r.set || r.cat || '품목명 없음') + '">' + (i + 1) + '</button>'; }).join('') + '<button class="add" id="dItem" aria-label="품목 추가" title="품목 추가"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>' +
-    '</div>' +
-    '<div class="deh"><b><em class="no">' + (n + 1) + '</em><span>' + esc(sel.item || sel.set || sel.cat || '품목명 없음') + '</span></b><div class="dra"><button data-mv="' + sel.id + '" data-d="-1" aria-label="앞으로"' + (n ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="' + sel.id + '" data-d="1" aria-label="뒤로"' + (n < d.rows.length - 1 ? '' : ' disabled') + '><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 9l6 6 6-6"/></svg></button><button data-dup="' + sel.id + '">복제</button><button data-del="' + sel.id + '" class="del">삭제</button></div></div></div>';
+    '</div>';
   {
     // 2026-11-20 실장님: 기본 정보 · 크기·페이지 · 용지·인쇄 · 가공·제본 · 정합·포장 묶음마다 박스 따로
     h += DSEC.map(function (sc) {
@@ -1377,7 +1385,12 @@ function renderDoc() {
   $('#main').innerHTML = h; bindDoc();
 }
 function bindDocPrev(d) {
+  var row = function (id) { return d.rows.filter(function (r) { return r.id === id; })[0]; };
+  var it = $('#dItem'); if (it) it.onclick = function (e) { e.stopPropagation(); var r = docRow(''); d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $$('[data-sel]').forEach(function (b) { b.onclick = function () { ls.set('pr:dsel', b.dataset.sel); renderDoc(); }; });
+  $$('#dPrev [data-mv]').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); var i = d.rows.indexOf(row(b.dataset.mv)), j = i + +b.dataset.d; if (j < 0 || j >= d.rows.length) return; var t = d.rows[i]; d.rows[i] = d.rows[j]; d.rows[j] = t; saveDocs(); renderDoc(); }; });
+  $$('#dPrev [data-dup]').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); var r = row(b.dataset.dup), c = JSON.parse(JSON.stringify(r)); c.id = uid(); d.rows.splice(d.rows.indexOf(r) + 1, 0, c); ls.set('pr:dsel', c.id); saveDocs(); renderDoc(); toast('복제했어요'); }; });
+  $$('#dPrev [data-del]').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); var r = row(b.dataset.del); if (!confirm('‘' + (r.item || '이 품목') + '’을 지울까요?')) return; var i = d.rows.indexOf(r); d.rows.splice(i, 1); var nx = d.rows[Math.min(i, d.rows.length - 1)]; ls.set('pr:dsel', nx ? nx.id : ''); saveDocs(); renderDoc(); }; });
   var c = $('#dCopy'); if (c) c.onclick = function () { copyText(d.rows.map(rowTsv).join('\n'), d.rows.length + '행 복사했어요'); };
   c = $('#dCopyH'); if (c) c.onclick = function () { copyText([MASTER.join('\t')].concat(d.rows.map(rowTsv)).join('\n'), '제목 줄까지 복사했어요'); };
 }
@@ -1388,7 +1401,7 @@ function bindDoc() {
   $$('[data-tpl]').forEach(function (b) { b.onclick = function () { tplLoad(b.dataset.tpl); }; });
   function tplLoad(k) {
     var t = DOC_TPL.filter(function (x) { return x.k === k; })[0], dd = curDoc() || newDoc();
-    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'qs', 'qp', 'size', 'pg', 'paper', 'print', 'cut', 'mat', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
+    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'qs', 'qp', 'size', 'pg', 'paper', 'print', 'cut', 'fold', 'glue', 'emb', 'mat', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
     t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
     saveDocs(); renderDoc(); toast(t.t + ' 구성을 불러왔어요');
   }
@@ -1412,11 +1425,7 @@ function bindDoc() {
   $$('[data-pick][data-dr]').forEach(function (i) { i.onclick = function () { var r = row(i.dataset.dr); openPick(i.dataset.pick, r[i.dataset.k], function (x) {
     if (i.dataset.k === 'item' && x && x !== '-') { var it = itemRow(x); if (it) { if (dEmpty(r.cat)) r.cat = it[1]; if (dEmpty(r.size)) r.size = it[2]; if (dEmpty(r.paper)) r.paper = it[3]; if (dEmpty(r.print)) r.print = it[4]; if (dEmpty(r.coat)) r.coat = it[5] || '-'; } }
     r[i.dataset.k] = x; saveDocs(); renderDoc(); }); }; });
-  $$('[data-mv]').forEach(function (b) { b.onclick = function () { var i = d.rows.indexOf(row(b.dataset.mv)), j = i + +b.dataset.d; if (j < 0 || j >= d.rows.length) return; var t = d.rows[i]; d.rows[i] = d.rows[j]; d.rows[j] = t; saveDocs(); renderDoc(); }; });
-  $$('[data-dup]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dup), c = JSON.parse(JSON.stringify(r)); c.id = uid(); d.rows.splice(d.rows.indexOf(r) + 1, 0, c); ls.set('pr:dsel', c.id); saveDocs(); renderDoc(); toast('복제했어요'); }; });
-  $$('[data-del]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.del); if (!confirm('‘' + (r.item || '이 품목') + '’을 지울까요?')) return; var i = d.rows.indexOf(r); d.rows.splice(i, 1); var nx = d.rows[Math.min(i, d.rows.length - 1)]; ls.set('pr:dsel', nx ? nx.id : ''); saveDocs(); renderDoc(); }; });
   var da = $('#dAdd'); if (da) da.onclick = function () { S.add = true; go('list'); };
-  $('#dItem').onclick = function () { add(docRow('')); };
   var db = $('#dBlank'); if (db) db.onclick = function () { add(docRow('')); };
   bindDel();
   function bindDel() { $('#dDel').onclick = function () { if (!confirm('‘' + dNmS(d) + '’ 사양서를 지울까요? 되돌릴 수 없어요')) return; DOCS.splice(DOCS.indexOf(d), 1); ls.set('pr:doc', DOCS[0] ? DOCS[0].id : ''); commitDocs(); renderDoc(); }; }
