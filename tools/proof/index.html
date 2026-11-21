@@ -441,6 +441,8 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .pfs { margin-bottom:20px; } .pfl { font-size:14px; font-weight:700; color:var(--txt); margin-bottom:10px; } .pfl small { font-size:12px; font-weight:500; color:var(--sub); margin-left:6px; }
 .pfp .chips button { background:#f2f4f6; } .pfpn { width:100%; margin:10px 0 0; background:#f2f4f6 !important; height:44px; } .pfh { font-size:12px; color:var(--sub); margin:0 0 10px; line-height:1.5; }
 .pfsel { width:100%; height:46px; padding:0 38px 0 14px; border:0; border-radius:12px; background:#f2f4f6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; -webkit-appearance:none; appearance:none; font:inherit; font-size:15px; font-weight:600; color:#191f28; cursor:pointer; } .pfh { font-weight:500 !important; }
+.pft button[disabled] { cursor:default; opacity:.7; } .pkl.pftl { border-top-left-radius:0; border-top-right-radius:0; }
+.pfsame { display:flex; align-items:center; gap:10px; margin:10px 2px 0; font-size:14px; font-weight:600; color:var(--txt); cursor:pointer; } .pfsame input { width:20px; height:20px; accent-color:#191f28; margin:0; flex:none; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -923,7 +925,7 @@ var PICK = {
   paper: { n: '용지', tabs: function () { return tabsOf(['용지']); }, mode: 'one' },
   print: { n: '인쇄', tabs: function () { return tabsOf(['인쇄']); }, mode: 'print' },
   // 2026-11-21 실장님: 실크코팅은 코팅으로 · 특수가공은 박 / 형압·에폭시 따로 · 톰슨·재단·타공 / 접지 / 합지·접착 따로
-  coat: { n: '코팅', tabs: function () { return tabsOf(['코팅']); }, mode: 'many', j: ' + ', side: ['단면', '양면'] },
+  coat: { n: '코팅', tabs: function () { return tabsOf(['코팅']); }, mode: 'many', j: ' + ', faces: true },
   fin: { n: '박', tabs: function () { return tabsOf(['박']); }, mode: 'many', each: ['앞면', '뒷면', '양면'] },
   emb: { n: '형압·에폭시', tabs: function () { return tabsOf(['가공']); }, mode: 'many', each: ['앞면', '뒷면', '양면'] },
   cut: { n: '톰슨·재단·타공', tabs: function () { return tabsOf(['톰슨']).filter(function (n) { return n !== '톰슨_접지'; }); }, mode: 'many' },
@@ -965,23 +967,42 @@ function openPick(key, cur, done) {
   if (P.each) parts.forEach(function (p) { if (!sd[p]) { var k = Object.keys(sd).filter(function (s) { return s.indexOf(p) >= 0; })[0]; sd[p] = k ? sd[k] : P.each[0]; } });
   var mem = ls.get('pr:pk:' + key);
   PK = { key: key, P: P, tabs: tabs, tab: mem && tabs.indexOf(mem) >= 0 ? mem : tabs[0], sel: P.mode === 'many' ? parts : [], sd: sd, side: side || (P.side ? P.side[0] : ''), txt: cur, q: '', done: done };
+  if (P.faces) {
+    var c0 = String(PK.txt || '').trim(), sp = function (t) { return t ? t.split(/\s*\+\s*/).filter(function (x) { return x && x !== '-'; }) : []; }, mm;
+    PK.cs = { f: [], b: [] }; PK.same = false; PK.face = 'f';
+    if ((mm = c0.match(/^양면\s*\/\s*(.*)$/))) { PK.cs.f = sp(mm[1]); PK.cs.b = PK.cs.f.slice(); PK.same = true; }
+    else if ((mm = c0.match(/^단면\s*\/\s*(.*)$/))) PK.cs.f = sp(mm[1]);
+    else if ((mm = c0.match(/^뒷면\s*\/\s*(.*)$/))) PK.cs.b = sp(mm[1]);
+    else if ((mm = c0.match(/^앞면\s+(.*?)\s*\/\s*뒷면\s+(.*)$/))) { PK.cs.f = sp(mm[1]); PK.cs.b = sp(mm[2]); }
+    else PK.cs.f = sp(c0);
+  }
   if (P.mode === 'print') {
     PK.pm = ''; PK.f = ''; PK.b = ''; PK.ps = []; PK.face = 'f';
-    var m = cur.match(/^(.*?)\s*(\d)\/(\d)\s*\(([^/]*)\/([^)]*)\)\s*(?:\+\s*(.*))?$/);
+    var m = prParse(cur);
     if (m) { PK.pm = m[1].trim(); PK.f = m[4].trim(); PK.b = m[5].trim(); if (m[6]) PK.ps = m[6].split(/\s*\+\s*/).filter(Boolean); }
     else { tabsOf(['인쇄']).forEach(function (n) { rowsOf(n).forEach(function (r) { if (cur.indexOf(r[0]) >= 0) { if (/방식/.test(n)) PK.pm = r[0]; else if (!/색구성|도수/.test(n)) PK.ps.push(r[0]); } }); }); var d = cur.match(/(\d)\/(\d)/); if (d) { var bd = function (x) { return (comps().filter(function (c) { return c[1] === +x; })[0] || ['0'])[0]; }; PK.f = bd(d[1]); PK.b = bd(d[2]); } }
     tabs.forEach(function (n) { if (/색구성|도수/.test(n)) PK.cmpTab = n; });
-    PK.fs = { f: faceSt(PK.f), b: faceSt(PK.b) };
+    PK.fs = { f: faceSt(PK.f), b: faceSt(PK.b) }; PK.same = faceDeg(PK.fs.f) > 0 && faceTxt(PK.fs.f) === faceTxt(PK.fs.b);
   }
   var el = $('#pk'); el.style.display = 'flex'; document.body.style.overflow = 'hidden'; drawPick();
 }
 // 2026-11-21 실장님: 인쇄 = 앞면/뒷면 인덱스 탭 → 인쇄 방식 → 원색(CMYK·K) / 별색(팬톤·화이트·은별색·금별색)
 var SPOTS = ['팬톤', '화이트', '은별색', '금별색'];
+// '옵셋 4/1 (CMYK+무광 기계 코팅 (OP)/K) + 형광' → 괄호 짝 맞춰 나누기
+function prParse(c) {
+  var h = c.match(/^(.*?)\s*(\d+)\/(\d+)\s*\(/); if (!h) return null;
+  var i = h[0].length, d = 1, j = i, sl = -1;
+  for (; j < c.length && d; j++) { var ch = c[j]; if (ch === '(') d++; else if (ch === ')') { d--; if (!d) break; } else if (ch === '/' && d === 1) sl = j; }
+  if (d || sl < 0) return null;
+  var rest = c.slice(j + 1).replace(/^\s*\+\s*/, '').trim();
+  return [c, h[1], h[2], h[3], c.slice(i, sl).trim(), c.slice(sl + 1, j).trim(), rest || undefined];
+}
 function faceSt(t) {
-  var o = { w: '', pn: [], p: false, x: [] }; t = String(t || '').trim(); if (!t || t === '0') return o;
+  var o = { w: '', pn: [], p: false, x: [], mc: '' }; t = String(t || '').trim(); if (!t || t === '0') return o;
   t.split(/\s*\+\s*/).forEach(function (k) {
     if (/^CMYK$/i.test(k)) o.w = 'CMYK'; else if (/^K$/i.test(k)) o.w = 'K';
     else if (/^(Pantone|팬톤|별색\d?)/i.test(k)) { o.p = true; var n = k.replace(/^(Pantone|팬톤|별색\d?)\s*/i, '').trim(); if (n) o.pn = o.pn.concat(n.split(/\s*,\s*/)); else if (/별색2/.test(k)) o.pn = o.pn.concat(['', '']); }
+    else if (/기계 코팅|수성 코팅/.test(k)) o.mc = k;
     else if (/^(White|화이트)/i.test(k)) o.x.push('화이트'); else if (/은별색/.test(k)) o.x.push('은별색'); else if (/금별색/.test(k)) o.x.push('금별색');
     else o.x.push(k);
   });
@@ -990,13 +1011,16 @@ function faceSt(t) {
 function faceTxt(o) {
   var pn = o.pn.filter(Boolean);
   var a = [o.w].concat(o.p ? ['Pantone' + (pn.length ? ' ' + pn.join(', ') : '')] : []).concat(o.x).filter(Boolean);
+  if (o.mc) a.push(o.mc);
   return a.length ? a.join('+') : '0';
 }
 function faceDeg(o) { return (o.w === 'CMYK' ? 4 : o.w ? 1 : 0) + (o.p ? Math.max(1, o.pn.filter(Boolean).length) : 0) + o.x.length; }
 function pkValue() {
   var P = PK.P;
-  if (P.mode === 'print') { var F = PK.fs.f, B = PK.fs.b, df = faceDeg(F), db = faceDeg(B), core = df || db ? (PK.pm ? PK.pm + ' ' : '') + df + '/' + db + ' (' + faceTxt(F) + '/' + faceTxt(B) + ')' : PK.pm; return [core].concat(PK.ps).filter(Boolean).join(' + '); }
+  if (P.mode === 'print') { var F = PK.fs.f, B = PK.same ? PK.fs.f : PK.fs.b, df = faceDeg(F), db = faceDeg(B), core = df || db ? (PK.pm ? PK.pm + ' ' : '') + df + '/' + db + ' (' + faceTxt(F) + '/' + faceTxt(B) + ')' : PK.pm; return [core].concat(PK.ps).filter(Boolean).join(' + '); }
   if (P.each) return PK.sel.map(function (v) { return (PK.sd[v] ? PK.sd[v] + ' ' : '') + v; }).join(' / ');
+  if (P.faces) { var cf = PK.cs.f.join(' + '), cb = PK.same ? cf : PK.cs.b.join(' + ');
+    if (!cf && !cb) return ''; if (cf && cf === cb) return '양면 / ' + cf; if (!cb) return '단면 / ' + cf; if (!cf) return '뒷면 / ' + cb; return '앞면 ' + cf + ' / 뒷면 ' + cb; }
   var v = PK.sel.join(P.j || ' / '); return P.side && v ? PK.side + ' / ' + v : v;
 }
 function rowDesc(n, r, q) {
@@ -1012,31 +1036,37 @@ function drawPick() {
   if (P.side) h += '<div class="pkbar"><span>코팅 면</span>' + seg('sdg', P.side, PK.side) + '</div>';
   if (false) h += '<div class="pkbar"><span>앞면</span><button class="face' + (PK.face === 'f' ? ' on' : '') + '" data-face="f">' + esc(PK.f || '고르기') + '</button><span>뒷면</span><button class="face' + (PK.face === 'b' ? ' on' : '') + '" data-face="b">' + esc(PK.b || (PK.f ? '0' : '고르기')) + '</button></div>';
   if (P.mode === 'print') {
-    var FS = PK.fs[PK.face], ftab = function (k, n) { var o = PK.fs[k], d = faceDeg(o); return '<button data-face="' + k + '"' + (PK.face === k ? ' class="on"' : '') + '>' + n + '<em>' + (d ? d + '도' : '인쇄 없음') + '</em></button>'; };
+    if (PK.same) PK.face = 'f';
+    var FS = PK.fs[PK.face], ftab = function (k, n) { var o = PK.same && k === 'b' ? PK.fs.f : PK.fs[k], d = faceDeg(o); return '<button data-face="' + k + '"' + (PK.face === k ? ' class="on"' : '') + (PK.same && k === 'b' ? ' disabled' : '') + '>' + n + '<em>' + (PK.same && k === 'b' ? '앞면과 동일' : d ? d + '도' : '인쇄 없음') + '</em></button>'; };
     var chip = function (attr, v, on) { return '<button data-' + attr + '="' + esc(v) + '"' + (on ? ' class="on"' : '') + '>' + esc(v) + '</button>'; };
     h += '<div class="pft">' + ftab('f', '앞면') + ftab('b', '뒷면') + '</div><div class="pfp">' +
       '<div class="pfs"><div class="pfl">인쇄 방식 <small>앞뒤 같음</small></div><select id="pfPm" class="pfsel"><option value="">고르기</option>' + rowsOf('인쇄_방식').map(function (r) { var v = String(r[0]); return '<option' + (PK.pm === v ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join('') + '</select></div>' +
       '<div class="pfs"><div class="pfl">원색</div><div class="chips">' + ['CMYK', 'K'].map(function (v) { return chip('pw', v, FS.w === v); }).join('') + '</div></div>' +
       '<div class="pfs"><div class="pfl">별색 <small>여러 개 고를 수 있어요</small></div><div class="chips">' + SPOTS.map(function (v) { return chip('px', v, v === '팬톤' ? FS.p : FS.x.indexOf(v) >= 0); }).join('') + '</div>' +
       (FS.p ? '<input id="pfPn" class="pkq pfpn" placeholder="팬톤 번호 · 여러 개는 쉼표 (예: 186 C, 877 C)" value="' + esc(FS.pn.filter(Boolean).join(', ')) + '">' : '') + '</div>' +
-      '<p class="pfh">' + (PK.face === 'b' ? '뒷면에 인쇄가 없으면 아무것도 고르지 않으면 돼요 (0도)' : '원색과 별색을 같이 고르면 함께 찍혀요 (예: CMYK + 팬톤 = 5도)') + '</p></div>';
+      '<div class="pfs"><div class="pfl">기계코팅 <small>인쇄하면서 같이 하는 코팅 · 필요할 때만</small></div><div class="chips">' + rowsOf('코팅_기계코팅').map(function (r) { return chip('pmc', String(r[0]), FS.mc === String(r[0])); }).join('') + '</div></div>' +
+      '<p class="pfh">' + (PK.face === 'b' ? '뒷면에 인쇄가 없으면 아무것도 고르지 않으면 돼요 (0도)' : '원색과 별색을 같이 고르면 함께 찍혀요 (예: CMYK + 팬톤 = 5도)') + '</p></div>' + '<label class="pfsame"><input type="checkbox" id="pfSame"' + (PK.same ? ' checked' : '') + '><span>뒷면도 앞면과 동일</span></label>';
   }
+  if (P.faces) { if (PK.same) PK.face = 'f'; PK.sel = PK.cs[PK.face];
+    var ctab = function (k, n) { var a = PK.same && k === 'b' ? PK.cs.f : PK.cs[k]; return '<button data-face="' + k + '"' + (PK.face === k ? ' class="on"' : '') + (PK.same && k === 'b' ? ' disabled' : '') + '>' + n + '<em>' + (PK.same && k === 'b' ? '앞면과 동일' : a.length ? a.length + '개' : '없음') + '</em></button>'; };
+    h += '<div class="pft">' + ctab('f', '앞면') + ctab('b', '뒷면') + '</div>'; }
   var flatPk = PK.key === 'coat'; // 코팅은 분류 없이 쭉 (2026-11-20 실장님)
   if (P.mode !== 'print') { if (!flatPk) h += '<div class="chips pkt">' + PK.tabs.map(function (n) { return '<button data-pt="' + esc(n) + '"' + (n === PK.tab ? ' class="on"' : '') + '>' + esc(sub(n)) + '</button>'; }).join('') + '</div>';
-  h += '<input id="pkQ" class="pkq" placeholder="검색 (이름 · 영문 · 설명)" value="' + esc(PK.q) + '">';
+  if (!P.faces) h += '<input id="pkQ" class="pkq" placeholder="검색 (이름 · 영문 · 설명)" value="' + esc(PK.q) + '">';
   var q = PK.q.trim().toLowerCase(), rows = q ? [].concat.apply([], PK.tabs.map(function (n) { return rowsOf(n).map(function (r) { return [n, r]; }); })).filter(function (x) { return x[1].join(' ').toLowerCase().indexOf(q) >= 0; }) : flatPk ? [].concat.apply([], PK.tabs.map(function (n) { return rowsOf(n).map(function (r) { return [n, r]; }); })) : rowsOf(PK.tab).map(function (r) { return [PK.tab, r]; });
   if (PK.key === 'paper' && !q) { h += '<div class="pkl pkpaper">' + paperPick(PK.tab) + '</div>'; } else
-  h += '<div class="pkl">' + rows.slice(0, 300).map(function (x) {
+  h += '<div class="pkl' + (P.faces ? ' pftl' : '') + '">' + rows.slice(0, 300).map(function (x) {
     var r = x[1], v = String(r[0]), isC = P.mode === 'print' && /색구성|도수/.test(x[0]);
     var on = P.mode === 'print' ? (isC ? v === (PK.face === 'f' ? PK.f : PK.b) : v === PK.pm || PK.ps.indexOf(v) >= 0) : PK.sel.indexOf(v) >= 0;
     return '<button class="pki' + (on ? ' on' : '') + '" data-pv="' + esc(v) + '" data-pn="' + esc(x[0]) + '"><b>' + (/^용지/.test(x[0]) ? dotOf(r[2], r[1]) : '') + esc(v) + '</b>' + rowDesc(x[0], r, q) + '</button>';
   }).join('') + (rows.length ? '' : '<div class="empty2">없어요 · 아래에 직접 입력해요</div>') + '</div>';
+  if (P.faces) h += '<label class="pfsame"><input type="checkbox" id="pfSame"' + (PK.same ? ' checked' : '') + '><span>뒷면도 앞면과 동일</span></label>';
   }
   var chosen = '';
   if (P.each && PK.sel.length) chosen = '<div class="pkc">' + PK.sel.map(function (v, i) { return '<div><b>' + esc(v) + '</b>' + seg('es="' + i + '" data-ev', P.each, PK.sd[v]) + '</div>'; }).join('') + '</div>';
   h += '<div class="pkf">' + chosen + '<input id="pkT" placeholder="직접 입력 (목록에 없으면)"><div class="pkv">' + (P.mode === 'one' ? '' : '사양서에 들어갈 문구: <b>' + esc(pkValue() || '없음') + '</b>') + '</div>' +
     '<div class="acts"><button class="rs" id="pkN">비우기 (-)</button><button class="sv" id="pkOk">' + (P.mode === 'one' ? '직접 입력한 걸로' : '완료') + '</button></div></div></div>';
-  var el = $('#pk'), sc = (el.querySelector('.pkl') || {}).scrollTop || 0; el.innerHTML = h; if (PK.keep) { el.querySelector('.pkl').scrollTop = sc; } PK.keep = false;
+  var el = $('#pk'), sc = (el.querySelector('.pkl, .pfp') || {}).scrollTop || 0; el.innerHTML = h; if (PK.keep) { var sl = el.querySelector('.pkl, .pfp'); if (sl) sl.scrollTop = sc; } PK.keep = false;
   var close = function () { el.style.display = 'none'; el.innerHTML = ''; document.body.style.overflow = ''; PK = null; };
   var finish = function (v) { var d = PK.done; close(); d(v); };
   $('#pkX').onclick = close; el.onclick = function (e) { if (e.target === el) close(); };
@@ -1045,7 +1075,9 @@ function drawPick() {
   $$('[data-pg]').forEach(function (b) { b.onclick = function () { PK.pc[b.dataset.pg] = b.dataset.pgv; PK.keep = true; drawPick(); }; });
   $$('[data-sdg]').forEach(function (b) { b.onclick = function () { PK.side = b.dataset.sdg; PK.keep = true; drawPick(); }; });
   $$('[data-ev]').forEach(function (b) { b.onclick = function () { PK.sd[PK.sel[+b.dataset.es]] = b.dataset.ev; PK.keep = true; drawPick(); }; });
-  $$('[data-face]').forEach(function (b) { b.onclick = function () { PK.face = b.dataset.face; drawPick(); }; });
+  $$('[data-face]').forEach(function (b) { b.onclick = function () { if (b.disabled) return; PK.face = b.dataset.face; drawPick(); }; });
+  var smc = $('#pfSame'); if (smc) smc.onchange = function () { PK.same = this.checked; if (P.faces && PK.same) PK.cs.b = PK.cs.f.slice(); if (P.mode === 'print' && PK.same) PK.fs.b = JSON.parse(JSON.stringify(PK.fs.f)); PK.face = 'f'; PK.keep = true; drawPick(); };
+  $$('[data-pmc]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.mc = o.mc === b.dataset.pmc ? '' : b.dataset.pmc; drawPick(); }; });
   var pmS = $('#pfPm'); if (pmS) pmS.onchange = function () { PK.pm = this.value; drawPick(); };
   $$('[data-pw]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.w = o.w === b.dataset.pw ? '' : b.dataset.pw; drawPick(); }; });
   $$('[data-px]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face], v = b.dataset.px; if (v === '팬톤') { o.p = !o.p; if (!o.p) o.pn = []; } else { var j = o.x.indexOf(v); if (j < 0) o.x.push(v); else o.x.splice(j, 1); } drawPick(); if (v === '팬톤' && o.p) { var i = $('#pfPn'); if (i) i.focus(); } }; });
@@ -1062,7 +1094,7 @@ function drawPick() {
     PK.keep = true; drawPick();
   }; });
   $('#pkN').onclick = function () { finish('-'); };
-  $('#pkOk').onclick = function () { var t = $('#pkT').value.trim(); if (P.mode === 'one') return finish(t || PK.txt); if (t) { if (P.mode === 'print') PK.ps.push(t); else { PK.sel.push(t); if (P.each) PK.sd[t] = PK.sd[t] || P.each[0]; } } finish(pkValue() || '-'); };
+  $('#pkOk').onclick = function () { var t = $('#pkT').value.trim(); if (P.mode === 'one') return finish(t || PK.txt); if (t) { if (P.mode === 'print') PK.ps.push(t); else if (P.faces) PK.cs[PK.face].push(t); else { PK.sel.push(t); if (P.each) PK.sd[t] = PK.sd[t] || P.each[0]; } } finish(pkValue() || '-'); };
 }
 function pickBtn(attrs, key, val) { return '<button type="button" class="pkin" data-pick="' + key + '" ' + attrs + '>' + (val ? esc(val) : '<i>고르기</i>') + '</button>'; }
 function itemRow(name) { var hit = null; tabsOf(['품목']).some(function (n) { return rowsOf(n).some(function (r) { if (r[0] === name) { hit = r; return true; } }); }); return hit; }
