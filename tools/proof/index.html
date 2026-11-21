@@ -446,6 +446,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .dfm button { min-height:40px; } .dsel { -webkit-appearance:none; appearance:none; background:#f2f4f6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center !important; padding-right:36px !important; cursor:pointer; }
 .dauto { min-height:46px; display:flex; align-items:center; padding:0 14px; border-radius:12px; background:#e8f3ff; color:#1b64da; font-size:15px; font-weight:700; } .dauto i { font-style:normal; font-weight:500; font-size:13px; color:var(--sub); }
 .dpgh { font-size:12px; color:var(--sub); margin:6px 2px 0; line-height:1.45; } .dpgh b { color:#e5484d; font-weight:600; } .dfr .pst input { width:100%; }
+.dbk { display:inline-flex; background:#f2f4f6; border-radius:12px; padding:4px; gap:4px; } .dbk button { border:0; height:38px; min-width:72px; padding:0 18px; border-radius:9px; background:none; font:inherit; font-size:14px; font-weight:600; color:var(--sub); cursor:pointer; } .dbk button.on { background:#fff; color:var(--txt); font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,.08); }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -1443,6 +1444,9 @@ function lfOf(r) {
 }
 // 2026-11-21 실장님: 책자는 제본 형태 고르면 페이지가 그 제본 배수로 오르내림 (무선 8 · 중철 4 · 사철·양장·링 등 2 — 책등 계산기와 같은 기준)
 function bStep(b) { b = String(b || ''); return /중철/.test(b) ? 4 : /무선|PUR/.test(b) ? 8 : b ? 2 : 4; }
+var BK_SYNC = ['form', 'bind', 'size', 'cat', 'set', 'q', 'qs', 'qp', 'qdp', 'gift'];
+function bkSync(d, r, k) { if (!r.bk || BK_SYNC.indexOf(k) < 0) return; d.rows.forEach(function (x) { if (x !== r && x.bk === r.bk) x[k] = r[k]; }); }
+function bkPair(d, r) { return r.bk ? d.rows.filter(function (x) { return x.bk === r.bk; }) : []; }
 function formOf(r) { return r.form || (r.book ? '책자' : r.die || r.pkg ? '패키지' : ''); }
 function pkgGroups() {
   var box = rowsOf('포장_박스형태').map(function (x) { return String(x[0]); });
@@ -1451,7 +1455,9 @@ function pkgGroups() {
 }
 function dFieldHtml(r, f) {
   var k = f[0], v = r[k], a = 'data-dr="' + r.id + '" data-k="' + k + '"', c, fm = formOf(r);
-  if (k === 'form') return '<div class="dfr"><label>' + f[1] + '</label><div class="chips dfm">' + FORMS.map(function (x) { return '<button type="button" data-form="' + x + '" data-dr="' + r.id + '"' + (fm === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div>';
+  if (k === 'form') { var pr = fm === '책자' ? bkPair(curDoc(), r) : [];
+    return '<div class="dfr"><label>' + f[1] + '</label><div class="chips dfm">' + FORMS.map(function (x) { return '<button type="button" data-form="' + x + '" data-dr="' + r.id + '"' + (fm === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div>' +
+      (pr.length > 1 ? '<div class="dfr"><label>구성</label><div><span class="seg dbk">' + pr.map(function (x) { return '<button type="button" data-bkgo="' + x.id + '"' + (x === r ? ' class="on"' : '') + '>' + esc(x.part || x.item) + '</button>'; }).join('') + '</span><div class="dpgh">표지 · 내지는 따로 품목이 돼요. 크기 · 제본 · 수량은 같이 바뀌어요</div></div></div>' : ''); }
   if (k === 'pkg') { if (fm !== '패키지') return ''; var cur = String(v || ''), seen = false;
     var og = pkgGroups().map(function (g) { return '<optgroup label="' + g[0] + '">' + g[1].map(function (n) { if (n === cur) seen = true; return '<option' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</optgroup>'; }).join('');
     return '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" ' + a + '><option value="">고르기</option>' + (cur && !seen ? '<option selected>' + esc(cur) + '</option>' : '') + og + '</select></div>'; }
@@ -1459,6 +1465,7 @@ function dFieldHtml(r, f) {
   if (k === 'bkb') { if (fm !== '책자') return ''; var bv = String(r.bind || ''), hit = false;
     var bo = tabsOf(['제본']).map(function (n) { return '<optgroup label="' + esc(sub(n)) + '">' + rowsOf(n).map(function (x) { var t = String(x[0]); if (t === bv) hit = true; return '<option' + (t === bv ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</optgroup>'; }).join('');
     return '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" data-dr="' + r.id + '" data-k="bind"><option value="">고르기</option>' + (bv && !dEmpty(bv) && !hit ? '<option selected>' + esc(bv) + '</option>' : '') + bo + '</select></div>'; }
+  if (k === 'pg' && fm === '책자' && r.part === '표지') return '<div class="dfr"><label>' + f[1] + '</label><div class="dauto">4p (표지)</div></div>';
   if (k === 'pg' && fm === '책자') { var st = bStep(r.bind);
     return '<div class="dfr"><label>' + f[1] + '</label><div><span class="ifx pst" data-step="' + st + '"><input class="din" type="number" inputmode="numeric" data-dr="' + r.id + '" data-k="pgn" value="' + esc(r.pgn || '') + '" placeholder="예: ' + st * 8 + '"><em>p</em><span class="psb"><button type="button" data-pst="1" aria-label="늘리기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" data-pst="-1" aria-label="줄이기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></span></span><div class="dpgh">' + (r.bind && !dEmpty(r.bind) ? esc(r.bind) + ' · ' + st + 'p 단위로 올라가요' : '제본 형태를 고르면 그 배수로 올라가요') + (r.pgn && +r.pgn % st ? ' · <b>' + r.pgn + 'p는 ' + st + '의 배수가 아니에요</b>' : '') + '</div></div></div>'; }
   if (k === 'fd') { if (fm !== '리플렛') return ''; return '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" ' + a + '><option value="">고르기</option>' + [2, 3, 4, 5, 6].map(function (n) { return '<option value="' + n + '"' + (+v === n ? ' selected' : '') + '>' + n + '단</option>'; }).join('') + '</select></div>'; }
@@ -1531,10 +1538,16 @@ function bindDoc() {
   bindDocPrev(d);
   var row = function (id) { return d.rows.filter(function (r) { return r.id === id; })[0]; };
   // 글자 칸: 치는 대로 저장 + 오른쪽 미리보기만 새로 그림 (입력 중인 칸은 그대로)
-  $$('[data-form]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dr); r.form = r.form === b.dataset.form ? '' : b.dataset.form; saveDocs(); renderDoc(); }; });
+  // 2026-11-21 실장님: 책자를 고르면 표지 · 내지 두 품목으로 자동으로 나눔 (크기 · 제본 · 수량은 둘이 같이 바뀜)
+  $$('[data-form]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dr); r.form = r.form === b.dataset.form ? '' : b.dataset.form;
+    if (r.form === '책자' && !r.bk) { var base = String(r.item || '').replace(/\s*(표지|내지)$/, ''), c = JSON.parse(JSON.stringify(r)); r.bk = uid(); c.bk = r.bk; c.id = uid();
+      r.part = '표지'; c.part = '내지'; r.item = base ? base + ' 표지' : '표지'; c.item = base ? base + ' 내지' : '내지'; r.pg = '4p'; r.pgn = ''; d.rows.splice(d.rows.indexOf(r) + 1, 0, c); toast('표지 · 내지 두 품목으로 나눴어요'); }
+    else bkSync(d, r, 'form');
+    saveDocs(); renderDoc(); }; });
+  $$('[data-bkgo]').forEach(function (b) { b.onclick = function () { ls.set('pr:dsel', b.dataset.bkgo); renderDoc(); }; });
   $$('.din[data-dr]').forEach(function (i) {
     if (i.dataset.k === 'size') i.addEventListener('input', function () { var v = i.value, n = v.replace(/(\d)\s*[xX*＊×]\s*/g, '$1×'); if (n !== v) { var c = Math.max(0, i.selectionStart - (v.length - n.length)); i.value = n; i.setSelectionRange(c, c); } }); // 2026-11-21 실장님: 알파벳 x 쓰면 × 로
-    var up = function () { var r = row(i.dataset.dr); if (i.dataset.k === 'cls') clsSet(r, i.value); else r[i.dataset.k] = i.value; saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
+    var up = function () { var r = row(i.dataset.dr); if (i.dataset.k === 'cls') clsSet(r, i.value); else { r[i.dataset.k] = i.value; bkSync(d, r, i.dataset.k); } saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
       if (i.dataset.k === 'item' || i.dataset.k === 'cls') { var t = r.item || r.set || r.cat || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); }
       if (/^q(s|p|dp)$/.test(i.dataset.k)) { var Q = dQty(r), qd = $('[data-qv="d"]'), qt = $('[data-qv="t"]'); if (qd) qd.textContent = Q.pc ? '= ' + fmtN(Q.d) + '개' : '판매용 수량 기준'; if (qt) qt.innerHTML = Q.t ? fmtN(Q.t) + '개' : '<i>수량을 넣으면 합계가 나와요</i>'; } };
     i.oninput = up; i.onchange = function () { up();
@@ -1545,7 +1558,7 @@ function bindDoc() {
   });
   $$('[data-pick][data-dr]').forEach(function (i) { i.onclick = function () { var r = row(i.dataset.dr); PK_CTX = r; openPick(i.dataset.pick, r[i.dataset.k], function (x) {
     if (i.dataset.k === 'item' && x && x !== '-') { var it = itemRow(x); if (it) { if (dEmpty(r.cat)) r.cat = it[1]; if (dEmpty(r.size)) r.size = it[2]; if (dEmpty(r.paper)) r.paper = it[3]; if (dEmpty(r.print)) r.print = it[4]; if (dEmpty(r.coat)) r.coat = it[5] || '-'; } }
-    r[i.dataset.k] = x; saveDocs(); renderDoc(); }); }; });
+    r[i.dataset.k] = x; bkSync(d, r, i.dataset.k); saveDocs(); renderDoc(); }); }; });
   var da = $('#dAdd'); if (da) da.onclick = function () { S.add = true; go('list'); };
   var db = $('#dBlank'); if (db) db.onclick = function () { add(docRow('')); };
   bindDel();
