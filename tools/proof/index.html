@@ -899,6 +899,23 @@ function trimCat(C) {
   // 2026-11-20 실장님: 판지는 BV · AB · BW · CCP · 갱판지 이름 그대로 (로얄 아이보리 · 아이보리 · 백판지 · 코트판지 이름은 안 씀)
   var bd = C.T['용지_판지'], BMAP = { '로얄 아이보리': 'BV', '아이보리': 'AB', '백판지': 'BW', '코트판지': 'CCP' };
   if (bd && bd[1]) bd[1].forEach(function (r) { var k = String(r[1]).trim(); if (BMAP[k]) { r[1] = BMAP[k]; r[0] = String(r[0]).replace(/^.*?\(\s*(BV|AB|BW|CCP)\s*\)/, '$1').replace(new RegExp('^' + k + '(?=\\s*/)'), BMAP[k]); } });
+  // 2026-11-21 실장님 정리: 판지는 도공 면으로 나눔 (단면 도공 = 앞면만 · 양면 도공 = 앞뒤 모두). '양면 도공'은 원지 사양, '양면 인쇄'는 인쇄 사양
+  if (bd && bd[1]) (function () {
+    var H = bd[0], R = bd[1], D = {
+      CCP: ['Cast Coated Paper', '앞면을 캐스트 도공해 거울처럼 매끄럽고 광택이 강함. 뒷면은 비도공이라 앞뒤 질감 차이가 뚜렷함.', '고광택이 필요하면 견적·발주 때 앞면 고광택 캐스트 도공이라고 따로 적기'],
+      BV: ['한창제지', '올펄프 단면 도공 판지. 앞면은 도공면, 뒷면은 광택 없는 매트한 질감.', '단면 로얄아이보리라는 이름으로도 유통됨'],
+      BW: ['한창제지', '올펄프 양면 도공 판지. 패키지 바깥쪽과 안쪽 모두 도공면에 인쇄할 때.', '한창제지 기준 BV는 단면 · BW는 양면'],
+      AB: ['한솔제지', '한솔제지 Hi-Q 아트보드. 양면 도공 판지.', 'Hi-Q AB 플러스(AB+)는 다른 제품이라 견적·발주 때 제품명 구분'] };
+    var fix = function (r) { var k = String(r[1]).trim(), d = D[k]; if (!d) return r; r = r.slice(); r[5] = d[0]; r[6] = d[1]; r[7] = (/추정/.test(r[7]) ? '두께 추정 · ' : '') + d[2]; return r; };
+    var ka = function (nm, al, fz, ds, tp) { return [nm, al, '', '', '', '한국제지', ds, tp]; };
+    var pick = function (k) { return R.filter(function (r) { return String(r[1]).trim() === k; }).map(fix); };
+    var one = pick('CCP').concat(pick('BV'), [ka('KAce P (케이스 피)', 'KAce P', 0, '한국제지 단면 도공 판지 · 무형광.', '평량은 업체 확인 · 양면 도공형은 KAce P DUO'), ka('KAce D (케이스 디)', 'KAce D', 0, '한국제지 단면 도공 판지 · 고백색.', '평량은 업체 확인 · 양면 도공형은 KAce D DUO')]);
+    var two = pick('BW').concat(pick('AB'), [ka('KAce P DUO (케이스 피 듀오)', 'KAce P DUO', 0, 'KAce P의 양면 도공형 · 무형광.', '평량은 업체 확인'), ka('KAce D DUO (케이스 디 듀오)', 'KAce D DUO', 0, 'KAce D의 양면 도공형 · 고백색.', '평량은 업체 확인')]);
+    var used = ['CCP', 'BV', 'BW', 'AB'], rest = R.filter(function (r) { var k = String(r[1]).trim(); return used.indexOf(k) < 0 && (CAT_KEEP['용지_판지'] || []).indexOf(k) >= 0; });
+    var T2 = {}; Object.keys(C.T).forEach(function (n) { if (n !== '용지_판지') { T2[n] = C.T[n]; return; }
+      T2['용지_판지 (단면 도공)'] = [H, one]; T2['용지_판지 (양면 도공)'] = [H, two]; if (rest.length) T2['용지_판지 (비도공)'] = [H, rest]; });
+    C.T = T2;
+  })();
   Object.keys(CAT_KEEP).forEach(function (n) { var t = C.T[n]; if (!t || !t[1]) return; var out = []; CAT_KEEP[n].forEach(function (k) { t[1].forEach(function (r) { if (String(r[1]).trim() === k) out.push(r); }); }); if (out.length) t[1] = out; });
   Object.keys(CAT_DROP).forEach(function (n) { var t = C.T[n]; if (t && t[1]) t[1] = t[1].filter(function (r) { return CAT_DROP[n].indexOf(String(r[0]).trim()) < 0; }); });
   Object.keys(C.T).forEach(function (n) { if (n.indexOf('박_') === 0) delete C.T[n]; });
@@ -1642,7 +1659,7 @@ function dEntry(r, sub) { return '<div class="gl"><div class="glt"><b data-cp="'
 // 2026-11-21 실장님: 용어사전 첫 화면 = 도우미 첫 화면처럼 분류를 카드 버튼으로
 var RHOME = true;
 window.plyshRefHome = function () { RHOME = true; S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
-var REF_DS = { '용지': '일반지 · 고급지 · 색지 · 판지 · 스티커 · 필름', '인쇄': '인쇄 방식 · 색 구성 · 별색', '코팅': '라미네이팅 · 기계 · UV · 실크 코팅', '박': '태창 기준 · 금·은·먹 · 컬러박 · 홀로그램 · 투명 홀로그램 · 특수박', '가공': '형압 · 에폭시 · 기타 가공', '톰슨': '목형 · 재단 · 귀도리 · 오시 · 미싱 · 접지 · 타공', '조립': '합지 · 접착', '제본': '중철 · 무선 · 사철 · 양장 · 링', '부속': '헤드밴드 · 가름끈 · 아일렛 · 고리', '포장': '개별 · 납품 · 박스 형태', '굿즈': '소재 · 표면 처리', '결·책등': '종이 결 방향 · 책등 계산법' };
+var REF_DS = { '용지': '일반지 · 고급지 · 색지 · 판지(단면 · 양면 도공) · 스티커 · 필름', '인쇄': '인쇄 방식 · 색 구성 · 별색', '코팅': '라미네이팅 · 기계 · UV · 실크 코팅', '박': '태창 기준 · 금·은·먹 · 컬러박 · 홀로그램 · 투명 홀로그램 · 특수박', '가공': '형압 · 에폭시 · 기타 가공', '톰슨': '목형 · 재단 · 귀도리 · 오시 · 미싱 · 접지 · 타공', '조립': '합지 · 접착', '제본': '중철 · 무선 · 사철 · 양장 · 링', '부속': '헤드밴드 · 가름끈 · 아일렛 · 고리', '포장': '개별 · 납품 · 박스 형태', '굿즈': '소재 · 표면 처리', '결·책등': '종이 결 방향 · 책등 계산법' };
 function renderRef() {
   var groups = REFG.filter(function (g) { return tabsOf([g]).length; }).concat(['결·책등', '디자인']);
   var k = ls.get('pr:ref2') || '용지'; if (groups.indexOf(k) < 0) k = groups[0];
