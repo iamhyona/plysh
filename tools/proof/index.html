@@ -1019,7 +1019,7 @@ function faceSt(t) {
   t.split(/\s*\+\s*/).forEach(function (k) {
     if (/^CMYK$/i.test(k)) o.w = 'CMYK'; else if (/^K$/i.test(k)) o.w = 'K';
     else if (/^(Pantone|팬톤|별색\d?)/i.test(k)) { o.p = true; var n = k.replace(/^(Pantone|팬톤|별색\d?)\s*/i, '').trim(); if (n) o.pn = o.pn.concat(n.split(/\s*,\s*/)); else if (/별색2/.test(k)) o.pn = o.pn.concat(['', '']); }
-    else if (/기계 코팅|수성 코팅/.test(k)) o.mc = k;
+    else if (/기계 코팅|수성 코팅/.test(k)) o.mc = '기계 코팅';
     else if (/^(White|화이트)/i.test(k)) o.x.push('화이트'); else if (/은별색/.test(k)) o.x.push('은별색'); else if (/금별색/.test(k)) o.x.push('금별색');
     else o.x.push(k);
   });
@@ -1095,7 +1095,7 @@ function drawPick() {
   $$('[data-ev]').forEach(function (b) { b.onclick = function () { PK.sd[PK.sel[+b.dataset.es]] = b.dataset.ev; PK.keep = true; drawPick(); }; });
   $$('[data-face]').forEach(function (b) { b.onclick = function () { if (b.disabled) return; PK.face = b.dataset.face; drawPick(); }; });
   var smc = $('#pfSame'); if (smc) smc.onchange = function () { PK.same = this.checked; if (P.faces && PK.same) PK.cs.b = PK.cs.f.slice(); if (P.mode === 'print' && PK.same) PK.fs.b = JSON.parse(JSON.stringify(PK.fs.f)); PK.face = 'f'; PK.keep = true; drawPick(); };
-  $$('[data-pmc]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.mc = b.dataset.pmc === '있음' ? (o.mc || '기계 코팅 (OP)') : ''; drawPick(); }; });
+  $$('[data-pmc]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.mc = b.dataset.pmc === '있음' ? '기계 코팅' : ''; drawPick(); }; });
   var pmS = $('#pfPm'); if (pmS) pmS.onchange = function () { PK.pm = this.value; drawPick(); };
   $$('[data-pw]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.w = o.w === b.dataset.pw ? '' : b.dataset.pw; drawPick(); }; });
   $$('[data-px]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face], v = b.dataset.px; if (v === '팬톤') { o.p = !o.p; if (!o.p) o.pn = []; } else { var j = o.x.indexOf(v); if (j < 0) o.x.push(v); else o.x.splice(j, 1); } drawPick(); if (v === '팬톤' && o.p) { var i = $('#pfPn'); if (i) i.focus(); } }; });
