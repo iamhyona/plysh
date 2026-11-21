@@ -666,7 +666,7 @@ function renderCalc() {
       '<div class="frow">' + num('w', '가로', 'mm') + num('h', '세로', 'mm') + '</div><div class="csep"></div>';
     if (c.t === 'book') L += stp(2, '쪽수 · 부수') + '<div class="frow"><div class="f"><label>내지</label>' + '<span class="ifx pst" data-step="' + (4) + '"><input type="number" inputmode="numeric" data-k="p" value="' + c.p + '"><em>쪽</em><span class="psb"><button type="button" data-pst="1" aria-label="늘리기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" data-pst="-1" aria-label="줄이기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></span></span>' + '</div>' + num('q', '부수', '부') + '</div><div class="frow">' + num('ex', '여분', '%') + '<div class="f"></div></div>' +
       '<div class="nt cnt0">책은 결이 책등과 같은 방향(세로결)으로 자동 계산해요 · 종목/횡목 따로 보여줘요</div>';
-    else if (c.t === 'leaf') L += stp(2, '접지') + '<div class="chips" id="cFd">' + [2, 3, 4, 5, 6].map(function (n) { return '<button data-fd="' + n + '" class="' + (c.fd === n ? 'on' : '') + '">' + n + '단</button>'; }).join('') + '</div>' +
+    else if (c.t === 'leaf') L += stp(2, '접지') + '<div class="chips" id="cFd">' + [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (n) { return '<button data-fd="' + n + '" class="' + (c.fd === n ? 'on' : '') + '">' + n + '단</button>'; }).join('') + '</div>' +
       '<div class="nt cnt0">한 면 가로 = 펼친 가로 ÷ 단수 · 안으로 접혀 들어가는 면은 보통 1~2mm 작게 잡아요</div><div class="csep"></div>' + stp(3, '수량') + qty + gseg;
     else L += stp(2, '수량') + qty + gseg;
   } else {
@@ -1447,6 +1447,7 @@ function bStep(b) { b = String(b || ''); return /중철/.test(b) ? 4 : /무선|P
 var BK_SYNC = ['form', 'bind', 'size', 'cat', 'set', 'q', 'qs', 'qp', 'qdp', 'gift'];
 function bkSync(d, r, k) { if (!r.bk || BK_SYNC.indexOf(k) < 0) return; d.rows.forEach(function (x) { if (x !== r && x.bk === r.bk) x[k] = r[k]; }); }
 function bkPair(d, r) { return r.bk ? d.rows.filter(function (x) { return x.bk === r.bk; }) : []; }
+function cvPg(r) { if (r.part !== '표지') return ''; if (r.cvp !== '8') return '4p'; return '8p (날개' + (r.wgw ? ' ' + r.wgw + 'mm' : '') + ' · ' + (r.wg || '접착') + ')'; }
 function formOf(r) { return r.form || (r.book ? '책자' : r.die || r.pkg ? '패키지' : ''); }
 function pkgGroups() {
   var box = rowsOf('포장_박스형태').map(function (x) { return String(x[0]); });
@@ -1465,10 +1466,13 @@ function dFieldHtml(r, f) {
   if (k === 'bkb') { if (fm !== '책자') return ''; var bv = String(r.bind || ''), hit = false;
     var bo = tabsOf(['제본']).map(function (n) { return '<optgroup label="' + esc(sub(n)) + '">' + rowsOf(n).map(function (x) { var t = String(x[0]); if (t === bv) hit = true; return '<option' + (t === bv ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</optgroup>'; }).join('');
     return '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" data-dr="' + r.id + '" data-k="bind"><option value="">고르기</option>' + (bv && !dEmpty(bv) && !hit ? '<option selected>' + esc(bv) + '</option>' : '') + bo + '</select></div>'; }
-  if (k === 'pg' && fm === '책자' && r.part === '표지') return '<div class="dfr"><label>' + f[1] + '</label><div class="dauto">4p (표지)</div></div>';
+  // 2026-11-21 실장님: 표지 4p / 8p(날개) · 8p면 날개 접착 여부
+  if (k === 'pg' && fm === '책자' && r.part === '표지') { var c8 = r.cvp === '8', sg = function (key, opts, cur) { return '<span class="seg dbk">' + opts.map(function (o) { return '<button type="button" data-cv="' + key + '" data-cvv="' + o[0] + '" data-dr="' + r.id + '"' + (cur === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</span>'; };
+    return '<div class="dfr"><label>' + f[1] + '</label><div>' + sg('cvp', [['4', '4p'], ['8', '8p (날개)']], c8 ? '8' : '4') + '</div></div>' +
+      (c8 ? '<div class="dfr"><label>날개</label><div>' + sg('wg', [['접착', '접착'], ['접착 안 함', '접기만']], r.wg || '접착') + '</div></div><div class="dfr"><label>날개 폭</label><span class="ifx"><input class="din" type="number" inputmode="decimal" data-dr="' + r.id + '" data-k="wgw" value="' + esc(r.wgw || '') + '" placeholder="예: 80"><em>mm</em></span></div>' : ''); }
   if (k === 'pg' && fm === '책자') { var st = bStep(r.bind);
     return '<div class="dfr"><label>' + f[1] + '</label><div><span class="ifx pst" data-step="' + st + '"><input class="din" type="number" inputmode="numeric" data-dr="' + r.id + '" data-k="pgn" value="' + esc(r.pgn || '') + '" placeholder="예: ' + st * 8 + '"><em>p</em><span class="psb"><button type="button" data-pst="1" aria-label="늘리기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" data-pst="-1" aria-label="줄이기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></span></span><div class="dpgh">' + (r.bind && !dEmpty(r.bind) ? esc(r.bind) + ' · ' + st + 'p 단위로 올라가요' : '제본 형태를 고르면 그 배수로 올라가요') + (r.pgn && +r.pgn % st ? ' · <b>' + r.pgn + 'p는 ' + st + '의 배수가 아니에요</b>' : '') + '</div></div></div>'; }
-  if (k === 'fd') { if (fm !== '리플렛') return ''; return '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" ' + a + '><option value="">고르기</option>' + [2, 3, 4, 5, 6].map(function (n) { return '<option value="' + n + '"' + (+v === n ? ' selected' : '') + '>' + n + '단</option>'; }).join('') + '</select></div>'; }
+  if (k === 'fd') { if (fm !== '리플렛') return ''; return '<div class="dfr"><label>' + f[1] + '</label><select class="din dsel" ' + a + '><option value="">고르기</option>' + [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (n) { return '<option value="' + n + '"' + (+v === n ? ' selected' : '') + '>' + n + '단</option>'; }).join('') + '</select></div>'; }
   if (k === 'pg' && fm === '리플렛') { var L = lfOf(r); return '<div class="dfr"><label>전개도 (펼침면)</label><div class="dauto">' + (L.sp ? L.sp + ' mm' : '<i>단수와 완제품 크기를 넣으면 계산돼요</i>') + '</div></div><div class="dfr"><label>' + f[1] + '</label><div class="dauto">' + (L.pg || '<i>단수를 고르면 계산돼요</i>') + '</div></div>'; }
   if (k === 'size') f = [k, fm === '패키지' ? '완제품 크기' : f[1], fm === '패키지' ? '가로×세로×높이 mm' : fm === '낱장' || fm === '책자' ? '가로×세로 mm' : fm === '리플렛' ? '접은 상태 가로×세로 mm' : f[2]];
   if (k === 'size' && fm === '리플렛') f[1] = '완제품 크기';
@@ -1544,10 +1548,11 @@ function bindDoc() {
       r.part = '표지'; c.part = '내지'; r.item = base ? base + ' 표지' : '표지'; c.item = base ? base + ' 내지' : '내지'; r.pg = '4p'; r.pgn = ''; d.rows.splice(d.rows.indexOf(r) + 1, 0, c); toast('표지 · 내지 두 품목으로 나눴어요'); }
     else bkSync(d, r, 'form');
     saveDocs(); renderDoc(); }; });
+  $$('[data-cv]').forEach(function (b) { b.onclick = function () { var r = row(b.dataset.dr); r[b.dataset.cv] = b.dataset.cvv; if (b.dataset.cv === 'cvp' && b.dataset.cvv === '8' && !r.wg) r.wg = '접착'; r.pg = cvPg(r); saveDocs(); renderDoc(); }; });
   $$('[data-bkgo]').forEach(function (b) { b.onclick = function () { ls.set('pr:dsel', b.dataset.bkgo); renderDoc(); }; });
   $$('.din[data-dr]').forEach(function (i) {
     if (i.dataset.k === 'size') i.addEventListener('input', function () { var v = i.value, n = v.replace(/(\d)\s*[xX*＊×]\s*/g, '$1×'); if (n !== v) { var c = Math.max(0, i.selectionStart - (v.length - n.length)); i.value = n; i.setSelectionRange(c, c); } }); // 2026-11-21 실장님: 알파벳 x 쓰면 × 로
-    var up = function () { var r = row(i.dataset.dr); if (i.dataset.k === 'cls') clsSet(r, i.value); else { r[i.dataset.k] = i.value; bkSync(d, r, i.dataset.k); } saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
+    var up = function () { var r = row(i.dataset.dr); if (i.dataset.k === 'cls') clsSet(r, i.value); else { r[i.dataset.k] = i.value; bkSync(d, r, i.dataset.k); if (i.dataset.k === 'wgw') r.pg = cvPg(r); } saveDocs(); $('#dPrev').innerHTML = dPrevHtml(d, r) + '<button class="ddel" id="dDel">이 사양서 삭제</button>'; bindDocPrev(d); bindDel();
       if (i.dataset.k === 'item' || i.dataset.k === 'cls') { var t = r.item || r.set || r.cat || '품목명 없음'; $$('.dit button.on span, .deh b span').forEach(function (e) { e.textContent = t; }); }
       if (/^q(s|p|dp)$/.test(i.dataset.k)) { var Q = dQty(r), qd = $('[data-qv="d"]'), qt = $('[data-qv="t"]'); if (qd) qd.textContent = Q.pc ? '= ' + fmtN(Q.d) + '개' : '판매용 수량 기준'; if (qt) qt.innerHTML = Q.t ? fmtN(Q.t) + '개' : '<i>수량을 넣으면 합계가 나와요</i>'; } };
     i.oninput = up; i.onchange = function () { up();
