@@ -907,10 +907,11 @@ function trimCat(C) {
       BW: ['한창제지', '올펄프 양면 도공 판지. 패키지 바깥쪽과 안쪽 모두 도공면에 인쇄할 때.', '한창제지 기준 BV는 단면 · BW는 양면'],
       AB: ['한솔제지', '한솔제지 Hi-Q 아트보드. 양면 도공 판지.', 'Hi-Q AB 플러스(AB+)는 다른 제품이라 견적·발주 때 제품명 구분'] };
     var fix = function (r) { var k = String(r[1]).trim(), d = D[k]; if (!d) return r; r = r.slice(); r[5] = d[0]; r[6] = d[1]; r[7] = (/추정/.test(r[7]) ? '두께 추정 · ' : '') + d[2]; return r; };
-    var ka = function (nm, al, fz, ds, tp) { return [nm, al, '', '', '', '한국제지', ds, tp]; };
+    // KAce 평량: 한국제지 공식 제품 페이지 300 · 350 · 400g (P DUO는 희망소비자가 표에 450g도 있음) · 두께는 공식 자료 없어 비움
+    var ka = function (nm, al, gs, ds, tp) { return gs.map(function (g) { return [al + ' / ' + g + 'g', al, '', g, '', '한국제지', ds, tp]; }); };
     var pick = function (k) { return R.filter(function (r) { return String(r[1]).trim() === k; }).map(fix); };
-    var one = pick('CCP').concat(pick('BV'), [ka('KAce P (케이스 피)', 'KAce P', 0, '한국제지 단면 도공 판지 · 무형광.', '평량은 업체 확인 · 양면 도공형은 KAce P DUO'), ka('KAce D (케이스 디)', 'KAce D', 0, '한국제지 단면 도공 판지 · 고백색.', '평량은 업체 확인 · 양면 도공형은 KAce D DUO')]);
-    var two = pick('BW').concat(pick('AB'), [ka('KAce P DUO (케이스 피 듀오)', 'KAce P DUO', 0, 'KAce P의 양면 도공형 · 무형광.', '평량은 업체 확인'), ka('KAce D DUO (케이스 디 듀오)', 'KAce D DUO', 0, 'KAce D의 양면 도공형 · 고백색.', '평량은 업체 확인')]);
+    var one = pick('CCP').concat(pick('BV'), ka('', 'KAce P', [300, 350, 400], '케이스 피. 한국제지 단면 도공 판지 · 무형광.', '양면 도공형은 KAce P DUO'), ka('', 'KAce D', [300, 350, 400], '케이스 디. 한국제지 단면 도공 판지 · 고백색.', '양면 도공형은 KAce D DUO'));
+    var two = pick('BW').concat(pick('AB'), ka('', 'KAce P DUO', [300, 350, 400, 450], '케이스 피 듀오. KAce P의 양면 도공형 · 무형광.', '450g은 한국제지 가격표에만 있음'), ka('', 'KAce D DUO', [300, 350, 400], '케이스 디 듀오. KAce D의 양면 도공형 · 고백색.', ''));
     var used = ['CCP', 'BV', 'BW', 'AB'], rest = R.filter(function (r) { var k = String(r[1]).trim(); return used.indexOf(k) < 0 && (CAT_KEEP['용지_판지'] || []).indexOf(k) >= 0; });
     var T2 = {}; Object.keys(C.T).forEach(function (n) { if (n !== '용지_판지') { T2[n] = C.T[n]; return; }
       T2['용지_판지 (단면 도공)'] = [H, one]; T2['용지_판지 (양면 도공)'] = [H, two]; if (rest.length) T2['용지_판지 (비도공)'] = [H, rest]; });
