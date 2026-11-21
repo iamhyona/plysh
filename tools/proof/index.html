@@ -447,6 +447,7 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 .dauto { min-height:46px; display:flex; align-items:center; padding:0 14px; border-radius:12px; background:#e8f3ff; color:#1b64da; font-size:15px; font-weight:700; } .dauto i { font-style:normal; font-weight:500; font-size:13px; color:var(--sub); }
 .dpgh { font-size:12px; color:var(--sub); margin:6px 2px 0; line-height:1.45; } .dpgh b { color:#e5484d; font-weight:600; } .dfr .pst input { width:100%; }
 .dbk { display:inline-flex; background:#f2f4f6; border-radius:12px; padding:4px; gap:4px; } .dbk button { border:0; height:38px; min-width:72px; padding:0 18px; border-radius:9px; background:none; font:inherit; font-size:14px; font-weight:600; color:var(--sub); cursor:pointer; } .dbk button.on { background:#fff; color:var(--txt); font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+/* 2026-11-21 실장님: 아이콘 · 글자는 박스 안 정가운데 (수직 · 수평) */ .pkh button, #pkX { display:inline-flex !important; align-items:center; justify-content:center; padding:0 !important; line-height:0; flex:none; } .pkh button svg { display:block; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -1036,7 +1037,7 @@ function rowDesc(n, r, q) {
 }
 function seg(attr, opts, cur) { return '<span class="seg">' + opts.map(function (o) { return '<button data-' + attr + '="' + esc(o) + '"' + (o === cur ? ' class="on"' : '') + '>' + esc(o) + '</button>'; }).join('') + '</span>'; }
 function drawPick() {
-  var P = PK.P, h = '<div class="pkb"><div class="pkh"><b>' + P.n + '</b><button id="pkX" aria-label="닫기">×</button></div>';
+  var P = PK.P, h = '<div class="pkb"><div class="pkh"><b>' + P.n + '</b><button id="pkX" aria-label="닫기"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
   if (P.side) h += '<div class="pkbar"><span>코팅 면</span>' + seg('sdg', P.side, PK.side) + '</div>';
   if (false) h += '<div class="pkbar"><span>앞면</span><button class="face' + (PK.face === 'f' ? ' on' : '') + '" data-face="f">' + esc(PK.f || '고르기') + '</button><span>뒷면</span><button class="face' + (PK.face === 'b' ? ' on' : '') + '" data-face="b">' + esc(PK.b || (PK.f ? '0' : '고르기')) + '</button></div>';
   if (P.mode === 'print') {
@@ -2075,7 +2076,7 @@ function ptImage(f) {
   var img = new Image(), url = URL.createObjectURL(f);
   img.onload = function () {
     var el = $('#pk'), W = Math.min(520, img.width), H = Math.round(img.height * W / img.width);
-    el.innerHTML = '<div class="pkb"><div class="pkh"><b>사진에서 색 고르기</b><button id="pkX">×</button></div><div class="nt">사진을 눌러서 색을 찍어요 (주변 5×5 평균)</div><canvas id="ptPic" width="' + W + '" height="' + H + '" style="width:100%;border-radius:12px;touch-action:none;cursor:crosshair"></canvas><div class="ptt" id="ptPv"></div><div class="acts"><button class="sv" id="pkOk">이 색으로 찾기</button></div></div>';
+    el.innerHTML = '<div class="pkb"><div class="pkh"><b>사진에서 색 고르기</b><button id="pkX" aria-label="닫기"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="nt">사진을 눌러서 색을 찍어요 (주변 5×5 평균)</div><canvas id="ptPic" width="' + W + '" height="' + H + '" style="width:100%;border-radius:12px;touch-action:none;cursor:crosshair"></canvas><div class="ptt" id="ptPv"></div><div class="acts"><button class="sv" id="pkOk">이 색으로 찾기</button></div></div>';
     el.style.display = 'flex'; document.body.style.overflow = 'hidden';
     var cv = $('#ptPic'), cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, W, H); URL.revokeObjectURL(url);
     var pick = '', close = function () { el.style.display = 'none'; el.innerHTML = ''; document.body.style.overflow = ''; };
@@ -2088,7 +2089,7 @@ function ptDetail(c) {
   var el = $('#pk'), key = c.lib + ':' + c.n, fav = PT.fav.indexOf(key) >= 0, cm = cmykOf(c.rgb), lab = c.lab.map(function (v) { return Math.round(v); });
   var twin = Object.keys(PT.L).filter(function (k) { return k !== c.lib && (k === 'C' || k === 'U'); }).map(function (k) { return PT.L[k].filter(function (x) { return x.n === c.n; })[0]; }).filter(Boolean);
   var nn = nearest(c.lab, c.lib, 8, c);
-  var h = '<div class="pkb ptd"><div class="pkh"><b>' + esc(ptName(c)) + '</b><button id="pkX">×</button></div><div class="pkl" style="padding:14px">';
+  var h = '<div class="pkb ptd"><div class="pkh"><b>' + esc(ptName(c)) + '</b><button id="pkX" aria-label="닫기"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="pkl" style="padding:14px">';
   h += '<div class="big" style="background:' + c.hex + '"></div>';
   h += '<div class="pdv">' + [['HEX', c.hex.toUpperCase()], ['RGB', c.rgb.join(', ')], ['CMYK ≈', cm.join(', ')], ['Lab', lab.join(', ')], ['라이브러리', PTLIB[c.lib][0] + ' · ' + PTLIB[c.lib][2]]].map(function (r) { return '<div data-cp="' + esc(r[1]) + '"><small>' + r[0] + '</small><b>' + esc(r[1]) + '</b></div>'; }).join('') + '</div>';
   h += '<div class="acts"><button class="rs" data-cp="' + esc(ptName(c)) + '">이름 복사</button><button class="rs" data-cp="별색 (' + esc(ptName(c)) + ')">사양서 별색 문구</button><button class="rs" id="ptFv">' + (fav ? '<svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z"/></svg>즐겨찾기 해제' : '<svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z"/></svg>즐겨찾기') + '</button></div>';

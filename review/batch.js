@@ -204,7 +204,7 @@ async function addSpecFiles(fl) {
   drawAtt(); rebuildItems();
 }
 function drawAtt() {
-  $('#specAtt').innerHTML = SPEC.att.map(function (a, i) { return '<span class="att">' + (a.url ? '<img src="' + a.url + '" alt="">' : '') + esc(a.name) + (a.url ? ' <span class="mute">참고용</span>' : a.err ? ' <span class="mute">읽지 못함</span>' : '') + '<button type="button" data-i="' + i + '" aria-label="빼기">×</button></span>'; }).join('');
+  $('#specAtt').innerHTML = SPEC.att.map(function (a, i) { return '<span class="att">' + (a.url ? '<img src="' + a.url + '" alt="">' : '') + esc(a.name) + (a.url ? ' <span class="mute">참고용</span>' : a.err ? ' <span class="mute">읽지 못함</span>' : '') + '<button type="button" data-i="' + i + '" aria-label="빼기"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>'; }).join('');
   $$('#specAtt button').forEach(function (b) { b.onclick = function () { SPEC.att.splice(+b.dataset.i, 1); drawAtt(); rebuildItems(); }; });
 }
 function loadJs(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
@@ -267,7 +267,7 @@ function drawQ() {
         '<select class="inp" data-f="kind">' + KINDS.map(function (k) { return '<option value="' + k[0] + '"' + (q.kind === k[0] ? ' selected' : '') + (k[0] === 'img' ? (q.kind === 'img' ? '' : ' disabled') : q.kind === 'img' ? ' disabled' : '') + '>' + k[1] + '</option>'; }).join('') + '</select>' +
         '<input class="inp" data-f="prodName" list="prodL" placeholder="예: 엽서" value="' + esc(q.prodName) + '">' +
         '<input class="inp" data-f="artist" list="artL" placeholder="아티스트" value="' + esc(q.artist) + '">' +
-        '<button type="button" class="x" data-f="x" aria-label="빼기">×</button>' +
+        '<button type="button" class="x" data-f="x" aria-label="빼기"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
         '<div class="fm">' + esc(CLS_NAME[q.prod]) + ' 기준으로 검사 · ' + (SPEC.items.length ? '사양 <select class="inp" data-f="item" style="padding:2px 6px;font-size:12px;max-width:260px"><option value="-1">맞는 품목 없음</option>' + SPEC.items.map(function (x, i) { return '<option value="' + i + '"' + (q.item === i ? ' selected' : '') + '>' + esc(x.name + (x.w ? ' ' + x.w + '×' + x.h : '')) + '</option>'; }).join('') + '</select>' + (o ? ' ' + esc([o.pages ? o.pages + 'p' : '', o.bind ? BIND_N[o.bind] : '', o.coat ? (o.coat === 'matte' ? '무광' : '유광') : '', o.paper || ''].filter(Boolean).join(' · ')) : '') : '사양서 없음 (크기는 파일 기준)') + '</div></div>';
     }).join('');
   }
