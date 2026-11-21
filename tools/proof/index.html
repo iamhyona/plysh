@@ -1062,7 +1062,7 @@ function drawPick() {
       '<div class="pfs"><div class="pfl">원색</div><div class="chips">' + ['CMYK', 'K'].map(function (v) { return chip('pw', v, FS.w === v); }).join('') + '</div></div>' +
       '<div class="pfs"><div class="pfl">별색 <small>여러 개 고를 수 있어요</small></div><div class="chips">' + SPOTS.map(function (v) { return chip('px', v, v === '팬톤' ? FS.p : FS.x.indexOf(v) >= 0); }).join('') + '</div>' +
       (FS.p ? '<input id="pfPn" class="pkq pfpn" placeholder="팬톤 번호 · 여러 개는 쉼표 (예: 186 C, 877 C)" value="' + esc(FS.pn.filter(Boolean).join(', ')) + '">' : '') + '</div>' +
-      '<div class="pfs"><div class="pfl">기계코팅 <small>인쇄하면서 같이 하는 코팅 · 필요할 때만</small></div><div class="chips">' + rowsOf('코팅_기계코팅').map(function (r) { return chip('pmc', String(r[0]), FS.mc === String(r[0])); }).join('') + '</div></div>' +
+      '<div class="pfs"><div class="pfl">기계 코팅 <small>인쇄하면서 같이 하는 코팅</small></div><div class="chips">' + chip('pmc', '없음', !FS.mc) + chip('pmc', '있음', !!FS.mc) + '</div></div>' +
       '<p class="pfh">' + (PK.face === 'b' ? '뒷면에 인쇄가 없으면 아무것도 고르지 않으면 돼요 (0도)' : '원색과 별색을 같이 고르면 함께 찍혀요 (예: CMYK + 팬톤 = 5도)') + '</p></div>' + '<label class="pfsame"><input type="checkbox" id="pfSame"' + (PK.same ? ' checked' : '') + '><span>뒷면도 앞면과 동일</span></label>';
   }
   if (P.faces) { if (PK.same) PK.face = 'f'; PK.sel = PK.cs[PK.face];
@@ -1095,7 +1095,7 @@ function drawPick() {
   $$('[data-ev]').forEach(function (b) { b.onclick = function () { PK.sd[PK.sel[+b.dataset.es]] = b.dataset.ev; PK.keep = true; drawPick(); }; });
   $$('[data-face]').forEach(function (b) { b.onclick = function () { if (b.disabled) return; PK.face = b.dataset.face; drawPick(); }; });
   var smc = $('#pfSame'); if (smc) smc.onchange = function () { PK.same = this.checked; if (P.faces && PK.same) PK.cs.b = PK.cs.f.slice(); if (P.mode === 'print' && PK.same) PK.fs.b = JSON.parse(JSON.stringify(PK.fs.f)); PK.face = 'f'; PK.keep = true; drawPick(); };
-  $$('[data-pmc]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.mc = o.mc === b.dataset.pmc ? '' : b.dataset.pmc; drawPick(); }; });
+  $$('[data-pmc]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.mc = b.dataset.pmc === '있음' ? (o.mc || '기계 코팅 (OP)') : ''; drawPick(); }; });
   var pmS = $('#pfPm'); if (pmS) pmS.onchange = function () { PK.pm = this.value; drawPick(); };
   $$('[data-pw]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face]; o.w = o.w === b.dataset.pw ? '' : b.dataset.pw; drawPick(); }; });
   $$('[data-px]').forEach(function (b) { b.onclick = function () { var o = PK.fs[PK.face], v = b.dataset.px; if (v === '팬톤') { o.p = !o.p; if (!o.p) o.pn = []; } else { var j = o.x.indexOf(v); if (j < 0) o.x.push(v); else o.x.splice(j, 1); } drawPick(); if (v === '팬톤' && o.p) { var i = $('#pfPn'); if (i) i.focus(); } }; });
