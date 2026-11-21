@@ -458,6 +458,8 @@ html.emb main.io > .cw2, main.io > .cw2, main.io > #cB { grid-column:1 / -1 !imp
 /* 2026-11-21 실장님: 미리보기 고르는 품목은 파란 칸 대신, 고르지 않은 품목을 흐리게 */
 .dsr:has(.dpv.on) .dpv { opacity:.42; transition:opacity .15s; } .dsr:has(.dpv.on) .dpv:hover { opacity:.75; background:none; } .dsr:has(.dpv.on) .dpv.on { opacity:1; background:none !important; }
 .dpe { color:var(--sub) !important; font-weight:600 !important; } .dpa button { background:var(--chip) !important; }
+/* 2026-11-21 실장님: 고른 뒤 드롭다운 · 입력 칸에 주황 테두리(브라우저 기본 초점선) 안 뜨게 */
+select:focus, input:focus, button:focus, textarea:focus { outline:none !important; } select:focus-visible { box-shadow:0 0 0 2px #d1d6db !important; }
 </style>
 <script>try { if (window.parent !== window && window.parent.plyshSync) document.documentElement.classList.add('emb'); } catch (e) {}</script>
 </head>
@@ -1563,7 +1565,7 @@ function bindDoc() {
     else t.i.forEach(function (n, j) { var r = docRow(n); if (t.form) r.form = t.form; dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
     saveDocs(); renderDoc(); toast(t.t + ' 구성을 불러왔어요');
   }
-  var lb = $('#dLoad'); if (lb) lb.onchange = function () { var k = lb.value; lb.value = ''; if (k) tplLoad(k); }; // 구성 불러오기 = 드롭다운 (2026-11-20 실장님: 상품 라벨 생성의 언어 선택처럼)
+  var lb = $('#dLoad'); if (lb) lb.onchange = function () { var k = lb.value; lb.value = ''; lb.blur(); if (k) tplLoad(k); }; // 구성 불러오기 = 드롭다운 (2026-11-20 실장님: 상품 라벨 생성의 언어 선택처럼)
   if (!d) return;
   var add = function (r) { d.rows.push(r); ls.set('pr:dsel', r.id); saveDocs(); renderDoc(); if (!r.item) setTimeout(function () { var x = $('.din[data-k="item"]'); if (x) x.focus(); }, 30); };
   $('#dSave').onclick = function () { commitDocs(); toast('임시 저장했어요 · 이 기기에서 이어 쓸 수 있어요'); };
