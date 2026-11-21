@@ -875,6 +875,8 @@ function trimCat(C) {
   Object.keys(CAT_DROP).forEach(function (n) { var t = C.T[n]; if (t && t[1]) t[1] = t[1].filter(function (r) { return CAT_DROP[n].indexOf(String(r[0]).trim()) < 0; }); });
   Object.keys(C.T).forEach(function (n) { if (n.indexOf('박_') === 0) delete C.T[n]; });
   Object.keys(CAT_TC).forEach(function (k) { C.T['박_' + k] = [['표준 표기', '별칭·영문', '설명', '주의·팁'], CAT_TC[k].map(function (r) { return r.slice(); })]; });
+  // 2026-11-21 실장님: 제본·부속 맨 위 = 무선제본 · 중철제본 · 떡제본 순서
+  (function () { var t = C.T['제본_중철·무선']; if (!t || !t[1]) return; var O = ['무선 제본', '중철 제본', '떡제본 (상단)']; t[1].sort(function (a, b) { var i = O.indexOf(String(a[0]).trim()), j = O.indexOf(String(b[0]).trim()); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); }); })();
   Object.keys(CAT_ADD).forEach(function (n) { var t = C.T[n]; if (!t || !t[1]) return; CAT_ADD[n].forEach(function (a) { if (t[1].some(function (r) { return String(r[0]).trim() === a.row[0]; })) return; var i = -1; t[1].forEach(function (r, j) { if (String(r[0]).trim() === a.after) i = j; }); t[1].splice(i < 0 ? t[1].length : i + 1, 0, a.row.slice()); }); });
   // 2026-11-20 실장님: 밍크지 컬러 채움 (삼화페이퍼 밍크지 페이지 기준 11색 · 평량은 색마다 다를 수 있음), 매직칼라 평량 안내
   var sk = C.T['용지_색지'];
