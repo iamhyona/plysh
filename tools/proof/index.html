@@ -928,8 +928,7 @@ function trimCat(C) {
   })();
   Object.keys(CAT_KEEP).forEach(function (n) { var t = C.T[n]; if (!t || !t[1]) return; var out = []; CAT_KEEP[n].forEach(function (k) { t[1].forEach(function (r) { if (String(r[1]).trim() === k) out.push(r); }); }); if (out.length) t[1] = out; });
   Object.keys(CAT_DROP).forEach(function (n) { var t = C.T[n]; if (t && t[1]) t[1] = t[1].filter(function (r) { return CAT_DROP[n].indexOf(String(r[0]).trim()) < 0; }); });
-  Object.keys(C.T).forEach(function (n) { if (n.indexOf('박_') === 0) delete C.T[n]; });
-  Object.keys(CAT_TC).forEach(function (k) { C.T['박_' + k] = [['표준 표기', '별칭·영문', '설명', '주의·팁'], CAT_TC[k].map(function (r) { return r.slice(); })]; });
+  Object.keys(CAT_TC).forEach(function (k) { C.T['박도감_' + k] = [['표준 표기', '별칭·영문', '설명', '주의·팁'], CAT_TC[k].map(function (r) { return r.slice(); })]; });
   // 2026-11-21 실장님: 제본·부속 맨 위 = 무선제본 · 중철제본 · 떡제본 순서
   (function () { var t = C.T['제본_중철·무선']; if (!t || !t[1]) return; var O = ['무선 제본', '중철 제본', '떡제본 (상단)']; t[1].sort(function (a, b) { var i = O.indexOf(String(a[0]).trim()), j = O.indexOf(String(b[0]).trim()); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); }); })();
   C.T['접지도감_접지'] = [['표준 표기', '별칭·영문', '설명', '주의·팁'], GLF.map(function (r) { return r.slice(); })];
@@ -1907,7 +1906,7 @@ function glossEntry0(n, r, showTab) {
     return h + '</div>';
   }
   var I = info(n, r); if (/색구성|도수/.test(n)) I.a = (I.a ? I.a + ' · ' : '') + degOf(v) + '도';
-  h += (I.a ? '<i>' + esc(I.a) + '</i>' : '') + (showTab ? '<em>' + esc(n.replace('_', ' › ').replace(/^제본도감/, '제본').replace(/^접지도감/, '톰슨')) + '</em>' : '') + '</div>' + (I.d ? '<p>' + esc(I.d) + '</p>' : '') + (I.t ? '<p class="tip' + (/^제본도감/.test(n) ? ' op' : '') + '">' + esc(I.t) + '</p>' : '') + glExLink(n, v);
+  h += (I.a ? '<i>' + esc(I.a) + '</i>' : '') + (showTab ? '<em>' + esc(n.replace('_', ' › ').replace(/^제본도감/, '제본').replace(/^박도감/, '박').replace(/^접지도감/, '톰슨')) + '</em>' : '') + '</div>' + (I.d ? '<p>' + esc(I.d) + '</p>' : '') + (I.t ? '<p class="tip' + (/^제본도감/.test(n) ? ' op' : '') + '">' + esc(I.t) + '</p>' : '') + glExLink(n, v);
   return h + '</div>';
 }
 /* 제본·접지: 그림 대신 실제 예시 이미지 검색으로 연결 */
@@ -1934,7 +1933,7 @@ function renderRef() {
   var h = '<div class="phd"><b>용어사전</b><small>인쇄 · 후가공 · 제본 용어와 디자인 용어</small></div>';
   h += '<input id="rQ" class="pkq rq" placeholder="용어 검색 (한글 · 영문 · 한자 · 일본어)" value="' + esc(S.rq || '') + '">';
   if (q) {
-    var hits = [].concat.apply([], Object.keys(CAT.T).filter(function (n) { return n.indexOf('제본_') !== 0 && n !== '톰슨_접지'; }).map(function (n) { return rowsOf(n).filter(function (r) { return (r.join(' ') + ' ' + (nmOf(r[0]) || []).join(' ')).toLowerCase().indexOf(q) >= 0; }).map(function (r) { return [n, r]; }); }));
+    var hits = [].concat.apply([], Object.keys(CAT.T).filter(function (n) { return n.indexOf('제본_') !== 0 && n.indexOf('박_') !== 0 && n !== '톰슨_접지'; }).map(function (n) { return rowsOf(n).filter(function (r) { return (r.join(' ') + ' ' + (nmOf(r[0]) || []).join(' ')).toLowerCase().indexOf(q) >= 0; }).map(function (r) { return [n, r]; }); }));
     var dh = []; Object.keys(DTERMS).forEach(function (k2) { DTERMS[k2].forEach(function (r) { if ((r.join(' ') + ' ' + (nmOf(r[0]) || []).join(' ')).toLowerCase().indexOf(q) >= 0) dh.push(dEntry(r, k2)); }); });
     h += '<div class="card">' + dh.join('') + hits.slice(0, 120).map(function (x) { return glossEntry(x[0], x[1], true); }).join('') + (hits.length || dh.length ? '' : '<div class="empty2">찾는 용어가 없어요</div>') + '</div><div class="nt c">' + hits.length + '개 · 굵은 이름을 누르면 표준 표기가 복사돼요</div>';
   } else {
@@ -1943,7 +1942,7 @@ function renderRef() {
     h += '<div class="rfx' + (home ? ' rhx' : '') + '"><aside class="rnav"><div class="chips rtab"><b class="rph">인쇄</b>' + groups.map(function (g) { return g === '디자인' ? '<button class="rdm' + (g === k ? ' on' : '') + '" data-ref="디자인">디자인</button>' : '<button data-ref="' + g + '"' + (g === k ? ' class="on"' : '') + '>' + g + '</button>'; }).join('') +
       '<b class="rph">디자인</b>' + Object.keys(DTERMS).map(function (n) { return '<button class="rdp' + (k === '디자인' && n === dsub ? ' on' : '') + '" data-ref="디자인" data-dsub="' + esc(n) + '">' + esc(n) + '<small>' + DTERMS[n].length + '</small></button>'; }).join('') + '</div></aside><div class="rbody">';
     if (home) {
-      var cnt = function (g) { return g === '결·책등' ? 0 : [].concat.apply([], tabsOf([g === '제본' ? '제본도감' : g]).map(function (n) { return rowsOf(n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n); })).length; };
+      var cnt = function (g) { return g === '결·책등' ? 0 : [].concat.apply([], tabsOf([g === '제본' ? '제본도감' : g === '박' ? '박도감' : g]).map(function (n) { return rowsOf(n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n); })).length; };
       var card = function (attr, t, n, d) { return '<button class="rhc" type="button" ' + attr + '><b>' + esc(t) + (n ? '<small>' + n + '</small>' : '') + '</b><span>' + esc(d) + '</span></button>'; };
       h += '<div class="rhm"><h4>인쇄</h4><div class="rhl">' + groups.filter(function (g) { return g !== '디자인'; }).map(function (g) { return card('data-ref="' + g + '"', g, cnt(g), REF_DS[g] || tabsOf([g]).map(sub).join(' · ')); }).join('') + '</div>' +
         '<h4>디자인</h4><div class="rhl">' + Object.keys(DTERMS).map(function (n) { return card('data-ref="디자인" data-dsub="' + esc(n) + '"', n, DTERMS[n].length, DTERMS[n].slice(0, 4).map(function (r) { return r[0]; }).join(' · ')); }).join('') + '</div></div>';
@@ -1960,7 +1959,7 @@ function renderRef() {
       h += '<div class="nt" style="margin:0 4px 10px">지난 사양서에서 찾은 오타·표기 불일치예요. 원본 파일은 고치지 않았어요.</div>';
       grp(CAT.FIX || [], 0).forEach(function (g) { h += '<div class="card"><div class="ct">' + esc(g[0]) + '<small>' + g[1].length + '</small></div>' + g[1].map(function (r) { return '<div class="fx"><small>' + esc(r[1]) + '</small><s>' + esc(r[2]) + '</s><b>→ ' + esc(r[3]) + '</b></div>'; }).join('') + '</div>'; });
     } else {
-      var tabs = tabsOf([k === '제본' ? '제본도감' : k]).map(function (n) { return n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n; }), st = ls.get('pr:refsub:' + k); if (tabs.indexOf(st) < 0) st = tabs[0];
+      var tabs = tabsOf([k === '제본' ? '제본도감' : k === '박' ? '박도감' : k]).map(function (n) { return n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n; }), st = ls.get('pr:refsub:' + k); if (tabs.indexOf(st) < 0) st = tabs[0];
       var flat = k === '코팅'; // 코팅은 세부 분류 없이 쭉 나열 (2026-11-20 실장님)
       if (!flat) h += '<div class="chips rsub">' + tabs.map(function (n) { return '<button data-rs="' + esc(n) + '"' + (n === st ? ' class="on"' : '') + '>' + esc(sub(n)) + '<small>' + rowsOf(n).length + '</small></button>'; }).join('') + '</div>';
       var rows = rowsOf(st);
