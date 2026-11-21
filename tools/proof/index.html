@@ -927,7 +927,9 @@ var PICK = {
   // 2026-11-21 실장님: 제본 / 부속 따로 · 부속은 고른 제본에 맞는 것만 (헤드밴드는 양장·사철, 가름끈은 양장·사철·PUR·반양장)
   bind: { n: '제본', tabs: function () { return tabsOf(['제본']); }, mode: 'many' },
   acc: { n: '부속', tabs: function () { return tabsOf(['부속']).filter(function (n) { return accOk(n, (PK_CTX || {}).bind); }); }, mode: 'many' },
-  pack: { n: '포장', tabs: function () { return tabsOf(['포장']); }, mode: 'many' }
+  // 2026-11-21 실장님: 포장에 박스 형태(제품 형태)는 빼고, 납품은 따로
+  pack: { n: '포장', tabs: function () { return tabsOf(['포장']).filter(function (n) { return n !== '포장_박스형태' && n !== '포장_납품'; }); }, mode: 'many' },
+  dlv: { n: '납품', tabs: function () { return ['포장_납품'].filter(function (n) { return CAT.T[n]; }); }, mode: 'many' }
 };
 /* 열 이름으로 찾기 (시트에서 열 순서가 바뀌어도 OK) */
 function hcol(n, re) { var h = (CAT.T[n] || [[]])[0] || []; for (var i = 0; i < h.length; i++) if (re.test(h[i])) return i; return -1; }
@@ -1215,7 +1217,7 @@ function sheetHint(r, v) {
   var q = (v && v.q) || 0, need = r.flat ? Math.ceil(q * ((v && v.k) || 1) * r.flat[2] / bs.n * 1.05) : Math.ceil(r.book[2] / (bs.n * 2) * q * 1.05);
   return '<div class="sh"><b>' + bs.P.n + '</b> ' + (r.book ? bs.n + '판걸이 (1장 ' + bs.n * 2 + 'p)' : bs.n + '개 걸이') + ' · 로스 ' + Math.round(bs.loss * 100) + '%' + (q ? ' · 전지 약 ' + fmtN(need) + '장 (' + fmtN(need / 500, 2) + '연)' : '') + (r.gn || r.book ? ' · ' + GN_LB[r.book ? 'v' : r.gn] : '') + '</div>';
 }
-var FLD = [['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['acc', '부속', ''], ['pack', '포장', 'dl-pack']];
+var FLD = [['paper', '용지', 'dl-paper'], ['print', '인쇄', 'dl-print'], ['coat', '코팅', 'dl-coat'], ['fin', '특수가공', 'dl-fin'], ['cut', '톰슨·접지·가공', 'dl-cut'], ['bind', '제본', 'dl-bind'], ['acc', '부속', ''], ['pack', '포장', 'dl-pack'], ['dlv', '납품', '']];
 function renderOne() {
   var t = tpl(S.id); if (!t) return go('list');
   if (!CUR || CUR.id !== t.id) { var st = stateOf(t); CUR = { id: t.id, v: st.v, R: st.R }; }
@@ -1294,7 +1296,7 @@ function splitPaper(p) { var m = String(p || '').match(/^(.*?)\s*\/\s*([\d,]+\s*
 function rowTsv(r, i) {
   var pp = splitPaper(r.paper);
   var Q = dQty(r), qa = Q.has ? fmtN(Q.s) : r.q, qb = Q.has ? ((Q.p + Q.d) ? fmtN(Q.p + Q.d) + ' / ' + fmtN(Q.t) : '') : r.gift;
-  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, dJn([r.fin, r.emb]), dJn([r.cut, r.fold, r.glue]), dJn([r.bind, r.acc]), r.mat, r.pack, r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
+  return [r.cat, r.set, i == null ? '' : i + 1, r.item, qa, qb, r.size, r.pg, pp[0], pp[1], r.print, r.coat, dJn([r.fin, r.emb]), dJn([r.cut, r.fold, r.glue]), dJn([r.bind, r.acc]), r.mat, dJn([r.pack, r.dlv]), r.etc].map(function (x) { return String(x == null ? '' : x).replace(/[\t\n]/g, ' '); }).join('\t');
 }
 function dJn(a) { var v = a.filter(function (x) { return !dEmpty(x); }); return v.length ? v.join(' / ') : (a[0] == null ? '' : a[0]); }
 var DF = [['item', '세부 품목', ''], ['set', '중분류', ''], ['cat', '대분류', ''], ['q', '제작수량', ''], ['gift', '증정 / 총 제작', ''], ['size', '판형', ''], ['pg', '페이지', ''],
@@ -1323,7 +1325,7 @@ var DSEC = [
   ['용지 · 인쇄', [['paper', '용지'], ['print', '인쇄'], ['coat', '코팅']]],
   ['가공 · 제본', [['fin', '박'], ['emb', '형압 · 에폭시'], ['cut', '톰슨 · 재단 · 타공'], ['fold', '접지'], ['glue', '합지 · 접착'], ['bind', '제본'], ['acc', '부속']]],
   // 2026-11-20 실장님: 정합(구성품 맞춰 넣기)과 포장(개별 · 외부 포장)을 따로
-  ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]],
+  ['정합 · 포장 · 전달', [['mat', '정합', '구성품을 맞춰 넣는 방법 · 순서'], ['pack', '포장'], ['dlv', '납품'], ['etc', '기타 전달 사항', '위치 · 주의할 점 등']]],
   ['수량', [['qs', '판매용 수량', '예: 1,000'], ['qp', '홍보용 수량', '예: 20'], ['qdp', '불량대응용 수량'], ['qt', '총 제작 수량']]]];
 function clsOf(r) { return [r.cat, r.set, r.item].filter(function (x) { return !dEmpty(x); }).join(' / '); }
 // 슬래시 3개 = 대분류 / 중분류 / 세부 품목, 2개 = 대분류 / 중분류, 1개 = 세부 품목
@@ -1411,7 +1413,7 @@ function bindDoc() {
   $$('[data-tpl]').forEach(function (b) { b.onclick = function () { tplLoad(b.dataset.tpl); }; });
   function tplLoad(k) {
     var t = DOC_TPL.filter(function (x) { return x.k === k; })[0], dd = curDoc() || newDoc();
-    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'qs', 'qp', 'size', 'pg', 'paper', 'print', 'cut', 'fold', 'glue', 'emb', 'mat', 'pack', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
+    dd.rows = dd.rows.filter(function (r) { return ['item', 'cat', 'set', 'q', 'gift', 'qs', 'qp', 'size', 'pg', 'paper', 'print', 'cut', 'fold', 'glue', 'emb', 'mat', 'pack', 'dlv', 'etc'].some(function (k) { return String(r[k] || '').trim(); }); });
     t.i.forEach(function (n, j) { var r = docRow(n); dd.rows.push(r); if (!j) ls.set('pr:dsel', r.id); });
     saveDocs(); renderDoc(); toast(t.t + ' 구성을 불러왔어요');
   }
