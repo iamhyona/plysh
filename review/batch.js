@@ -872,7 +872,7 @@ async function sheetDoc(Rs) {
     cov + pages.map(function (p) { return p.html; }).join('') + '<script>' + SHEET_JS + '<\/script></body></html>';
   return doc;
 }
-var SHEET_V = '20261120u';
+var SHEET_V = '20261122a';
 function strip(s) { return String(s || '').replace(/<[^>]+>/g, '').replace(/\*\*/g, ''); }
 
 
