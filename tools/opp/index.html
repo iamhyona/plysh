@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>/* 승인된 팀원만: 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>OPP 봉투 규격</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script>try { if (window.self !== window.top) document.documentElement.classList.add('emb'); } catch (e) { document.documentElement.classList.add('emb'); }</script>
+<style>
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --line2:#f2f4f6; --t1:#191f28; --t2:#4e5968; --t3:#8b95a1; --t4:#b0b8c1; --blue:#3182f6; --bluebg:#e8f3ff; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { background:var(--bg); color:var(--t1); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; font-size:14px; line-height:1.5; letter-spacing:0; }
+button, input { font:inherit; color:inherit; }
+svg.i { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+main { max-width:1120px; margin:0 auto; padding:20px 16px 80px; }
+html.emb main { padding-top:16px; }
+.phd { margin:0 0 20px; } .phd b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; } .phd small { display:block; margin-top:6px; font-size:14px; color:var(--t3); }
+html.emb .phd { display:none; }
+.lay { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; align-items:start; }
+.side { display:none; }
+@media (min-width:760px) {
+  .lay { grid-template-columns:minmax(0,1fr) 272px; }
+  .side { display:block; position:sticky; top:0; max-height:100vh; overflow:auto; scrollbar-width:none; }
+  .side::-webkit-scrollbar { display:none; }
+  .fbtn { display:none !important; }
+}
+/* 검색 + 칩 한 줄 (PC) · 모바일은 두 줄 */
+.bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 12px; }
+.q { position:relative; flex:1 1 0; min-width:0; }
+@media (min-width:760px) { .qrow { flex:1 1 260px !important; max-width:360px !important; } }
+.q svg { position:absolute; left:14px; top:13px; color:var(--t3); }
+.q input { width:100%; height:46px; border:0; background:#fff; border-radius:12px; padding:0 40px 0 44px; font-size:16px; outline:none; }
+.q input:focus { box-shadow:inset 0 0 0 1.5px #4e5968; }
+.q .x { position:absolute; right:8px; top:9px; width:28px; height:28px; border:0; border-radius:50%; background:#e5e8eb; color:var(--t2); display:none; align-items:center; justify-content:center; cursor:pointer; }
+.q .x svg { position:static; width:14px; height:14px; color:var(--t2); }
+.q.on .x { display:flex; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { height:36px; padding:0 16px; border:0; border-radius:18px; background:#fff; color:var(--t2); font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; }
+.chip small { font-size:12px; color:var(--t3); font-weight:600; }
+.chip.on { background:var(--t1); color:#fff; } .chip.on small { color:#b0b8c1; }
+.fbtn { flex:none; width:46px; height:46px; padding:0; border-radius:12px; justify-content:center; position:relative; }
+.fbtn em { position:absolute; top:6px; right:6px; }
+.chips#kind { flex:1 1 100%; }
+@media (min-width:760px) { .chips#kind { flex:0 1 auto; } }
+.fbtn em { font-style:normal; min-width:18px; height:18px; border-radius:9px; background:var(--t1); color:#fff; font-size:11px; display:none; align-items:center; justify-content:center; padding:0 5px; }
+.fbtn.has em { display:inline-flex; }
+/* 결과 머리 */
+.box { background:var(--card); border-radius:20px; padding:20px; }
+@media (max-width:519px) { .box { padding:16px; } }
+.fit { margin:0 0 12px; }
+.fit b { display:block; font-size:16px; font-weight:800; }
+.fit p { margin-top:6px; font-size:13px; color:var(--t3); }
+.cnt { margin:4px 0 12px; font-size:13px; color:var(--t3); }
+.cnt b { color:var(--t2); font-weight:700; }
+.grp { margin:28px 0 12px; font-size:16px; font-weight:800; display:flex; align-items:baseline; gap:8px; }
+.grp:first-child { margin-top:0; } .grp small { font-size:13px; color:var(--t3); font-weight:600; }
+.grid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+@media (min-width:640px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (min-width:1180px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+.card { background:var(--card); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:14px; }
+@media (max-width:519px) { .card { padding:16px; } }
+.ch { display:flex; gap:14px; align-items:center; }
+.pic { width:48px; height:48px; flex:none; display:flex; align-items:center; justify-content:center; }
+.pic svg { overflow:visible; }
+.sz { min-width:0; flex:1; }
+.sz b { display:block; font-size:19px; font-weight:800; letter-spacing:-0.01em; font-variant-numeric:tabular-nums; cursor:copy; }
+.sz b span { font-size:14px; font-weight:700; color:var(--t3); }
+.sz div { margin-top:2px; display:flex; flex-wrap:wrap; gap:4px 8px; font-size:13px; color:var(--t3); }
+.tg { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; background:var(--line2); color:var(--t2); font-size:12px; font-weight:700; white-space:nowrap; }
+.tg.rec { background:var(--bluebg); color:var(--blue); }
+.buys { display:flex; flex-direction:column; gap:6px; }
+.buy { display:flex; align-items:center; gap:10px; min-height:40px; padding:8px 12px 8px 14px; border-radius:12px; background:var(--line2); text-decoration:none; color:var(--t1); }
+.buy:hover { background:#e9ecef; }
+.buy b { font-size:14px; font-weight:700; white-space:nowrap; }
+.buy span { flex:1; min-width:0; font-size:13px; color:var(--t3); text-align:right; line-height:1.4; }
+.buy svg { width:16px; height:16px; color:var(--t3); }
+.empty { padding:48px 20px; text-align:center; color:var(--t3); font-size:14px; line-height:1.6; }
+.more { display:flex; justify-content:center; margin-top:12px; }
+.btn2 { height:40px; padding:0 18px; border:0; border-radius:12px; background:#fff; color:var(--t2); font-size:14px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; text-decoration:none; }
+/* 필터 패널 */
+.fp { background:var(--card); border-radius:20px; padding:20px; }
+.fs + .fs { margin-top:28px; }
+.fs h5 { font-size:13px; font-weight:700; color:var(--t2); margin:0 0 8px; display:flex; justify-content:space-between; }
+.fs h5 small { font-weight:600; color:var(--t3); }
+.fp .chip { background:var(--line2); }
+.fp .chip.on { background:var(--t1); }
+.use { display:flex; flex-direction:column; gap:4px; }
+.use button { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:40px; padding:0 12px; border:0; border-radius:10px; background:none; text-align:left; cursor:pointer; font-size:14px; font-weight:600; color:var(--t2); }
+.use button small { font-size:12px; color:var(--t3); font-weight:600; font-variant-numeric:tabular-nums; }
+.use button.on { background:var(--line2); color:var(--t1); box-shadow:inset 0 0 0 1.5px #4e5968; }
+.cus { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:8px; }
+.cus label { display:block; font-size:12px; font-weight:600; color:var(--t3); margin:0 0 6px; }
+.cus span { position:relative; display:block; }
+.cus input { width:100%; height:46px; border:0; border-radius:10px; background:var(--line2); padding:0 26px 0 10px; font-size:16px; font-weight:700; font-variant-numeric:tabular-nums; outline:none; }
+.cus input:focus { box-shadow:inset 0 0 0 1.5px #4e5968; background:#fff; }
+.cus em { position:absolute; right:8px; top:14px; font-style:normal; font-size:12px; color:var(--t3); }
+.rst { margin-top:28px; width:100%; height:40px; border:0; border-radius:12px; background:var(--line2); color:var(--t2); font-size:14px; font-weight:700; cursor:pointer; }
+/* 안내 */
+.notes { margin-top:28px; }
+.notes details { background:var(--card); border-radius:20px; }
+.notes details + details { margin-top:12px; }
+.notes summary { list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:18px 20px; font-size:15px; font-weight:700; }
+.notes summary::-webkit-details-marker { display:none; }
+.notes summary svg { color:var(--t3); transition:transform .15s; }
+.notes details[open] summary svg { transform:rotate(180deg); }
+.nb { padding:0 20px 20px; font-size:14px; color:var(--t2); line-height:1.7; }
+.nb li { list-style:none; position:relative; padding-left:12px; } .nb li + li { margin-top:6px; }
+.nb li::before { content:''; position:absolute; left:0; top:11px; width:4px; height:4px; border-radius:50%; background:var(--t4); }
+.nb a { color:var(--blue); text-decoration:none; }
+.src { margin-top:12px; font-size:12px; color:var(--t3); line-height:1.6; }
+.glo { margin-top:12px; }
+/* 모바일 필터 시트 */
+.dim { position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .2s; z-index:40; }
+.sheet { position:fixed; left:0; right:0; bottom:0; max-height:86vh; overflow:auto; background:#fff; border-radius:20px 20px 0 0; padding:20px 16px calc(24px + env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform .22s; z-index:41; }
+.sheet .fp { padding:0; }
+.sheet .sh { display:flex; align-items:center; justify-content:space-between; margin:0 0 20px; font-size:18px; font-weight:800; }
+.cls { width:40px; height:40px; border:0; border-radius:50%; background:#191f28; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.cls svg { width:18px; height:18px; }
+body.sopen .dim { opacity:1; pointer-events:auto; } body.sopen .sheet { transform:none; }
+.toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:#191f28; color:#fff; font-size:14px; font-weight:600; padding:12px 18px; border-radius:12px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:50; white-space:nowrap; }
+.toast.on { opacity:1; }
+</style>
+</head>
+<body>
+<main>
+  <div class="phd"><b>OPP 봉투 규격</b><small>국내 판매처에 실제로 있는 OPP 봉투 규격과 구매 링크 · 조사 2026.11.22</small></div>
+  <div class="lay">
+    <div>
+      <div class="bar">
+        <div style="display:flex;gap:8px;flex:1 1 100%;max-width:100%" class="qrow"><label class="q" id="qw"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" inputmode="search" autocomplete="off" placeholder="크기로 찾기 · 예: 60 90, 6x9"><button type="button" class="x" id="qx" aria-label="지우기"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label><button type="button" class="chip fbtn" id="fb" aria-label="필터"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg><em id="fbn"></em></button></div>
+        <div class="chips" id="kind"></div>
+      </div>
+      <div id="out"></div>
+      <div class="notes">
+        <details><summary>규격 읽는 법 · 고르는 법<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary><div class="nb"><ul>
+          <li>규격은 <b>가로 × 세로 + 접착 날개</b> (mm). 판매처는 cm로도 써요. 6 × 9 + 4 = 60 × 90 + 40mm.</li>
+          <li>가로 = 입구 폭, 세로 = 입구에서 바닥까지. 접착 날개(보통 40mm)는 세로에 들어가지 않아요.</li>
+          <li>두께 0.04mm = 40㎛(마이크론) = 0.04T. 새로피엔엘 품명의 (3) · (4)는 0.03 · 0.04mm예요.</li>
+          <li>물건 가로 + 두께가 봉투 가로보다 작아야 들어가요. 세로도 같은 식. OPP는 늘어나지 않아 가로 3~10mm, 세로 3~15mm 여유가 좋아요.</li>
+          <li>헤다 봉투는 위에 걸이 구멍이 있는 머리(헤다) 30mm가 따로 있어요. 여기 세로는 물건이 들어가는 칸만이에요.</li>
+          <li>사양서에는 '봉투 종류 · 규격 · 두께'를 함께 적어요. 규격 숫자를 누르면 그대로 복사돼요.</li>
+        </ul></div></details>
+        <details><summary>출처 · 조사 날짜<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary><div class="nb"><ul>
+          <li><a href="https://www.saeropnl.com/m/page.php?ps_code=31" target="_blank" rel="noopener">새로피엔엘</a> · OPP 접착 · 비접착 규격표 (0.03 · 0.04mm)</li>
+          <li><a href="https://xn--ij1bycz62bkyq.com/category/opp%EB%B4%89%ED%88%AC%EC%A0%91%EC%B0%A9%EC%8B%9D/100/" target="_blank" rel="noopener">비닐닷컴</a> · OPP 접착 · 비접착 · 헤다 (기본 0.04mm, 일부 0.03mm)</li>
+          <li><a href="https://kspojang.co.kr/category/opp%EC%A0%91%EC%B0%A9%ED%97%A4%EB%8B%A4%EB%B4%89%ED%88%AC/70/" target="_blank" rel="noopener">광성비닐포장</a> · OPP 접착 · 비접착 · 헤다 (두께 표기 없음, 200매 가격)</li>
+        </ul><p class="src">2026.11.22 각 판매처 상품 목록에서 모았어요. 가격 · 재고 · 상품 번호는 바뀔 수 있으니 주문 전에 상품 페이지에서 다시 확인해요. 비접착 봉투 일부는 '가로 묶음' 상품 안에서 세로를 고르는 방식이에요.</p>
+        <div class="glo"><button type="button" class="btn2" id="glo"><svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h8"/></svg>용어사전에서 OPP 보기</button></div></div></details>
+      </div>
+    </div>
+    <aside class="side" id="side"></aside>
+  </div>
+</main>
+<div class="dim" id="dim"></div>
+<div class="sheet" id="sheet"><div class="sh">필터<button type="button" class="cls" id="sx" aria-label="닫기"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="sbody"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+var D = [{"k":"접착","w":30,"h":160,"s":[{"v":"ks","t":null,"id":"1322","q":500,"p":4100}]},{"k":"접착","w":40,"h":60,"s":[{"v":"ks","t":null,"id":"1321","q":200,"p":1200}]},{"k":"접착","w":40,"h":150,"s":[{"v":"ks","t":null,"id":"195","q":200,"p":1600}]},{"k":"접착","w":40,"h":200,"s":[{"v":"ks","t":null,"id":"1324","q":200,"p":1800}]},{"k":"접착","w":40,"h":300,"s":[{"v":"sr","t":0.04,"id":"13042"}]},{"k":"접착","w":50,"h":70,"s":[{"v":"sr","t":0.04,"id":"13780"},{"v":"vd","t":0.04,"id":"236","q":400},{"v":"ks","t":null,"id":"196","q":200,"p":1300}]},{"k":"접착","w":50,"h":100,"s":[{"v":"ks","t":null,"id":"1323","q":200,"p":1500}]},{"k":"접착","w":50,"h":120,"s":[{"v":"ks","t":null,"id":"1325","q":200,"p":1600}]},{"k":"접착","w":50,"h":150,"s":[{"v":"ks","t":null,"id":"1326","q":200,"p":1700}]},{"k":"접착","w":50,"h":200,"s":[{"v":"ks","t":null,"id":"1327","q":200,"p":1900}]},{"k":"접착","w":50,"h":250,"s":[{"v":"ks","t":null,"id":"1328","q":200,"p":2200}]},{"k":"접착","w":60,"h":80,"s":[{"v":"vd","t":0.04,"id":"237","q":400}]},{"k":"접착","w":60,"h":90,"s":[{"v":"sr","t":0.03,"id":"6391"},{"v":"vd","t":0.04,"id":"238","q":400},{"v":"ks","t":null,"id":"197","q":200,"p":1500}]},{"k":"접착","w":60,"h":100,"s":[{"v":"vd","t":0.04,"id":"239","q":400}]},{"k":"접착","w":60,"h":120,"s":[{"v":"ks","t":null,"id":"1329","q":200,"p":1700}]},{"k":"접착","w":60,"h":150,"s":[{"v":"ks","t":null,"id":"1330","q":200,"p":1900}]},{"k":"접착","w":60,"h":180,"s":[{"v":"ks","t":null,"id":"1331","q":200,"p":2100}]},{"k":"접착","w":60,"h":230,"s":[{"v":"sr","t":0.04,"id":"13611"},{"v":"ks","t":null,"id":"1332","q":200,"p":2400}]},{"k":"접착","w":60,"h":250,"s":[{"v":"ks","t":null,"id":"1333","q":200,"p":2500}]},{"k":"접착","w":60,"h":300,"s":[{"v":"ks","t":null,"id":"1334","q":200,"p":2800}]},{"k":"접착","w":60,"h":400,"s":[{"v":"sr","t":0.04,"id":"12920"}]},{"k":"접착","w":70,"h":90,"s":[{"v":"sr","t":0.04,"id":"2166"},{"v":"vd","t":0.04,"id":"240","q":400},{"v":"ks","t":null,"id":"1335","q":200,"p":1500}]},{"k":"접착","w":70,"h":100,"s":[{"v":"vd","t":0.04,"id":"241","q":400},{"v":"ks","t":null,"id":"198","q":200,"p":1600}]},{"k":"접착","w":70,"h":120,"s":[{"v":"ks","t":null,"id":"1336","q":200,"p":1800}]},{"k":"접착","w":70,"h":150,"s":[{"v":"ks","t":null,"id":"1337","q":200,"p":2000}]},{"k":"접착","w":70,"h":240,"s":[{"v":"sr","t":0.04,"id":"13613"},{"v":"ks","t":null,"id":"1338","q":200,"p":2700}]},{"k":"접착","w":70,"h":280,"s":[{"v":"ks","t":null,"id":"1339","q":200,"p":3100}]},{"k":"접착","w":75,"h":160,"s":[{"v":"vd","t":0.03,"id":"966","q":200}]},{"k":"접착","w":80,"h":90,"s":[{"v":"sr","t":0.03,"id":"22123"}]},{"k":"접착","w":80,"h":100,"s":[{"v":"vd","t":0.04,"id":"243","q":400},{"v":"ks","t":null,"id":"1340","q":200,"p":1900}]},{"k":"접착","w":80,"h":120,"s":[{"v":"vd","t":0.04,"id":"244","q":400},{"v":"ks","t":null,"id":"199","q":200,"p":2000}]},{"k":"접착","w":80,"h":140,"s":[{"v":"sr","t":0.04,"id":"13567"},{"v":"vd","t":0.04,"id":"246","q":200}]},{"k":"접착","w":80,"h":150,"s":[{"v":"ks","t":null,"id":"1341","q":200,"p":2300}]},{"k":"접착","w":80,"h":160,"s":[{"v":"ks","t":null,"id":"1342","q":200,"p":2400}]},{"k":"접착","w":80,"h":180,"s":[{"v":"sr","t":0.04,"id":"13536"},{"v":"vd","t":0.04,"id":"247","q":200},{"v":"ks","t":null,"id":"1343","q":200,"p":2600}]},{"k":"접착","w":80,"h":230,"s":[{"v":"sr","t":0.04,"id":"13612"},{"v":"vd","t":0.04,"id":"249","q":200},{"v":"ks","t":null,"id":"1344","q":200,"p":3000}]},{"k":"접착","w":80,"h":300,"s":[{"v":"ks","t":null,"id":"1345","q":200,"p":3700}]},{"k":"접착","w":90,"h":100,"s":[{"v":"sr","t":0.03,"id":"2427"}]},{"k":"접착","w":90,"h":110,"s":[{"v":"ks","t":null,"id":"1346","q":200,"p":2200}]},{"k":"접착","w":90,"h":120,"s":[{"v":"vd","t":0.04,"id":"251","q":200},{"v":"ks","t":null,"id":"200","q":200,"p":2300}]},{"k":"접착","w":90,"h":130,"s":[{"v":"sr","t":0.04,"id":"13804"}]},{"k":"접착","w":90,"h":150,"s":[{"v":"sr","t":0.04,"id":"13596"},{"v":"vd","t":0.04,"id":"252","q":200},{"v":"ks","t":null,"id":"1347","q":200,"p":2600}]},{"k":"접착","w":90,"h":160,"s":[{"v":"ks","t":null,"id":"1348","q":200,"p":2700}]},{"k":"접착","w":90,"h":180,"s":[{"v":"ks","t":null,"id":"1349","q":200,"p":2900}]},{"k":"접착","w":90,"h":240,"s":[{"v":"sr","t":0.04,"id":"13601"}]},{"k":"접착","w":90,"h":250,"s":[{"v":"ks","t":null,"id":"1350","q":200,"p":3600}]},{"k":"접착","w":100,"h":100,"s":[{"v":"vd","t":0.03,"id":"759","q":200},{"v":"ks","t":null,"id":"201","q":200,"p":2300}]},{"k":"접착","w":100,"h":110,"s":[{"v":"sr","t":0.03,"id":"4145"},{"v":"vd","t":0.04,"id":"253","q":200},{"v":"vd","t":0.03,"id":"680","q":200}]},{"k":"접착","w":100,"h":120,"s":[{"v":"ks","t":null,"id":"1351","q":200,"p":2500}]},{"k":"접착","w":100,"h":150,"s":[{"v":"sr","t":0.04,"id":"13597"},{"v":"vd","t":0.04,"id":"255","q":200},{"v":"ks","t":null,"id":"1352","q":200,"p":2800}]},{"k":"접착","w":100,"h":180,"s":[{"v":"sr","t":0.03,"id":"3206"},{"v":"ks","t":null,"id":"1353","q":200,"p":3200}]},{"k":"접착","w":100,"h":200,"s":[{"v":"sr","t":0.04,"id":"13603"},{"v":"vd","t":0.04,"id":"257","q":200},{"v":"ks","t":null,"id":"1354","q":200,"p":3400}]},{"k":"접착","w":100,"h":250,"s":[{"v":"ks","t":null,"id":"1355","q":200,"p":4000}]},{"k":"접착","w":100,"h":400,"s":[{"v":"sr","t":0.04,"id":"12921"}]},{"k":"접착","w":105,"h":130,"s":[{"v":"vd","t":0.04,"id":"258","q":200}]},{"k":"접착","w":105,"h":150,"s":[{"v":"vd","t":0.04,"id":"259","q":200}]},{"k":"접착","w":105,"h":220,"s":[{"v":"vd","t":0.04,"id":"260","q":200}]},{"k":"접착","w":110,"h":100,"s":[{"v":"sr","t":0.03,"id":"4267"}]},{"k":"접착","w":110,"h":150,"s":[{"v":"vd","t":0.04,"id":"262","q":200}]},{"k":"접착","w":110,"h":160,"s":[{"v":"ks","t":null,"id":"203","q":200,"p":3200}]},{"k":"접착","w":110,"h":170,"s":[{"v":"sr","t":0.04,"id":"13595"},{"v":"vd","t":0.04,"id":"263","q":200}]},{"k":"접착","w":110,"h":180,"s":[{"v":"ks","t":null,"id":"204","q":200,"p":3400}]},{"k":"접착","w":110,"h":190,"s":[{"v":"vd","t":0.04,"id":"761","q":200}]},{"k":"접착","w":110,"h":200,"s":[{"v":"ks","t":null,"id":"1356","q":200,"p":3700}]},{"k":"접착","w":110,"h":240,"s":[{"v":"sr","t":0.04,"id":"13602"},{"v":"vd","t":0.04,"id":"264","q":200},{"v":"ks","t":null,"id":"1357","q":200,"p":4200}]},{"k":"접착","w":110,"h":280,"s":[{"v":"vd","t":0.04,"id":"265","q":200},{"v":"ks","t":null,"id":"1358","q":200,"p":4700}]},{"k":"접착","w":120,"h":150,"s":[{"v":"sr","t":0.04,"id":"13598"},{"v":"vd","t":0.04,"id":"266","q":200}]},{"k":"접착","w":120,"h":160,"s":[{"v":"ks","t":null,"id":"205","q":200,"p":3500}]},{"k":"접착","w":120,"h":170,"s":[{"v":"vd","t":0.04,"id":"267","q":200}]},{"k":"접착","w":120,"h":180,"s":[{"v":"sr","t":0.04,"id":"13538"},{"v":"vd","t":0.04,"id":"268","q":200},{"v":"ks","t":null,"id":"206","q":200,"p":3700}]},{"k":"접착","w":120,"h":200,"s":[{"v":"ks","t":null,"id":"1359","q":200,"p":4000}]},{"k":"접착","w":120,"h":220,"s":[{"v":"vd","t":0.04,"id":"269","q":200}]},{"k":"접착","w":120,"h":230,"s":[{"v":"ks","t":null,"id":"1360","q":200,"p":4400}]},{"k":"접착","w":120,"h":250,"s":[{"v":"vd","t":0.04,"id":"270","q":200},{"v":"ks","t":null,"id":"1361","q":200,"p":4700}]},{"k":"접착","w":120,"h":280,"s":[{"v":"sr","t":0.04,"id":"13600"},{"v":"vd","t":0.04,"id":"271","q":200},{"v":"ks","t":null,"id":"1362","q":200,"p":5200}]},{"k":"접착","w":120,"h":300,"s":[{"v":"ks","t":null,"id":"1363","q":200,"p":5400}]},{"k":"접착","w":130,"h":130,"s":[{"v":"sr","t":0.03,"id":"4264"},{"v":"vd","t":0.03,"id":"919","q":200},{"v":"ks","t":null,"id":"207","q":200,"p":3900}]},{"k":"접착","w":130,"h":180,"s":[{"v":"sr","t":0.04,"id":"13805"},{"v":"vd","t":0.04,"id":"272","q":200},{"v":"ks","t":null,"id":"208","q":200,"p":4100}]},{"k":"접착","w":130,"h":200,"s":[{"v":"vd","t":0.04,"id":"273","q":200},{"v":"ks","t":null,"id":"209","q":200,"p":4300}]},{"k":"접착","w":130,"h":220,"s":[{"v":"vd","t":0.04,"id":"274","q":200}]},{"k":"접착","w":130,"h":250,"s":[{"v":"sr","t":0.04,"id":"13539"},{"v":"vd","t":0.04,"id":"275","q":200},{"v":"ks","t":null,"id":"210","q":200,"p":5100}]},{"k":"접착","w":130,"h":280,"s":[{"v":"ks","t":null,"id":"1364","q":200,"p":5600}]},{"k":"접착","w":138,"h":150,"s":[{"v":"ks","t":null,"id":"1367","q":200,"p":3800}]},{"k":"접착","w":140,"h":150,"s":[{"v":"sr","t":0.04,"id":"13599"},{"v":"ks","t":null,"id":"1365","q":200,"p":4600}]},{"k":"접착","w":140,"h":180,"s":[{"v":"vd","t":0.04,"id":"276","q":200},{"v":"ks","t":null,"id":"211","q":200,"p":4700}]},{"k":"접착","w":140,"h":200,"s":[{"v":"vd","t":0.04,"id":"277","q":200},{"v":"ks","t":null,"id":"212","q":200,"p":4900}]},{"k":"접착","w":140,"h":230,"s":[{"v":"ks","t":null,"id":"1579","q":200,"p":5300}]},{"k":"접착","w":140,"h":250,"s":[{"v":"sr","t":0.04,"id":"13542"},{"v":"vd","t":0.04,"id":"278","q":200},{"v":"ks","t":null,"id":"213","q":200,"p":5500}]},{"k":"접착","w":140,"h":280,"s":[{"v":"ks","t":null,"id":"1366","q":200,"p":6000}]},{"k":"접착","w":150,"h":180,"s":[{"v":"sr","t":0.03,"id":"21609"},{"v":"vd","t":0.04,"id":"279","q":200},{"v":"vd","t":0.03,"id":"920","q":200},{"v":"ks","t":null,"id":"214","q":200,"p":4800}]},{"k":"접착","w":150,"h":200,"s":[{"v":"vd","t":0.04,"id":"280","q":200},{"v":"vd","t":0.03,"id":"921","q":200},{"v":"ks","t":null,"id":"215","q":200,"p":5200}]},{"k":"접착","w":150,"h":230,"s":[{"v":"vd","t":0.04,"id":"281","q":200},{"v":"ks","t":null,"id":"216","q":200,"p":5600}]},{"k":"접착","w":150,"h":250,"s":[{"v":"sr","t":0.04,"id":"13540"},{"v":"vd","t":0.04,"id":"282","q":200},{"v":"ks","t":null,"id":"217","q":200,"p":6000}]},{"k":"접착","w":150,"h":280,"s":[{"v":"ks","t":null,"id":"1584","q":200,"p":6700}]},{"k":"접착","w":150,"h":300,"s":[{"v":"ks","t":null,"id":"1368","q":200,"p":7000}]},{"k":"접착","w":150,"h":350,"s":[{"v":"ks","t":null,"id":"1369","q":200,"p":7700}]},{"k":"접착","w":160,"h":200,"s":[{"v":"ks","t":null,"id":"1270","q":200,"p":5900}]},{"k":"접착","w":160,"h":230,"s":[{"v":"vd","t":0.04,"id":"283","q":200},{"v":"ks","t":null,"id":"219","q":200,"p":6200}]},{"k":"접착","w":160,"h":250,"s":[{"v":"ks","t":null,"id":"1370","q":200,"p":6500}]},{"k":"접착","w":160,"h":300,"s":[{"v":"ks","t":null,"id":"1371","q":200,"p":7300}]},{"k":"접착","w":170,"h":200,"s":[{"v":"ks","t":null,"id":"1561","q":200,"p":6100}]},{"k":"접착","w":170,"h":230,"s":[{"v":"ks","t":null,"id":"220","q":200,"p":6300}]},{"k":"접착","w":170,"h":250,"s":[{"v":"sr","t":0.04,"id":"13541"},{"v":"vd","t":0.04,"id":"284","q":200},{"v":"ks","t":null,"id":"221","q":200,"p":6600}]},{"k":"접착","w":170,"h":300,"s":[{"v":"ks","t":null,"id":"1372","q":200,"p":7800}]},{"k":"접착","w":180,"h":200,"s":[{"v":"ks","t":null,"id":"1562","q":200,"p":6500}]},{"k":"접착","w":180,"h":250,"s":[{"v":"sr","t":0.04,"id":"2264"},{"v":"vd","t":0.04,"id":"285","q":200},{"v":"ks","t":null,"id":"222","q":200,"p":7200}]},{"k":"접착","w":180,"h":300,"s":[{"v":"ks","t":null,"id":"1373","q":200,"p":8500}]},{"k":"접착","w":190,"h":260,"s":[{"v":"ks","t":null,"id":"1564","q":200,"p":8000}]},{"k":"접착","w":200,"h":200,"s":[{"v":"ks","t":null,"id":"1563","q":200,"p":7200}]},{"k":"접착","w":200,"h":250,"s":[{"v":"sr","t":0.04,"id":"13806"},{"v":"vd","t":0.04,"id":"286","q":200},{"v":"ks","t":null,"id":"224","q":200,"p":7800}]},{"k":"접착","w":200,"h":280,"s":[{"v":"ks","t":null,"id":"1374","q":200,"p":8700}]},{"k":"접착","w":200,"h":300,"s":[{"v":"sr","t":0.04,"id":"2241"},{"v":"vd","t":0.04,"id":"287","q":200},{"v":"ks","t":null,"id":"225","q":200,"p":9000}]},{"k":"접착","w":210,"h":250,"s":[{"v":"ks","t":null,"id":"1375","q":200,"p":8300}]},{"k":"접착","w":210,"h":280,"s":[{"v":"ks","t":null,"id":"1376","q":200,"p":9000}]},{"k":"접착","w":220,"h":240,"s":[{"v":"vd","t":0.04,"id":"289","q":200}]},{"k":"접착","w":220,"h":250,"s":[{"v":"vd","t":0.04,"id":"290","q":200}]},{"k":"접착","w":220,"h":300,"s":[{"v":"sr","t":0.04,"id":"13568"},{"v":"vd","t":0.04,"id":"291","q":100}]},{"k":"접착","w":220,"h":320,"s":[{"v":"ks","t":null,"id":"226","q":200,"p":10500}]},{"k":"접착","w":230,"h":230,"s":[{"v":"sr","t":0.04,"id":"15975"}]},{"k":"접착","w":230,"h":300,"s":[{"v":"ks","t":null,"id":"1377","q":200,"p":10500}]},{"k":"접착","w":230,"h":320,"s":[{"v":"vd","t":0.04,"id":"292","q":100},{"v":"ks","t":null,"id":"1378","q":200,"p":10900}]},{"k":"접착","w":230,"h":350,"s":[{"v":"vd","t":0.04,"id":"294","q":100}]},{"k":"접착","w":250,"h":350,"s":[{"v":"sr","t":0.04,"id":"13569"},{"v":"vd","t":0.04,"id":"296","q":100},{"v":"ks","t":null,"id":"1379","q":200,"p":12600}]},{"k":"접착","w":250,"h":380,"s":[{"v":"vd","t":0.04,"id":"297","q":100},{"v":"ks","t":null,"id":"227","q":200,"p":13600}]},{"k":"접착","w":270,"h":380,"s":[{"v":"sr","t":0.04,"id":"13570"},{"v":"vd","t":0.04,"id":"299","q":100}]},{"k":"접착","w":300,"h":160,"s":[{"v":"sr","t":0.04,"id":"13629"}]},{"k":"접착","w":300,"h":250,"s":[{"v":"sr","t":0.04,"id":"12778"}]},{"k":"접착","w":300,"h":400,"s":[{"v":"sr","t":0.04,"id":"13571"},{"v":"vd","t":0.04,"id":"300","q":100},{"v":"ks","t":null,"id":"228","q":200,"p":17000}]},{"k":"접착","w":320,"h":440,"s":[{"v":"ks","t":null,"id":"1140","q":200,"p":19700}]},{"k":"접착","w":340,"h":440,"s":[{"v":"ks","t":null,"id":"1183","q":200,"p":23800}]},{"k":"접착","w":350,"h":500,"s":[{"v":"ks","t":null,"id":"1272","q":200,"p":22000}]},{"k":"비접착","w":50,"h":60,"s":[{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":80,"s":[{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":90,"s":[{"v":"sr","t":0.04,"id":"13760"}]},{"k":"비접착","w":50,"h":100,"s":[{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":120,"s":[{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":150,"s":[{"v":"sr","t":0.04,"id":"13592"},{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":200,"s":[{"v":"sr","t":0.04,"id":"2368"},{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":250,"s":[{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":50,"h":280,"s":[{"v":"vd","t":0.04,"id":"232","q":400}]},{"k":"비접착","w":50,"h":300,"s":[{"v":"ks","t":null,"id":"174","q":200,"o":1}]},{"k":"비접착","w":55,"h":155,"s":[{"v":"vd","t":0.04,"id":"1073","q":400}]},{"k":"비접착","w":60,"h":80,"s":[{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":90,"s":[{"v":"sr","t":0.04,"id":"13552"},{"v":"vd","t":0.04,"id":"1075","q":400},{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":100,"s":[{"v":"vd","t":0.04,"id":"233","q":400},{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":120,"s":[{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":160,"s":[{"v":"sr","t":0.04,"id":"6408"},{"v":"vd","t":0.04,"id":"234","q":400},{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":180,"s":[{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":200,"s":[{"v":"sr","t":0.04,"id":"13586"},{"v":"vd","t":0.04,"id":"235","q":400},{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":250,"s":[{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":280,"s":[{"v":"vd","t":0.04,"id":"242","q":400},{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":60,"h":300,"s":[{"v":"ks","t":null,"id":"175","q":200,"o":1}]},{"k":"비접착","w":70,"h":90,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":100,"s":[{"v":"sr","t":0.04,"id":"13581"},{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":120,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":140,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":150,"s":[{"v":"vd","t":0.04,"id":"245","q":400}]},{"k":"비접착","w":70,"h":160,"s":[{"v":"sr","t":0.04,"id":"13533"},{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":180,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":200,"s":[{"v":"sr","t":0.04,"id":"13587"},{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":250,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":280,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":300,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":70,"h":350,"s":[{"v":"ks","t":null,"id":"176","q":200,"o":1}]},{"k":"비접착","w":80,"h":100,"s":[{"v":"sr","t":0.04,"id":"13582"},{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":120,"s":[{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":150,"s":[{"v":"sr","t":0.04,"id":"2294"},{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":160,"s":[{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":180,"s":[{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":200,"s":[{"v":"sr","t":0.04,"id":"13588"},{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":230,"s":[{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":80,"h":250,"s":[{"v":"ks","t":null,"id":"177","q":200,"o":1}]},{"k":"비접착","w":90,"h":120,"s":[{"v":"sr","t":0.04,"id":"13763"},{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":140,"s":[{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":150,"s":[{"v":"vd","t":0.04,"id":"248","q":400}]},{"k":"비접착","w":90,"h":160,"s":[{"v":"sr","t":0.04,"id":"2288"},{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":180,"s":[{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":200,"s":[{"v":"sr","t":0.04,"id":"13589"},{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":230,"s":[{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":250,"s":[{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":280,"s":[{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":90,"h":300,"s":[{"v":"ks","t":null,"id":"178","q":200,"o":1}]},{"k":"비접착","w":100,"h":120,"s":[{"v":"sr","t":0.04,"id":"13534"},{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":150,"s":[{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":160,"s":[{"v":"sr","t":0.04,"id":"2299"}]},{"k":"비접착","w":100,"h":180,"s":[{"v":"sr","t":0.04,"id":"13604"},{"v":"vd","t":0.04,"id":"250","q":200},{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":200,"s":[{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":220,"s":[{"v":"sr","t":0.04,"id":"2300"},{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":250,"s":[{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":280,"s":[{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":300,"s":[{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":100,"h":400,"s":[{"v":"ks","t":null,"id":"179","q":200,"o":1}]},{"k":"비접착","w":105,"h":155,"s":[{"v":"vd","t":0.04,"id":"1074","q":200}]},{"k":"비접착","w":110,"h":140,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":150,"s":[{"v":"sr","t":0.04,"id":"13583"}]},{"k":"비접착","w":110,"h":160,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":180,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":200,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":220,"s":[{"v":"sr","t":0.03,"id":"6404"},{"v":"sr","t":0.04,"id":"1655"},{"v":"vd","t":0.04,"id":"254","q":200},{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":250,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":280,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":300,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":350,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":110,"h":400,"s":[{"v":"ks","t":null,"id":"180","q":200,"o":1}]},{"k":"비접착","w":120,"h":150,"s":[{"v":"sr","t":0.04,"id":"13584"},{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":160,"s":[{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":180,"s":[{"v":"sr","t":0.04,"id":"1661"},{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":200,"s":[{"v":"vd","t":0.04,"id":"256","q":200},{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":220,"s":[{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":250,"s":[{"v":"sr","t":0.03,"id":"3644"},{"v":"sr","t":0.04,"id":"4269"},{"v":"vd","t":0.04,"id":"261","q":200},{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":280,"s":[{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":300,"s":[{"v":"sr","t":0.03,"id":"3645"},{"v":"sr","t":0.04,"id":"3664"},{"v":"vd","t":0.04,"id":"293","q":200},{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":350,"s":[{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":120,"h":400,"s":[{"v":"sr","t":0.03,"id":"3646"},{"v":"sr","t":0.04,"id":"3665"},{"v":"vd","t":0.04,"id":"295","q":200},{"v":"ks","t":null,"id":"181","q":200,"o":1}]},{"k":"비접착","w":130,"h":150,"s":[{"v":"sr","t":0.04,"id":"13766"},{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":130,"h":180,"s":[{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":130,"h":200,"s":[{"v":"sr","t":0.04,"id":"1656"},{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":130,"h":220,"s":[{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":130,"h":250,"s":[{"v":"sr","t":0.03,"id":"2258"},{"v":"sr","t":0.04,"id":"1662"},{"v":"vd","t":0.04,"id":"298","q":200},{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":130,"h":300,"s":[{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":130,"h":350,"s":[{"v":"sr","t":0.04,"id":"2315"},{"v":"ks","t":null,"id":"182","q":200,"o":1}]},{"k":"비접착","w":140,"h":180,"s":[{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":200,"s":[{"v":"sr","t":0.04,"id":"13590"},{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":220,"s":[{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":250,"s":[{"v":"sr","t":0.04,"id":"2317"},{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":280,"s":[{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":300,"s":[{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":350,"s":[{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":140,"h":400,"s":[{"v":"ks","t":null,"id":"183","q":200,"o":1}]},{"k":"비접착","w":150,"h":160,"s":[{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":180,"s":[{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":200,"s":[{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":220,"s":[{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":250,"s":[{"v":"sr","t":0.03,"id":"3647"},{"v":"sr","t":0.04,"id":"1664"},{"v":"vd","t":0.04,"id":"301","q":200},{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":300,"s":[{"v":"sr","t":0.03,"id":"3648"},{"v":"sr","t":0.04,"id":"1657"},{"v":"vd","t":0.04,"id":"302","q":200},{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":350,"s":[{"v":"sr","t":0.03,"id":"3649"},{"v":"sr","t":0.04,"id":"3226"},{"v":"vd","t":0.04,"id":"303","q":200},{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":150,"h":400,"s":[{"v":"sr","t":0.03,"id":"2260"},{"v":"sr","t":0.04,"id":"3666"},{"v":"ks","t":null,"id":"184","q":200,"o":1}]},{"k":"비접착","w":160,"h":200,"s":[{"v":"sr","t":0.04,"id":"13591"},{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":160,"h":230,"s":[{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":160,"h":250,"s":[{"v":"sr","t":0.04,"id":"13593"},{"v":"vd","t":0.04,"id":"304","q":200},{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":160,"h":280,"s":[{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":160,"h":300,"s":[{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":160,"h":350,"s":[{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":160,"h":400,"s":[{"v":"ks","t":null,"id":"185","q":200,"o":1}]},{"k":"비접착","w":170,"h":200,"s":[{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":170,"h":220,"s":[{"v":"sr","t":0.04,"id":"3006"}]},{"k":"비접착","w":170,"h":230,"s":[{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":170,"h":250,"s":[{"v":"sr","t":0.04,"id":"13594"},{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":170,"h":280,"s":[{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":170,"h":300,"s":[{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":170,"h":350,"s":[{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":170,"h":400,"s":[{"v":"ks","t":null,"id":"186","q":200,"o":1}]},{"k":"비접착","w":180,"h":200,"s":[{"v":"vd","t":0.04,"id":"305","q":200},{"v":"ks","t":null,"id":"187","q":200,"o":1}]},{"k":"비접착","w":180,"h":250,"s":[{"v":"sr","t":0.03,"id":"3650"},{"v":"sr","t":0.04,"id":"2487"},{"v":"vd","t":0.04,"id":"306","q":200},{"v":"ks","t":null,"id":"187","q":200,"o":1}]},{"k":"비접착","w":180,"h":280,"s":[{"v":"ks","t":null,"id":"187","q":200,"o":1}]},{"k":"비접착","w":180,"h":300,"s":[{"v":"sr","t":0.03,"id":"3651"},{"v":"sr","t":0.04,"id":"3305"},{"v":"vd","t":0.04,"id":"307","q":200},{"v":"ks","t":null,"id":"187","q":200,"o":1}]},{"k":"비접착","w":180,"h":350,"s":[{"v":"sr","t":0.03,"id":"3652"},{"v":"sr","t":0.04,"id":"2596"},{"v":"vd","t":0.04,"id":"309","q":200},{"v":"ks","t":null,"id":"187","q":200,"o":1}]},{"k":"비접착","w":180,"h":400,"s":[{"v":"sr","t":0.03,"id":"3653"},{"v":"sr","t":0.04,"id":"4272"},{"v":"vd","t":0.04,"id":"310","q":200},{"v":"ks","t":null,"id":"187","q":200,"o":1}]},{"k":"비접착","w":180,"h":450,"s":[{"v":"sr","t":0.03,"id":"2266"}]},{"k":"비접착","w":200,"h":250,"s":[{"v":"sr","t":0.03,"id":"3654"},{"v":"sr","t":0.04,"id":"3667"},{"v":"ks","t":null,"id":"188","q":200,"o":1}]},{"k":"비접착","w":200,"h":300,"s":[{"v":"sr","t":0.03,"id":"3655"},{"v":"sr","t":0.04,"id":"3668"},{"v":"vd","t":0.04,"id":"312","q":200},{"v":"ks","t":null,"id":"188","q":200,"o":1}]},{"k":"비접착","w":200,"h":350,"s":[{"v":"sr","t":0.03,"id":"3656"},{"v":"sr","t":0.04,"id":"3669"},{"v":"vd","t":0.04,"id":"314","q":200},{"v":"ks","t":null,"id":"188","q":200,"o":1}]},{"k":"비접착","w":200,"h":400,"s":[{"v":"sr","t":0.03,"id":"3657"},{"v":"sr","t":0.04,"id":"4273"},{"v":"vd","t":0.04,"id":"316","q":100},{"v":"ks","t":null,"id":"188","q":200,"o":1}]},{"k":"비접착","w":220,"h":250,"s":[{"v":"sr","t":0.03,"id":"3658"},{"v":"sr","t":0.04,"id":"2331"},{"v":"vd","t":0.04,"id":"318","q":100},{"v":"ks","t":null,"id":"189","q":200,"o":1}]},{"k":"비접착","w":220,"h":300,"s":[{"v":"sr","t":0.03,"id":"1717"},{"v":"sr","t":0.04,"id":"2332"},{"v":"ks","t":null,"id":"189","q":200,"o":1}]},{"k":"비접착","w":220,"h":320,"s":[{"v":"sr","t":0.03,"id":"3659"}]},{"k":"비접착","w":220,"h":350,"s":[{"v":"sr","t":0.03,"id":"459"},{"v":"sr","t":0.04,"id":"3964"},{"v":"vd","t":0.04,"id":"321","q":100},{"v":"ks","t":null,"id":"189","q":200,"o":1}]},{"k":"비접착","w":220,"h":400,"s":[{"v":"sr","t":0.03,"id":"3660"},{"v":"sr","t":0.04,"id":"1667"},{"v":"vd","t":0.04,"id":"323","q":100},{"v":"ks","t":null,"id":"189","q":200,"o":1}]},{"k":"비접착","w":220,"h":450,"s":[{"v":"sr","t":0.03,"id":"3661"},{"v":"sr","t":0.04,"id":"3670"},{"v":"vd","t":0.04,"id":"325","q":100}]},{"k":"비접착","w":230,"h":300,"s":[{"v":"sr","t":0.04,"id":"1666"}]},{"k":"비접착","w":250,"h":300,"s":[{"v":"sr","t":0.04,"id":"2813"},{"v":"ks","t":null,"id":"191","q":200,"o":1}]},{"k":"비접착","w":250,"h":350,"s":[{"v":"sr","t":0.04,"id":"2336"},{"v":"ks","t":null,"id":"191","q":200,"o":1}]},{"k":"비접착","w":250,"h":400,"s":[{"v":"sr","t":0.04,"id":"2337"},{"v":"vd","t":0.04,"id":"328","q":100},{"v":"ks","t":null,"id":"191","q":200,"o":1}]},{"k":"비접착","w":250,"h":450,"s":[{"v":"ks","t":null,"id":"191","q":200,"o":1}]},{"k":"비접착","w":260,"h":380,"s":[{"v":"sr","t":0.04,"id":"4275"},{"v":"vd","t":0.04,"id":"330","q":100}]},{"k":"비접착","w":260,"h":400,"s":[{"v":"sr","t":0.03,"id":"3662"}]},{"k":"비접착","w":280,"h":350,"s":[{"v":"ks","t":null,"id":"190","q":200,"o":1}]},{"k":"비접착","w":280,"h":400,"s":[{"v":"sr","t":0.04,"id":"2341"},{"v":"ks","t":null,"id":"190","q":200,"o":1}]},{"k":"비접착","w":280,"h":450,"s":[{"v":"ks","t":null,"id":"190","q":200,"o":1}]},{"k":"비접착","w":280,"h":500,"s":[{"v":"sr","t":0.03,"id":"2274"}]},{"k":"비접착","w":300,"h":350,"s":[{"v":"ks","t":null,"id":"192","q":200,"o":1}]},{"k":"비접착","w":300,"h":400,"s":[{"v":"sr","t":0.04,"id":"2344"},{"v":"vd","t":0.04,"id":"333","q":100},{"v":"ks","t":null,"id":"192","q":200,"o":1}]},{"k":"비접착","w":300,"h":450,"s":[{"v":"sr","t":0.04,"id":"13564"},{"v":"ks","t":null,"id":"192","q":200,"o":1}]},{"k":"비접착","w":350,"h":400,"s":[{"v":"sr","t":0.04,"id":"2346"},{"v":"ks","t":null,"id":"193","q":200,"o":1}]},{"k":"비접착","w":350,"h":450,"s":[{"v":"sr","t":0.04,"id":"13565"},{"v":"ks","t":null,"id":"193","q":200,"o":1}]},{"k":"비접착","w":400,"h":500,"s":[{"v":"sr","t":0.04,"id":"13566"},{"v":"ks","t":null,"id":"194","q":200,"o":1}]},{"k":"비접착","w":400,"h":600,"s":[{"v":"sr","t":0.04,"id":"13773"},{"v":"ks","t":null,"id":"194","q":200,"o":1}]},{"k":"헤다","w":50,"h":110,"s":[{"v":"vd","t":0.04,"id":"308","q":200}]},{"k":"헤다","w":50,"h":150,"s":[{"v":"vd","t":0.04,"id":"311","q":200},{"v":"ks","t":null,"id":"717","q":200,"p":4300}]},{"k":"헤다","w":50,"h":180,"s":[{"v":"vd","t":0.04,"id":"313","q":200}]},{"k":"헤다","w":50,"h":200,"s":[{"v":"ks","t":null,"id":"1497","q":200,"p":4600}]},{"k":"헤다","w":60,"h":90,"s":[{"v":"vd","t":0.04,"id":"315","q":200},{"v":"ks","t":null,"id":"1498","q":200,"p":4200}]},{"k":"헤다","w":60,"h":150,"s":[{"v":"vd","t":0.04,"id":"317","q":200},{"v":"ks","t":null,"id":"1499","q":200,"p":4600}]},{"k":"헤다","w":60,"h":180,"s":[{"v":"vd","t":0.04,"id":"319","q":200}]},{"k":"헤다","w":70,"h":110,"s":[{"v":"vd","t":0.04,"id":"320","q":200}]},{"k":"헤다","w":70,"h":150,"s":[{"v":"vd","t":0.04,"id":"322","q":200},{"v":"ks","t":null,"id":"718","q":200,"p":4800}]},{"k":"헤다","w":70,"h":180,"s":[{"v":"vd","t":0.04,"id":"324","q":200}]},{"k":"헤다","w":70,"h":200,"s":[{"v":"ks","t":null,"id":"1500","q":200,"p":5200}]},{"k":"헤다","w":80,"h":90,"s":[{"v":"ks","t":null,"id":"1501","q":200,"p":4500}]},{"k":"헤다","w":80,"h":150,"s":[{"v":"ks","t":null,"id":"1502","q":200,"p":5000}]},{"k":"헤다","w":80,"h":180,"s":[{"v":"vd","t":0.04,"id":"326","q":200}]},{"k":"헤다","w":80,"h":220,"s":[{"v":"vd","t":0.04,"id":"327","q":200}]},{"k":"헤다","w":90,"h":110,"s":[{"v":"vd","t":0.04,"id":"329","q":200}]},{"k":"헤다","w":90,"h":150,"s":[{"v":"vd","t":0.04,"id":"331","q":200},{"v":"ks","t":null,"id":"719","q":200,"p":5200}]},{"k":"헤다","w":100,"h":150,"s":[{"v":"vd","t":0.04,"id":"332","q":200},{"v":"ks","t":null,"id":"1503","q":200,"p":5900}]},{"k":"헤다","w":100,"h":180,"s":[{"v":"vd","t":0.04,"id":"334","q":200}]},{"k":"헤다","w":100,"h":200,"s":[{"v":"ks","t":null,"id":"720","q":200,"p":6500}]},{"k":"헤다","w":100,"h":250,"s":[{"v":"vd","t":0.04,"id":"335","q":200},{"v":"ks","t":null,"id":"1504","q":200,"p":7200}]},{"k":"헤다","w":110,"h":120,"s":[{"v":"vd","t":0.04,"id":"336","q":100}]},{"k":"헤다","w":110,"h":150,"s":[{"v":"ks","t":null,"id":"1505","q":200,"p":6200}]},{"k":"헤다","w":110,"h":180,"s":[{"v":"vd","t":0.04,"id":"337","q":100}]},{"k":"헤다","w":110,"h":200,"s":[{"v":"ks","t":null,"id":"1506","q":200,"p":6800}]},{"k":"헤다","w":110,"h":250,"s":[{"v":"vd","t":0.04,"id":"338","q":100},{"v":"ks","t":null,"id":"1507","q":200,"p":7400}]},{"k":"헤다","w":120,"h":180,"s":[{"v":"vd","t":0.04,"id":"339","q":100}]},{"k":"헤다","w":120,"h":200,"s":[{"v":"ks","t":null,"id":"1508","q":200,"p":7500}]},{"k":"헤다","w":120,"h":250,"s":[{"v":"vd","t":0.04,"id":"340","q":100},{"v":"ks","t":null,"id":"1509","q":200,"p":8300}]},{"k":"헤다","w":130,"h":180,"s":[{"v":"vd","t":0.04,"id":"341","q":100}]},{"k":"헤다","w":130,"h":200,"s":[{"v":"ks","t":null,"id":"721","q":200,"p":8300}]},{"k":"헤다","w":130,"h":250,"s":[{"v":"vd","t":0.04,"id":"342","q":100},{"v":"ks","t":null,"id":"1510","q":200,"p":9000}]},{"k":"헤다","w":140,"h":180,"s":[{"v":"vd","t":0.04,"id":"343","q":100}]},{"k":"헤다","w":140,"h":200,"s":[{"v":"ks","t":null,"id":"1511","q":200,"p":8600}]},{"k":"헤다","w":140,"h":250,"s":[{"v":"vd","t":0.04,"id":"344","q":100},{"v":"ks","t":null,"id":"1512","q":200,"p":9400}]},{"k":"헤다","w":150,"h":200,"s":[{"v":"ks","t":null,"id":"1513","q":200,"p":9300}]},{"k":"헤다","w":150,"h":250,"s":[{"v":"vd","t":0.04,"id":"345","q":100},{"v":"ks","t":null,"id":"1514","q":200,"p":10100}]},{"k":"헤다","w":160,"h":180,"s":[{"v":"vd","t":0.04,"id":"346","q":100}]},{"k":"헤다","w":160,"h":200,"s":[{"v":"ks","t":null,"id":"722","q":200,"p":10000}]},{"k":"헤다","w":160,"h":250,"s":[{"v":"vd","t":0.04,"id":"347","q":100},{"v":"ks","t":null,"id":"1515","q":200,"p":11000}]},{"k":"헤다","w":170,"h":250,"s":[{"v":"vd","t":0.04,"id":"348","q":100},{"v":"ks","t":null,"id":"723","q":200,"p":11300}]},{"k":"헤다","w":170,"h":280,"s":[{"v":"vd","t":0.04,"id":"349","q":100}]},{"k":"헤다","w":180,"h":250,"s":[{"v":"vd","t":0.04,"id":"350","q":100},{"v":"ks","t":null,"id":"1516","q":200,"p":12300}]},{"k":"헤다","w":190,"h":250,"s":[{"v":"ks","t":null,"id":"1517","q":200,"p":13000}]},{"k":"헤다","w":190,"h":280,"s":[{"v":"vd","t":0.04,"id":"351","q":100}]},{"k":"헤다","w":200,"h":250,"s":[{"v":"vd","t":0.04,"id":"352","q":100},{"v":"ks","t":null,"id":"724","q":200,"p":13800}]},{"k":"헤다","w":200,"h":330,"s":[{"v":"vd","t":0.04,"id":"353","q":50}]},{"k":"헤다","w":215,"h":330,"s":[{"v":"vd","t":0.04,"id":"354","q":50}]},{"k":"헤다","w":230,"h":300,"s":[{"v":"vd","t":0.04,"id":"355","q":50}]},{"k":"헤다","w":230,"h":330,"s":[{"v":"vd","t":0.04,"id":"356","q":50}]},{"k":"헤다","w":250,"h":300,"s":[{"v":"vd","t":0.04,"id":"357","q":50}]},{"k":"헤다","w":250,"h":330,"s":[{"v":"vd","t":0.04,"id":"358","q":50}]},{"k":"헤다","w":300,"h":370,"s":[{"v":"vd","t":0.04,"id":"382","q":50}]}];
+var SEL = { sr: { n: '새로피엔엘', u: function (id) { return 'https://www.saeropnl.com/m/goods_detail.php?ps_uid=' + id; } },
+  vd: { n: '비닐닷컴', u: function (id) { return 'https://xn--ij1bycz62bkyq.com/product/detail.html?product_no=' + id; } },
+  ks: { n: '광성비닐포장', u: function (id) { return 'https://kspojang.co.kr/product/detail.html?product_no=' + id; } } };
+var KINDS = [['접착', '접착'], ['비접착', '비접착'], ['헤다', '헤다 (걸이)']];
+var THK = [['0.03', '0.03mm'], ['0.04', '0.04mm'], ['-', '표기 없음']];
+// 엔터 굿즈에 자주 쓰는 크기 (가로 · 세로 · 두께 mm)
+var USES = [
+  { k: 'pc', n: '포토카드', w: 55, h: 85, t: 1 },
+  { k: 'id', n: '증명사진', w: 35, h: 45, t: 1 },
+  { k: 'nc', n: '명함 · 네임카드', w: 90, h: 50, t: 1 },
+  { k: 'pcd', n: '엽서 · A6', w: 105, h: 148, t: 1 },
+  { k: 'a5', n: 'A5 · 미니 포스터', w: 148, h: 210, t: 1 },
+  { k: 'b5', n: 'B5 책자 · 포토북', w: 182, h: 257, t: 5 },
+  { k: 'a4', n: 'A4', w: 210, h: 297, t: 1 },
+  { k: 'a3', n: 'A3 포스터', w: 297, h: 420, t: 1 },
+  { k: 'cd', n: 'CD 쥬얼 케이스', w: 142, h: 125, t: 10 }
+];
+var S = { q: '', k: [], t: [], s: [], u: '', cw: '', ch: '', ct: '1', all: 0 };
+try { var sv = JSON.parse(localStorage.getItem('opp:st') || 'null'); if (sv) for (var x in sv) if (x in S) S[x] = sv[x]; S.all = 0; } catch (e) {}
+function save() { try { localStorage.setItem('opp:st', JSON.stringify(S)); } catch (e) {} }
+function $(s) { return document.querySelector(s); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function tk(v) { return v == null ? '-' : v.toFixed(2); }
+function item() {
+  if (S.u === 'cu') { var w = +S.cw, h = +S.ch; return w > 0 && h > 0 ? { n: '직접 입력', w: w, h: h, t: +S.ct || 0 } : null; }
+  return USES.filter(function (u) { return u.k === S.u; })[0] || null;
+}
+function sellers(r) { return r.s.filter(function (x) { return (!S.t.length || S.t.indexOf(tk(x.t)) >= 0) && (!S.s.length || S.s.indexOf(x.v) >= 0); }); }
+function qMatch(r) {
+  var q = S.q.trim(); if (!q) return true;
+  var n = q.match(/\d+(\.\d+)?/g); if (!n) return (r.k + ' ' + r.s.map(function (x) { return SEL[x.v].n; }).join(' ')).indexOf(q) >= 0;
+  n = n.map(Number); var cm = n.every(function (v) { return v <= 45; }); if (cm) n = n.map(function (v) { return Math.round(v * 10); });
+  if (n.length === 1) return r.w === n[0] || r.h === n[0];
+  return (r.w === n[0] && r.h === n[1]) || (r.w === n[1] && r.h === n[0]);
+}
+function fitOf(r, it) {
+  var best = null;
+  [[it.w, it.h, 0], [it.h, it.w, 1]].forEach(function (o) {
+    var dw = r.w - (o[0] + it.t), dh = r.h - (o[1] + it.t);
+    if (dw < 2 || dh < 2 || dw > 25 || dh > 40) return;
+    var sc = dw + dh * 0.6; if (!best || sc < best.sc) best = { dw: dw, dh: dh, sc: sc, rot: o[2] };
+  });
+  return best;
+}
+function rows() {
+  var it = item(), L = [];
+  D.forEach(function (r) {
+    if (S.k.length && S.k.indexOf(r.k) < 0) return;
+    if (!qMatch(r)) return;
+    var ss = sellers(r); if (!ss.length) return;
+    var f = it ? fitOf(r, it) : null; if (it && !f) return;
+    L.push({ r: r, ss: ss, f: f });
+  });
+  if (it) { L.sort(function (a, b) { return a.f.sc - b.f.sc; }); L.slice(0, 3).forEach(function (x) { x.rec = 1; }); }
+  return L;
+}
+function pic(r) {
+  var M = 40, sc = M / Math.max(r.w, r.h + (r.k === '헤다' ? 30 : 0) + (r.k === '비접착' ? 0 : 40)), w = r.w * sc, h = r.h * sc, fl = r.k === '비접착' ? 0 : 40 * sc, hd = r.k === '헤다' ? 30 * sc : 0;
+  var tot = h + fl + hd, x = (48 - w) / 2, y = (48 - tot) / 2 + fl;
+  var s = '<svg width="48" height="48" viewBox="0 0 48 48">';
+  if (fl) s += '<rect x="' + x + '" y="' + (y - fl) + '" width="' + w + '" height="' + fl + '" rx="1.5" fill="none" stroke="#b0b8c1" stroke-width="1.5" stroke-dasharray="4 3"/>';
+  s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + (h + hd) + '" rx="2" fill="#f2f4f6" stroke="#4e5968" stroke-width="1.5"/>';
+  if (hd) s += '<line x1="' + x + '" y1="' + (y + hd) + '" x2="' + (x + w) + '" y2="' + (y + hd) + '" stroke="#4e5968" stroke-width="1"/><circle cx="' + (x + w / 2) + '" cy="' + (y + hd / 2) + '" r="' + Math.min(2.2, hd / 4) + '" fill="none" stroke="#4e5968" stroke-width="1"/>';
+  return s + '</svg>';
+}
+function szTxt(r) { return r.w + ' × ' + r.h + (r.k === '비접착' ? '' : ' + 40'); }
+function card(x) {
+  var r = x.r, th = {}; x.ss.forEach(function (s) { if (s.t != null) th[tk(s.t)] = 1; });
+  var tags = '<span class="tg">' + (r.k === '헤다' ? '헤다' : r.k) + '</span>' + (x.rec ? '<span class="tg rec">추천</span>' : '');
+  var sub = (r.k === '헤다' ? '헤다 30mm 별도 · ' : '') + (Object.keys(th).sort().map(function (t) { return t + 'mm'; }).join(' · ') || '두께 표기 없음');
+  if (x.f) sub += ' · 여유 가로 ' + x.f.dw + ' · 세로 ' + x.f.dh + 'mm' + (x.f.rot ? ' · 눕혀서' : '');
+  var cp = 'OPP ' + (r.k === '헤다' ? '헤다' : r.k) + ' 봉투 ' + szTxt(r) + 'mm' + (r.k === '헤다' ? ' (헤다 30mm 별도)' : '') + (Object.keys(th).length === 1 ? ' · ' + Object.keys(th)[0] + 'mm' : '');
+  return '<div class="card"><div class="ch"><div class="pic">' + pic(r) + '</div><div class="sz"><b data-cp="' + esc(cp) + '">' + esc(szTxt(r)) + '<span> mm</span></b><div>' + tags + '<span>' + esc(sub) + '</span></div></div></div><div class="buys">' +
+    x.ss.map(function (s) {
+      var m = [s.t != null ? tk(s.t) + 'mm' : '', s.q ? fmt(s.q) + '매' : '', s.p ? fmt(s.p) + '원' : '', s.o ? '가로 ' + r.w / 10 + 'cm 묶음에서 세로 ' + r.h / 10 + 'cm 선택' : ''].filter(Boolean).join(' · ');
+      return '<a class="buy" href="' + esc(SEL[s.v].u(s.id)) + '" target="_blank" rel="noopener"><b>' + esc(SEL[s.v].n) + '</b><span>' + esc(m) + '</span><svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>';
+    }).join('') + '</div></div>';
+}
+function render() {
+  var L = rows(), it = item(), h = '';
+  if (it) h += '<div class="box fit"><b>' + esc(it.n) + ' ' + it.w + ' × ' + it.h + 'mm' + (it.t ? ' · 두께 ' + it.t + 'mm' : '') + '에 맞는 봉투</b><p>가로 여유 2~25mm, 세로 여유 2~40mm인 규격만 여유가 적은 순서로 보여줘요. 위 세 개가 추천이에요.</p></div>';
+  h += '<div class="cnt"><b>규격 ' + L.length + '개</b> · 판매처 ' + Object.keys(SEL).length + '곳 · 조사 2026.11.22</div>';
+  if (!L.length) h += '<div class="box empty">조건에 맞는 규격이 없어요.<br>필터를 줄이거나 검색어를 바꿔 보세요.</div>';
+  else if (it) h += '<div class="grid">' + L.slice(0, S.all ? 999 : 30).map(card).join('') + '</div>' + (L.length > 30 && !S.all ? '<div class="more"><button type="button" class="btn2" id="all">' + (L.length - 30) + '개 더 보기</button></div>' : '');
+  else {
+    var n = 0, cap = S.all || S.q || S.k.length ? 9999 : 60;
+    KINDS.forEach(function (k) {
+      var g = L.filter(function (x) { return x.r.k === k[0]; }); if (!g.length || n >= cap) return;
+      var show = g.slice(0, Math.max(0, cap - n)); n += show.length;
+      h += '<div class="grp">' + esc(k[1]) + ' 봉투<small>' + g.length + '개</small></div><div class="grid">' + show.map(card).join('') + '</div>';
+    });
+    if (n < L.length) h += '<div class="more"><button type="button" class="btn2" id="all">' + (L.length - n) + '개 더 보기</button></div>';
+  }
+  $('#out').innerHTML = h;
+  var a = $('#all'); if (a) a.onclick = function () { S.all = 1; render(); };
+  document.querySelectorAll('[data-cp]').forEach(function (b) { b.onclick = function () { copy(b.dataset.cp); }; });
+  bar(); panel();
+}
+function cntBy(fn) { var c = {}; D.forEach(function (r) { fn(r).forEach(function (k) { c[k] = (c[k] || 0) + 1; }); }); return c; }
+function bar() {
+  var c = cntBy(function (r) { return [r.k]; });
+  $('#kind').innerHTML = '<button type="button" class="chip' + (!S.k.length ? ' on' : '') + '" data-k="">전체</button>' + KINDS.map(function (k) { return '<button type="button" class="chip' + (S.k.indexOf(k[0]) >= 0 ? ' on' : '') + '" data-k="' + k[0] + '">' + esc(k[0]) + '<small>' + (c[k[0]] || 0) + '</small></button>'; }).join('');
+  document.querySelectorAll('#kind [data-k]').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; if (!k) S.k = []; else S.k = S.k.indexOf(k) >= 0 ? S.k.filter(function (x) { return x !== k; }) : S.k.concat([k]); S.all = 0; save(); render(); }; });
+  var n = (S.u ? 1 : 0) + S.t.length + S.s.length; $('#fb').classList.toggle('has', !!n); $('#fbn').textContent = n || '';
+  $('#qw').classList.toggle('on', !!S.q);
+}
+function panelHtml() {
+  var tc = cntBy(function (r) { var o = {}; r.s.forEach(function (s) { o[tk(s.t)] = 1; }); return Object.keys(o); });
+  var sc = cntBy(function (r) { var o = {}; r.s.forEach(function (s) { o[s.v] = 1; }); return Object.keys(o); });
+  var h = '<div class="fp"><div class="fs"><h5>용도<small>넣을 물건 크기</small></h5><div class="use">' +
+    '<button type="button" data-u=""' + (!S.u ? ' class="on"' : '') + '>전체 규격</button>' +
+    USES.map(function (u) { return '<button type="button" data-u="' + u.k + '"' + (S.u === u.k ? ' class="on"' : '') + '>' + esc(u.n) + '<small>' + u.w + '×' + u.h + '</small></button>'; }).join('') +
+    '<button type="button" data-u="cu"' + (S.u === 'cu' ? ' class="on"' : '') + '>직접 입력</button></div>' +
+    (S.u === 'cu' ? '<div class="cus"><div><label>가로</label><span><input data-c="cw" inputmode="decimal" value="' + esc(S.cw) + '"><em>mm</em></span></div><div><label>세로</label><span><input data-c="ch" inputmode="decimal" value="' + esc(S.ch) + '"><em>mm</em></span></div><div><label>두께</label><span><input data-c="ct" inputmode="decimal" value="' + esc(S.ct) + '"><em>mm</em></span></div></div>' : '') + '</div>' +
+    '<div class="fs"><h5>두께</h5><div class="chips">' + THK.map(function (t) { return '<button type="button" class="chip' + (S.t.indexOf(t[0]) >= 0 ? ' on' : '') + '" data-t="' + t[0] + '">' + t[1] + '<small>' + (tc[t[0]] || 0) + '</small></button>'; }).join('') + '</div></div>' +
+    '<div class="fs"><h5>판매처</h5><div class="chips">' + Object.keys(SEL).map(function (k) { return '<button type="button" class="chip' + (S.s.indexOf(k) >= 0 ? ' on' : '') + '" data-s="' + k + '">' + SEL[k].n + '<small>' + (sc[k] || 0) + '</small></button>'; }).join('') + '</div></div>' +
+    '<button type="button" class="rst" data-rst="1">필터 초기화</button></div>';
+  return h;
+}
+function tog(arr, v) { return arr.indexOf(v) >= 0 ? arr.filter(function (x) { return x !== v; }) : arr.concat([v]); }
+function panel() {
+  var h = panelHtml(), act = document.activeElement, ac = act && act.dataset ? act.dataset.c : null, pos = ac ? act.selectionStart : 0, inSheet = act && act.closest && act.closest('#sheet');
+  $('#side').innerHTML = h; $('#sbody').innerHTML = h;
+  ['#side', '#sbody'].forEach(function (root) {
+    var R = $(root);
+    R.querySelectorAll('[data-u]').forEach(function (b) { b.onclick = function () { S.u = b.dataset.u; S.all = 0; save(); render(); }; });
+    R.querySelectorAll('[data-t]').forEach(function (b) { b.onclick = function () { S.t = tog(S.t, b.dataset.t); S.all = 0; save(); render(); }; });
+    R.querySelectorAll('[data-s]').forEach(function (b) { b.onclick = function () { S.s = tog(S.s, b.dataset.s); S.all = 0; save(); render(); }; });
+    R.querySelectorAll('[data-c]').forEach(function (i) { i.oninput = function () { S[i.dataset.c] = i.value.replace(/[^\d.]/g, ''); save(); render(); }; });
+    R.querySelector('[data-rst]').onclick = function () { S.u = ''; S.t = []; S.s = []; S.k = []; S.q = ''; $('#q').value = ''; S.all = 0; save(); render(); };
+  });
+  if (ac) { var i = document.querySelector((inSheet ? '#sbody' : '#side') + ' [data-c="' + ac + '"]'); if (i) { i.focus(); try { i.setSelectionRange(pos, pos); } catch (e) {} } }
+}
+function copy(t) { var done = function () { toast('복사했어요 · ' + t); }; try { navigator.clipboard.writeText(t).then(done, function () { fb(); }); } catch (e) { fb(); } function fb() { var a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); } catch (e) {} a.remove(); done(); } }
+var tt; function toast(m) { var e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { e.classList.remove('on'); }, 1600); }
+$('#q').value = S.q;
+$('#q').oninput = function () { S.q = this.value; S.all = 0; save(); render(); };
+$('#qx').onclick = function (e) { e.preventDefault(); S.q = ''; $('#q').value = ''; save(); render(); $('#q').focus(); };
+$('#fb').onclick = function () { document.body.classList.add('sopen'); };
+$('#dim').onclick = $('#sx').onclick = function () { document.body.classList.remove('sopen'); };
+$('#glo').onclick = function () { try { if (window.parent !== window && window.parent.plyshOpenRef) return window.parent.plyshOpenRef('MD', 'OPP'); } catch (e) {} location.href = '../../#ref'; };
+// 용어사전에서 '규격 보기'로 들어오면 #접착 같은 해시로 종류 고르기
+window.plyshOppKind = function (k) { S.k = k ? [k] : []; S.q = ''; $('#q').value = ''; S.all = 0; save(); render(); window.scrollTo(0, 0); };
+render();
+</script>
+</body>
+</html>

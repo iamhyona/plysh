@@ -1011,7 +1011,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .tmsum .tdsh { margin-left:auto; }
 /* 정보 구조 시안 (2026-11-19 2차): 오늘 · 프로젝트 · 도구 · 자료 네 공간 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
    html[data-nav] = w 왼쪽 메뉴 · t 위 메뉴. 데스크탑 우선, 1023px 이하는 모바일 */
-:root { --pvh:0px; --sw:232px; }
+:root { --pvh:0px; --sw:264px; } /* 2026-11-22 실장님: 메뉴 이름이 두 줄 되지 않게 넓힘 */
 html[data-nav] #nav, html[data-nav] #tkBar { display:none !important; }
 .nvi { width:16px; height:16px; flex:none; }
 /* 찾기 칸 (머리줄) */
@@ -1132,14 +1132,15 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .spg .tkl { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:10px; }
 
 /* 소메뉴 (왼쪽 메뉴 3단계) */
-.s3 { margin:2px 0 6px; padding-left:40px; }
+.s3, .stg { margin:2px 0 6px; padding-left:40px; }
 .s3 .s3h { display:block; font-size:12px; font-weight:700; color:var(--faint); padding:8px 12px 2px; }
-.s3 button { display:flex; align-items:center; gap:8px; width:100%; min-height:34px; border:0; background:none; text-align:left; padding:0 12px; border-radius:10px; font:inherit; font-size:14px; font-weight:500; color:var(--mute); cursor:pointer; position:relative; }
-.s3 button:before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:2px; border-radius:1px; background:var(--line); }
-.s3 button:hover { background:var(--bg); color:var(--sub); }
-.s3 button.on { color:var(--txt); font-weight:700; } .s3 button.on:before { background:var(--txt); }
-.s3 button small { margin-left:auto; font-size:11.5px; font-weight:600; color:var(--faint); }
-#nfm .s3 { padding-left:12px; }
+.s3 button, .stg button { display:flex; align-items:center; gap:8px; width:100%; min-height:34px; border:0; background:none; text-align:left; padding:0 12px; border-radius:10px; font:inherit; font-size:14px; font-weight:500; color:var(--mute); cursor:pointer; position:relative; }
+.s3 button:before, .stg button:before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:2px; border-radius:1px; background:var(--line); }
+.s3 button:hover, .stg button:hover { background:var(--bg); color:var(--sub); }
+.s3 button.on, .stg button.on { color:var(--txt); font-weight:700; } .s3 button.on:before, .stg button.on:before { background:var(--txt); }
+.s3 button small, .stg button small { margin-left:auto; font-size:11.5px; font-weight:600; color:var(--faint); }
+#nfm .s3, #nfm .stg { padding-left:12px; }
+.tgh .cv { display:inline-block; flex:none; margin-left:auto; margin-right:6px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(45deg); opacity:.55; transition:transform .15s; } .tgh.op .cv { transform:rotate(-135deg); } .lk.tgh { display:flex; align-items:center; width:100%; } .stg[hidden] { display:none; }
 .s3 button.pt { color:var(--sub); font-weight:600; } .s3 button.pt.op { color:var(--txt); font-weight:700; } .s3 button.pt:before { display:none; }
 .s3 button.pt .cv { margin-left:auto; margin-right:4px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(-45deg); opacity:.55; }
 .s3 button.pt.op .cv { transform:rotate(45deg); margin-top:-3px; }
@@ -1625,7 +1626,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm67';
+var APP_VER = '20261122hm73';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2107,7 +2108,7 @@ function lgBody() {
 }
 // GUIDE 메뉴 (2026-11-10): 목록은 화면에, 문서는 아래에서 올라오는 창으로
 // 2026-11-18: 업무 및 행정 / 디자인 작업 2그룹, 아래 항목은 해당 섹션 바로가기
-var GUIDE_GROUPS = [{"g":"업무 및 행정","i":[{"f":"g.html?id=office","t":"사무실 이용 가이드","s":[["사무실 출입","door"],["나스(NAS)","nas"],["와이파이","wifi"],["복합기 사용","printer"]]},{"f":"g.html?id=admin","t":"행정업무 가이드","s":[["퀵 이용법","quick"],["법인택시 사용법","taxi"],["법인카드 사용법","corpcard"],["지출결의서 작성법","expense"],["명함 제작 방법","namecard"]]},{"f":"g.html?id=system","t":"업무 시스템 가이드","s":[["위하고 접속","wehago"],["메일플러그 접속","mailplug"],["메일 서명 수정","signature"]]}]},{"g":"디자인 작업 기본설정","i":[{"f":"folder-file.html","t":"폴더·파일 작성법","s":[]},{"f":"g.html?id=illustrator","t":"일러스트 셋팅","s":[["워크스페이스","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["새 문서·저장","save"]]},{"f":"g.html?id=photoshop","t":"포토샵 셋팅","s":[["워크스페이스","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["문서 기준","doc"]]},{"f":"g.html?id=indesign","t":"인디자인 셋팅","s":[["워크스페이스","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["저장·전달","save"]]},{"f":"g.html?id=bridge","t":"브릿지 셋팅","s":[["색상 설정 동기화","color"],["워크스페이스","workspace"],["환경설정","prefs"],["일괄 이름 바꾸기","rename"],["레이블·별점","label"]]},{"f":"g.html?id=acrobat","t":"아크로뱃 셋팅","s":[["워크스페이스","workspace"],["환경설정","prefs"],["인쇄 PDF 검수","check"],["피드백·비교","feedback"]]}]},{"g":"디자인 실무","i":[{"f":"g.html?id=label","t":"상품 라벨 스티커","s":[["주문 옵션","option"],["데이터 만들기","data"],["체크 포인트","check"]]},{"f":"packshot.html","t":"시즌그리팅 팩샷","s":[]},{"f":"g.html?id=photocard","t":"포토카드","s":[["기본 규격","spec"],["사진 작업","image"],["앞·뒷면","back"],["발주·검수","order"]]},{"f":"g.html?id=barcode","t":"바코드 디자인","s":[["크기","size"],["양옆 여백 (Quiet Zone)","quiet"],["색 · 먹 1도","color"],["바 폭 보정 (BWR)","bwr"],["위치","place"],["파일 작업","file"],["종류별","type"],["인쇄 전 확인","test"]]},{"f":"g.html?id=fsc","t":"FSC 로고","s":[["FSC 라벨","what"],["구성","parts"],["크기","size"],["색 · 대비","color"],["여백 · 변형 금지","rule"],["제품 라벨 · 홍보용","promo"],["인쇄 전 확인","check"]]}]}];
+var GUIDE_GROUPS = [{"g":"업무 및 행정","i":[{"f":"g.html?id=office","t":"사무실 이용 가이드","s":[["사무실 출입","door"],["나스(NAS)","nas"],["와이파이","wifi"],["복합기 사용","printer"]]},{"f":"g.html?id=admin","t":"행정업무 가이드","s":[["퀵 이용법","quick"],["법인택시 사용법","taxi"],["법인카드 사용법","corpcard"],["지출결의서 작성법","expense"],["명함 제작 방법","namecard"]]},{"f":"g.html?id=system","t":"업무 시스템 가이드","s":[["위하고 접속","wehago"],["메일플러그 접속","mailplug"],["메일 서명 수정","signature"]]}]},{"g":"디자인 작업 기본설정","i":[{"f":"folder-file.html","t":"폴더·파일 작성법","s":[]},{"f":"g.html?id=illustrator","t":"일러스트 셋팅","s":[["워크스페이스","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["새 문서·저장","save"]]},{"f":"g.html?id=photoshop","t":"포토샵 셋팅","s":[["워크스페이스","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["문서 기준","doc"]]},{"f":"g.html?id=indesign","t":"인디자인 셋팅","s":[["워크스페이스","workspace"],["단축키","shortcut"],["환경설정","prefs"],["컬러 설정","color"],["검정 정확하게 보기","black"],["저장·전달","save"]]},{"f":"g.html?id=bridge","t":"브릿지 셋팅","s":[["색상 설정 동기화","color"],["워크스페이스","workspace"],["환경설정","prefs"],["일괄 이름 바꾸기","rename"],["레이블·별점","label"]]},{"f":"g.html?id=acrobat","t":"아크로뱃 셋팅","s":[["워크스페이스","workspace"],["환경설정","prefs"],["인쇄 PDF 검수","check"],["피드백·비교","feedback"]]}]},{"g":"디자인 실무","i":[{"f":"g.html?id=printbase","t":"인쇄 데이터 기본","s":[["도련 · 안전 영역","bleed"],["이미지 해상도","image"],["글자 크기","text"],["선 두께","line"],["색","color"],["접지 · 제본","fold"],["파일 넘기기","export"]]},{"f":"g.html?id=label","t":"상품 라벨 스티커","s":[["주문 옵션","option"],["데이터 만들기","data"],["체크 포인트","check"]]},{"f":"packshot.html","t":"시즌그리팅 팩샷","s":[]},{"f":"g.html?id=photocard","t":"포토카드","s":[["기본 규격","spec"],["사진 작업","image"],["앞·뒷면","back"],["발주·검수","order"]]},{"f":"g.html?id=overprint","t":"녹아웃 · 오버프린트 · 트랩","s":[["녹아웃과 오버프린트","concept"],["오버프린트 해야 할 때","when"],["오버프린트 하면 안 될 때","dont"],["트랩","trap"],["리치 블랙과 오버프린트","rich"],["프로그램 설정","app"],["검수기 판정","check"]]},{"f":"g.html?id=barcode","t":"바코드 디자인","s":[["크기","size"],["양옆 여백 (Quiet Zone)","quiet"],["색 · 먹 1도","color"],["바 폭 보정 (BWR)","bwr"],["위치","place"],["파일 작업","file"],["번호 받기 · 바코드 만들기","make"],["종류별","type"],["인쇄 전 확인","test"]]},{"f":"g.html?id=qr","t":"QR코드","s":[["크기","size"],["여백","quiet"],["색 · 대비","color"],["주소 · 오류 복원","data"],["만들기","make"],["인쇄 전 확인","test"]]},{"f":"g.html?id=fsc","t":"FSC 로고","s":[["FSC 라벨","what"],["구성","parts"],["크기","size"],["색 · 대비","color"],["여백 · 변형 금지","rule"],["제품 라벨 · 홍보용","promo"],["인쇄 전 확인","check"]]},{"f":"g.html?id=marks","t":"표시사항 · 인증 마크","s":[["공통 규칙","rule"],["분리배출 표시","recycle"],["KC 마크","kc"],["제품 표시사항","label"],["친환경 표시","eco"],["발주 전 확인","check"]]}]}];
 var GUIDES = [];
 GUIDE_GROUPS.forEach(function (gr) { gr.i.forEach(function (g) { GUIDES.push(g); }); });
 function renderGuide() {
@@ -2144,14 +2145,15 @@ var TOOLS = [
     { k: 'checklist', t: '자가점검리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
   { g: '자료', i: [
     { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
-    { k: 'ref', t: '용어사전', s: '인쇄·후가공·제본 용어와 디자인 용어', f: 'tools/proof/', pv: 'ref' },
-    { k: 'pt', t: '팬톤 가이드', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
+    { k: 'ref', t: '용어·견본', s: '용어 개념과 견본 (용지 · 박 · 원단 …)', f: 'tools/proof/', pv: 'ref' },
+    { k: 'pt', t: '색 · 팬톤', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
     { k: 'logo', t: '로고', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
-    { k: 'fonts', t: '폰트', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' }] }
+    { k: 'fonts', t: '폰트', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' },
+    { k: 'opp', t: 'OPP 봉투 규격', s: '국내 판매 규격 · 용도별 추천 · 구매 링크', f: 'tools/opp/' }] }
 ];
 var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut', die: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
-var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', unit: '단위 환산', review: 'PREFLIGHT', gcheck: '상품 검수기', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
+var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', unit: '단위 환산', opp: 'OPP 봉투', review: 'PREFLIGHT', gcheck: '상품 검수기', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
 if (TOOL_OLD[S.tk]) S.tk = TOOL_OLD[S.tk]; if (S.view === 'calc') S.view = 'tk', S.tk = 'cut';
 function toolKey() { if (S.view === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === S.view; })[0]; return t ? t.k : ''; }
 function isToolView(v) { return v === 'tools' || v === 'tk' || TOOL_LIST.some(function (x) { return x.v === v; }); }
@@ -2191,7 +2193,10 @@ function renderTk() {
   f._pv = t.pv || ''; if (f._ok) tkGo(f);
   rvSize(); window.scrollTo(0, 0);
 }
-function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) { if (f._pv === 'ref' && NAV.refHome && f.contentWindow.plyshRefHome) { NAV.refHome = 0; f.contentWindow.plyshRefHome(); } if (f._pv === 'ref' && NAV.refPart && f.contentWindow.plyshRefPart) { f.contentWindow.plyshRefPart(NAV.refPart); NAV.refPart = ''; } f.contentWindow.plyshGo(f._pv); } } catch (e) {} }
+function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) { if (f._pv === 'ref' && NAV.refHome && f.contentWindow.plyshRefHome) { NAV.refHome = 0; f.contentWindow.plyshRefHome(); } if (f._pv === 'ref' && NAV.refPart && f.contentWindow.plyshRefPart) { f.contentWindow.plyshRefPart(NAV.refPart); NAV.refPart = ''; } if (f._pv === 'ref' && NAV.refQ && f.contentWindow.plyshRefFind) { f.contentWindow.plyshRefFind(NAV.refQ); NAV.refQ = ''; } f.contentWindow.plyshGo(f._pv); } if (f.dataset.f === 'tools/opp/' && NAV.oppK != null && f.contentWindow.plyshOppKind) { f.contentWindow.plyshOppKind(NAV.oppK); NAV.oppK = null; } } catch (e) {} }
+// 도구 ↔ 용어사전 서로 이동 (2026-11-22 OPP 봉투 규격): 용어 검색으로 열기 / 도구 열기
+window.plyshOpenRef = function (part, q) { navGo('refq:' + (q || '')); };
+window.plyshOpenTool = function (k, arg) { if (k === 'opp') NAV.oppK = arg || ''; navGo(k); };
 // 용어사전 안에서 파트(지류 · MD · 디자인)를 바꾸면 왼쪽 메뉴 · 머리도 같이 (2026-11-22)
 window.plyshRefSync = function (p) { p = p || ''; if (S.refP === p) return; S.refP = p; if (S.view === 'tk' && S.tk === 'ref') { navSync(); pgSync(); SUB.sig = ''; } };
 // 도구 안에서 화면을 옮기면(예: 지류 품목 → 사양서에 담기) 위 칩도 같이 바뀜
@@ -2483,14 +2488,14 @@ var SPACES = [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 세로형 · 가로형 · 리스트로' }] }] },
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
   { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
-    { g: '지류', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'paper', t: '용지 크기', tool: 1 }] },
+    { g: '지류', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] },
     { g: 'MD', i: [{ k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }] },
-    { g: '디자인', i: [{ k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }] },
+    { g: '디자인', i: [{ k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }] },
     { g: '공통', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
-  { k: 'gloss', t: '용어사전', d: '지류 · 음반 · MD · 디자인 용어', home: 'ref', ic: 'ref', g: [
-    { g: '용어사전', i: [{ k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 특수 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 책 구조 · 부속 · 포장' }, { k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · 포장 · 마감 · 실물 포맷' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재 · 비즈의 소재 · 기법 · 용어' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
+  { k: 'gloss', t: '용어·견본', d: '색 · 지류 · 음반 · MD · 디자인 — 개념과 견본', home: 'ref', ic: 'ref', g: [
+    { g: '용어·견본', i: [{ k: 'pt', t: '색', s: '팬톤 · 별색 견본' }, { k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 특수 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 책 구조 · 부속 · 포장' }, { k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · 포장 · 마감 · 실물 포맷' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재 · 비즈의 소재 · 기법 · 용어' }, { k: 'opp', t: 'OPP 봉투', s: 'MD 포장 견본 · 규격 · 구매 링크' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
-    { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드 · 바코드 · FSC 로고' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
+    { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 기본 · 오버프린트 · 바코드 · QR · FSC 로고 · 표시사항 · 상품 라벨 · 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '안내', d: '퀵 배차, 사무실 이용, 행정 업무, 업무 시스템', home: 'space:admin', ic: 'office', g: [
     { g: '안내', i: [{ k: 'qk', t: '퀵 배차', s: '카카오 T 퀵 주문 · 거래처 주소와 연락처' }, { k: 'gd:g.html?id=office', t: '사무실 이용', s: '출입 · 나스 · 와이파이 · 복합기' }, { k: 'gd:g.html?id=admin', t: '행정 업무', s: '휴가 · 지출 · 서류' }, { k: 'gd:g.html?id=system', t: '업무 시스템', s: '사내 시스템 사용법' }] }] }
 ];
@@ -2512,6 +2517,7 @@ function navGo(k) {
   navClose(); S.ws = null;
   if (TOOL_OLD[k]) k = TOOL_OLD[k]; // 예전 메뉴 키 (전개도 생성기 → 종이연수·칼선)
   if (k === 'ref') { NAV.refHome = 1; NAV.refPart = ''; S.refP = ''; } // 용어사전 메뉴를 누르면 늘 첫 화면(분류 카드)
+  if (k.indexOf('refq:') === 0) { NAV.refHome = 0; NAV.refPart = ''; S.refP = ''; NAV.refQ = k.slice(5); k = 'ref'; } // 안내 문서 → 용어사전 검색
   if (k.indexOf('ref:') === 0) { NAV.refHome = 0; NAV.refPart = S.refP = k.slice(4); k = 'ref'; } // 용어사전 > 지류 · MD · 디자인
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
   if (k.indexOf('gd:') === 0) { S.gdf = k.slice(3); S.view = 'gdoc'; window.scrollTo(0, 0); return render(); }
@@ -2811,13 +2817,18 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); }).join('') + '</div>'; }).join('') + '</div>';
-  bindGo(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
+    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
+  bindGo(f); tgBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
   document.documentElement.style.overflow = 'hidden';
   requestAnimationFrame(function () { requestAnimationFrame(function () { f.classList.add('open'); bd.classList.add('open'); subPaint(f, null, '.lk'); }); });
 }
+// 2026-11-22 실장님: 도구는 용어사전처럼 대메뉴 > 중메뉴(지류 · MD · 디자인 · 공통) > 소메뉴. 중메뉴를 눌러야 소메뉴가 펼쳐짐
+function tgOpen(sp, g) { var cur = navCur(); NAV.tgo = NAV.tgo || {}; if (NAV.tgo[g.g] != null) return NAV.tgo[g.g]; return g.i.some(function (x) { return x.k === cur; }); }
+function tgHtml(sp, cls) { var cur = navCur(); return sp.g.map(function (g) { var op = tgOpen(sp, g), has = g.i.some(function (x) { return x.k === cur && !inWs(); });
+  return '<button type="button" class="' + cls + ' tgh' + (op ? ' op' : '') + (has && cls === 'si' ? ' on' : '') + '" data-tg="' + esc(g.g) + '">' + esc(g.g) + '<span class="cv"></span></button><div class="stg"' + (op ? '' : ' hidden') + '>' + g.i.map(function (x) { return '<button type="button" class="' + (x.k === cur && !inWs() ? 'on' : '') + '" data-ng="' + x.k + '">' + esc(TOOL_SHORT[x.k] || x.t) + '</button>'; }).join('') + '</div>'; }).join(''); }
+function tgBind(root) { $$('[data-tg]', root).forEach(function (b) { b.onclick = function () { var w = b.nextElementSibling, op = w.hasAttribute('hidden'); NAV.tgo = NAV.tgo || {}; NAV.tgo[b.dataset.tg] = op; if (op) w.removeAttribute('hidden'); else w.setAttribute('hidden', ''); b.classList.toggle('op', op); }; }); }
 function sideHtml() {
   var cur = navCur(), sk = spOf();
   return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
@@ -2827,7 +2838,7 @@ function sideHtml() {
       h += '<div class="sx">';
       if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
-      } else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { return '<button type="button" class="si' + (x.k === cur && !inWs() ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); });
+      } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { return '<button type="button" class="si' + (x.k === cur && !inWs() ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
 }
@@ -2850,7 +2861,7 @@ var PG_DESC = {
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', unit: 'mm · cm · m · in · ft · yd · pt · pc · Q · px를 한 번에 바꿔요 · px는 해상도(ppi)를 골라서', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
   qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '지류 · MD · 디자인 용어 · 영문 · 한자 · 일본어 표기와 함께',
-  checklist: '컨펌 요청 전 단계별 자가 점검' };
+  checklist: '컨펌 요청 전 단계별 자가 점검', opp: '국내 판매처에 실제로 있는 OPP 봉투 규격과 구매 링크 · 용도를 고르면 맞는 크기 추천 · 조사 2026.11.22' };
 function pgInfo() {
   var v = S.view; if (v === 'start' || inWs()) return null;
   var sp = SPACES.filter(function (x) { return x.k === spOf(); })[0], cur = navCur();
@@ -2895,7 +2906,7 @@ function navSync() {
   hdr.onmouseleave = function (ev) { if (NAV.hv && !(ev.relatedTarget && $('#nmg').contains(ev.relatedTarget))) navClose(); };
   if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
-    sd.innerHTML = sideHtml(); bindGo(sd); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
+    sd.innerHTML = sideHtml(); bindGo(sd); tgBind(sd); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
     var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');

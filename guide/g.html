@@ -276,13 +276,16 @@ td{font-size:14.5px;padding:10px 12px}th{font-size:12.5px}
 .golink{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border:1px solid #cfd6df;border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:16px;font-weight:600;letter-spacing:var(--track);cursor:pointer}
 .golink:hover{border-color:var(--ink)}
 .golinks{display:flex;flex-wrap:wrap;gap:10px;padding-top:8px}
+/* 표 첫 칸이 길면 모바일에서 둘째 칸이 한 글자씩 세로로 쪼개지던 문제 (2026-11-22) */
+td{word-break:keep-all}
+@media (max-width:640px){td:first-child,td.k{white-space:normal;min-width:6em;max-width:44%}}
 @media (max-width:640px){.golink{height:40px;font-size:14.5px;padding:0 14px}}
 </style>
 <link rel="stylesheet" href="toc.css">
 </head>
 <body>
 <div class="wrap" data-toc id="root"><a class="back" href="./"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg> 가이드 목록</a></div>
-<script src="gdata.js?v=20261122b"></script>
+<script src="gdata.js?v=20261122d"></script>
 <script>
 (function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1],g=window.GD&&GD[id],r=document.getElementById('root');
 if(!g){r.insertAdjacentHTML('beforeend','<p>가이드를 찾을 수 없음.</p>');return}
