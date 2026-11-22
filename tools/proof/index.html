@@ -483,6 +483,14 @@ select:focus, input:focus, button:focus, textarea:focus { outline:none !importan
 /* 2026-11-21 실장님: 용어 이름 표기 통일 (영문 · 한자 · 일본어 · 약어) */
 .gl .nm{display:flex;flex-wrap:wrap;gap:2px 14px;margin:6px 0 0;font-size:13px;color:var(--sub)} .gl .nm em{font-style:normal;color:var(--mute);margin-right:6px;font-size:12px} .gl .nm+p:not(.nm){margin-top:8px}
 
+
+.rix { display:none; }
+.rix .ixs { background:#fff; border-radius:16px; padding:12px; margin-bottom:12px; }
+.rix .ixh { font-size:12px; font-weight:700; color:#8b95a1; margin:4px 4px 6px; } .rix .ixh ~ .ixh { margin-top:12px; }
+.rix .ixc { display:flex; flex-wrap:wrap; gap:4px; } .rix .ixc button { border:0; background:#f2f4f6; color:#4e5968; border-radius:8px; padding:5px 9px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; } .rix .ixc button.on { background:#191f28; color:#fff; }
+.rix .ixl { display:flex; flex-direction:column; max-height:calc(100vh - 220px); overflow:auto; } .rix .ixl button { border:0; background:none; text-align:left; padding:6px 8px; border-radius:8px; font:inherit; font-size:13px; color:#4e5968; cursor:pointer; } .rix .ixl button:hover { background:#f2f4f6; color:#191f28; } .rix .ixl p { margin:4px 8px; font-size:12.5px; color:#8b95a1; }
+@media (min-width:900px) { .rxg { display:grid; grid-template-columns:minmax(0, 1fr) 176px; gap:20px; align-items:start; } .rix { display:block; position:sticky; top:16px; } }
+@media (max-width:899px) { .rix { display:block; order:4; } .rix .ixi { display:none; } .rxg { display:flex; flex-direction:column; } .rxm { display:contents; } .rxm > .card, .rxm > .nt { order:5; } .rix .ixs { padding:10px 12px; } .rix .ixc { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; } .rix .ixc button { flex:none; } }
 /* 2026-11-22 용어·견본 */
 .rmode { margin:0 0 12px; } .rmode button { min-height:36px; padding:0 16px; font-weight:700; }
 .rint dl { display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin:4px 0 0; font-size:14px; line-height:1.6; } .rint dt { font-weight:700; color:#4e5968; white-space:nowrap; } .rint dd { margin:0; color:#333d4b; }
@@ -2155,6 +2163,19 @@ var REF_INTRO = {"용지": [["큰 갈래", "용지는 표면에 도료를 바른
 function refIntro(k) { var I = REF_INTRO[k]; return I ? '<div class="card rint"><div class="ct">' + esc(k) + ' 한눈에</div><dl>' + I.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>' : ''; }
 function refModeBar(has) { if (!has) return ''; var m = RM(); return '<div class="chips rmode"><button data-rm="t"' + (m === 't' ? ' class="on"' : '') + '>용어 · 개념</button><button data-rm="s"' + (m === 's' ? ' class="on"' : '') + '>견본 보기</button></div>'; }
 function RM() { return ls.get('pr:rm') === 's' ? 's' : 't'; }
+// 2026-11-22 실장님: 오른쪽 패널 = 필터(제조사 · 평량) + 바로 가기 색인 (아래로만 길게 열리지 않게)
+function refIx() {
+  var box = document.querySelector('.rix .ixl'); if (!box) return;
+  var mk = ls.get('pr:pmk') || '', gb = ls.get('pr:pgb') || '', inB = function (g) { return !gb || (gb === 'a' ? g > 0 && g <= 100 : gb === 'b' ? g > 100 && g <= 200 : gb === 'c' ? g > 200 && g <= 300 : g > 300); };
+  $$('.pcard > div[data-mk]').forEach(function (d) { var ok = (!mk || d.dataset.mk.split('|').indexOf(mk) >= 0) && (!gb || d.dataset.g.split(',').some(function (g) { return inB(+g); })); d.style.display = ok ? '' : 'none'; });
+  var T = [];
+  $$('.pcard > div[data-mk]').forEach(function (d) { if (d.style.display === 'none') return; var b = d.querySelector('.pbh b'); if (b) T.push([b.textContent, d]); });
+  $$('.glc > .gl').forEach(function (d) { if (!d.offsetParent) return; var b = d.querySelector('.glt b'); if (b) T.push([b.textContent, d]); });
+  box.innerHTML = T.length ? T.map(function (x, i) { return '<button data-ix="' + i + '">' + esc(x[0]) + '</button>'; }).join('') : '<p>맞는 항목이 없어요</p>';
+  $$('[data-ix]', box).forEach(function (b) { b.onclick = function () { var t = T[+b.dataset.ix][1]; window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' }); }; });
+  $$('[data-pmk]').forEach(function (b) { b.onclick = function () { ls.set('pr:pmk', b.dataset.pmk); $$('[data-pmk]').forEach(function (x) { x.classList.toggle('on', x === b); }); refIx(); }; });
+  $$('[data-pgb]').forEach(function (b) { b.onclick = function () { ls.set('pr:pgb', b.dataset.pgb); $$('[data-pgb]').forEach(function (x) { x.classList.toggle('on', x === b); }); refIx(); }; });
+}
 function renderRef() {
   var q = (S.rq || '').trim().toLowerCase(), home = RHOME && !q, phome = !home && RPH && !q;
   var k = refCur(RP);
@@ -2172,6 +2193,7 @@ function renderRef() {
     // 색인: PC 오른쪽(PLYSH 안에서는 왼쪽 메뉴 소메뉴로 옮겨지고 숨김) · 모바일 = 파트 세그먼트 + 그 파트 분류 칩
     h += '<div class="rfx' + (home ? ' rhx' : phome ? ' rhx rpx' : '') + '"><aside class="rnav"><div class="chips rpseg">' + RPARTS.map(function (p) { return '<button data-rpp="' + p + '"' + (p === RP && !home ? ' class="on"' : '') + '>' + p + '</button>'; }).join('') + '</div><div class="chips rtab">' +
       RPARTS.map(function (p) { return '<b class="rph">' + p + '</b>' + refCats(p).map(function (g) { var on = !home && !phome && p === RP && g === k; return '<button data-rp="' + p + '" data-rc="' + esc(g) + '" class="' + (p !== RP || home ? 'rx' : '') + (on ? ' on' : '') + '">' + esc(g) + (refCnt(p, g) ? '<small>' + refCnt(p, g) + '</small>' : '') + '</button>'; }).join(''); }).join('') + '</div></aside><div class="rbody">';
+    var bi = h.length;
     var card = function (p, g) { var n = refCnt(p, g); return '<button class="rhc" type="button" data-rp="' + p + '" data-rc="' + esc(g) + '"><b>' + esc(g) + (n ? '<small>' + n + '</small>' : '') + '</b><span>' + esc(refDs(p, g)) + '</span></button>'; };
     var grp = function (rows, gi) { var o = {}, order = []; rows.forEach(function (r) { var key = r[gi]; if (!o[key]) { o[key] = []; order.push(key); } o[key].push(r); }); return order.map(function (g) { return [g, o[g]]; }); };
     if (home) {
@@ -2204,7 +2226,7 @@ function renderRef() {
         h += '<div class="nt c">굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요</div>';
       } else if (k === '용지') {
         var G = grp(rows, 1);
-        h += '<div class="card pcard ' + gm + '">' + G.map(function (g, i) { return '<div id="pb' + i + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('') + '</div>';
+        h += '<div class="card pcard ' + gm + '">' + G.map(function (g, i) { return '<div id="pb' + i + '" data-mk="' + esc(uniq(g[1].map(function (r) { return String(r[5] || '').trim(); })).join('|')) + '" data-g="' + uniq(g[1].map(function (r) { return +r[3] || 0; })).join(',') + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('') + '</div>';
         h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
       } else {
         if (st === '접지도감_접지') h += '<div class="nt" style="margin:0 4px 10px">' + esc(GLF_NOTE) + '</div>';
@@ -2212,9 +2234,16 @@ function renderRef() {
         h += '<div class="nt c">' + (k === '제본' ? '제본 종류 전체 비교예요 · 사양서 제본 칸에는 자주 쓰는 것만 나와요 · 누르면 복사' : '굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요') + '</div>';
       }
     }
+    if (!home && !phome && k !== '용지 크기' && k !== '결·책등') {
+      var pf = '';
+      if (RP === '지류' && k === '용지') { var MK = uniq(rows.map(function (r) { return String(r[5] || '').trim(); }).filter(Boolean)), mk = ls.get('pr:pmk') || '', gb = ls.get('pr:pgb') || '';
+        pf = '<div class="ixs"><div class="ixh">제조사</div><div class="ixc">' + [''].concat(MK).map(function (m) { return '<button data-pmk="' + esc(m) + '"' + (m === mk ? ' class="on"' : '') + '>' + esc(m || '전체') + '</button>'; }).join('') + '</div><div class="ixh">평량</div><div class="ixc">' + [['', '전체'], ['a', '~100g'], ['b', '101~200g'], ['c', '201~300g'], ['d', '300g 이상']].map(function (x) { return '<button data-pgb="' + x[0] + '"' + (x[0] === gb ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') + '</div></div>'; }
+      h = h.slice(0, bi) + '<div class="rxg"><div class="rxm">' + h.slice(bi) + '</div><aside class="rix">' + pf + '<div class="ixs ixi"><div class="ixh">바로 가기</div><div class="ixl"></div></div></aside></div>';
+    }
     h += '</div></div>';
   }
   $('#main').innerHTML = h;
+  refIx();
   var rq = $('#rQ'); rq.oninput = function () { S.rq = this.value; var p = this.selectionStart; renderRef(); var i = $('#rQ'); i.focus(); i.setSelectionRange(p, p); };
   $$('[data-rc]').forEach(function (b) { b.onclick = function () { RHOME = false; RPH = false; RP = b.dataset.rp; ls.set('pr:rp', RP); ls.set(RP === '지류' ? 'pr:ref2' : 'pr:refsub:' + RP, b.dataset.rc); window.scrollTo(0, 0); renderRef(); }; });
   $$('[data-rpp]').forEach(function (b) { b.onclick = function () { window.plyshRefPart(b.dataset.rpp); }; });
