@@ -41,7 +41,7 @@ function cstyle(name, f, size, color) {
   try { a.kerningMethod = AutoKernType.OPTICAL; } catch (e1) {}
   a.autoLeading = false; a.leading = size * 2.0; a.fillColor = color; return st;
 }
-var TIERS = {}, TB = { XS: 14, S: 20, M: 26, L: 36, XL: 54 }, TT = { XS: 28, S: 40, M: 52, L: 72, XL: 108 };
+var TIERS = {}, TB = { XS: 18, S: 26, M: 34, L: 46, XL: 70 }, TT = { XS: 36, S: 50, M: 66, L: 90, XL: 136 };
 function tierOf(D) { return D <= 60 ? 'XS' : D <= 150 ? 'S' : D <= 300 ? 'M' : D <= 700 ? 'L' : 'XL'; }
 function styles(t) {
   if (TIERS[t]) return TIERS[t];
@@ -52,7 +52,7 @@ function styles(t) {
     item: lead(cstyle(p + 'Item', F_B, TT[t] * 0.8, C_TXT), TT[t] * 0.8 * 1.2),
     writer: lead(cstyle(p + 'Writer', F_R, b, C_TXT), b * 1.6),
     eye: cstyle(p + 'Eyebrow', F_R, b * 0.9, C_MUTE),
-    sec: cstyle(p + 'Section', F_B, b * 1.2, C_TXT),
+    sec: cstyle(p + 'Section', F_B, b * 1.45, C_TXT),
     label: cstyle(p + 'Label', F_B, b, C_TXT),
     body: cstyle(p + 'Body', F_R, b, C_TXT),
     hint: cstyle(p + 'Hint', F_R, b * 0.88, C_MUTE),
