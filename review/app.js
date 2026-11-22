@@ -973,6 +973,7 @@ function renderTab() {
       h += '<div class="iss"><div class="ih"><span class="sev ' + sevCls(x) + '">' + sevName(x) + '</span><div class="t"><b>' + esc(x.title) + '</b>' + (x.sus ? '<span class="sus">의심</span>' : '') +
         (L.length === 1 || pages.length <= 1 ? '<div class="d">' + rich(x.detail) + '</div>' : '<div class="d">' + pages.length + '개 페이지 · 예: ' + rich(x.detail) + '</div>') +
         (x.fix ? '<div class="fx">→ ' + rich(x.fix) + '</div>' : '') +
+        (/^(bcfail|bcok|isbnbar)$/.test(x.code) ? '<div class="fx noprint"><button type="button" class="lnk" data-gd="barcode">바코드 디자인 기준 보기</button></div>' : x.code === 'boxfsc' ? '<div class="fx noprint"><button type="button" class="lnk" data-gd="fsc">FSC 로고 기준 보기</button></div>' : '') +
         (pages.length ? '<div class="pgs">' + pages.slice(0, 80).map(function (p) { return '<button data-pg="' + p + '" data-iss="' + L.find(function (y) { return y.page === p; }).id + '">' + esc(pl(p)) + '</button>'; }).join('') + '</div>' : '') +
         (x.ref != null && L.length <= 6 ? L.map(function (y) { return compareHTML(y); }).join('') : '') +
         '</div></div></div>';

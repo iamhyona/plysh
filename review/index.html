@@ -315,6 +315,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
     <h3 class="sh">검수 기준 확인</h3>
     <div class="grid2" id="setG"></div>
     <div class="note">바꾼 값은 이 기기에 저장돼요. <button type="button" id="setReset" class="lnk">기본값으로</button></div>
+    <div class="note">바코드 · FSC 로고 판정 기준은 작업 기초 지침과 같아요. <button type="button" class="lnk" data-gd="barcode">바코드 디자인</button> · <button type="button" class="lnk" data-gd="fsc">FSC 로고</button></div>
     <div style="margin-top:16px"><button type="button" class="go" id="go" disabled>검수 시작</button></div>
   </div>
 
@@ -337,6 +338,8 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 </div></div>
 
 <script>
+// 작업 기초 지침 가이드 열기 (PLYSH 안이면 메뉴 이동, 따로 열었으면 새 탭)
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-gd]'); if (!b) return; var k = 'gd:g.html?id=' + b.getAttribute('data-gd'); try { if (parent !== window && parent.navGo) { parent.navGo(k); return; } } catch (x) {} window.open('../guide/g.html?id=' + b.getAttribute('data-gd'), '_blank'); });
 // 라이브러리 위치 (미리보기 빌드에서 로컬 경로로 바뀜)
 var LIBS = {
   pdfjs: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
