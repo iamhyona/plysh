@@ -1626,7 +1626,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm76';
+var APP_VER = '20261122hm77';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2146,7 +2146,7 @@ var TOOLS = [
   { g: '자료', i: [
     { k: 'items', t: '지류 품목', s: '대표 품목별 사양 예시, 골라서 사양서에 담기', f: 'tools/proof/', pv: 'list' },
     { k: 'ref', t: '용어·견본', s: '용어 개념과 견본 (용지 · 박 · 원단 …)', f: 'tools/proof/', pv: 'ref' },
-    { k: 'pt', t: '색 · 팬톤', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
+    { k: 'pt', t: '팬톤', s: '팬톤 번호·CMYK 근사값 찾기', f: 'tools/proof/', pv: 'pt' },
     { k: 'logo', t: '로고', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
     { k: 'fonts', t: '폰트', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' },
     { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 국내 판매 규격 · 구매 링크', f: 'tools/opp/' }] }
@@ -2488,12 +2488,12 @@ var SPACES = [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 세로형 · 가로형 · 리스트로' }] }] },
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
   { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
-    { g: '지류', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] },
+    { g: '지류', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'paper', t: '용지 크기', tool: 1 }] },
     { g: 'MD', i: [{ k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 구매 링크', tool: 1 }] },
-    { g: '디자인', i: [{ k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }] },
+    { g: '디자인', i: [{ k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }] },
     { g: '공통', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
-  { k: 'gloss', t: '용어·견본', d: '색 · 지류 · 음반 · MD · 디자인 — 개념과 견본', home: 'ref', ic: 'ref', g: [
-    { g: '용어·견본', i: [{ k: 'pt', t: '색', s: '팬톤 · 별색 견본' }, { k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 특수 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 책 구조 · 부속 · 포장' }, { k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · 포장 · 마감 · 실물 포맷' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재 · 비즈의 소재 · 기법 · 용어' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
+  { k: 'gloss', t: '용어·견본', d: '지류 · 음반 · MD · 디자인 — 개념과 견본', home: 'ref', ic: 'ref', g: [
+    { g: '용어·견본', i: [{ k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 특수 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 책 구조 · 부속 · 포장' }, { k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · 포장 · 마감 · 실물 포맷 · 엔터 · 팬 굿즈' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재 · 비즈의 소재 · 기법 · 용어' }, { k: 'opp', t: 'OPP 봉투', s: 'MD 포장 견본 · 규격 · 구매 링크' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 기본 · 오버프린트 · 바코드 · QR · FSC 로고 · 표시사항 · 상품 라벨 · 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '안내', d: '퀵 배차, 사무실 이용, 행정 업무, 업무 시스템', home: 'space:admin', ic: 'office', g: [
