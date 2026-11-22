@@ -2184,28 +2184,32 @@ function ptSearch(hit) {
   return o;
 }
 function refGo(s) { // "파트|분류|용어"
-  var a = String(s).split('|'), p = a[0], g = a[1], t = a[2];
-  if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = false; RP = p; ls.set('pr:rp', p); ls.set(p === '지류' ? 'pr:ref2' : 'pr:refsub:' + p, g);
-  if (t && p !== '지류' && p !== '부위') { var R = TT(p)[g] || [], row = R.filter(function (r) { return r[1] === t; })[0]; if (row) { ls.set('pr:rm', 's'); ls.set('pr:rk:' + p + ':' + g, row[0]); } }
+  var a = String(s).split('|'), p = a[0], g = a[1], t = a[2]; if (p === '지류') p = jPart(g);
+  if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = false; RP = p; ls.set('pr:rp', p); ls.set(isJ(p) ? 'pr:ref2' : 'pr:refsub:' + p, g);
+  if (t && !isJ(p) && p !== '부위') { var R = TT(p)[g] || [], row = R.filter(function (r) { return r[1] === t; })[0]; if (row) { ls.set('pr:rm', 's'); ls.set('pr:rk:' + p + ':' + g, row[0]); } }
   window.scrollTo(0, 0); renderRef();
   if (t) setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b'), function (x) { return x.textContent.trim() === t || (x.dataset.cp || '') === t; })[0]; if (e) { var d = e.closest('.gl'); window.scrollTo({ top: d.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); d.classList.add('bkhi'); setTimeout(function () { d.classList.remove('bkhi'); }, 1600); } }, 60);
 }
-var RHOME = true, RPH = false, RPARTS = ['지류', '음반', 'MD', '부자재', '포장', '부위', '디자인'], RPL = { MD: 'MD 소재', '부자재': 'MD 부자재', '포장': 'MD 포장', '부위': '상품별 부위 명칭' }; function rpl(p) { return RPL[p] || p; }
+// 2026-11-22 실장님: 지류도 MD처럼 소재 · 인쇄 · 후가공 · 제본 · 포장으로 나눔 (용어·견본만, 사양서 고르기는 그대로)
+var JP = { '지류 소재': ['용지', '결·책등'], '지류 인쇄': ['인쇄', '특수 인쇄'], '지류 후가공': ['코팅', '박', '가공', '톰슨', '조립'], '지류 제본': ['제본', '책 구조', '부속'], '지류 포장': ['포장'] };
+function isJ(p) { return /^지류/.test(String(p || '')); }
+function jPart(g) { var k = Object.keys(JP).filter(function (x) { return JP[x].indexOf(g) >= 0; })[0]; return k || '지류 소재'; }
+var RHOME = true, RPH = false, RPARTS = Object.keys(JP).concat(['음반', 'MD', '부자재', '포장', '부위', '디자인']), RPL = { '지류 제본': '지류 제본 · 부속', MD: 'MD 소재', '부자재': 'MD 부자재', '포장': 'MD 포장', '부위': '상품별 부위 명칭' }; function rpl(p) { return RPL[p] || p; }
 function TT(p) { return p === '부위' ? PTT : p === 'MD' ? MTERMS : p === '부자재' ? PTERMS : p === '포장' ? KTERMS : p === '음반' ? ATERMS : DTERMS; }
-var RP = ls.get('pr:rp'); if (RPARTS.indexOf(RP) < 0) RP = '지류';
+var RP = ls.get('pr:rp'); if (RP === '지류') RP = jPart(ls.get('pr:ref2')); if (RPARTS.indexOf(RP) < 0) RP = '지류 소재';
 window.plyshRefHome = function () { RHOME = true; RPH = false; S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
 // 2026-11-22 실장님: 메뉴를 누르면 마지막 세부 분류·위치 대신 항상 첫 화면(용어·개념, 분류 전체, 맨 위)
 function refReset(p, k) { ls.set('pr:rm', 't'); if (k) { ls.set('pr:refsub:' + k, ''); ls.set('pr:rk:' + p + ':' + k, ''); } ls.set('pr:pmk', ''); ls.set('pr:pgb', ''); S.rq = ''; window.scrollTo(0, 0); try { if (window.parent !== window) window.parent.scrollTo(0, 0); } catch (e) {} }
-window.plyshRefPart = function (p) { refReset(p, ''); if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = true; RP = p; ls.set('pr:rp', p); S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
+window.plyshRefPart = function (p) { if (p === '지류') p = '지류 소재'; refReset(p, ''); if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = true; RP = p; ls.set('pr:rp', p); S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
 window.plyshRefFind = function (q) { RHOME = false; RPH = false; S.rq = q || ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } }; // 안내 문서에서 용어 바로 찾기 (2026-11-22)
 window.plyshRefState = function () { return RHOME ? '' : RP; };
 var REF_DS = { '용지': '일반지 · 고급지 · 색지 · 판지(단면 · 양면 도공) · 스티커 · 필름', '인쇄': '인쇄 방식 · 색 구성 · 별색', '코팅': '라미네이팅 · 기계 · UV · 실크 코팅', '박': '태창 기준 · 금·은·먹 · 컬러박 · 홀로그램 · 투명 홀로그램 · 특수박', '가공': '형압 · 에폭시 · 기타 가공', '톰슨': '목형 · 재단 · 귀도리 · 오시 · 미싱 · 접지 · 타공', '조립': '합지 · 접착', '제본': '접착·표지 · 철심·실 · 노출 책등·수제책 · 링·기계식 · 전통 장정·접지', '부속': '헤드밴드 · 가름끈 · 아일렛 · 고리', '포장': '개별 · 납품 · 박스 형태', '결·책등': '종이 결 방향 · 책등 계산법' };
 var MKIND = ['소재', '짜임', '기법', '용어', '비교'];
 function refCats(p) {
-  if (p !== '지류') return Object.keys(TT(p));
-  return REFG.filter(function (g) { return g !== '굿즈' && tabsOf([g]).length; }).concat(['결·책등']);
+  if (!isJ(p)) return Object.keys(TT(p));
+  return REFG.filter(function (g) { return g !== '굿즈' && tabsOf([g]).length; }).concat(['결·책등']).filter(function (g) { return JP[p] ? JP[p].indexOf(g) >= 0 : true; });
 }
-function refCur(p) { var L = refCats(p), v = ls.get(p === '지류' ? 'pr:ref2' : 'pr:refsub:' + p); return L.indexOf(v) < 0 ? L[0] : v; }
+function refCur(p) { var L = refCats(p), v = ls.get(isJ(p) ? 'pr:ref2' : 'pr:refsub:' + p); return L.indexOf(v) < 0 ? L[0] : v; }
 function refTab(g) { return g === '제본' ? '제본도감' : g === '박' ? '박도감' : g === '용지' && tabsOf(['용지도감']).length ? '용지도감' : g; }
 // 2026-11-22 실장님: 용어사전에서는 숫자만 다른 항목(1공·2공, 오시 1줄·2줄, 1R·3R …)을 개념 하나로. 사양서 고르기 목록은 그대로
 var REF_MERGE = [
@@ -2231,7 +2235,7 @@ function refRows(n) {
   return out;
 }
 function refCnt(p, g) {
-  if (p !== '지류') return TT(p)[g].length;
+  if (!isJ(p)) return TT(p)[g].length;
   return g === '결·책등' || g === '용지 크기' ? 0 : [].concat.apply([], tabsOf([refTab(g)]).map(function (n) { return refRows(n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n); })).length;
 }
 function refDs(p, g) {
@@ -2325,7 +2329,7 @@ function renderRef() {
       h += '<div class="rhm"><div class="rhl">' + refCats(RP).map(function (g) { return card(RP, g); }).join('') + '</div></div>';
     } else if (RP === '부위') {
       h += partsPage(k) + '<div class="nt c">굵은 이름을 누르면 복사돼요 · 치수는 통상 예시라 최종 사양은 제작 업체 기준으로 확인</div>';
-    } else if (RP !== '지류') {
+    } else if (!isJ(RP)) {
       // 2026-11-22 실장님: 소재·기법·용어(MD) · 하위 분류(디자인)를 스크롤 대신 위쪽 탭으로 바로 전환
       var KR = TT(RP)[k], KG = kGroups(RP, k), kg = ls.get('pr:rk:' + RP + ':' + k);
       var EE = KR.map(function (r) { var e = dEntry(r.slice(1), '', RP); return { g: r[0], r: r, e: e, sw: e.indexOf('class="gdet"') >= 0 }; });
@@ -2380,7 +2384,7 @@ function renderRef() {
     }
     if (!home && !phome && k !== '용지 크기' && k !== '결·책등') {
       var pf = '';
-      if (RP === '지류' && k === '용지' && RM() === 's') { var MK = uniq(rows.map(function (r) { return String(r[5] || '').trim(); }).filter(Boolean)), mk = ls.get('pr:pmk') || '', gb = ls.get('pr:pgb') || '';
+      if (isJ(RP) && k === '용지' && RM() === 's') { var MK = uniq(rows.map(function (r) { return String(r[5] || '').trim(); }).filter(Boolean)), mk = ls.get('pr:pmk') || '', gb = ls.get('pr:pgb') || '';
         pf = '<div class="ixs"><div class="ixh">제조사</div><div class="ixc">' + [''].concat(MK).map(function (m) { return '<button data-pmk="' + esc(m) + '"' + (m === mk ? ' class="on"' : '') + '>' + esc(m || '전체') + '</button>'; }).join('') + '</div><div class="ixh">평량</div><div class="ixc">' + [['', '전체'], ['a', '~100g'], ['b', '101~200g'], ['c', '201~300g'], ['d', '300g 이상']].map(function (x) { return '<button data-pgb="' + x[0] + '"' + (x[0] === gb ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') + '</div></div>'; }
       h = h.slice(0, bi) + '<div class="rxg"><div class="rxm">' + h.slice(bi) + '</div><aside class="rix">' + RF + pf + '<div class="ixs ixi"><div class="ixh">바로 가기</div><div class="ixl"></div></div></aside></div>';
     }
@@ -2389,13 +2393,13 @@ function renderRef() {
   $('#main').innerHTML = h;
   refIx();
   var rq = $('#rQ'); rq.oninput = function () { S.rq = this.value; var p = this.selectionStart; renderRef(); var i = $('#rQ'); i.focus(); i.setSelectionRange(p, p); };
-  $$('[data-rc]').forEach(function (b) { b.onclick = function () { refReset(b.dataset.rp, b.dataset.rc); RHOME = false; RPH = false; RP = b.dataset.rp; ls.set('pr:rp', RP); ls.set(RP === '지류' ? 'pr:ref2' : 'pr:refsub:' + RP, b.dataset.rc); window.scrollTo(0, 0); renderRef(); }; });
+  $$('[data-rc]').forEach(function (b) { b.onclick = function () { refReset(b.dataset.rp, b.dataset.rc); RHOME = false; RPH = false; RP = b.dataset.rp; ls.set('pr:rp', RP); ls.set(isJ(RP) ? 'pr:ref2' : 'pr:refsub:' + RP, b.dataset.rc); window.scrollTo(0, 0); renderRef(); }; });
   $$('[data-rpp]').forEach(function (b) { b.onclick = function () { window.plyshRefPart(b.dataset.rpp); }; });
   $$('[data-rgo]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); refGo(b.dataset.rgo); }; });
   $$('[data-rm]').forEach(function (b) { b.onclick = function () { ls.set('pr:rm', b.dataset.rm); renderRef(); }; });
   $$('.bkn').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); var t = document.querySelector(b.getAttribute('href')); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('bkhi'); setTimeout(function () { t.classList.remove('bkhi'); }, 1600); } }); });
   $$('[data-pgo]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); try { window.parent.navGo(b.dataset.pgo); } catch (x) {} }; });
-  $$('[data-kgs]').forEach(function (b) { b.onclick = function () { var g = b.dataset.kgs, n = b.dataset.kgn; ls.set('pr:rm', 's'); if (RP === '지류') ls.set('pr:refsub:' + k, g); else ls.set('pr:rk:' + RP + ':' + k, g); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b, .pbh b'), function (x) { return x.textContent.trim() === n || (x.dataset.cp || '') === n; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
+  $$('[data-kgs]').forEach(function (b) { b.onclick = function () { var g = b.dataset.kgs, n = b.dataset.kgn; ls.set('pr:rm', 's'); if (isJ(RP)) ls.set('pr:refsub:' + k, g); else ls.set('pr:rk:' + RP + ':' + k, g); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b, .pbh b'), function (x) { return x.textContent.trim() === n || (x.dataset.cp || '') === n; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
   $$('[data-gsw]').forEach(function (b) { b.onclick = function () { var t = b.dataset.gsw; ls.set('pr:rm', RM() === 's' ? 't' : 's'); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b[data-cp]'), function (x) { return x.dataset.cp === t && x.offsetParent; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
   $$('.rif').forEach(function (f) { var fit = function () { try { var d = f.contentDocument; if (d && d.body) f.style.height = Math.max(600, d.documentElement.scrollHeight) + 'px'; } catch (e) {} }; f.onload = function () { fit(); setInterval(fit, 800); }; });
   $$('[data-rk]').forEach(function (b) { b.onclick = function () { ls.set('pr:rk:' + RP + ':' + k, b.dataset.rk); renderRef(); }; });
