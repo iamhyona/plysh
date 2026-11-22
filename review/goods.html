@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<script>/* 승인된 팀원만: 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../')}catch(e){location.replace('../')}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PLYSH 상품 검수기</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg?v=2">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --faint:#b0b8c1; --acc:#3182f6; --chip:#f2f4f6;
+  --red:#e0263a; --redbg:#fdecee; --org:#ff7300; --orgbg:#fff1e5; --pur:#6546b9; --purbg:#f2eefb; --grn:#0c8a62; --grnbg:#e7f8f1; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { margin:0; background:var(--bg); color:var(--txt); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; font-size:15px; letter-spacing:-0.01em; }
+button, input, select, textarea { font-family:inherit; letter-spacing:inherit; font-size:inherit; color:inherit; }
+button { cursor:pointer; }
+.wrap { max-width:1080px; margin:0 auto; padding:14px 16px 80px; }
+h2 { font-size:20px; font-weight:800; margin:4px 4px 12px; }
+.card { background:var(--card); border-radius:20px; padding:20px; margin-bottom:12px; }
+.sh { font-size:20px; font-weight:800; margin:0 0 6px; letter-spacing:-.2px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.sh .lk { border:0; background:none; padding:6px 0; font-size:14px; font-weight:600; color:var(--sub); }
+.desc { font-size:14px; color:var(--sub); line-height:1.6; margin:0 0 16px; }
+.drop { border:2px dashed var(--faint); border-radius:18px; padding:28px 16px; text-align:center; background:#fafbfc; transition:.15s; }
+.drop.on { border-color:var(--acc); background:#eef5ff; }
+.drop b { display:block; font-size:17px; margin-bottom:6px; }
+.drop .sub { font-size:13px; color:var(--sub); line-height:1.55; }
+.pick { display:inline-flex; align-items:center; min-height:40px; margin-top:14px; border:0; background:var(--txt); color:#fff; border-radius:999px; padding:0 18px; font-weight:700; }
+.fl { font-size:13px; font-weight:700; color:var(--sub); margin:18px 0 8px; display:flex; justify-content:space-between; align-items:center; }
+.fl small { font-weight:600; color:var(--mute); }
+.ta { width:100%; min-height:220px; border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:14px; line-height:1.65; resize:vertical; background:#fff; }
+.ta:focus, .inp:focus { outline:2px solid #cfe1fd; border-color:var(--acc); }
+.inp { border:1px solid var(--line); border-radius:12px; padding:0 12px; height:40px; background:#fff; width:100%; }
+.files { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.files span { font-size:12.5px; font-weight:600; background:var(--chip); color:var(--sub); border-radius:999px; padding:6px 12px; }
+.files span.bad { background:var(--redbg); color:var(--red); }
+/* 품목 확인 */
+.gl { display:grid; gap:10px; }
+@media (min-width:700px) { .gl { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+.gi { display:grid; grid-template-columns:minmax(0, 1fr); gap:8px; border:1px solid var(--line); border-radius:14px; padding:14px; }
+.gi b { font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.gi small { font-size:12.5px; color:var(--mute); }
+.gi select { height:40px; border:1px solid var(--line); border-radius:12px; padding:0 10px; background:#fff; }
+.empty { font-size:14px; color:var(--mute); padding:6px 0; }
+.go { border:0; background:var(--acc); color:#fff; border-radius:14px; min-height:52px; font-weight:700; font-size:16px; width:100%; margin-top:18px; }
+.go:disabled { background:var(--faint); }
+/* 결과 + 오른쪽 필터 */
+.lay { display:grid; gap:12px; align-items:start; }
+@media (min-width:900px) { .lay.has { grid-template-columns:minmax(0, 1fr) 236px; } .lay.has .side { position:sticky; top:12px; order:2; } }
+.side { background:var(--card); border-radius:20px; padding:20px; }
+.side h4 { font-size:14px; font-weight:800; margin:0 0 10px; }
+.side h4 + .fg { margin-bottom:18px; }
+.fg { display:grid; gap:4px; }
+.fg label { display:flex; align-items:center; gap:8px; min-height:36px; font-size:14px; font-weight:600; color:var(--sub); cursor:pointer; border-radius:10px; padding:0 8px; margin:0 -8px; }
+.fg label:hover { background:var(--chip); }
+.fg label em { margin-left:auto; font-style:normal; font-size:12.5px; font-weight:700; color:var(--mute); }
+.fg input { appearance:none; -webkit-appearance:none; width:18px; height:18px; border:1.5px solid var(--faint); border-radius:5px; margin:0; display:grid; place-content:center; flex:none; background:#fff; }
+.fg input:checked { border-color:var(--txt); }
+.fg input:checked::after { content:""; width:10px; height:5px; border:solid var(--txt); border-width:0 0 2px 2px; transform:rotate(-45deg) translate(1px, -1px); }
+.fg .dot { width:8px; height:8px; border-radius:50%; flex:none; }
+.side .ib { width:100%; min-height:40px; border:0; border-radius:12px; background:var(--chip); font-weight:700; margin-top:4px; }
+@media (max-width:899px) {
+  .side { padding:16px 20px; }
+  .side .fg { display:flex; flex-wrap:wrap; gap:6px; }
+  .fg label { margin:0; border:1px solid var(--line); border-radius:999px; padding:0 12px; min-height:36px; font-size:13.5px; }
+  .fg label em { margin-left:2px; }
+}
+.rbar { display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px; }
+.rbar .ib { min-height:40px; border:0; border-radius:12px; background:var(--chip); font-weight:700; padding:0 16px; }
+/* 결과지 덧칠 (번호는 동그라미 없이 글자로) */
+.spk .spk-no { width:auto !important; height:auto !important; border-radius:0 !important; background:none !important; color:#8b95a1 !important; font-size:13px !important; font-weight:700 !important; justify-content:flex-start !important; padding-top:2px; font-variant-numeric:tabular-nums; }
+.spk .lv.t { background:#fdecee; color:#e0263a; } .spk-stat .t { background:#fdecee; color:#e0263a; }
+.gdk-gr { display:grid; gap:10px; }
+@media (min-width:640px) { .gdk-gr { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+.gdk-g { border:1px solid #e5e8eb; border-radius:14px; padding:14px 16px; break-inside:avoid; }
+.gdk-gh { display:flex; align-items:baseline; gap:8px; margin-bottom:8px; } .gdk-gh b { font-size:14.5px; } .gdk-gh span { font-size:12px; color:#8b95a1; }
+.gdk-g table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.gdk-g th { text-align:left; font-weight:600; color:#4e5968; width:96px; padding:5px 8px 5px 0; vertical-align:top; border-top:1px solid #f2f4f6; }
+.gdk-g td { padding:5px 0; border-top:1px solid #f2f4f6; word-break:keep-all; overflow-wrap:anywhere; }
+.gdk-g tr:first-child th, .gdk-g tr:first-child td { border-top:0; }
+.gdk-g td.r { color:#e0263a; font-weight:700; } .gdk-g td.o { color:#ff7300; font-weight:700; } .gdk-g td.p { color:#6546b9; font-weight:700; } .gdk-g td.na { color:#8b95a1; }
+.hid { display:none !important; }
+#res .spk { padding:4px 0 0; border-radius:0; } .spk .spk-sum th:first-child { white-space:nowrap; width:36px; } .spk-it .spk-no { align-self:start; }
+@media (max-width:899px) { .lay.has .side { order:-1; } }
+.drop b, .drop .sub, .desc { word-break:keep-all; }
+@media (max-width:560px) { .fl { flex-direction:column; align-items:flex-start; gap:4px; } .drop { padding:24px 14px; } .drop b { font-size:16px; } .drop .sub br { display:none; } }
+@media print { .noprint, .side { display:none !important; } body, html { background:#fff; } .wrap { padding:0; max-width:none; } .lay { display:block; } .spk { padding:0 !important; border-radius:0 !important; } .card { padding:0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 class="noprint">상품 검수기 <span style="font-size:13px;color:var(--mute);font-weight:600">굿즈 작업지시서 · 사양서</span></h2>
+
+  <div class="card noprint" id="inCard">
+    <h3 class="sh">작업지시서<button type="button" class="lk" id="demo">예시 넣어 보기</button></h3>
+    <p class="desc">품목마다 꼭 들어가야 할 사양(소재 · 두께 · 부자재 · 인쇄 방식 · 수량 …)이 빠졌는지, 도수 · 핀 · 수량처럼 서로 안 맞는 값과 오탈자를 찾아요.</p>
+    <div class="drop" id="drop">
+      <b>작업지시서 파일을 여기에 끌어다 놓기</b>
+      <div class="sub">PDF · AI · 엑셀 · CSV · TXT · 여러 개를 한 번에 넣어도 돼요<br>AI는 PDF 호환으로 저장한 파일, 글자를 깨기 전 파일이어야 글자를 읽어요</div>
+      <button class="pick" id="pick" type="button">파일 고르기</button>
+      <input type="file" id="file" accept=".pdf,.ai,.xlsx,.xls,.csv,.txt,.tsv,application/pdf,image/*" multiple hidden>
+    </div>
+    <div class="files" id="files"></div>
+    <div class="fl"><span>작업지시서 글자</span><small>파일에서 읽은 글자가 여기 들어와요 · 직접 써도 돼요</small></div>
+    <textarea class="ta" id="ta" placeholder="품목마다 이름 줄을 먼저 쓰고 그 아래에 사양을 적어 주세요.&#10;&#10;1. 아크릴 키링&#10;사이즈: 50×60mm&#10;소재: 투명 아크릴 3T&#10;인쇄: UV 양면 (화이트 포함)&#10;부자재: 볼체인 (실버)&#10;수량: 500개"></textarea>
+    <div class="fl"><span>프로젝트 이름</span><small>결과지 제목 · 비워 두면 파일 이름</small></div>
+    <input class="inp" id="ttl" placeholder="예: [아티스트] 2027 팬미팅 MD">
+  </div>
+
+  <div class="card noprint" id="gCard">
+    <h3 class="sh">품목 확인</h3>
+    <p class="desc">이름 줄로 품목을 나눴어요. 종류가 다르게 잡혔으면 바꿔 주세요. 종류마다 필수 사양이 달라요.</p>
+    <div id="gl" class="gl"><div class="empty">작업지시서를 넣으면 품목이 보여요.</div></div>
+    <button type="button" class="go" id="go" disabled>검수 시작</button>
+  </div>
+
+  <div class="lay" id="lay">
+    <div id="res" class="card" hidden></div>
+    <aside class="side noprint" id="side" hidden></aside>
+  </div>
+</div>
+
+<script src="spec.js?v=20261122g1"></script>
+<script src="goods.js?v=20261122g1"></script>
+<script>
+(function () {
+var $ = function (s) { return document.querySelector(s); }, $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+var G = window.PLYSH_GOODS, LV = G.LV;
+var LIBS = { pdfjs: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', worker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js', xlsx: 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js' };
+if (window.PLYSH_SPECCHECK) { var st = document.createElement('style'); st.textContent = window.PLYSH_SPECCHECK.CSS; document.head.insertBefore(st, document.head.querySelector('style')); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function load(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+var S = { types: {}, fname: '', pdf: false, R: null, off: { lv: {}, g: {} } };
+try { var sv = localStorage.getItem('d4:gdk'); if (sv) { sv = JSON.parse(sv); $('#ta').value = sv.t || ''; $('#ttl').value = sv.ttl || ''; S.fname = sv.f || ''; } } catch (e) {}
+function save() { try { localStorage.setItem('d4:gdk', JSON.stringify({ t: $('#ta').value, ttl: $('#ttl').value, f: S.fname })); } catch (e) {} }
+
+/* ── 파일 → 글자 ── */
+async function pdfText(buf) {
+  if (!window.pdfjsLib) { await load(LIBS.pdfjs); pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; }
+  var doc = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise, out = [];
+  for (var p = 1; p <= doc.numPages; p++) {
+    var tc = await (await doc.getPage(p)).getTextContent(), rows = [];
+    tc.items.forEach(function (it) { if (!it.str || !it.str.trim()) return; var y = it.transform[5], x = it.transform[4], fs = Math.abs(it.transform[3]) || 10, r = rows.filter(function (r) { return Math.abs(r.y - y) < fs * 0.45; })[0]; if (!r) { r = { y: y, fs: fs, it: [] }; rows.push(r); } r.it.push({ x: x, w: it.width, s: it.str, fs: fs }); });
+    rows.sort(function (a, b) { return b.y - a.y; });
+    rows.forEach(function (r) {
+      r.it.sort(function (a, b) { return a.x - b.x; });
+      var chunks = [], cur = '', end = null;
+      r.it.forEach(function (c) { var gap = end == null ? 0 : c.x - end; if (end != null && gap > c.fs * 1.6) { chunks.push(cur.trim()); cur = ''; } else if (end != null && gap > c.fs * 0.18 && !/\s$/.test(cur) && !/^\s/.test(c.s)) cur += ' '; cur += c.s; end = c.x + c.w; });
+      chunks.push(cur.trim()); chunks = chunks.filter(Boolean);
+      if (chunks.length === 2 && chunks[0].length <= 10 && !/[:：]/.test(chunks[0])) out.push(chunks[0] + ': ' + chunks[1]);
+      else out.push(chunks.join(' · ').replace(/\s{2,}/g, ' '));
+    });
+    if (p < doc.numPages) out.push('');
+  }
+  return out.join('\n');
+}
+async function sheetText(buf, name) {
+  if (!window.XLSX) await load(LIBS.xlsx);
+  var wb = XLSX.read(buf, { type: 'array' }), out = [];
+  wb.SheetNames.forEach(function (sn) {
+    var rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', raw: false }).map(function (r) { return r.map(function (c) { return String(c).replace(/\s*\n\s*/g, ' ').trim(); }); }).filter(function (r) { return r.some(Boolean); });
+    if (!rows.length) return;
+    var hi = rows.findIndex(function (r) { return r.some(function (c) { return /^(품목|품명|상품명|제품명|아이템)/.test(c); }); });
+    if (hi >= 0 && hi < 6) {
+      var hd = rows[hi], ni = hd.findIndex(function (c) { return /^(품목|품명|상품명|제품명|아이템)/.test(c); });
+      rows.slice(0, hi).forEach(function (r) { out.push(r.filter(Boolean).join(' · ')); });
+      rows.slice(hi + 1).forEach(function (r) { if (!r[ni]) { var x = r.filter(Boolean); if (x.length) out.push(x.join(' · ')); return; } out.push(''); out.push('품목: ' + r[ni]); hd.forEach(function (h, j) { if (j !== ni && h) out.push(h + ': ' + (r[j] || '')); }); });
+    } else rows.forEach(function (r) { var x = r.filter(Boolean); out.push(x.length === 2 && x[0].length <= 12 ? x[0] + ': ' + x[1] : x.join(' · ')); });
+    out.push('');
+  });
+  return out.join('\n');
+}
+async function addFiles(fs) {
+  var parts = [], chips = [];
+  S.pdf = false;
+  for (var i = 0; i < fs.length; i++) {
+    var f = fs[i], ext = (f.name.split('.').pop() || '').toLowerCase(), t = '';
+    try {
+      if (/^image\//.test(f.type) || /^(jpe?g|png|gif|webp|heic)$/.test(ext)) { chips.push('<span class="bad">' + esc(f.name) + ' · 이미지는 글자를 못 읽어요</span>'); continue; }
+      var buf = await f.arrayBuffer();
+      if (ext === 'pdf' || ext === 'ai') { t = await pdfText(new Uint8Array(buf)); S.pdf = true; }
+      else if (/^(xlsx|xls)$/.test(ext)) t = await sheetText(new Uint8Array(buf), f.name);
+      else t = new TextDecoder('utf-8').decode(buf);
+      if (ext === 'csv' || ext === 'tsv') t = t.split('\n').map(function (l) { return l.split(ext === 'csv' ? ',' : '\t').map(function (c) { return c.replace(/^"|"$/g, '').trim(); }).filter(Boolean).join(' · '); }).join('\n');
+      if (!t.trim()) { chips.push('<span class="bad">' + esc(f.name) + ' · 글자 없음 (깬 파일이면 안 깬 파일로)</span>'); continue; }
+      parts.push(t.trim()); chips.push('<span>' + esc(f.name) + '</span>');
+    } catch (e) { chips.push('<span class="bad">' + esc(f.name) + ' · 못 읽음' + (ext === 'ai' ? ' (PDF 호환 아님)' : '') + '</span>'); }
+  }
+  $('#files').innerHTML = chips.join('');
+  if (parts.length) { $('#ta').value = parts.join('\n\n'); S.fname = Array.prototype.map.call(fs, function (f) { return f.name; }).join(', '); S.types = {}; refresh(); }
+}
+var drop = $('#drop');
+$('#pick').onclick = function () { $('#file').click(); };
+$('#file').onchange = function () { if (this.files.length) addFiles(this.files); this.value = ''; };
+['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('on'); }); });
+['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('on'); }); });
+drop.addEventListener('drop', function (e) { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+
+/* ── 품목 확인 ── */
+var tmr;
+$('#ta').addEventListener('input', function () { clearTimeout(tmr); tmr = setTimeout(function () { S.pdf = false; refresh(); }, 300); });
+$('#ttl').addEventListener('input', save);
+function refresh() {
+  save();
+  var t = $('#ta').value, R = t.trim() ? G.check(t, { types: S.types }) : null;
+  $('#go').disabled = !R || !R.groups.length;
+  if (!R || !R.groups.length) { $('#gl').innerHTML = '<div class="empty">작업지시서를 넣으면 품목이 보여요.</div>'; return; }
+  $('#gl').innerHTML = R.groups.map(function (g) {
+    return '<div class="gi"><b>' + esc(g.name) + '</b><small>' + g.line + '줄부터 · 필수 사양 ' + g.fields.length + '개 확인</small><select data-g="' + g.i + '">' + G.TYPES.map(function (T) { return '<option value="' + T.k + '"' + (T.k === g.type ? ' selected' : '') + '>' + esc(T.n) + '</option>'; }).join('') + '</select></div>';
+  }).join('');
+  $$('#gl select').forEach(function (s) { s.onchange = function () { S.types[s.dataset.g] = s.value; refresh(); if (S.R) run(); }; });
+}
+$('#demo').onclick = function () {
+  $('#ta').value = '[아티스트] 2027 팬미팅 MD 작업지시서\n포장: 개별 OPP\n\n1. 아크릴 키링\n사이즈: 50x60\n소재: 아크릴\n인쇄: UV 4도 PANTONE 186C, PANTONE 7621C\n부자재:\n수량: 총 500개 (A 200개 / B 200개)\n\n2. 메탈 뱃지\n크기: 45×30mm\n소재: 아연합금\n도금: 골드\n컬러: 소프트 에나맬\n뒷면: 1핀 안전핀\n수량: 300개\n\n3. 티셔츠\n원단: 면 100% 20수\n컬러: 화이트\n인쇄: 실크 나염 2도 앞면 가슴\n사이즈: S 50 / M 100 / L 100\n수량: 총 300벌\n\n4. 캔뱃지\n지름 58mm\n유광\n수량: 미정';
+  $('#ttl').value = '예시 · 2027 팬미팅 MD'; S.types = {}; S.fname = ''; $('#files').innerHTML = ''; refresh();
+};
+
+/* ── 검수 ── */
+function run() {
+  var R = G.check($('#ta').value, { types: S.types, noDbl: S.pdf }); S.R = R; S.off = { lv: {}, g: {} };
+  var ttl = $('#ttl').value.trim() || (S.fname ? S.fname.replace(/\.[a-z0-9]+(, |$)/gi, '$1') : '상품 작업지시서');
+  $('#res').innerHTML = '<div class="rbar noprint"><button type="button" class="ib" id="pdf">PDF 저장</button></div>' + G.render(R, { title: ttl, file: S.fname });
+  $('#res').hidden = false; $('#lay').classList.add('has');
+  var c = { t: 0, r: 0, o: 0, p: 0 }; R.items.forEach(function (x) { c[x.lv]++; });
+  var col = { t: '#e0263a', r: '#e0263a', o: '#ff7300', p: '#8b71d0' };
+  var side = '<h4>단계</h4><div class="fg">' + ['t', 'r', 'o', 'p'].map(function (k) { return '<label><input type="checkbox" data-lv="' + k + '" checked><i class="dot" style="background:' + col[k] + '"></i>' + LV[k][0] + '<em>' + c[k] + '</em></label>'; }).join('') + '</div>';
+  if (R.groups.length > 1) side += '<h4>품목</h4><div class="fg">' + R.groups.map(function (g) { var n = R.items.filter(function (x) { return x.g === g.i; }).length; return '<label><input type="checkbox" data-gf="' + g.i + '" checked>' + esc(g.name) + '<em>' + n + '</em></label>'; }).join('') + '</div>';
+  $('#side').innerHTML = side; $('#side').hidden = false;
+  $$('#side input').forEach(function (i) { i.onchange = function () { if (i.dataset.lv) S.off.lv[i.dataset.lv] = !i.checked; else S.off.g[i.dataset.gf] = !i.checked; filt(); }; });
+  $('#pdf').onclick = function () { var t = document.title, d = new Date(); document.title = '상품작업지시서검수_' + String(d.getFullYear()).slice(2) + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); setTimeout(function () { window.print(); document.title = t; }, 50); };
+  $('#res').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function filt() {
+  $$('#res [data-lv]').forEach(function (el) { var g = el.dataset.g; el.classList.toggle('hid', !!S.off.lv[el.dataset.lv] || (g !== '-1' && !!S.off.g[g])); });
+  $$('#res .gdk-g').forEach(function (el) { el.classList.toggle('hid', !!S.off.g[el.dataset.g]); });
+}
+$('#go').onclick = run;
+refresh();
+})();
+</script>
+</body>
+</html>
