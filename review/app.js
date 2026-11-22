@@ -29,7 +29,7 @@ function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
 var libsP = null;
 function libs() {
-  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261120g'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
+  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261122b1'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
   return libsP;
 }
 var faceP = null;

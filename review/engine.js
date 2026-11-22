@@ -351,7 +351,7 @@
     if (fill) {
       var fi = this.patInks(gs, true);
       var rect = segs.length >= 3 && segs.length <= 5 && segs.every(function (s) { return Math.abs(s[0] - s[2]) < 0.05 || Math.abs(s[1] - s[3]) < 0.05; }); // 네모 칠 (가림 판정용)
-      this.emit('fill', { box: box, vis: vis, ink: fi, op: gs.op, ca: gs.ca, rect: rect, layer: this.layer(mc), segs: fi.spots ? segs.slice() : null });
+      this.emit('fill', { box: box, vis: vis, ink: fi, op: gs.op, ca: gs.ca, rect: rect, layer: this.layer(mc), segs: fi.spots ? segs.slice() : null, vb: segs.length >= 80 && segs.every(function (s) { return Math.abs(s[0] - s[2]) < 0.05 || Math.abs(s[1] - s[3]) < 0.05; }) ? segs.length : 0 }); // vb = 네모 여러 개를 한 덩어리로 칠함 (바코드 한 패스)
     }
     if (stroke) {
       var si = this.patInks(gs, false), w = gs.lw * scaleOf(gs.ctm), hw = Math.max(w / 2, 0.25), sb = [box[0] - hw, box[1] - hw, box[2] + hw, box[3] + hw];
