@@ -149,6 +149,8 @@ iframe.fmon { position:relative; z-index:2000 !important; } /* 팝업 열린 동
 /* 화면 폭 규칙 (2026-11-19): 모바일은 화면 꽉(좌우 16px), PC는 틀 하나(--fw 1024px, 양옆 여백 40px 이상) 안에서 헤더·메뉴·본문·도구가 같은 폭.
    1024px 이상: 카드 목록 = 여러 열, 입력 + 결과 = 왼쪽 입력 · 오른쪽 결과, 달력·표·검수 = 틀 폭 전체, 아래 시트(팝업) = 560px 가운데 */
 :root { --fw:560px; }
+/* 2026-11-22 실장님: 큰 PC 화면은 틀을 조금 넓힘 (오른쪽 패널 이름이 두 줄 되지 않게) */
+@media (min-width:1440px) { html:root { --fw:1080px; } }
 @media (min-width:1024px) {
   /* PC 틀 960px: 가장 작은 PC 모니터(가로 1280px)에서도 양옆 여백이 넉넉히 남는 폭. 큰 모니터에서도 이 폭 그대로, 남는 곳은 여백 */
   :root { --fw:960px; }
@@ -1636,7 +1638,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm119';
+var APP_VER = '20261122hm120';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);

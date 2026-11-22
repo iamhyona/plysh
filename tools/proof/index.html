@@ -489,8 +489,9 @@ select:focus, input:focus, button:focus, textarea:focus { outline:none !importan
 .rix .ixs { background:#fff; border-radius:16px; padding:12px; margin-bottom:12px; }
 .rix .ixh { font-size:12px; font-weight:700; color:#8b95a1; margin:4px 4px 6px; } .rix .ixh ~ .ixh { margin-top:12px; }
 .rix .ixc { display:flex; flex-wrap:wrap; gap:4px; } .rix .ixc button { border:0; background:#f2f4f6; color:#4e5968; border-radius:8px; padding:5px 9px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; } .rix .ixc button.on { background:#191f28; color:#fff; }
+@media (min-width:1060px) { .rxg { grid-template-columns:minmax(0, 1fr) 236px; } } .rix .ixl button, .rix .ixc button { word-break:keep-all; } /* 2026-11-22 실장님: 오른쪽 패널 이름이 두 줄로 꺾이지 않게 넓힘 */
 .rix .ixl { display:flex; flex-direction:column; max-height:calc(100vh - 220px); overflow:auto; } .rix .ixl button { border:0; background:none; text-align:left; padding:6px 8px; border-radius:8px; font:inherit; font-size:13px; color:#4e5968; cursor:pointer; } .rix .ixl button:hover { background:#f2f4f6; color:#191f28; } .rix .ixl p { margin:4px 8px; font-size:12.5px; color:#8b95a1; }
-@media (min-width:900px) { .rix .ixc { flex-direction:column; flex-wrap:nowrap; gap:0; } .rix .ixc button { display:flex; justify-content:space-between; align-items:baseline; background:none; text-align:left; padding:6px 8px; font-size:13px; font-weight:400; color:#4e5968; } .rix .ixc button:hover { background:#f2f4f6; color:#191f28; } .rix .ixc button.on { background:none; color:#191f28; font-weight:700; } .rix { max-height:calc(100vh - 32px); overflow:auto; } .rxg { display:grid; grid-template-columns:minmax(0, 1fr) 176px; gap:20px; align-items:start; } .rix { display:block; position:sticky; top:16px; } }
+@media (min-width:900px) { .rix .ixc { flex-direction:column; flex-wrap:nowrap; gap:0; } .rix .ixc button { display:flex; justify-content:space-between; align-items:baseline; background:none; text-align:left; padding:6px 8px; font-size:13px; font-weight:400; color:#4e5968; } .rix .ixc button:hover { background:#f2f4f6; color:#191f28; } .rix .ixc button.on { background:none; color:#191f28; font-weight:700; } .rix { max-height:calc(100vh - 32px); overflow:auto; } .rxg { display:grid; grid-template-columns:minmax(0, 1fr) 208px; gap:20px; align-items:start; } .rix { display:block; position:sticky; top:16px; } }
 @media (max-width:899px) { .rix { display:block; order:4; } .rix .ixi { display:none; } .rxg { display:flex; flex-direction:column; } .rxm { display:contents; } .rxm > .card, .rxm > .nt, .rxm > .rkh { order:5; } .bkfig .bksvg .bkd { display:none; } .bkfig .bksvg .bkm { display:block; } .bkfig .ct { display:block; } .bkfig .ct small { display:block; margin:4px 0 0; } .rix .ixs { padding:10px 12px; } .rix .ixc { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; } .rix .ixc button { flex:none; } }
 /* 상품별 부위 명칭 (2026-11-22) */
 .ptiw { display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:20px; align-items:start; } .ptiw dl { margin:0; }
@@ -2222,7 +2223,7 @@ function refGo(s) { // "파트|분류|용어"
   if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = false; RP = p; ls.set('pr:rp', p); ls.set(isJ(p) ? 'pr:ref2' : 'pr:refsub:' + p, g);
   if (t && !isJ(p) && p !== '부위') { var R = TT(p)[g] || [], row = R.filter(function (r) { return r[1] === t; })[0]; if (row) { ls.set('pr:rm', 's'); ls.set('pr:rk:' + p + ':' + g, row[0]); } }
   window.scrollTo(0, 0); renderRef();
-  if (t) setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b'), function (x) { return x.textContent.trim() === t || (x.dataset.cp || '') === t; })[0]; if (e) { var d = e.closest('.gl'); window.scrollTo({ top: d.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); d.classList.add('bkhi'); setTimeout(function () { d.classList.remove('bkhi'); }, 1600); } }, 60);
+  if (t) setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b'), function (x) { return x.textContent.trim() === t || (x.dataset.cp || '') === t; })[0]; if (e) { var d = e.closest('.gl'); goEl(d, 80); d.classList.add('bkhi'); setTimeout(function () { d.classList.remove('bkhi'); }, 1600); } }, 60);
 }
 // 2026-11-22 실장님: 지류도 MD처럼 소재 · 인쇄 · 후가공 · 제본 · 포장으로 나눔 (용어·견본만, 사양서 고르기는 그대로)
 var JP = { '지류 소재': ['용지', '결·책등'], '지류 인쇄': ['인쇄', '특수 인쇄'], '지류 후가공': ['코팅', '박', '가공', '톰슨', '조립'], '지류 제본': ['제본', '책 구조', '부속'], '지류 포장': ['포장'] };
@@ -2288,6 +2289,8 @@ function refIntro(k) { var I = (REF_INTRO[k] || []).filter(function (x) { return
 function refModeBar(has) { return ''; if (!has) return ''; var m = RM(); return '<div class="chips rmode"><button data-rm="t"' + (m === 't' ? ' class="on"' : '') + '>용어 · 개념</button><button data-rm="s"' + (m === 's' ? ' class="on"' : '') + '>견본 보기</button></div>'; }
 // 2026-11-22 실장님: '용어 · 개념' 탭 없애고 견본 보기 한 화면으로 (이름 · 표기 · 설명 · 종류 · 견본이 모두 견본 보기에 있음)
 function RM() { return 's'; }
+// 2026-11-22 실장님: 바로 가기 = PLYSH 안(iframe)에서는 바깥 화면을 스크롤해야 이동함
+function goEl(t, off) { off = off == null ? 70 : off; var y = t.getBoundingClientRect().top; try { var f = window.frameElement, W = window.parent; if (f && W && W !== window) { var sc = W.document.scrollingElement || W.document.documentElement; W.scrollTo({ top: f.getBoundingClientRect().top + y + (W.scrollY || sc.scrollTop) - off, behavior: 'smooth' }); return; } } catch (e) {} window.scrollTo({ top: y + window.scrollY - off, behavior: 'smooth' }); }
 // 2026-11-22 실장님: 오른쪽 패널 = 필터(제조사 · 평량) + 바로 가기 색인 (아래로만 길게 열리지 않게)
 function refIx() {
   var box = document.querySelector('.rix .ixl'); if (!box) return;
@@ -2299,7 +2302,7 @@ function refIx() {
   $$('.glc > .gl').forEach(function (d) { if (!d.offsetParent) return; var b = d.querySelector('.glt b'); if (b) T.push([b.textContent, d]); });
   var ixi = document.querySelector('.rix .ixi'); if (ixi) ixi.style.display = T.length ? '' : 'none';
   box.innerHTML = T.length ? T.map(function (x, i) { return '<button data-ix="' + i + '">' + esc(x[0]) + '</button>'; }).join('') : '<p>맞는 항목이 없어요</p>';
-  $$('[data-ix]', box).forEach(function (b) { b.onclick = function () { var t = T[+b.dataset.ix][1]; window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' }); }; });
+  $$('[data-ix]', box).forEach(function (b) { b.onclick = function () { goEl(T[+b.dataset.ix][1]); }; });
   $$('[data-pmk]').forEach(function (b) { b.onclick = function () { ls.set('pr:pmk', b.dataset.pmk); $$('[data-pmk]').forEach(function (x) { x.classList.toggle('on', x === b); }); refIx(); }; });
   $$('[data-pgb]').forEach(function (b) { b.onclick = function () { ls.set('pr:pgb', b.dataset.pgb); $$('[data-pgb]').forEach(function (x) { x.classList.toggle('on', x === b); }); refIx(); }; });
 }
@@ -2434,12 +2437,12 @@ function renderRef() {
   $$('[data-rm]').forEach(function (b) { b.onclick = function () { ls.set('pr:rm', b.dataset.rm); renderRef(); }; });
   $$('.bkn').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); var t = document.querySelector(b.getAttribute('href')); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('bkhi'); setTimeout(function () { t.classList.remove('bkhi'); }, 1600); } }); });
   $$('[data-pgo]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); try { window.parent.navGo(b.dataset.pgo); } catch (x) {} }; });
-  $$('[data-kgs]').forEach(function (b) { b.onclick = function () { var g = b.dataset.kgs, n = b.dataset.kgn; ls.set('pr:rm', 's'); if (isJ(RP)) ls.set('pr:refsub:' + k, g); else ls.set('pr:rk:' + RP + ':' + k, g); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b, .pbh b'), function (x) { return x.textContent.trim() === n || (x.dataset.cp || '') === n; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
-  $$('[data-gsw]').forEach(function (b) { b.onclick = function () { var t = b.dataset.gsw; ls.set('pr:rm', RM() === 's' ? 't' : 's'); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b[data-cp]'), function (x) { return x.dataset.cp === t && x.offsetParent; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
+  $$('[data-kgs]').forEach(function (b) { b.onclick = function () { var g = b.dataset.kgs, n = b.dataset.kgn; ls.set('pr:rm', 's'); if (isJ(RP)) ls.set('pr:refsub:' + k, g); else ls.set('pr:rk:' + RP + ':' + k, g); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b, .pbh b'), function (x) { return x.textContent.trim() === n || (x.dataset.cp || '') === n; })[0]; if (e) goEl(e, 80); }, 30); }; });
+  $$('[data-gsw]').forEach(function (b) { b.onclick = function () { var t = b.dataset.gsw; ls.set('pr:rm', RM() === 's' ? 't' : 's'); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b[data-cp]'), function (x) { return x.dataset.cp === t && x.offsetParent; })[0]; if (e) goEl(e, 80); }, 30); }; });
   $$('.rif').forEach(function (f) { var fit = function () { try { var d = f.contentDocument; if (d && d.body) f.style.height = Math.max(600, d.documentElement.scrollHeight) + 'px'; } catch (e) {} }; f.onload = function () { fit(); setInterval(fit, 800); }; });
   $$('[data-rk]').forEach(function (b) { b.onclick = function () { ls.set('pr:rk:' + RP + ':' + k, b.dataset.rk); renderRef(); }; });
   $$('[data-rs]').forEach(function (b) { b.onclick = function () { ls.set('pr:refsub:' + k, b.dataset.rs); renderRef(); }; });
-  $$('.pidx a').forEach(function (a) { a.onclick = function (e) { e.preventDefault(); var t = document.getElementById(a.getAttribute('href').slice(1)); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' }); }; });
+  $$('.pidx a').forEach(function (a) { a.onclick = function (e) { e.preventDefault(); var t = document.getElementById(a.getAttribute('href').slice(1)); if (t) goEl(t, 70); }; });
   $$('[data-cp]').forEach(function (b) { b.onclick = function () { copyText(b.dataset.cp, '‘' + b.dataset.cp + '’ 복사했어요'); }; });
   var ron = document.querySelector('.rnav .rtab button.on'); if (ron) { var rp = ron.parentNode; if (rp.scrollWidth > rp.clientWidth) rp.scrollLeft = Math.max(0, ron.offsetLeft - rp.offsetLeft - 16); }
   try { if (window.parent !== window && window.parent.plyshRefSync) window.parent.plyshRefSync(RHOME ? '' : RP); } catch (e) {}
