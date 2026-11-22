@@ -1658,7 +1658,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm165';
+var APP_VER = '20261123hm166';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4355,8 +4355,21 @@ function exLoad(force) {
   if (X.D[k] && !force) return;
   call('appExpGet', S.pin, X.p, X.ym).then(function (r) { X.D[k] = r; if (S.view === 'exp') exList(); }).catch(function (e) { X.D[k] = { err: errMsg(e), items: [] }; if (S.view === 'exp') exList(); });
 }
+// 2026-11-23 실장님: 지출결의는 접속한 사람 본인 이름만 (실장님은 전체). 서버(appMe.exMe)가 로그인 계정으로 알려 주고, 서버도 남의 이름 요청은 막음
+// S.exMe: '' = 아직 모름(예전 서버) · '*' = 전체 · '-' = 팀원 이름과 연결 안 된 계정 · 그 밖 = 본인 이름
+S.exMe = ls.get('d4:exme') || '';
+function exTeam() { var m = S.exMe; if (!m || m === '*') return team(); if (m === '-') return []; return [m]; }
+function exMeSet(o) {
+  if (!o || o.exMe === undefined) return;
+  var v = o.admin ? '*' : (o.exMe || '-'); if (v === S.exMe) return;
+  S.exMe = v; ls.set('d4:exme', v);
+  if (v !== '*') { S.ex.p = v === '-' ? '' : v; ls.set('d4:exp', S.ex.p); }
+  if (S.view === 'exp') { S.ex.rr = 1; renderExp(); }
+}
 function renderExp() {
-  var X = S.ex, T = team(); if (X.p && T.indexOf(X.p) < 0) X.p = '';
+  var X = S.ex, T = exTeam(); if (X.p && T.indexOf(X.p) < 0) X.p = ''; if (!X.p && T.length === 1) X.p = T[0];
+  if (S.exMe === '-') { X.p = ''; $('#main').innerHTML = '<p class="srcinfo" style="margin-top:14px">이 계정은 아직 팀원 이름과 연결되지 않아 지출결의를 볼 수 없어요. 실장님께 로그인한 구글 계정을 알려 주세요.</p>'; return; }
+  if (X.rr) { X.rr = 0; $('#main').innerHTML = ''; }
   // 2026-10-28: 사진 고르러 갔다 오면(화면 숨김→복귀) 자동 새로고침이 폼을 다시 그려서 적던 내용이 사라지던 문제 → 폼이 있으면 목록만 다시 그림 + 작성 중 내용은 임시 저장
   if ($('#exA') && $('#exS')) { exList(); return; }
   exDraftLoad();
@@ -4707,7 +4720,7 @@ function lgCheck(manual) {
     .catch(function (e) { if (/^LOGIN/.test(String(e && e.message))) lgOut(); });
 }
 function lgEnter() { clearInterval(showLogin.t); ls.set('d4:ok', '1'); $('#lgScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">시트에서 불러오는 중…</div>'; load(); dvBadge(); }
-function lgOut() { S.tok = ''; S.pin = ''; ls.set('d4:tok', ''); ls.set('d4:ok', ''); ls.set('d4:who', ''); ls.set('d4:data', ''); showLogin(false); }
+function lgOut() { S.tok = ''; S.pin = ''; ls.set('d4:tok', ''); ls.set('d4:ok', ''); ls.set('d4:who', ''); ls.set('d4:data', ''); ls.set('d4:exme', ''); S.exMe = ''; showLogin(false); }
 function authErr(e) {
   var m = String(e && e.message || e);
   if (/^LOGIN|PIN/.test(m)) { lgOut(); return true; }
@@ -4737,6 +4750,7 @@ function dvBadge() {
   geo().then(function (g) { return call('appMe', S.tok, g); }).then(function (o) {
     ls.set('d4:ok', o.st === 'ok' ? '1' : '');
     $('#dvBtn').style.display = o.admin ? '' : 'none';
+    exMeSet(o);
     var n = $('#dvBtn .dvN'); n.textContent = o.pend || ''; n.classList.toggle('on', o.pend > 0);
   }).catch(function () {});
 }
