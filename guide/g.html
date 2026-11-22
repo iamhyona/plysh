@@ -272,6 +272,13 @@ td{font-size:14.5px;padding:10px 12px}th{font-size:12.5px}
 .flow .st .go{width:30px;height:30px;font-size:15px;right:14px}
 .meta{font-size:12.5px}
 }
+/* 체크리스트 (눌러서 체크, 이 기기에 저장) 2026-11-22 */
+.ckl li{display:block}
+.ckl label{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;cursor:pointer}
+.ckl input{appearance:none;-webkit-appearance:none;width:20px;height:20px;margin:3px 0 0;border:1.8px solid #8b95a1;border-radius:5px;background:#fff;cursor:pointer;display:grid;place-items:center}
+.ckl input:checked{background:var(--st,var(--accent));border-color:var(--st,var(--accent))}
+.ckl input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.4px 2.4px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ckl input:checked+span{color:var(--muted);text-decoration:line-through}
 /* 다른 메뉴로 가는 단추 (2026-11-22) */
 .golink{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border:1px solid #cfd6df;border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:16px;font-weight:600;letter-spacing:var(--track);cursor:pointer}
 .golink:hover{border-color:var(--ink)}
@@ -285,13 +292,14 @@ td{word-break:keep-all}
 </head>
 <body>
 <div class="wrap" data-toc id="root"><a class="back" href="./"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg> 가이드 목록</a></div>
-<script src="gdata.js?v=20261122d"></script>
+<script src="gdata.js?v=20261122e"></script>
 <script>
 (function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1],g=window.GD&&GD[id],r=document.getElementById('root');
 if(!g){r.insertAdjacentHTML('beforeend','<p>가이드를 찾을 수 없음.</p>');return}
 document.title='DESIGN_4 '+g.t;r.insertAdjacentHTML('beforeend',g.h+'<footer>디자인4팀 · 초안 — 노란 표시 항목은 확인 후 업데이트.</footer>');})();
 </script>
 <script>/* data-go = PLYSH 메뉴로 이동 */document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(!b)return;e.preventDefault();var k=b.getAttribute('data-go');try{if(parent!==window&&parent.navGo){parent.navGo(k);return}}catch(x){}if(k.indexOf('gd:g.html')===0)location.href=k.slice(3);else location.href='../'})</script>
+<script>/* 체크리스트 저장 */(function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1]||'x';document.querySelectorAll('.ckl input').forEach(function(c,i){var k='gdck:'+id+':'+i;try{c.checked=localStorage.getItem(k)==='1'}catch(e){}c.addEventListener('change',function(){try{localStorage.setItem(k,c.checked?'1':'0')}catch(e){}})})})()</script>
 <script src="toc.js"></script>
 </body>
 </html>
