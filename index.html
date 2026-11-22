@@ -1658,7 +1658,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm164';
+var APP_VER = '20261122hm167';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3156,7 +3156,7 @@ function artSplit(artist, title) {
   var m = t.match(/^(\S+)\s+(.+)$/); return m ? [m[1], m[2]] : ['', t];
 }
 function artHtml(o) { var a = artSplit(o.artist, o.title); return '<div><b>' + esc(a[0]) + '</b>' + (a[0] ? ' ' : '') + '<span class="gst">' + esc(a[1]) + '</span></div>'; }
-var PCOLOR = { '이혜선': '#f97316', '유이시': '#16a34a', '허희원': '#ec4899', '박주영': '#3182f6', '박현아': '#8b5cf6' };
+var PCOLOR = { '이혜선': '#f97316', '유이시': '#16a34a', '허희원': '#ec4899', '박주영': '#3182f6', '변경연': '#C29300', '박현아': '#8b5cf6' };
 function dcol(n) { if (PCOLOR[n]) return PCOLOR[n]; var i = team().indexOf(n); return DCOL[(i < 0 ? 0 : i) % DCOL.length]; }
 function dshort(n) { return n.length === 3 ? n.slice(1) : n; }
 // 날짜별 접는 카드: 오늘만 기본으로 열림, 연 상태는 기억
@@ -3526,7 +3526,7 @@ $('#npGo').onclick = function () {
 };
 
 /* ───── 업무보고 ───── */
-var TEAM0 = ['이혜선', '유이시', '허희원', '박주영', '박현아'];
+var TEAM0 = ['이혜선', '유이시', '허희원', '박주영', '변경연', '박현아'];
 var RCOL = '#8b95a1';
 // 프로젝트 이름 비교용: 연도·공백·기호 제거, SG/시그/시즌그리팅 통일
 function pnorm(x) {
