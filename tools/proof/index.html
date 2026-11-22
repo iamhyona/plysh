@@ -59,7 +59,7 @@ main { max-width:560px; margin:0 auto; padding:14px 16px calc(80px + env(safe-ar
 .tt { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .tt div { background:var(--chip); border-radius:12px; padding:10px; } .tt small { display:block; font-size:11px; color:var(--mute); font-weight:600; } .tt b { font-size:17px; } .tt b i { font-style:normal; font-size:11px; color:var(--sub); margin-left:1px; }
 .tx { margin:0; font-size:14px; line-height:1.7; color:var(--sub); } .tx b { color:var(--txt); }
 #toast { position:fixed; left:50%; bottom:calc(30px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:rgba(25,31,40,.92); color:#fff; padding:11px 18px; border-radius:999px; font-size:14px; display:none; z-index:50; white-space:nowrap; }
-@media (max-width:380px) { .ig { grid-template-columns:1fr 1fr; } }
+@media (max-width:520px) { .ig { grid-template-columns:1fr 1fr; } }
 .cpre { margin:0 0 12px; } .cpre button small { margin-left:5px; font-size:11px; opacity:.6; }
 .cres .ct span { display:flex; align-items:center; gap:6px; } .cbest { font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--acc); border-radius:999px; padding:2px 7px; }
 .cres.best { box-shadow:inset 0 0 0 2px var(--acc); }
@@ -683,7 +683,8 @@ function renderCalc() {
     var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0], dv = dieVals(c, dd);
     var PL = DIE_PRE[dd.id] || [], PS = function (p) { return Object.keys(p[1]).every(function (k) { return +dv[k] === p[1][k]; }); }; CPRE = PL;
     L += stp(1, '크기', dd.n) + '<div class="nt cnt0 csd">' + dd.d + '</div>' + (PL.length ? '<label class="csel"><select id="cPre" aria-label="규격 고르기"><option value="">규격 고르기 · 직접 입력</option>' + PL.map(function (p, i) { return '<option value="' + i + '"' + (PS(p) ? ' selected' : '') + '>' + esc(p[0]) + '</option>'; }).join('') + '</select></label>' : '') +
-      '<div class="ig">' + Object.keys(dd.in).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
+      '<div class="ig">' + Object.keys(dd.in).filter(function (k) { return !DIE_SEG[k]; }).map(function (k) { var Lb = DIE_LB[k] || [k, '']; return '<div class="f"><label>' + Lb[0] + '</label><span class="ifx"><input type="number" inputmode="decimal" step="any" data-cdv="' + k + '" value="' + dv[k] + '">' + (Lb[1] ? '<em>' + Lb[1] + '</em>' : '') + '</span></div>'; }).join('') + '</div>' +
+      Object.keys(dd.in).filter(function (k) { return DIE_SEG[k]; }).map(function (k) { var Q = DIE_SEG[k]; return '<div class="f cgf"><label>' + Q[0] + '</label><div class="seg">' + Q[1].map(function (t, i) { return '<button data-cdvs="' + k + '" data-v="' + i + '" class="' + ((+dv[k] ? 1 : 0) === i ? 'on' : '') + '">' + t + '</button>'; }).join('') + '</div></div>'; }).join('') +
       '<div class="csep"></div>' + stp(2, '수량') + qty + gseg + '<div class="nt cnt0">칼선 모양 그대로 원판에 앉혀요 · 180° 뒤집어 맞물리는 배치까지 비교 · 세로결 = 전개도 세로 방향</div>';
   } else if (c.m === 'size') {
     L += stp(1, c.t === 'leaf' ? '펼친 크기' : '완성 크기', c.t === 'leaf' ? '재단 후 · 접기 전' : '재단 후') + (function () { var PL = (c.t === 'leaf' ? LEAF_PRE : PRESETS).map(function (p) { return [p[0].replace('국배판(A4)', 'A4') + '  ' + p[1] + '×' + p[2], { w: p[1], h: p[2] }]; }), PS = function (p) { return +c.w === p[1].w && +c.h === p[1].h; }; CPRE = PL; return '<label class="csel"><select id="cPre" aria-label="규격 고르기"><option value="">규격 고르기 · 직접 입력</option>' + PL.map(function (p, i) { return '<option value="' + i + '"' + (PS(p) ? ' selected' : '') + '>' + esc(p[0]) + '</option>'; }).join('') + '</select></label>'; })() +
@@ -795,6 +796,7 @@ function bindCalc() {
   $('#cBs').onchange = function () { var v = this.value; if (v.indexOf('die:') === 0) { var g = v.slice(4); c.t = 'die'; if (!DIE.some(function (x) { return x.id === c.die && x.gr === g; })) { c.die = (DIE.filter(function (x) { return x.gr === g; })[0] || DIE[0]).id; c.selP = ''; } } else c.t = v; upd(); };
   $$('[data-cd]').forEach(function (b) { b.onclick = function () { c.die = b.dataset.cd; c.selP = ''; upd(); }; });
   if ($('#cImg')) $('#cImg').onchange = function () { var f = this.files[0]; if (f) dieAI(f); this.value = ''; };
+  $$('[data-cdvs]').forEach(function (b) { b.onclick = function () { var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0]; dieVals(c, dd)[b.dataset.cdvs] = +b.dataset.v; $$('[data-cdvs="' + b.dataset.cdvs + '"]').forEach(function (x) { x.classList.toggle('on', x === b); }); upd(true); }; });
   $$('[data-cdv]').forEach(function (i) { i.oninput = function () { var dd = DIE.filter(function (x) { return x.id === c.die; })[0] || DIE[0]; dieVals(c, dd)[i.dataset.cdv] = i.value === '' ? 0 : +i.value; upd(true); }; });
   $$('#cG button').forEach(function (b) { b.onclick = function () { c.gn = b.dataset.g; upd(); }; });
   $$('#cM button').forEach(function (b) { b.onclick = function () { c.m = b.dataset.m; upd(); }; });
@@ -2069,7 +2071,7 @@ var DIE = [
   { gr: '패키지', id: 'hdbox', n: '하도메 박스', d: '끈 단추 박스 · 와샤 박스 · String & Button Box · 두께 있는 봉투형 케이스 · 뒤판 + 옆벽 · 바닥 · 앞판(옆 풀칠 날개) · 위 뚜껑이 앞판으로 덮이고 단추 2개에 끈을 감아 닫음 · 예 218×165+10mm', in: { w: 165, h: 218, D: 10, fl: 70, ey: 4 } },
   { gr: '패키지', id: 'mailer', n: '가로 G형 박스', d: '시즌그리팅 아웃박스 · 옆벽 두겹 + 앞 꽂이 뚜껑', in: { L: 310, W: 220, H: 40 } },
   // 2026-11-21 실장님: 싸바리는 칼선이 상짝 · 하짝 따로
-  { gr: '패키지', id: 'sabari', n: '싸바리 하짝 (몸통)', d: '하짝 싸개지 · 보드 겉에 감싸기 · 크기는 하짝 안쪽 기준 · 브이컷 1 = 모서리 90° 각진 브이컷 (귀 날개 없이 십자형 싸개)', in: { L: 200, W: 270, H: 50, bd: 2, wr: 15, vc: 0 } },
+  { gr: '패키지', id: 'sabari', n: '싸바리 하짝 (몸통)', d: '하짝 싸개지 · 보드 겉에 감싸기 · 크기는 하짝 안쪽 기준 · 모서리 브이컷을 고르면 귀 날개 없는 십자형 싸개', in: { L: 200, W: 270, H: 50, bd: 2, wr: 15, vc: 0 } },
   { gr: '패키지', id: 'sabariT', geo: 'sabari', n: '싸바리 상짝 (뚜껑)', d: '상짝 싸개지 · 상짝 안쪽 = 하짝 바깥(보드 포함) + 여유 1mm씩이 보통 · 상중하짝이면 상짝 안쪽 = 중짝 바깥 + 여유 · 기본값은 예시', in: { L: 206, W: 276, H: 30, bd: 2, wr: 15, vc: 0 } },
   // 2026-11-22 실장님: 상중하짝 = 하짝 안쪽에 한 겹(중짝)을 더 붙여 위로 올라오게, 닫으면 상짝·하짝 사이에 띠처럼 보임
   { gr: '패키지', id: 'sabariN', geo: 'neck', n: '싸바리 중짝', d: '상중하짝 박스 가운데 띠 · 하짝 안쪽에 붙임 · 높이 = 하짝 안 높이 + 올라온 높이', in: { L: 200, W: 270, H: 65, wr: 15 } },
@@ -2087,6 +2089,8 @@ var DIE = [
   { id: 'envPS', geo: 'envj', gr: '봉투', n: '엽서 봉투', d: '완성 160×110 · 엽서 100×148 기준 · 긴 변 입구', in: { w: 110, h: 160, mg: 0, fl: 15, lid: 40 } }
 ];
 // 2026-11-21 실장님: 크기는 드롭다운에서 고르면 자동 입력 (직접 입력도 그대로)
+// 2026-11-22 0/1 값은 숫자 칸 대신 고르기 단추로
+var DIE_SEG = { vc: ['모서리', ['기본 (둥근)', '브이컷 (각진 90°)']], hd: ['손잡이 구멍', ['없음', '있음']] };
 var CPRE = [];
 var BOOKSZ = [['국판', 148, 210], ['신국판', 152, 225], ['46판', 128, 188], ['크라운판', 176, 248], ['46배판', 188, 257], ['A5', 148, 210], ['A4', 210, 297], ['B5', 182, 257]];
 var DIE_PRE = {
