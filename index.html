@@ -1349,6 +1349,7 @@ html[data-nav] #cvSeg { display:none !important; }
 .pst { position:relative; } .pst input { padding-right:64px !important; -moz-appearance:textfield; } .pst input::-webkit-outer-spin-button, .pst input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
 .pst em { right:44px !important; } .psb { position:absolute; right:6px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:2px; }
 .psb button { width:30px; height:19px; border:0; border-radius:6px; background:#fff; color:#4e5968; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; box-shadow:0 0 0 1px #e5e8eb; } .psb button:active { background:#e5e8eb; }
+#nfm .fsg { display:block; font-style:normal; font-size:12px; font-weight:600; color:var(--mute); margin:12px 0 2px; }
 </style>
 </head>
 <body>
@@ -1624,7 +1625,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm61';
+var APP_VER = '20261122hm62';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2809,7 +2810,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + sp.g.map(function (g) { return g.i.map(function (x) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); }).join('') + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); }).join('') + '</div>'; }).join('') + '</div>';
   bindGo(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
