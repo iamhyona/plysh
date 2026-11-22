@@ -82,6 +82,8 @@ h2 { font-size:20px; font-weight:800; margin:4px 4px 12px; }
 .hid { display:none !important; }
 #res .spk { padding:4px 0 0; border-radius:0; } .spk .spk-sum th:first-child { white-space:nowrap; width:36px; } .spk-it .spk-no { align-self:start; }
 @media (max-width:899px) { .lay.has .side { order:-1; } }
+.drop b, .drop .sub, .desc { word-break:keep-all; }
+@media (max-width:560px) { .fl { flex-direction:column; align-items:flex-start; gap:4px; } .drop { padding:24px 14px; } .drop b { font-size:16px; } .drop .sub br { display:none; } }
 @media print { .noprint, .side { display:none !important; } body, html { background:#fff; } .wrap { padding:0; max-width:none; } .lay { display:block; } .spk { padding:0 !important; border-radius:0 !important; } .card { padding:0; } }
 </style>
 </head>
