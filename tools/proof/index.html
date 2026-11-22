@@ -497,6 +497,14 @@ select:focus, input:focus, button:focus, textarea:focus { outline:none !importan
 .bksvg svg { width:100%; height:auto; display:block; } .bksvg .bkn { cursor:pointer; } .bksvg .bkn:hover circle { fill:#3182f6; }
 .bki { position:relative; padding-left:40px !important; scroll-margin-top:80px; } .bkb { position:absolute; left:0; top:14px; width:26px; height:26px; border-radius:50%; background:#191f28; color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 .glc .gl.bki:nth-child(-n+2) .bkb { top:2px; } .bki.bkhi { background:#f2f8ff; border-radius:12px; transition:background .3s; }
+
+.rkd .ct small { font-size:12px; font-weight:500; color:#8b95a1; margin-left:6px; }
+.rkg { padding:12px 0; border-top:1px solid #f2f4f6; } .ct + .rkg { border-top:0; padding-top:4px; }
+.rkgh { font-size:13px; font-weight:700; color:#4e5968; margin-bottom:8px; } .rkgh small { margin-left:5px; color:#8b95a1; font-weight:600; }
+.rkc { display:flex; flex-wrap:wrap; gap:6px; } .rkc button { border:0; background:#f2f4f6; color:#333d4b; border-radius:8px; padding:6px 10px; font:inherit; font-size:13px; cursor:pointer; } .rkc button b { font-weight:600; }
+.rkr { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; } .rkr button { border:0; background:#f9fafb; border-radius:10px; padding:10px 12px; text-align:left; font:inherit; cursor:pointer; display:flex; flex-direction:column; gap:3px; }
+.rkr button b { font-size:14px; color:#191f28; } .rkr button span { font-size:12.5px; color:#6b7684; line-height:1.5; } .rkc button:hover, .rkr button:hover { background:#e8f3ff; }
+.rix .ixc button small { font-size:11px; opacity:.6; margin-left:2px; }
 /* 2026-11-22 용어·견본 */
 .rmode { margin:0 0 12px; } .rmode button { min-height:36px; padding:0 16px; font-weight:700; }
 .rint dl { display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin:4px 0 0; font-size:14px; line-height:1.6; } .rint dt { font-weight:700; color:#4e5968; white-space:nowrap; } .rint dd { margin:0; color:#333d4b; } .rint a { color:#3182f6; font-weight:700; text-decoration:none; }
@@ -2017,7 +2025,6 @@ function glExtra(h, v) {
   var sw = GL_SW[v], sp = GL_SPEC[v], rows = [];
   if (sw) rows.push('<dt>컬러</dt><dd><div class="gsw' + (GL_SW_BAR[v] ? ' bar' : '') + '">' + sw.map(function (c) { return '<span><i style="background:' + esc(c[1]) + '"></i>' + esc(c[0]) + '</span>'; }).join('') + '</div></dd>');
   if (sp) sp.forEach(function (c) { rows.push('<dt>' + esc(c[0]) + '</dt><dd>' + esc(c[1]) + '</dd>'); });
-  if (rows.length) x += '<button type="button" class="gsl" data-gsw="' + esc(v) + '"><span class="a">견본 보기</span><span class="b">용어 보기</span></button>';
   if (rows.length || GL_SUB[v]) x += '<div class="gdet' + (rows.length ? '' : ' nosw') + '"><div class="gdh">세부 정보</div>' + (rows.length ? '<dl class="gspec">' + rows.join('') + '</dl>' : '') + (GL_SUB[v] ? gSub(GL_SUB[v], true) : '') + '</div>';
   if (!x) return h; var i = h.lastIndexOf('<figure class="glimg"'); if (i < 0) i = h.lastIndexOf('</div>'); return h.slice(0, i) + x + h.slice(i);
 }
@@ -2170,7 +2177,7 @@ function refDs(p, g) {
 function kGroups(p, g) { var R = TT(p)[g], G = []; R.forEach(function (r) { if (G.indexOf(r[0]) < 0) G.push(r[0]); }); return p === 'MD' ? MKIND.filter(function (x) { return G.indexOf(x) >= 0; }) : G; }
 function mEntry(r, cat) { return dEntry(r.slice(1), cat, 'MD'); }
 // 2026-11-22 실장님: 용어·견본 — 위에는 큰 갈래 개념, 견본(색 칩 · 두께 · 평량)은 견본 보기로 분리
-var REF_INTRO = {"용지": [["큰 갈래", "용지는 표면에 도료를 바른 <b>도공지</b>와 바르지 않은 <b>비도공지</b>로 먼저 나눠요. 두께가 두꺼우면 <b>판지</b>, 질감·광택이 특별하면 <b>특수지</b>예요."], ["비도공지", "종이 결이 그대로라 필기감이 좋고 차분해요. 모조지 · 미색 모조 · 크라프트 · 고급 비도공지(문켄 · 몽블랑 · 앙상블 등)."], ["도공지", "표면이 매끈해 인쇄 발색이 좋아요. 유광 = 아트지, 무광 = 스노우지, 고급 도공지(랑데뷰 · 아르떼 등)."], ["판지", "패키지 · 카드용 두꺼운 종이. 단면 도공(CCP · BV · KAce) · 양면 도공(BW · AB · DUO) · 비도공(갱판지) · 골판지."], ["특수지", "색지 · 패턴 · 엠보 · 펄 · 메탈 · 필름 · 스티커 원지."], ["크기", "규격 크기(A · B · 국판 · 46판)는 <a href=\"#\" data-pgo=\"paper\">도구 › 용지 크기</a>에서 실제 비율로 비교해요."]], "인쇄": [["큰 갈래", "판을 쓰는 <b>옵셋</b>(대량·정확한 색)과 판 없이 찍는 <b>디지털</b>(소량·빠름)로 나눠요. 색은 CMYK 4원색과 팬톤 같은 <b>별색</b>을 써요."], ["팬톤", "팬톤 번호 · CMYK 근사값은 <a href=\"#\" data-pgo=\"pt\">도구 › 팬톤</a>에서 찾아요."]], "특수 인쇄": [["큰 갈래", "잉크 자체가 특별한 것(형광 · 메탈릭 · 펄 · 시온 · 축광 · 화이트)과 찍는 방식이 특별한 것(실크 · UV · 난수 · 바코드)이 있어요."], ["팬톤", "팬톤 번호 · CMYK 근사값은 <a href=\"#\" data-pgo=\"pt\">도구 › 팬톤</a>에서 찾아요."]], "코팅": [["큰 갈래", "필름을 붙이는 <b>라미네이팅</b>(유광 · 무광 · 벨벳 · 홀로그램)과 액체를 바르는 <b>UV · 바니시</b>(전면 · 부분)로 나눠요. 부분 UV · 에폭시처럼 일부만 도드라지게 하는 것도 있어요."]], "박": [["큰 갈래", "열과 압력으로 얇은 금속 막을 찍어 붙이는 가공. 유광 · 무광 · 컬러 · 홀로그램 · 투명 홀로그램 · 특수박으로 나눠요. 색 견본은 견본 보기에서."]], "가공": [["큰 갈래", "인쇄 뒤에 종이 모양 · 질감을 바꾸는 가공. 형압(볼록 · 오목) · 에폭시 · 박 · 오시 · 접지 등."]], "톰슨": [["큰 갈래", "칼판(목형)으로 모양대로 자르는 가공. 완칼(끝까지) · 반칼(스티커 윗면만) · 오시(누름선) · 미싱(점선)으로 나눠요."]], "조립": [["큰 갈래", "잘라낸 종이를 접고 붙여 입체로 만드는 공정. 접착 · 합지 · 브이컷 · 싸바리."]], "제본": [["큰 갈래", "낱장을 책으로 묶는 방법. 풀로 붙이는 <b>접착</b>(무선 · PUR), 철심 · 실로 엮는 <b>철·사철</b>(중철 · 사철), 딱딱한 표지의 <b>양장</b>, 링 · 와이어의 <b>링 제본</b>으로 나눠요."]], "책 구조": [["큰 갈래", "책은 겉의 <b>표지(케이스)</b>, 표지와 본문을 잇는 <b>면지</b>, 본문 묶음인 <b>책 블록</b>, 그리고 헤드밴드 · 가름끈 같은 <b>부속</b>으로 이뤄져요."]], "부속": [["큰 갈래", "책 · 다이어리에 덧붙이는 부자재. 헤드밴드 · 가름끈 · 아일렛 · 고무밴드 · 끈 · 고리. 색 견본은 견본 보기에서."]], "포장": [["큰 갈래", "제품을 감싸는 개별 포장(OPP · 지퍼백 · 케이스)과 나르는 외부 포장(박스 · 에어캡 · 마스터 카톤)으로 나눠요."]], "봉제류": [["큰 갈래", "원단은 실을 엮는 방식(짜임)으로 먼저 나눠요. 가로세로로 짠 <b>직물</b>(평직 · 능직 · 주자직), 고리로 엮은 <b>니트</b>(편물), 짜지 않은 <b>부직</b>(펠트 · 부직포)."], ["표면", "털을 세워 짠 <b>파일</b>(벨벳 · 코듀로이 · 테리 · 보아)과, 짠 뒤 긁어 일으킨 <b>기모</b>(피치 스킨 · 스웨이드 · 융 · 플리스)는 비슷해 보여도 만드는 방법이 달라요."], ["두께 표기", "면은 수(번수) · 캔버스·데님은 oz · 폴리·나일론은 D(데니어) · 니트는 g/㎡ · 털 원단은 털 길이 mm."]], "아크릴류": [["큰 갈래", "두께(T)와 색 · 투명도로 고르고, 표면 효과(미러 · 글리터 · 오로라 · 프로스트)로 나눠요. 칼날 대신 레이저 · CNC로 잘라요."]], "금속류": [["큰 갈래", "찍어 누르는 <b>프레스</b>, 녹여 붓는 <b>다이캐스팅</b>, 녹여 새기는 <b>에칭</b>으로 모양을 만들고, 도금 · 에나멜 · 인쇄로 색을 넣어요."]]};
+var REF_INTRO = {"용지": [["정의", "인쇄물에 쓰는 종이. 표면 도공 여부 · 두께(평량 g) · 질감으로 나눠 골라요."], ["큰 갈래", "용지는 표면에 도료를 바른 <b>도공지</b>와 바르지 않은 <b>비도공지</b>로 먼저 나눠요. 두께가 두꺼우면 <b>판지</b>, 질감·광택이 특별하면 <b>특수지</b>예요."], ["비도공지", "종이 결이 그대로라 필기감이 좋고 차분해요. 모조지 · 미색 모조 · 크라프트 · 고급 비도공지(문켄 · 몽블랑 · 앙상블 등)."], ["도공지", "표면이 매끈해 인쇄 발색이 좋아요. 유광 = 아트지, 무광 = 스노우지, 고급 도공지(랑데뷰 · 아르떼 등)."], ["판지", "패키지 · 카드용 두꺼운 종이. 단면 도공(CCP · BV · KAce) · 양면 도공(BW · AB · DUO) · 비도공(갱판지) · 골판지."], ["특수지", "색지 · 패턴 · 엠보 · 펄 · 메탈 · 필름 · 스티커 원지."], ["크기", "규격 크기(A · B · 국판 · 46판)는 <a href=\"#\" data-pgo=\"paper\">도구 › 용지 크기</a>에서 실제 비율로 비교해요."]], "인쇄": [["정의", "잉크를 종이나 소재에 옮기는 방식과 색 지정. 옵셋 · 디지털 · 실크 등 방식과 CMYK · 별색으로 나뉘어요."], ["큰 갈래", "판을 쓰는 <b>옵셋</b>(대량·정확한 색)과 판 없이 찍는 <b>디지털</b>(소량·빠름)로 나눠요. 색은 CMYK 4원색과 팬톤 같은 <b>별색</b>을 써요."], ["팬톤", "팬톤 번호 · CMYK 근사값은 <a href=\"#\" data-pgo=\"pt\">도구 › 팬톤</a>에서 찾아요."]], "특수 인쇄": [["정의", "일반 CMYK 밖의 잉크 · 효과를 쓰는 인쇄. 형광 · 화이트 · 펄 · 시온 · 축광 · 난수 등."], ["큰 갈래", "잉크 자체가 특별한 것(형광 · 메탈릭 · 펄 · 시온 · 축광 · 화이트)과 찍는 방식이 특별한 것(실크 · UV · 난수 · 바코드)이 있어요."], ["팬톤", "팬톤 번호 · CMYK 근사값은 <a href=\"#\" data-pgo=\"pt\">도구 › 팬톤</a>에서 찾아요."]], "코팅": [["정의", "인쇄 뒤 표면에 막을 입혀 보호하고 질감을 바꾸는 후가공. 필름을 붙이는 라미네이팅과 액을 바르는 코팅이 있어요."], ["큰 갈래", "필름을 붙이는 <b>라미네이팅</b>(유광 · 무광 · 벨벳 · 홀로그램)과 액체를 바르는 <b>UV · 바니시</b>(전면 · 부분)로 나눠요. 부분 UV · 에폭시처럼 일부만 도드라지게 하는 것도 있어요."]], "박": [["정의", "열과 압력으로 금속 · 색 필름을 종이에 눌러 붙이는 후가공. 색(금 · 은 · 컬러 · 홀로그램)과 광(유광 · 무광)으로 골라요."], ["큰 갈래", "열과 압력으로 얇은 금속 막을 찍어 붙이는 가공. 유광 · 무광 · 컬러 · 홀로그램 · 투명 홀로그램 · 특수박으로 나눠요. 색 견본은 견본 보기에서."]], "가공": [["정의", "인쇄 뒤 모양 · 질감을 더하는 후가공 전반. 형압 · 부분 UV · 에폭시 · 넘버링 등."], ["큰 갈래", "인쇄 뒤에 종이 모양 · 질감을 바꾸는 가공. 형압(볼록 · 오목) · 에폭시 · 박 · 오시 · 접지 등."]], "톰슨": [["정의", "칼 틀(목형)로 모양대로 자르거나 누름선 · 절취선을 내는 가공. 칼선 · 오시 · 미싱 · 타공 · 귀도리."], ["큰 갈래", "칼판(목형)으로 모양대로 자르는 가공. 완칼(끝까지) · 반칼(스티커 윗면만) · 오시(누름선) · 미싱(점선)으로 나눠요."]], "조립": [["정의", "자르고 접은 종이를 붙이고 세워 완성품으로 만드는 공정. 합지 · 접착 · 박스 조립."], ["큰 갈래", "잘라낸 종이를 접고 붙여 입체로 만드는 공정. 접착 · 합지 · 브이컷 · 싸바리."]], "제본": [["정의", "여러 장을 묶어 책으로 만드는 방식. 풀 · 철심 · 실 · 링 등 묶는 재료와 표지 형태로 나뉘어요."], ["큰 갈래", "낱장을 책으로 묶는 방법. 풀로 붙이는 <b>접착</b>(무선 · PUR), 철심 · 실로 엮는 <b>철·사철</b>(중철 · 사철), 딱딱한 표지의 <b>양장</b>, 링 · 와이어의 <b>링 제본</b>으로 나눠요."]], "책 구조": [["정의", "책을 이루는 부위의 이름. 표지 · 책등 · 면지 · 본문 등."], ["큰 갈래", "책은 겉의 <b>표지(케이스)</b>, 표지와 본문을 잇는 <b>면지</b>, 본문 묶음인 <b>책 블록</b>, 그리고 헤드밴드 · 가름끈 같은 <b>부속</b>으로 이뤄져요."]], "부속": [["정의", "책 · 굿즈에 덧붙이는 부자재. 가름끈 · 헤드밴드 · 아일렛 · 고무줄 등."], ["큰 갈래", "책 · 다이어리에 덧붙이는 부자재. 헤드밴드 · 가름끈 · 아일렛 · 고무밴드 · 끈 · 고리. 색 견본은 견본 보기에서."]], "포장": [["정의", "완성품을 담고 보호하는 포장재와 방식. 봉투 · 수축 포장 · 박스 · 완충재."], ["큰 갈래", "제품을 감싸는 개별 포장(OPP · 지퍼백 · 케이스)과 나르는 외부 포장(박스 · 에어캡 · 마스터 카톤)으로 나눠요."]], "봉제류": [["정의", "원단을 재단해 바느질로 만드는 굿즈. 원단(소재 · 짜임) · 두께 · 표면 질감으로 골라요."], ["큰 갈래", "원단은 실을 엮는 방식(짜임)으로 먼저 나눠요. 가로세로로 짠 <b>직물</b>(평직 · 능직 · 주자직), 고리로 엮은 <b>니트</b>(편물), 짜지 않은 <b>부직</b>(펠트 · 부직포)."], ["표면", "털을 세워 짠 <b>파일</b>(벨벳 · 코듀로이 · 테리 · 보아)과, 짠 뒤 긁어 일으킨 <b>기모</b>(피치 스킨 · 스웨이드 · 융 · 플리스)는 비슷해 보여도 만드는 방법이 달라요."], ["두께 표기", "면은 수(번수) · 캔버스·데님은 oz · 폴리·나일론은 D(데니어) · 니트는 g/㎡ · 털 원단은 털 길이 mm."]], "아크릴류": [["정의", "투명하고 단단한 플라스틱 판(PMMA). 레이저로 잘라 스탠드 · 키링 · 굿즈를 만들어요."], ["큰 갈래", "두께(T)와 색 · 투명도로 고르고, 표면 효과(미러 · 글리터 · 오로라 · 프로스트)로 나눠요. 칼날 대신 레이저 · CNC로 잘라요."]], "금속류": [["정의", "금속을 찍고 녹여 만드는 굿즈. 뱃지 · 키링 · 메달 등. 소재 · 도금 · 에나멜로 골라요."], ["큰 갈래", "찍어 누르는 <b>프레스</b>, 녹여 붓는 <b>다이캐스팅</b>, 녹여 새기는 <b>에칭</b>으로 모양을 만들고, 도금 · 에나멜 · 인쇄로 색을 넣어요."]], "유리류": [["정의", "규사를 녹여 만든 투명 소재. 컵 · 머그 · 액자 등 굿즈에 써요."], ["큰 갈래", "일반 소다석회 유리 · 내열 유리(보로실리케이트) · 강화 유리로 나뉘고, 인쇄는 전사 · UV 인쇄 · 샌드블라스트."]], "도자기류": [["정의", "흙을 빚어 구운 소재. 머그컵 · 접시 · 오브제."], ["큰 갈래", "자기(단단 · 흰색) · 도기(무르고 두꺼움) · 석기. 그림은 전사지 · 하회 · 상회로 넣어요."]], "플라스틱류": [["정의", "열로 모양을 만드는 합성수지. 파일 · 케이스 · 봉투 · 부품에 써요."], ["큰 갈래", "PP · PET · PVC · PE(LDPE) · ABS · PU 등 수지 종류로 나누고, 두께와 투명도로 골라요."]], "실리콘·고무류": [["정의", "말랑하고 늘어나는 소재. 키링 · 코스터 · 케이스 · 손목 밴드."], ["큰 갈래", "실리콘(내열 · 무독성)과 고무 · PVC 소프트(말랑 키링)로 나뉘어요."]], "부자재": [["정의", "굿즈 본체에 다는 고리 · 끈 · 장식 같은 부품."], ["큰 갈래", "고리(볼체인 · 카라비너 · 랍스터) · 끈 · 지퍼 · 스냅 등으로 나뉘어요."]], "비즈": [["정의", "구멍을 뚫어 꿰는 작은 장식 알. 팔찌 · 키링 · 폰 스트랩."], ["큰 갈래", "소재(아크릴 · 유리 · 금속 · 원목 · 진주)와 모양 · 크기(mm)로 골라요."]]};
 function refIntro(k) { var I = REF_INTRO[k]; return I ? '<div class="card rint"><div class="ct">' + esc(k) + ' 한눈에</div><dl>' + I.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>' : ''; }
 function refModeBar(has) { if (!has) return ''; var m = RM(); return '<div class="chips rmode"><button data-rm="t"' + (m === 't' ? ' class="on"' : '') + '>용어 · 개념</button><button data-rm="s"' + (m === 's' ? ' class="on"' : '') + '>견본 보기</button></div>'; }
 function RM() { return ls.get('pr:rm') === 's' ? 's' : 't'; }
@@ -2181,7 +2188,9 @@ function refIx() {
   $$('.pcard > div[data-mk]').forEach(function (d) { var ok = (!mk || d.dataset.mk.split('|').indexOf(mk) >= 0) && (!gb || d.dataset.g.split(',').some(function (g) { return inB(+g); })); d.style.display = ok ? '' : 'none'; });
   var T = [];
   $$('.pcard > div[data-mk]').forEach(function (d) { if (d.style.display === 'none') return; var b = d.querySelector('.pbh b'); if (b) T.push([b.textContent, d]); });
+  $$('.rkg').forEach(function (d) { var b = d.querySelector('.rkgh'); if (b) T.push([b.firstChild.textContent, d]); });
   $$('.glc > .gl').forEach(function (d) { if (!d.offsetParent) return; var b = d.querySelector('.glt b'); if (b) T.push([b.textContent, d]); });
+  var ixi = document.querySelector('.rix .ixi'); if (ixi) ixi.style.display = T.length ? '' : 'none';
   box.innerHTML = T.length ? T.map(function (x, i) { return '<button data-ix="' + i + '">' + esc(x[0]) + '</button>'; }).join('') : '<p>맞는 항목이 없어요</p>';
   $$('[data-ix]', box).forEach(function (b) { b.onclick = function () { var t = T[+b.dataset.ix][1]; window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' }); }; });
   $$('[data-pmk]').forEach(function (b) { b.onclick = function () { ls.set('pr:pmk', b.dataset.pmk); $$('[data-pmk]').forEach(function (x) { x.classList.toggle('on', x === b); }); refIx(); }; });
@@ -2207,6 +2216,17 @@ function bookPage() {
   if (rest.length) h += '<div class="rkh">그 밖의 부위 · 쪽 이름<small>' + rest.length + '</small></div><div class="card glc">' + rest.map(function (x) { return glossEntry(x[0], x[1]); }).join('') + '</div>';
   return h;
 }
+// 2026-11-22 실장님: 용어 · 개념 = 정의 · 큰 갈래 + 종류 구조(누르면 견본으로) + 견본 없는 용어 / 견본 보기 = 예전 견본 그대로 (분류는 오른쪽 필터)
+function kindsCard(G) {
+  var tot = G.reduce(function (a, g) { return a + g[2].length; }, 0), rich = tot <= 48;
+  return '<div class="card rkd"><div class="ct">종류<small>누르면 견본으로</small></div>' + G.map(function (g) {
+    return '<div class="rkg"><div class="rkgh">' + esc(g[1]) + '<small>' + g[2].length + '</small></div><div class="' + (rich ? 'rkr' : 'rkc') + '">' + g[2].map(function (it) {
+      var d = String(it[1] || '').replace(/<[^>]+>/g, '').replace(/\.\s.*$/, ".");
+      return '<button type="button" data-kgs="' + esc(g[0]) + '" data-kgn="' + esc(it[0]) + '"><b>' + esc(it[0]) + '</b>' + (rich && d ? '<span>' + esc(d) + '</span>' : '') + '</button>';
+    }).join('') + '</div></div>';
+  }).join('') + '</div>';
+}
+function rFilt(key, L, cur, cnt) { return L.length > 1 ? '<div class="ixs"><div class="ixh">분류</div><div class="ixc">' + L.map(function (n) { return '<button ' + key + '="' + esc(n) + '"' + (n === cur ? ' class="on"' : '') + '>' + esc(sub(n)) + ' <small>' + cnt(n) + '</small></button>'; }).join('') + '</div></div>' : ''; }
 function renderRef() {
   var q = (S.rq || '').trim().toLowerCase(), home = RHOME && !q, phome = !home && RPH && !q;
   var k = refCur(RP);
@@ -2224,7 +2244,7 @@ function renderRef() {
     // 색인: PC 오른쪽(PLYSH 안에서는 왼쪽 메뉴 소메뉴로 옮겨지고 숨김) · 모바일 = 파트 세그먼트 + 그 파트 분류 칩
     h += '<div class="rfx' + (home ? ' rhx' : phome ? ' rhx rpx' : '') + '"><aside class="rnav"><div class="chips rpseg">' + RPARTS.map(function (p) { return '<button data-rpp="' + p + '"' + (p === RP && !home ? ' class="on"' : '') + '>' + p + '</button>'; }).join('') + '</div><div class="chips rtab">' +
       RPARTS.map(function (p) { return '<b class="rph">' + p + '</b>' + refCats(p).map(function (g) { var on = !home && !phome && p === RP && g === k; return '<button data-rp="' + p + '" data-rc="' + esc(g) + '" class="' + (p !== RP || home ? 'rx' : '') + (on ? ' on' : '') + '">' + esc(g) + (refCnt(p, g) ? '<small>' + refCnt(p, g) + '</small>' : '') + '</button>'; }).join(''); }).join('') + '</div></aside><div class="rbody">';
-    var bi = h.length;
+    var bi = h.length, RF = '';
     var card = function (p, g) { var n = refCnt(p, g); return '<button class="rhc" type="button" data-rp="' + p + '" data-rc="' + esc(g) + '"><b>' + esc(g) + (n ? '<small>' + n + '</small>' : '') + '</b><span>' + esc(refDs(p, g)) + '</span></button>'; };
     var grp = function (rows, gi) { var o = {}, order = []; rows.forEach(function (r) { var key = r[gi]; if (!o[key]) { o[key] = []; order.push(key); } o[key].push(r); }); return order.map(function (g) { return [g, o[g]]; }); };
     if (home) {
@@ -2233,12 +2253,19 @@ function renderRef() {
       h += '<div class="rhm"><div class="rhl">' + refCats(RP).map(function (g) { return card(RP, g); }).join('') + '</div></div>';
     } else if (RP !== '지류') {
       // 2026-11-22 실장님: 소재·기법·용어(MD) · 하위 분류(디자인)를 스크롤 대신 위쪽 탭으로 바로 전환
-      var KR = TT(RP)[k], KG = kGroups(RP, k), kg = ls.get('pr:rk:' + RP + ':' + k); if (KG.indexOf(kg) < 0) kg = KG[0];
-      var krows = KR.filter(function (r) { return r[0] === kg; });
-      if (KG.length > 1) h += '<div class="chips rsub">' + KG.map(function (g) { return '<button data-rk="' + esc(g) + '"' + (g === kg ? ' class="on"' : '') + '>' + esc(g) + '<small>' + KR.filter(function (r) { return r[0] === g; }).length + '</small></button>'; }).join('') + '</div>';
-      var kb = krows.map(function (r) { return dEntry(r.slice(1), '', RP); }).join(''), khas = kb.indexOf('class="gdet"') >= 0;
-      h = h.replace('<div class="chips rsub">', refModeBar(khas) + (khas && RM() === 's' ? '' : refIntro(k)) + '<div class="chips rsub">'); if (KG.length <= 1) h += refModeBar(khas) + (khas && RM() === 's' ? '' : refIntro(k));
-      h += '<div class="card glc ' + (khas && RM() === 's' ? 'msw' : 'mterm') + '">' + kb + '</div>';
+      var KR = TT(RP)[k], KG = kGroups(RP, k), kg = ls.get('pr:rk:' + RP + ':' + k);
+      var EE = KR.map(function (r) { var e = dEntry(r.slice(1), '', RP); return { g: r[0], r: r, e: e, sw: e.indexOf('class="gdet"') >= 0 }; });
+      var khas = EE.some(function (x) { return x.sw; }), md = khas ? RM() : 'x';
+      h += refModeBar(khas) + (md === 's' ? '' : refIntro(k));
+      if (md === 't') {
+        var KD = KG.map(function (g) { return [g, g, EE.filter(function (x) { return x.g === g && x.sw; }).map(function (x) { return [x.r[1], x.r[3]]; })]; }).filter(function (g) { return g[2].length; });
+        h += kindsCard(KD);
+        KG.forEach(function (g) { var N = EE.filter(function (x) { return x.g === g && !x.sw; }); if (N.length) h += '<div class="rkh">' + esc(g) + '<small>' + N.length + '</small></div><div class="card glc mterm">' + N.map(function (x) { return x.e; }).join('') + '</div>'; });
+      } else {
+        var KF = md === 's' ? KG.filter(function (g) { return EE.some(function (x) { return x.g === g && x.sw; }); }) : KG; if (KF.indexOf(kg) < 0) kg = KF[0];
+        RF = rFilt('data-rk', KF, kg, function (g) { return EE.filter(function (x) { return x.g === g && (md !== 's' || x.sw); }).length; });
+        h += '<div class="card glc">' + EE.filter(function (x) { return x.g === kg && (md !== 's' || x.sw); }).map(function (x) { return x.e; }).join('') + '</div>';
+      }
       h += '<div class="nt c">' + (RP === 'MD' ? '굵은 이름을 누르면 복사돼요 · 수치는 일반 기준이라 최종 사양은 제작 업체 기준으로 확인' : '굵은 이름을 누르면 복사돼요') + '</div>';
     } else if (k === '용지 크기') {
       h += '<iframe class="rif" src="../paper/index.html" title="용지 크기"></iframe>';
@@ -2249,29 +2276,37 @@ function renderRef() {
       h += '<div class="card"><div class="ct">책등 계산법</div><p class="tx">무선·PUR 책등 = <b>본문 장수(쪽수 ÷ 2) × 본문 한 장 두께</b> + 표지 두께 × 2, 0.5mm 단위로 반올림.<br>양장은 본문 + 면지 두께로 책등을 구하고, 책등 보드는 4mm 크게 · 보드 사이 홈 10mm 정도.</p></div>';
     } else {
       var tabs = tabsOf([refTab(k)]).map(function (n) { return n === '톰슨_접지' && CAT.T['접지도감_접지'] ? '접지도감_접지' : n; }), st = ls.get('pr:refsub:' + k); if (tabs.indexOf(st) < 0) st = tabs[0];
-      var flat = k === '코팅'; // 코팅은 세부 분류 없이 쭉 나열 (2026-11-20 실장님)
-      if (!flat) h += '<div class="chips rsub">' + tabs.map(function (n) { return '<button data-rs="' + esc(n) + '"' + (n === st ? ' class="on"' : '') + '>' + esc(sub(n)) + '<small>' + refRows(n).length + '</small></button>'; }).join('') + '</div>';
-      var rows = refRows(st), allR = flat ? [].concat.apply([], tabs.map(function (n) { return refRows(n).map(function (r) { return [n, r]; }); })) : rows.map(function (r) { return [st, r]; });
-      var gb = k === '용지' ? '' : allR.map(function (x) { return glossEntry(x[0], x[1]); }).join(''), ghas = k === '용지' || gb.indexOf('class="gdet"') >= 0, gm = ghas && RM() === 's' ? 'msw' : 'mterm';
-      h = h.replace('<div class="chips rsub">', refModeBar(ghas) + (gm === 'msw' ? '' : refIntro(k)) + '<div class="chips rsub">'); if (flat) h += refModeBar(ghas) + (gm === 'msw' ? '' : refIntro(k));
-      if (flat) {
-        h += '<div class="card glc ' + gm + '">' + gb + '</div>';
-        h += '<div class="nt c">굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요</div>';
-      } else if (k === '용지') {
-        var G = grp(rows, 1);
-        h += '<div class="card pcard ' + gm + '">' + G.map(function (g, i) { return '<div id="pb' + i + '" data-mk="' + esc(uniq(g[1].map(function (r) { return String(r[5] || '').trim(); })).join('|')) + '" data-g="' + uniq(g[1].map(function (r) { return +r[3] || 0; })).join(',') + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('') + '</div>';
-        h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
+      var flat = k === '코팅', isP = k === '용지', E = {}; // 코팅은 세부 분류 없이 쭉 나열 (2026-11-20 실장님)
+      if (!isP) tabs.forEach(function (n) { E[n] = refRows(n).map(function (r) { var e = glossEntry(n, r); return { n: n, r: r, e: e, sw: e.indexOf('class="gdet"') >= 0 }; }); });
+      var ghas = isP || tabs.some(function (n) { return E[n].some(function (x) { return x.sw; }); }), md = ghas ? RM() : 'x';
+      var rows = refRows(st);
+      h += refModeBar(ghas) + (md === 's' ? '' : refIntro(k));
+      if (md === 't') {
+        var KD = tabs.map(function (n) { var di = hcol(n, /^설명/), it = isP ? uniq(refRows(n).map(function (r) { return String(r[1]).trim(); })).map(function (x) { return [x, '']; }) : E[n].filter(function (x) { return x.sw; }).map(function (x) { return [String(x.r[0]).trim(), di >= 0 ? x.r[di] : '']; }); return [n, flat ? k : sub(n), it]; }).filter(function (g) { return g[2].length; });
+        h += kindsCard(KD);
+        var N = isP ? [] : [].concat.apply([], tabs.map(function (n) { return E[n].filter(function (x) { return !x.sw; }); }));
+        if (N.length) h += '<div class="rkh">용어<small>' + N.length + '</small></div><div class="card glc mterm">' + N.map(function (x) { return x.e; }).join('') + '</div>';
       } else {
-        if (st === '접지도감_접지') h += '<div class="nt" style="margin:0 4px 10px">' + esc(GLF_NOTE) + '</div>';
-        h += '<div class="card glc ' + gm + '">' + gb + (rows.length ? '' : '<div class="empty2">비어 있어요 · 시트의 ‘' + esc(st) + '’ 탭에 행을 추가하세요</div>') + '</div>';
-        h += '<div class="nt c">' + (k === '제본' ? '제본 종류 전체 비교예요 · 사양서 제본 칸에는 자주 쓰는 것만 나와요 · 누르면 복사' : '굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요') + '</div>';
+        var TF = isP || md !== 's' ? tabs : tabs.filter(function (n) { return E[n].some(function (x) { return x.sw; }); }); if (TF.indexOf(st) < 0) { st = TF[0]; rows = refRows(st); }
+        var pick = function (n) { return E[n].filter(function (x) { return md !== 's' || x.sw; }); };
+        if (!flat) RF = rFilt('data-rs', TF, st, function (n) { return isP ? refRows(n).length : pick(n).length; });
+        if (isP) {
+          var G = grp(rows, 1);
+          h += '<div class="card pcard">' + G.map(function (g, i) { return '<div id="pb' + i + '" data-mk="' + esc(uniq(g[1].map(function (r) { return String(r[5] || '').trim(); })).join('|')) + '" data-g="' + uniq(g[1].map(function (r) { return +r[3] || 0; })).join(',') + '">' + paperBlock(g[0], g[1]) + '</div>'; }).join('') + '</div>';
+          h += '<div class="nt c">평량(g)이 기준 · 칸 숫자는 한 장 두께(㎛, 참고용) · ●는 두께 미기재 · 칸을 누르면 표준 표기 복사</div>';
+        } else {
+          var L = flat ? [].concat.apply([], TF.map(pick)) : pick(st);
+          if (st === '접지도감_접지') h += '<div class="nt" style="margin:0 4px 10px">' + esc(GLF_NOTE) + '</div>';
+          h += '<div class="card glc">' + L.map(function (x) { return x.e; }).join('') + (L.length ? '' : '<div class="empty2">비어 있어요</div>') + '</div>';
+          h += '<div class="nt c">' + (k === '제본' ? '제본 종류 전체 비교예요 · 사양서 제본 칸에는 자주 쓰는 것만 나와요 · 누르면 복사' : '굵은 이름이 사양서 표준 표기예요 · 누르면 복사 · 사양서 칸에서도 이 목록으로 골라요') + '</div>';
+        }
       }
     }
     if (!home && !phome && k !== '용지 크기' && k !== '결·책등') {
       var pf = '';
-      if (RP === '지류' && k === '용지') { var MK = uniq(rows.map(function (r) { return String(r[5] || '').trim(); }).filter(Boolean)), mk = ls.get('pr:pmk') || '', gb = ls.get('pr:pgb') || '';
+      if (RP === '지류' && k === '용지' && RM() === 's') { var MK = uniq(rows.map(function (r) { return String(r[5] || '').trim(); }).filter(Boolean)), mk = ls.get('pr:pmk') || '', gb = ls.get('pr:pgb') || '';
         pf = '<div class="ixs"><div class="ixh">제조사</div><div class="ixc">' + [''].concat(MK).map(function (m) { return '<button data-pmk="' + esc(m) + '"' + (m === mk ? ' class="on"' : '') + '>' + esc(m || '전체') + '</button>'; }).join('') + '</div><div class="ixh">평량</div><div class="ixc">' + [['', '전체'], ['a', '~100g'], ['b', '101~200g'], ['c', '201~300g'], ['d', '300g 이상']].map(function (x) { return '<button data-pgb="' + x[0] + '"' + (x[0] === gb ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') + '</div></div>'; }
-      h = h.slice(0, bi) + '<div class="rxg"><div class="rxm">' + h.slice(bi) + '</div><aside class="rix">' + pf + '<div class="ixs ixi"><div class="ixh">바로 가기</div><div class="ixl"></div></div></aside></div>';
+      h = h.slice(0, bi) + '<div class="rxg"><div class="rxm">' + h.slice(bi) + '</div><aside class="rix">' + RF + pf + '<div class="ixs ixi"><div class="ixh">바로 가기</div><div class="ixl"></div></div></aside></div>';
     }
     h += '</div></div>';
   }
@@ -2283,6 +2318,7 @@ function renderRef() {
   $$('[data-rm]').forEach(function (b) { b.onclick = function () { ls.set('pr:rm', b.dataset.rm); renderRef(); }; });
   $$('.bkn').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); var t = document.querySelector(b.getAttribute('href')); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('bkhi'); setTimeout(function () { t.classList.remove('bkhi'); }, 1600); } }); });
   $$('[data-pgo]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); try { window.parent.navGo(b.dataset.pgo); } catch (x) {} }; });
+  $$('[data-kgs]').forEach(function (b) { b.onclick = function () { var g = b.dataset.kgs, n = b.dataset.kgn; ls.set('pr:rm', 's'); if (RP === '지류') ls.set('pr:refsub:' + k, g); else ls.set('pr:rk:' + RP + ':' + k, g); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b, .pbh b'), function (x) { return x.textContent.trim() === n || (x.dataset.cp || '') === n; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
   $$('[data-gsw]').forEach(function (b) { b.onclick = function () { var t = b.dataset.gsw; ls.set('pr:rm', RM() === 's' ? 't' : 's'); renderRef(); setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b[data-cp]'), function (x) { return x.dataset.cp === t && x.offsetParent; })[0]; if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 80 }); }, 30); }; });
   $$('.rif').forEach(function (f) { var fit = function () { try { var d = f.contentDocument; if (d && d.body) f.style.height = Math.max(600, d.documentElement.scrollHeight) + 'px'; } catch (e) {} }; f.onload = function () { fit(); setInterval(fit, 800); }; });
   $$('[data-rk]').forEach(function (b) { b.onclick = function () { ls.set('pr:rk:' + RP + ':' + k, b.dataset.rk); renderRef(); }; });
