@@ -2221,7 +2221,7 @@ function partsPage(k) {
   }
   var v = PARTS[k]; if (!v) return '';
   var dl = function (n) { return '<button type="button" class="ptdl" data-ptdl="' + esc(k + ' ' + n) + '">SVG 받기</button>'; };
-  var h = '<div class="card bkfig"><div class="ct"><span>' + esc(k) + ' 부위 <small>번호를 누르면 설명으로</small></span></div>' + (v.svgB ? '<div class="bkvh"><b>앞면</b>' + dl('앞면') + '</div>' : '<div class="bkvh">' + dl('부위') + '</div>') + '<div class="bksvg">' + v.svg + '</div>' + (v.svgB ? '<div class="bkvh"><b>뒷면</b>' + dl('뒷면') + '</div><div class="bksvg">' + v.svgB + '</div>' : '') + '</div>';
+  var h = '<div class="card bkfig"><div class="ct"><span>' + esc(k) + ' 부위 <small>번호를 누르면 설명으로</small></span></div>' + (v.svgB ? '<div class="bkvh"><b>앞면</b><button type="button" class="ptdl" data-ptdlb="' + esc(k + ' 앞뒤') + '">SVG 받기 (앞 · 뒤)</button></div>' : '<div class="bkvh">' + dl('부위') + '</div>') + '<div class="bksvg">' + v.svg + '</div>' + (v.svgB ? '<div class="bkvh"><b>뒷면</b></div><div class="bksvg">' + v.svgB + '</div>' : '') + '</div>';
   h += '<div class="card glc bkl">' + v.pt.map(function (r, i) { return ptEntry(r, i + 1); }).join('') + '</div>';
   var CMx = PARTS_CM[k] || []; if (CMx.length) h += '<div class="card rint ptcm"><div class="ct">소통 용어 <small>업체 · 팀과 말할 때</small></div><dl>' + CMx.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl></div>';
   h += '<div class="rkh">치수 · 단위<small>통상 · 예시</small></div><div class="card ptm"><div class="ptmw"><div class="ptmf"><div class="bkvh">' + dl('치수') + '</div>' + v.ms + '</div><div class="ptmt"><ul class="ptmk">' + v.mk.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' + ptTable(v.sz.head, v.sz.rows) + '<p class="ptn">' + esc(v.sz.note) + '</p></div></div></div>';
@@ -2479,6 +2479,12 @@ function renderRef() {
   $$('[data-rc]').forEach(function (b) { b.onclick = function () { refReset(b.dataset.rp, b.dataset.rc); RHOME = false; RPH = false; RP = b.dataset.rp; ls.set('pr:rp', RP); ls.set(isJ(RP) ? 'pr:ref2' : 'pr:refsub:' + RP, b.dataset.rc); window.scrollTo(0, 0); renderRef(); }; });
   $$('[data-rpp]').forEach(function (b) { b.onclick = function () { window.plyshRefPart(b.dataset.rpp); }; });
   $$('[data-rgo]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); refGo(b.dataset.rgo); }; });
+  $$('[data-ptdlb]').forEach(function (b) { b.onclick = function () { // 2026-11-22 실장님: 의류는 앞 · 뒤를 단추 하나로 한 파일에
+    var NS = 'http://www.w3.org/2000/svg', L = [].slice.call(b.closest('.bkfig').querySelectorAll('.bksvg > svg')), W = 0, H = 0, root = document.createElementNS(NS, 'svg');
+    L.forEach(function (sv, i) { var vb = sv.getAttribute('viewBox').split(/[\s,]+/).map(Number), n = sv.cloneNode(true); n.setAttribute('x', W); n.setAttribute('y', 36); n.setAttribute('width', vb[2]); n.setAttribute('height', vb[3]);
+      var t = document.createElementNS(NS, 'text'); t.setAttribute('x', W + 24); t.setAttribute('y', 26); t.setAttribute('font-size', '18'); t.setAttribute('font-weight', '700'); t.setAttribute('font-family', 'Pretendard,sans-serif'); t.setAttribute('fill', '#191f28'); t.textContent = i ? '뒷면' : '앞면';
+      root.appendChild(t); root.appendChild(n); W += vb[2]; H = Math.max(H, vb[3]); });
+    root.setAttribute('viewBox', '0 0 ' + W + ' ' + (H + 36)); svgDl(root, b.dataset.ptdlb); }; });
   $$('[data-ptdl]').forEach(function (b) { b.onclick = function () { var bx = b.closest('.bkvh'), nx = bx.nextElementSibling, sv = (nx && nx.querySelector && nx.querySelector('svg')) || (nx && nx.tagName === 'svg' ? nx : null); if (sv) svgDl(sv, b.dataset.ptdl); }; });
   $$('[data-rm]').forEach(function (b) { b.onclick = function () { ls.set('pr:rm', b.dataset.rm); renderRef(); }; });
   $$('.bkn').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); var t = document.querySelector(b.getAttribute('href')); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('bkhi'); setTimeout(function () { t.classList.remove('bkhi'); }, 1600); } }); });
