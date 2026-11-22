@@ -233,5 +233,9 @@ doc.saveAs(File(HERE + '/' + OUTNAME + '.ai'), ai);
 var pdf = new PDFSaveOptions(); pdf.preserveEditability = false; pdf.viewAfterSaving = false;
 doc.saveAs(File(HERE + '/' + OUTNAME + '.pdf'), pdf);
 doc.saveAs(File(HERE + '/' + OUTNAME + '.ai'), ai);
+// 품목별 .ai (대지 하나씩)
+var sub = Folder(HERE + '/ByItem'); if (!sub.exists) sub.create();
+try { var ai2 = new IllustratorSaveOptions(); ai2.pdfCompatible = true; ai2.compressed = true; ai2.saveMultipleArtboards = true; ai2.artboardRange = '1-' + DATA.length;
+  doc.saveAs(File(sub + '/[PLYSH]MDWorkOrder.ai'), ai2); } catch (e) { NOTE.push('품목별 저장 실패: ' + e); }
 var log = File(HERE + '/build_log.txt'); log.encoding = 'UTF-8'; log.open('w'); log.write('done ' + DATA.length + '\n' + NOTE.join('\n')); log.close();
 })();
