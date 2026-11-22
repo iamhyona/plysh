@@ -1,4 +1,4 @@
-// MD 상품 작업지시서 포맷 — 22품목 A3 가로 대지 생성 (PLYSH 디자인4팀)
+﻿// MD 상품 작업지시서 포맷 — 22품목 A3 가로 대지 생성 (PLYSH 디자인4팀)
 // 표 = 선(사각형) + 영역 문자 상자. 글자 = HYONA_ 문자 스타일, 표기 색 = HYONA_ 별색.
 #target illustrator
 (function () {
