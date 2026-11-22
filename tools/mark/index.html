@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <script>try { if (window.self !== window.top) document.documentElement.classList.add('emb'); } catch (e) { document.documentElement.classList.add('emb'); }</script>
 <style>
-:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --chip:#f2f4f6; --warn:#c8412f; --warnbg:#fdecea; --tbd:#7a4b00; --tbdbg:#fff3bf; }
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --chip:#f2f4f6; --warn:#c8412f; --warnbg:#fdecea; --tbd:#4e5968; --tbdbg:#e5e8eb; }
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 html, body { background:var(--bg); color:var(--txt); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; letter-spacing:-0.01em; }
 main { max-width:1040px; margin:0 auto; padding:20px 16px 80px; }
@@ -17,37 +17,47 @@ html.emb main { padding-top:6px; }
 html.emb .phd { display:none; }
 .wrap { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
 @media (min-width:900px) { .wrap { grid-template-columns:400px minmax(0,1fr); align-items:start; } }
-.card { background:var(--card); border-radius:20px; padding:22px 20px; }
+.card { background:var(--card); border-radius:20px; padding:20px; }
+@media (max-width:520px) { .card { padding:16px; } }
 .card + .card { margin-top:16px; }
-.ct { font-size:16px; font-weight:800; margin:0 0 14px; display:flex; align-items:center; gap:8px; }
+.ct { font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:8px; }
 .ct small { margin-left:auto; font-size:12.5px; font-weight:600; color:var(--mute); }
-label.l, .l { display:block; font-size:13px; font-weight:600; color:var(--sub); margin:0 0 6px; }
-.f + .f { margin-top:14px; }
-input[type=text], select { width:100%; height:44px; border:1px solid var(--line); background:#f7f8fa; border-radius:10px; padding:0 12px; font:inherit; font-size:15px; font-weight:600; color:var(--txt); }
-input[type=text]:focus, select:focus { outline:none; border-color:#191f28; background:#fff; }
-.seg { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:var(--chip); border-radius:12px; padding:4px; }
-.seg button { height:40px; border:0; border-radius:9px; background:none; font:inherit; font-size:14.5px; font-weight:600; color:var(--sub); cursor:pointer; }
-.seg button.on { background:#fff; color:var(--txt); font-weight:800; box-shadow:0 1px 3px rgba(0,0,0,.08); }
-.ex { display:flex; flex-wrap:wrap; gap:6px; }
-.ex button { border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 12px; font:inherit; font-size:13px; font-weight:600; color:var(--sub); cursor:pointer; }
-.ex button:hover { border-color:var(--txt); color:var(--txt); }
+label.l, .l { display:block; font-size:13px; font-weight:600; color:var(--sub); margin:0 0 8px; }
+.f + .f { margin-top:20px; }
+/* 입력 (2026-11-22 실장님: PLYSH 입력 폼과 같게 · 채울 칸은 비워 두고 예시는 연하게) */
+input[type=text], select { width:100%; height:46px; border:0; background-color:#f2f4f6; border-radius:12px; padding:0 14px; font:inherit; font-size:15px; font-weight:500; color:var(--txt); -webkit-appearance:none; appearance:none; }
+select { padding-right:38px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:18px; cursor:pointer; }
+select.ph { color:#b0b8c1; } select option { color:#191f28; }
+input[type=text]::placeholder { color:#b0b8c1; font-weight:500; }
+input[type=text]:focus, select:focus { outline:none; background-color:#fff; box-shadow:inset 0 0 0 2px #3182f6; }
+.seg { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:#e5e8eb; border-radius:12px; padding:3px; }
+.seg button { height:36px; border:0; border-radius:10px; background:none; font:inherit; font-size:14px; font-weight:700; color:var(--mute); cursor:pointer; }
+.seg button.on { background:#fff; color:var(--txt); }
+/* 체크 줄: 칸마다 회색 카드 · 줄 사이 8 · 행간 1.5 */
 .cks { display:grid; gap:8px; }
-.cks label { display:grid; grid-template-columns:20px 1fr; gap:8px; align-items:start; font-size:14.5px; font-weight:500; cursor:pointer; }
-.cks small { display:block; font-size:12.5px; color:var(--mute); font-weight:400; margin-top:1px; }
-input[type=checkbox] { -webkit-appearance:none; appearance:none; width:18px; height:18px; margin-top:2px; border:1.6px solid #8b95a1; border-radius:2px; background:#fff; display:grid; place-items:center; cursor:pointer; }
+.cks label { display:grid; grid-template-columns:20px minmax(0,1fr); column-gap:12px; align-items:start; padding:13px 14px; border-radius:14px; background:#f2f4f6; font-size:15px; font-weight:600; line-height:1.5; cursor:pointer; }
+.cks label:has(input:checked) { background:#fff; box-shadow:inset 0 0 0 1.5px #4e5968; }
+.cks small { display:block; font-size:13px; line-height:1.5; color:var(--mute); font-weight:500; margin-top:2px; }
+input[type=checkbox] { -webkit-appearance:none; appearance:none; width:20px; height:20px; margin:1px 0 0; border:2px solid #b0b8c1; border-radius:3px; background:#fff; display:grid; place-items:center; cursor:pointer; }
 input[type=checkbox]:checked { background:var(--txt); border-color:var(--txt); }
-input[type=checkbox]:checked::after { content:""; width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px); }
-.parts { display:grid; gap:10px; }
-.pt { border:1px solid var(--line); border-radius:14px; padding:12px; display:grid; gap:8px; }
-.pt .r { display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:center; } .pt .r select[data-k="1"] { grid-column:1 / -1; }
-.pt .x { width:36px; height:36px; border:0; background:var(--chip); border-radius:10px; cursor:pointer; color:var(--sub); font-size:18px; line-height:1; }
-.pt .x:hover { background:#e5e8eb; color:var(--txt); }
-.pt .cks label { font-size:13.5px; }
-.add { width:100%; height:44px; border:1px dashed #b0b8c1; background:none; border-radius:12px; font:inherit; font-size:14px; font-weight:700; color:var(--sub); cursor:pointer; margin-top:10px; }
-.add:hover { border-color:var(--txt); color:var(--txt); }
+input[type=checkbox]:checked::after { content:""; width:5px; height:10px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px); }
+/* 단추: SVG 픽토그램 + 글자, 안쪽 여백 16 */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:40px; padding:0 16px; border:0; border-radius:12px; background:#f2f4f6; color:var(--sub); font:inherit; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.btn svg { width:18px; height:18px; flex:none; }
+.btn:hover { background:#e5e8eb; color:var(--txt); }
+.btn.dk { background:var(--txt); color:#fff; } .btn.dk:hover { background:#333d4b; }
+.btn.full { width:100%; margin-top:12px; }
+.ib { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0; border:0; border-radius:50%; background:#fff; color:var(--mute); cursor:pointer; flex:none; }
+.ib svg { width:16px; height:16px; } .ib:hover { color:var(--txt); }
+.parts { display:grid; gap:12px; }
+.pt { background:#f2f4f6; border-radius:16px; padding:14px; display:grid; gap:8px; }
+.pt .hd { display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:700; color:var(--sub); }
+.pt select { background-color:#fff; }
+.pt .cks label { background:#fff; padding:11px 12px; font-size:14px; }
+.pt .cks label:has(input:checked) { box-shadow:inset 0 0 0 1.5px #4e5968; }
 /* 결과 */
 .grp + .grp { margin-top:20px; padding-top:18px; border-top:1px solid var(--line); }
-.gh { font-size:14px; font-weight:800; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+.gh { font-size:15px; font-weight:700; margin:0 0 12px; display:flex; align-items:center; gap:8px; }
 .gh .fl { font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px; background:var(--chip); color:var(--sub); }
 .rows { display:grid; gap:8px; }
 .row { display:grid; grid-template-columns:120px minmax(0,1fr); gap:12px; align-items:start; padding:10px 0; border-top:1px solid var(--line); }
@@ -56,198 +66,302 @@ input[type=checkbox]:checked::after { content:""; width:5px; height:9px; border:
 .mk { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
 .bd { display:inline-grid; justify-items:center; align-content:center; min-width:58px; padding:6px 10px; border:1.6px solid var(--txt); border-radius:6px; line-height:1.15; text-align:center; }
 .bd b { font-size:13.5px; font-weight:800; } .bd i { font-style:normal; font-size:12px; font-weight:700; } .bd em { font-style:normal; font-size:10.5px; color:var(--sub); font-weight:600; }
-.bd.jp { border-radius:3px; } .bd.no { border-style:dashed; border-color:#b0b8c1; color:var(--mute); }
+.bd.jp { border-radius:3px; } .bd u { text-underline-offset:2px; } .bd.no { border-style:dashed; border-color:#b0b8c1; color:var(--mute); }
 .bd.opt { border-style:dashed; }
-.nt { font-size:13px; color:var(--sub); line-height:1.55; margin-top:6px; }
+.nt { font-size:13px; color:var(--sub); line-height:1.6; margin-top:8px; }
 .mk + .nt { margin-top:6px; }
-.wn { font-size:13px; line-height:1.5; color:var(--warn); background:var(--warnbg); border-radius:8px; padding:6px 10px; margin-top:6px; }
+.wn { font-size:13px; line-height:1.5; color:#f04452; background:#fdecec; border-radius:10px; padding:8px 12px; margin-top:8px; }
 mark.tbd { background:var(--tbdbg); color:var(--tbd); border-radius:5px; padding:1px 6px; font-weight:600; font-size:.92em; }
 mark.tbd::before { content:"확인 필요 · "; font-weight:700; }
 .one { background:var(--chip); border-radius:12px; padding:12px 14px; font-size:14px; line-height:1.7; }
 .one b { font-weight:800; }
-.cp { margin-left:auto; border:0; background:var(--txt); color:#fff; border-radius:9px; padding:7px 12px; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
-.sz { width:100%; border-collapse:collapse; font-size:13.5px; } .sz td { padding:8px 0; border-top:1px solid var(--line); vertical-align:top; } .sz tr:first-child td { border-top:0; } .sz td:first-child { font-weight:700; width:42%; padding-right:10px; } .sz td:last-child { color:var(--sub); }
-.empty { font-size:14px; color:var(--mute); }
+.sz { width:100%; border-collapse:collapse; font-size:13.5px; } .sz td { padding:8px 0; border-top:1px solid var(--line); vertical-align:top; } .sz tr:first-child td { border-top:0; } .sz td:first-child { font-weight:700; width:42%; padding-right:10px; } .sz td small { display:block; font-size:12.5px; font-weight:500; color:var(--mute); margin-top:2px; } .sz td:last-child { color:var(--sub); }
+.empty { font-size:14px; line-height:1.6; color:var(--mute); }
 .toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:#191f28; color:#fff; font-size:14px; font-weight:600; padding:12px 18px; border-radius:12px; opacity:0; transition:opacity .2s; pointer-events:none; }
 .toast.on { opacity:1; }
 @media (max-width:520px) { .row { grid-template-columns:1fr; gap:6px; } }
+/* 2026-11-22 다시 짜기: MD 포장 품목 그대로 · 부품별 의무/자율/생략 · 실제 도안 모양 */
+.pt .g2 { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; }
+.pt .g2 input { background-color:#fff; }
+.pt .hint { font-size:12.5px; color:var(--mute); line-height:1.45; }
+.res { display:grid; gap:0; }
+.ri { display:grid; grid-template-columns:76px minmax(0,1fr); gap:14px; padding:14px 0; border-top:1px solid var(--line); }
+.ri:first-child { border-top:0; padding-top:2px; }
+.ri .sym { display:grid; justify-items:center; align-content:start; gap:6px; }
+.ri .sym svg { width:64px; height:auto; }
+.ri .sym .none { width:64px; height:64px; border:1.6px dashed #b0b8c1; border-radius:10px; display:grid; place-items:center; font-size:12px; font-weight:700; color:var(--mute); text-align:center; line-height:1.3; }
+.ri .nm { font-size:15px; font-weight:700; display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.ri .nm small { font-size:12.5px; font-weight:500; color:var(--mute); }
+.tag { display:inline-block; font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px; }
+.tag.must { background:#e8f0fe; color:#1c64d6; } .tag.opt { background:#f2f4f6; color:#4e5968; } .tag.skip { background:#e6f6ec; color:#1e7a3c; } .tag.na { background:#f2f4f6; color:#8b95a1; } .tag.q { background:#fff4e6; color:#b35c00; }
+.ri .kr { font-size:14.5px; font-weight:700; margin-top:6px; }
+.ri .why { font-size:13px; color:var(--sub); line-height:1.6; margin-top:4px; }
+.ri .jpl { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; font-size:13px; color:var(--sub); }
+.ri .rq { border:0; background:none; padding:0; font:inherit; font-size:13px; font-weight:600; color:#3182f6; text-decoration:underline; text-underline-offset:3px; cursor:pointer; margin-top:6px; }
+.ilg { display:flex; gap:14px; align-items:center; background:var(--chip); border-radius:14px; padding:14px; }
+.ilg svg { width:72px; height:auto; flex:none; }
+.ilg .lines { display:grid; gap:3px; font-size:14.5px; font-weight:700; }
+.acts { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+@media (max-width:520px) { .ri { grid-template-columns:64px minmax(0,1fr); gap:12px; } .ri .sym svg { width:56px; } }
 </style>
 </head>
 <body>
 <main>
-  <div class="phd"><b>분리배출 · 표시 마크</b><small>제품 · 포장 재질과 판매 국가를 넣으면 넣을 마크, 위치, 조합을 알려 줘요</small></div>
+  <div class="phd"><b>분리배출 · 표시 마크</b><small>포장 부품을 용어·견본의 MD 포장 이름 그대로 고르면 부품마다 넣을 도안, 의무 · 자율 · 생략, 위치를 알려 줘요</small></div>
   <div class="wrap">
     <div>
       <div class="card">
         <div class="f"><span class="l">판매 국가</span><div class="seg" id="cty"><button type="button" data-c="kr">한국</button><button type="button" data-c="jp">일본</button><button type="button" data-c="both">한국 + 일본</button></div></div>
-        <div class="f"><span class="l">예시 불러오기</span><div class="ex" id="exs"></div></div>
+        <div class="f"><label class="l" for="exs">구성 불러오기</label><select id="exs" class="ph"></select></div>
       </div>
       <div class="card">
         <div class="ct">제품</div>
-        <div class="f"><label class="l" for="pN">이름</label><input type="text" id="pN" placeholder="예: 키링"></div>
-        <div class="f"><label class="l" for="pM">재질</label><select id="pM"></select></div>
-        <div class="f"><span class="l">제품 특징</span><div class="cks" id="pF"></div></div>
+        <div class="f"><label class="l" for="pN">이름</label><input type="text" id="pN" placeholder="예: 아크릴 키링" autocomplete="off"></div>
+        <div class="f"><label class="l" for="pC">제품 종류</label><select id="pC"></select><p class="nt" id="pCn"></p></div>
+        <div class="f"><span class="l">제품 특징 <small style="font-weight:500;color:#8b95a1">KC · PSE 같은 제품 마크</small></span><div class="cks" id="pF"></div></div>
       </div>
       <div class="card">
-        <div class="ct">포장 구성 <small>버리는 부위마다 한 줄</small></div>
+        <div class="ct">포장 부품 <small>버리는 단위마다 한 칸</small></div>
         <div class="parts" id="pts"></div>
-        <button type="button" class="add" id="addP">+ 부위 추가</button>
+        <button type="button" class="btn full" id="addP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>부품 추가</button>
       </div>
     </div>
     <div>
       <div class="card" id="out"></div>
+      <div class="card" id="prd"></div>
       <div class="card"><div class="ct">크기 · 위치 기준</div>
         <table class="sz">
-          <tr><td>한국 분리배출 표시</td><td>도안 가로 · 세로 8mm 이상 (재질 글자 제외), 비율 그대로</td></tr>
+          <tr><td>한국 분리배출 표시</td><td>도안 가로 · 세로 8mm 이상 (아래 재질 글자 빼고), 정면 · 측면 · 바코드 상하좌우. 안 되면 밑면 · 뚜껑<small>분리배출 표시에 관한 지침 제5조</small></td></tr>
+          <tr><td>재활용 어려움</td><td>등급 평가에서 '재활용 어려움'을 받은 포장만, 분리배출 표시 위 · 아래 · 옆<small>포장재 재질 · 구조 등급표시 기준 제4조</small></td></tr>
           <tr><td>일본 紙 · プラ 마크</td><td>높이(プラ는 한 변) 6mm 이상 (인쇄 · 라벨), 각인은 8mm 이상</td></tr>
-          <tr><td>일본 역할명 (役割名)</td><td>箱 · 袋 · 台紙 등 6pt 이상, 마크 옆이나 아래</td></tr>
-          <tr><td>KC · PSE 등 인증</td><td>제품에 지워지지 않게, 번호는 도안 아래 · 옆 <mark class="tbd">최소 크기</mark></td></tr>
-          <tr><td>공통</td><td>재단선 안쪽 3mm 안, 접는 곳 · 풀칠 면 피하기, 바탕과 대비</td></tr>
+          <tr><td>일본 역할명 (役割名)</td><td>袋 · 箱 · 台紙 등 6pt 이상, 마크 옆이나 아래</td></tr>
+          <tr><td>공통</td><td>재단선 안쪽 3mm 안, 접는 곳 · 실링 · 걸이 구멍 피하기, 바탕과 대비</td></tr>
         </table>
-        <p class="nt">마크 모양은 예시예요. 실제 도안은 도구 › 로고의 원본 파일, 설명은 작업 기초 지침 › 표시사항 · 인증 마크에 있어요.</p>
+        <div class="acts"><button type="button" class="btn" data-go="gd:g.html?id=recycle">분리배출 표시 가이드</button><button type="button" class="btn" data-go="gd:g.html?id=marks">표시사항 · 인증 마크</button></div>
       </div>
     </div>
   </div>
 </main>
 <div class="toast" id="toast"></div>
 <script>
-/* 분리배출 · 표시 마크 계산기 (2026-11-22 실장님: PVC 키링 + 종이 박스면 어떤 마크가 들어가는지 계산)
-   근거: 환경부 「분리배출 표시에 관한 지침」, 일본 資源有効利用促進法 識別表示 (METI Q&A), 어린이제품 안전특별법 · 전기생활용품안전법 · 전파법, 일본 電気用品安全法 · 電波法 · 家庭用品品質表示法.
-   법 해석 · 의무 여부가 불확실한 곳은 '확인 필요'로 표시. */
+/* 분리배출 · 표시 마크 계산기 v2 (2026-11-22 실장님: 지금까지 만든 페이지와 이어지게 다시)
+   포장 이름 = 용어·견본 MD 포장(KTERMS) 그대로. 재질 = MD 소재 플라스틱류.
+   근거: 「분리배출 표시에 관한 지침」 환경부고시 제2025-165호 (2025.10.1 시행) 제5조 · 제6조 · 별표,
+   자원재활용법 시행령 제16조 · 제18조, 「포장재 재질·구조 등급표시 기준」 (2026.7.20 시행),
+   일본 資源有効利用促進法 識別表示. 해석이 갈리는 곳은 '확인 필요'. */
 var $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return [].slice.call((r || document).querySelectorAll(q)); };
 function T(s) { return '<mark class="tbd">' + s + '</mark>'; }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-// 제품 재질 (제품 자체는 포장재가 아님 → 분리배출 · 識別マーク 대상 아님)
-var PMAT = [['pvc', 'PVC (연질 · 말랑이)'], ['acr', '아크릴'], ['pl', '그 밖 플라스틱 (ABS · PP 등)'], ['sil', '실리콘 · 고무'], ['met', '금속 (아연 · 스틸)'], ['fab', '천 · 섬유 (면 · 폴리 · 봉제)'], ['pap', '종이 (포토카드 · 엽서 · 스티커)'], ['cer', '유리 · 도자기'], ['elc', '전자 부품 섞임 (응원봉 · 무드등)'], ['wd', '나무']];
-var FLAGS = [['kid', '어린이가 쓸 수 있음', '만 13세 이하 사용 가능 (인형 · 장난감 · 문구)'], ['elc', '전기 · 배터리', '충전 · 건전지 · 전원 연결'], ['rf', '무선', '블루투스 · Wi-Fi · 리모컨 연동'], ['tex', '섬유 제품', '의류 · 에코백 · 인형 · 쿠션 · 타월'], ['food', '음식이 닿음', '머그 · 텀블러 · 식기 · 도시락']];
-// 포장 부위: [키, 이름, 일본 역할명]
-var PART = [['box', '상자', '箱'], ['bag', '봉투', '袋'], ['dai', '台紙 · 받침 종이', '台紙'], ['tray', '트레이 · 블리스터', 'トレイ'], ['case', '케이스', 'ケース'], ['band', '띠지 · 슬리브', '帯'], ['film', '수축 필름 · 랩', 'フィルム'], ['cush', '완충재', '緩衝材'], ['tag', '택 · 라벨', 'タグ'], ['shop', '쇼핑백', '手提げ袋'], ['can', '캔 · 틴케이스', '缶'], ['btl', '병', 'びん']];
-// 포장 재질: [키, 이름, 종류, 약어]
+// ── 한국 도안 (지침 별표 모양 · 예시)
+var KRC = { '무색페트': '#E8B400', '플라스틱': '#1C64D6', '비닐류': '#7B3FC4', '캔류': '#8A9099', '종이': '#191F28', '일반팩': '#1E9E4A', '멸균팩': '#0E9AA7', '유리': '#F07A14', '도포': '#D9432E' };
+function krsym(txt, mat, bar) {
+  var col = bar ? KRC['도포'] : (KRC[txt] || '#191F28'), A = 7, cx = 50, cy = 54, R = 40, C = [-90, 30, 150].map(function (a) { a = a * Math.PI / 180; return [cx + R * Math.cos(a), cy + R * Math.sin(a)]; }), s = '';
+  for (var k = 0; k < 3; k++) {
+    var a = C[k], b = C[(k + 1) % 3], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, g = -120 * Math.PI / 180;
+    var p1 = [a[0] + .30 * dx, a[1] + .30 * dy], p2 = [a[0] + .93 * dx, a[1] + .93 * dy], rx = ux * Math.cos(g) - uy * Math.sin(g), ry = ux * Math.sin(g) + uy * Math.cos(g), p3 = [p2[0] + rx * .2 * L, p2[1] + ry * .2 * L];
+    s += '<path d="M' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + 'L' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1) + 'L' + p3[0].toFixed(1) + ' ' + p3[1].toFixed(1) + '" fill="none" stroke="' + col + '" stroke-width="' + A + '" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  if (bar) s += '<line x1="22" y1="80" x2="80" y2="18" stroke="' + col + '" stroke-width="9.1"/>';
+  else if (txt) { var n = txt.length, fs = { 1: 20, 2: 18, 3: 15, 4: 12.5 }[n] || 12; s += '<text x="50" y="' + (cy + 6 + fs * .36).toFixed(1) + '" font-size="' + fs + '" font-weight="900" fill="#191F28" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="middle" font-family="Pretendard Variable,Pretendard,sans-serif"' + (n >= 3 ? ' textLength="' + Math.round(n * fs * .92) + '" lengthAdjust="spacingAndGlyphs"' : '') + '>' + txt + '</text>'; }
+  if (mat) s += '<text x="50" y="112" font-size="' + (mat.length < 6 ? 17 : 13) + '" font-weight="800" fill="#191F28" text-anchor="middle" font-family="Pretendard Variable,Pretendard,sans-serif">' + esc(mat) + '</text>';
+  return '<svg viewBox="0 0 100 120" role="img" aria-label="' + esc((txt || '도포 · 첩합') + ' ' + (mat || '')) + '">' + s + '</svg>';
+}
+// ── 재질: [키, 이름, 종류, 한국 표시재질, 일본 약어('_'로 시작하면 첫 재질 밑줄), 표시]
+//   종류: film 비닐류 · plas 플라스틱 · foam 발포(플라스틱) · paper 종이 · corr 골판지 · pack 종이팩 · steel · alu · glass · none
+//   표시: pvc = PVC 경고, comp = 복합(재활용 어려움 가능), dc = 도포 · 첩합 도안
 var MAT = [
-  ['paper', '종이 (일반 · 아트지 · 모조지)', 'paper'], ['coat', '종이 + 코팅 · 라미 · 박', 'paper'], ['card', '판지 · 카드보드 (CCP · 아이보리)', 'paper'], ['corr', '골판지', 'corr'], ['pulp', '펄프 몰드', 'paper'], ['pack', '종이팩 (음료용)', 'pack'],
-  ['f_pp', 'OPP · CPP 필름 (PP)', 'film', 'PP'], ['f_ldpe', 'PE · LDPE 필름 (지퍼백 · 에어캡)', 'film', 'LDPE'], ['f_hdpe', 'HDPE 필름 (비닐 쇼핑백)', 'film', 'HDPE'], ['f_pet', 'PET 필름', 'film', 'PET'], ['f_pvc', 'PVC 필름', 'film', 'PVC'], ['f_oth', '복합 · 기타 필름 (알루미늄 증착 등)', 'film', 'OTHER'],
-  ['p_pet', 'PET 플라스틱 (투명 블리스터 · 트레이)', 'plas', 'PET'], ['p_pp', 'PP 플라스틱 (케이스 · 트레이)', 'plas', 'PP'], ['p_ps', 'PS (투명 하드 케이스)', 'plas', 'PS'], ['p_hdpe', 'HDPE 플라스틱', 'plas', 'HDPE'], ['p_pvc', 'PVC 블리스터 · 케이스', 'plas', 'PVC'], ['p_oth', '아크릴 · ABS 등 그 밖 플라스틱', 'plas', 'OTHER'],
-  ['steel', '철 (틴케이스)', 'steel'], ['alu', '알루미늄', 'alu'], ['glass', '유리', 'glass'], ['wood', '나무', 'none'], ['cloth', '천 · 부직포', 'none']];
-var EX = [
-  ['PVC 키링 · 종이 박스 · OPP 봉투', { n: 'PVC 키링', m: 'pvc', f: [], p: [['box', 'card', 0], ['bag', 'f_pp', 0]] }],
-  ['포토카드 세트 · PP 봉투 · 台紙', { n: '포토카드 세트', m: 'pap', f: [], p: [['bag', 'f_pp', 0], ['dai', 'paper', 0]] }],
-  ['인형 · OPP 봉투 · 종이 택', { n: '인형', m: 'fab', f: ['kid', 'tex'], p: [['bag', 'f_pp', 0], ['tag', 'paper', 0]] }],
-  ['응원봉 · 종이 박스 · 펄프 몰드 · PE 봉투', { n: '응원봉', m: 'elc', f: ['elc', 'rf'], p: [['box', 'coat', 0], ['cush', 'pulp', 0], ['bag', 'f_ldpe', 0]] }],
-  ['텀블러 · 창 있는 종이 박스', { n: '텀블러', m: 'met', f: ['food'], p: [['box', 'card', 1]] }],
-  ['아크릴 스탠드 · PET 블리스터 · 台紙', { n: '아크릴 스탠드', m: 'acr', f: [], p: [['tray', 'p_pet', 0], ['dai', 'card', 0]] }]];
-var ST = { c: 'both', n: '', m: 'pvc', f: [], p: [] };
-try { var sv = JSON.parse(localStorage.getItem('mark:st') || 'null'); if (sv && sv.p) ST = sv; } catch (e) {}
-if (!ST.p.length) ST = JSON.parse(JSON.stringify(EX[0][1])), ST.c = 'both';
-function save() { try { localStorage.setItem('mark:st', JSON.stringify(ST)); } catch (e) {} }
-function opt(L, v) { return L.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === v ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join(''); }
+  ['f_pp', 'PP (OPP · CPP)', 'film', 'PP', 'PP'], ['f_pp2', 'OPP/CPP 2겹 · 무광 · 펄 (모두 PP)', 'film', 'PP', 'PP'], ['f_ldpe', 'LDPE · PE', 'film', 'LDPE', 'PE'], ['f_hdpe', 'HDPE', 'film', 'HDPE', 'PE'], ['f_pet', 'PET 필름', 'film', 'PET', 'PET'],
+  ['f_pvc', 'PVC', 'film', 'OTHER', 'PVC', 'pvc'], ['f_eva', 'EVA', 'film', 'OTHER', 'EVA'], ['f_tpu', 'TPU', 'film', 'OTHER', 'TPU'], ['f_pof', 'POF (여러 겹 폴리올레핀)', 'film', 'OTHER', '_PE,PP'], ['f_petg', 'PET-G 수축 필름', 'film', 'OTHER', 'PET'],
+  ['f_tpc', '전투후은 (앞 투명 · 뒤 은박, PET/AL/PE)', 'film', 'OTHER', '_PET,AL,PE', 'comp'], ['f_vm', '알루미늄 증착 (VMPET/PE)', 'film', 'OTHER', '_PET,PE', 'comp'], ['f_al', '알루미늄 호일 합지 (PET/AL/PE)', 'film', 'OTHER', '_PET,AL,PE', 'comp'], ['f_holo', '홀로그램 · 오로라 (증착 PET/PE)', 'film', 'OTHER', '_PET,PE', 'comp'], ['f_nype', '나일론 합지 (NY/PE)', 'film', 'OTHER', 'NY,_PE', 'comp'], ['f_petpe', 'PET/PE 합지 (스탠드 파우치)', 'film', 'OTHER', '_PET,PE', 'comp'], ['f_es', '은색 차폐형 (금속층)', 'film', 'OTHER', '_PET,PE', 'comp'],
+  ['p_pet', 'PET (투명 · 진공 성형)', 'plas', 'PET', 'PET'], ['p_petg', 'PET-G', 'plas', 'OTHER', 'PET'], ['p_pp', 'PP', 'plas', 'PP', 'PP'], ['p_ps', 'PS (하드 투명)', 'plas', 'PS', 'PS'], ['p_pvc', 'PVC', 'plas', 'OTHER', 'PVC', 'pvc'], ['p_pc', 'PC · ABS', 'plas', 'OTHER', 'PC'], ['p_eva', 'EVA · 스펀지 (PU) 폼', 'plas', 'OTHER', 'EVA'], ['p_dc', '벨벳 플록킹 · 금속 증착 트레이', 'plas', '', '_PET', 'dc'], ['p_pla', 'PLA (생분해)', 'plas', 'OTHER', 'PLA'],
+  ['eps', '스티로폼 (발포 PS)', 'foam', 'PS', 'PS'],
+  ['paper', '종이 (아트 · 모조 · 판지)', 'paper'], ['coat', '종이 + 한 면 코팅 · 라미 · 박', 'paper'], ['coat2', '종이 + 양면 플라스틱 라미', 'paper2'], ['corr', '골판지', 'corr'], ['kraft', '크라프트지', 'paper'], ['kral', '크라프트 + 은박 + PE (종이/AL/PE)', 'kral'], ['pack', '종이팩 (음료용)', 'pack'],
+  ['steel', '철 (틴)', 'steel'], ['alu', '알루미늄', 'alu'], ['glass', '유리', 'glass'], ['none', '천 · 나무 · 그 밖', 'none']];
 function mat(k) { return MAT.filter(function (x) { return x[0] === k; })[0] || MAT[0]; }
-function part(k) { return PART.filter(function (x) { return x[0] === k; })[0] || PART[0]; }
+// ── 포장 (용어·견본 MD 포장 이름 그대로): [이름, 묶음, 부품 이름(한국), 일본 역할명, 고를 재질들(첫 번째 기본), 봉투(면 2개)]
+var PK = [
+  ['OPP 봉투', '봉투', '봉투', '袋', ['f_pp', 'f_pp2'], 1], ['헤더 OPP 봉투', '봉투', '봉투', '袋', ['f_pp', 'f_pp2'], 1], ['PP 봉투', '봉투', '봉투', '袋', ['f_pp'], 1], ['CPP 봉투', '봉투', '봉투', '袋', ['f_pp'], 1],
+  ['PE 지퍼백', '봉투', '지퍼백', '袋', ['f_ldpe'], 1], ['기입란 지퍼백', '봉투', '지퍼백', '袋', ['f_ldpe'], 1], ['스탠드 지퍼백', '봉투', '파우치', '袋', ['f_petpe', 'f_nype', 'f_al'], 1],
+  ['PVC 슬라이드 지퍼백', '봉투', '지퍼백', '袋', ['f_pvc'], 1], ['LDPE 슬라이드 지퍼백', '봉투', '지퍼백', '袋', ['f_ldpe'], 1], ['EVA 슬라이드 지퍼백', '봉투', '지퍼백', '袋', ['f_eva'], 1], ['TPU 슬라이드 지퍼백', '봉투', '지퍼백', '袋', ['f_tpu'], 1],
+  ['알루미늄 · 은박 봉투', '봉투', '봉투', '袋', ['f_tpc', 'f_vm', 'f_al', 'f_holo'], 1], ['뽁뽁이 봉투 (에어캡 봉투)', '봉투', '봉투', '袋', ['f_ldpe', 'kral'], 1], ['크라프트 종이 봉투', '봉투', '봉투', '袋', ['kraft', 'kral'], 1], ['정전기 방지 봉투', '봉투', '봉투', '袋', ['f_ldpe', 'f_es'], 1],
+  ['수축 필름 (슈링크)', '필름 · 완충', '수축 필름', 'フィルム', ['f_pp', 'f_ldpe', 'f_pof', 'f_petg', 'f_pvc']], ['에어캡 (뽁뽁이)', '필름 · 완충', '에어캡', '緩衝材', ['f_ldpe']], ['박엽지 (티슈 페이퍼)', '필름 · 완충', '박엽지', '包装紙', ['paper']], ['종이 완충재', '필름 · 완충', '완충재', '緩衝材', ['paper']], ['스티로폼 완충재', '필름 · 완충', '완충재', '緩衝材', ['eps']],
+  ['싸바리 박스', '박스', '박스', '箱', ['coat', 'paper', 'coat2']], ['자석 박스', '박스', '박스', '箱', ['coat', 'paper']], ['서랍 박스', '박스', '박스', '箱', ['coat', 'paper']], ['단상자', '박스', '상자', '箱', ['coat', 'paper', 'coat2']], ['우편 박스 (크라프트)', '박스', '상자', '箱', ['corr']],
+  ['슬리브', '박스', '슬리브', '帯', ['paper', 'p_pet']], ['PET 투명 박스', '박스', '케이스', 'ケース', ['p_pet', 'p_petg', 'p_pp', 'p_pvc']], ['틴케이스', '박스', '틴케이스', '缶', ['steel', 'alu']], ['쇼핑백', '박스', '쇼핑백', '手提げ袋', ['paper', 'f_hdpe', 'f_ldpe']],
+  ['헤더 카드', '걸이 포장', '헤더 카드', '台紙', ['paper']], ['블리스터 카드', '걸이 포장', '블리스터', 'ブリスター', ['p_pet', 'p_pvc', 'p_petg']], ['스킨 포장', '걸이 포장', '스킨 필름', 'フィルム', ['f_ldpe']], ['플라스틱 행거 (후크)', '걸이 포장', '행거', 'フック', ['p_pp', 'p_ps']],
+  ['종이 속지 (형태 유지)', '속지 · 받침', '속지', '台紙', ['paper']], ['받침 대지 (백보드)', '속지 · 받침', '대지', '台紙', ['paper']], ['띠지 (벨리 밴드)', '속지 · 받침', '띠지', '帯', ['paper', 'coat']], ['칸막이 · 트레이', '속지 · 받침', '트레이', 'トレイ', ['p_pet', 'p_ps', 'p_pp', 'p_eva', 'p_dc', 'paper']], ['포스터 튜브 · 지관', '속지 · 받침', '지관', '筒', ['paper']]];
+function pk(n) { return PK.filter(function (x) { return x[0] === n; })[0]; }
+// ── 제품 종류 (시행령 제18조): 어떤 포장이 의무인지 달라짐
+var CAT = [['goods', '일반 굿즈 (키링 · 아크릴 · 문구 · 인형 · 머그 등)', '플라스틱 · 비닐 포장만 의무 (시행령 제18조 1호 타목). 종이 · 금속 · 유리는 자율.'],
+  ['cloth', '의류 · 의복 잡화 (티셔츠 · 후디 · 양말 · 모자)', '의복류: 금속캔 · 유리병 포장도 의무 (시행령 제18조 1호 아목). 종이는 자율.'],
+  ['food', '음식 · 음료 (과자 · 캔디 · 음료 굿즈)', '종이팩 · 유리병 · 금속캔 · 플라스틱 모두 의무 (시행령 제18조 1호 가목).'],
+  ['cos', '화장품 · 향수 · 핸드크림', '종이팩 · 유리병 · 금속캔 · 플라스틱 모두 의무 (시행령 제18조 1호 라목). 30mL · 30g 이하는 생략 가능.'],
+  ['elec', '전자 굿즈 (응원봉 · 무드등 · 스피커)', '안전인증 · 확인 대상 전기용품이면 필름 · 시트와 발포 완충재만 의무 (시행령 제18조 2호).']];
+var FLAGS = [['kid', '어린이가 쓸 수 있음', '만 13세 이하 사용 가능 (인형 · 장난감 · 문구)'], ['elc', '전기 · 배터리', '충전 · 건전지 · 전원 연결'], ['rf', '무선', '블루투스 · Wi-Fi · 리모컨 연동'], ['tex', '섬유 제품', '의류 · 에코백 · 인형 · 쿠션 · 타월'], ['food', '음식이 닿음', '머그 · 텀블러 · 식기 · 도시락']];
+// ── 구성 불러오기 (용어·견본 MD 포장 > 품목별 포장)
+//   부품: [포장 이름, 재질 키, 가로, 세로, 인쇄 있음, 한 몸(떼어낼 수 없음)]
+var EX = [
+  ['포토카드 · 엽서 · 스티커', { n: '포토카드', cat: 'goods', f: [], p: [['OPP 봉투', 'f_pp', 65, 95, 0, 0], ['받침 대지 (백보드)', 'paper', 60, 90, 1, 0]] }],
+  ['포토카드 · 전투후은 지퍼백', { n: '포토카드', cat: 'goods', f: [], p: [['알루미늄 · 은박 봉투', 'f_tpc', 100, 150, 1, 0]] }],
+  ['키링 · 아크릴 키링', { n: '아크릴 키링', cat: 'goods', f: [], p: [['헤더 OPP 봉투', 'f_pp', 100, 150, 1, 0]] }],
+  ['캔뱃지 · 핀 뱃지', { n: '캔뱃지', cat: 'goods', f: [], p: [['OPP 봉투', 'f_pp', 80, 100, 0, 0], ['받침 대지 (백보드)', 'paper', 70, 90, 1, 0]] }],
+  ['아크릴 스탠드', { n: '아크릴 스탠드', cat: 'goods', f: [], p: [['단상자', 'coat', 0, 0, 1, 0], ['OPP 봉투', 'f_pp', 120, 180, 0, 0]] }],
+  ['블리스터 카드 굿즈', { n: '미니 피규어', cat: 'goods', f: [], p: [['헤더 카드', 'paper', 0, 0, 1, 0], ['블리스터 카드', 'p_pet', 0, 0, 0, 1]] }],
+  ['인형 · 봉제 굿즈', { n: '인형', cat: 'goods', f: ['kid', 'tex'], p: [['OPP 봉투', 'f_pp', 250, 350, 1, 0]] }],
+  ['의류 (티셔츠 · 후드)', { n: '티셔츠', cat: 'cloth', f: ['tex'], p: [['PE 지퍼백', 'f_ldpe', 300, 400, 1, 0], ['종이 속지 (형태 유지)', 'paper', 0, 0, 0, 0]] }],
+  ['머그 · 유리컵 · 도자기', { n: '머그', cat: 'goods', f: ['food'], p: [['단상자', 'coat', 0, 0, 1, 0], ['에어캡 (뽁뽁이)', 'f_ldpe', 0, 0, 0, 0]] }],
+  ['포스터', { n: '포스터', cat: 'goods', f: [], p: [['포스터 튜브 · 지관', 'paper', 0, 0, 1, 0], ['OPP 봉투', 'f_pp', 0, 0, 0, 0]] }],
+  ['담요 · 쿠션 · 에코백', { n: '담요', cat: 'goods', f: ['tex'], p: [['PE 지퍼백', 'f_ldpe', 350, 450, 1, 0]] }],
+  ['휴대폰 케이스 · 전자 굿즈', { n: '응원봉', cat: 'elec', f: ['elc', 'rf'], p: [['싸바리 박스', 'coat', 0, 0, 1, 0], ['칸막이 · 트레이', 'p_eva', 0, 0, 0, 0], ['PE 지퍼백', 'f_ldpe', 0, 0, 0, 0]] }],
+  ['시즌그리팅 · 세트', { n: '시즌그리팅', cat: 'goods', f: [], p: [['싸바리 박스', 'coat', 0, 0, 1, 0], ['띠지 (벨리 밴드)', 'paper', 0, 0, 1, 0], ['OPP 봉투', 'f_pp', 0, 0, 0, 0], ['수축 필름 (슈링크)', 'f_pof', 0, 0, 0, 0]] }]];
+var ST = { c: 'kr', n: '', cat: '', f: [], p: [] };
+try { var sv = JSON.parse(localStorage.getItem('mark:st3') || 'null'); if (sv && sv.p) ST = sv; } catch (e) {}
+function save() { try { localStorage.setItem('mark:st3', JSON.stringify(ST)); } catch (e) {} }
+function opt(L, v, ph) { return (ph ? '<option value="">' + ph + '</option>' : '') + L.map(function (x) { return '<option value="' + esc(x[0]) + '"' + (x[0] === v ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join(''); }
+function pkOpt(v) { var g = {}, o = '<option value="">포장 고르기</option>'; PK.forEach(function (x) { (g[x[1]] = g[x[1]] || []).push(x); }); Object.keys(g).forEach(function (k) { o += '<optgroup label="' + k + '">' + g[k].map(function (x) { return '<option' + (x[0] === v ? ' selected' : '') + '>' + esc(x[0]) + '</option>'; }).join('') + '</optgroup>'; }); return o; }
+var XI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 // ── 입력 그리기
 function paint() {
   $$('#cty button').forEach(function (b) { b.classList.toggle('on', b.dataset.c === ST.c); });
-  $('#pN').value = ST.n || ''; $('#pM').innerHTML = opt(PMAT, ST.m);
+  $('#exs').innerHTML = '<option value="">품목 고르기</option>' + EX.map(function (x, i) { return '<option value="' + i + '">' + esc(x[0]) + '</option>'; }).join(''); $('#exs').className = 'ph';
+  $('#pN').value = ST.n || '';
+  $('#pC').innerHTML = opt(CAT, ST.cat, '제품 종류 고르기'); $('#pC').className = ST.cat ? '' : 'ph';
+  var cc = CAT.filter(function (x) { return x[0] === ST.cat; })[0]; $('#pCn').textContent = cc ? cc[2] : '제품 종류에 따라 종이 · 금속 · 유리 포장의 의무 여부가 달라져요.';
   $('#pF').innerHTML = FLAGS.map(function (x) { return '<label><input type="checkbox" data-f="' + x[0] + '"' + (ST.f.indexOf(x[0]) > -1 ? ' checked' : '') + '><span>' + x[1] + '<small>' + x[2] + '</small></span></label>'; }).join('');
-  $('#pts').innerHTML = ST.p.map(function (p, i) {
-    return '<div class="pt" data-i="' + i + '"><div class="r"><select data-k="0" aria-label="부위">' + opt(PART, p[0]) + '</select><button type="button" class="x" aria-label="이 부위 빼기">×</button><select data-k="1" aria-label="재질">' + opt(MAT, p[1]) + '</select></div>' +
-      '<div class="cks"><label><input type="checkbox" data-k="2"' + (p[2] ? ' checked' : '') + '><span>다른 재질이 붙어 떼어낼 수 없음<small>코팅 · 라미 · PET 창 · 금속 증착 등</small></span></label></div></div>';
-  }).join('');
+  $('#pts').innerHTML = ST.p.length ? ST.p.map(function (p, i) {
+    var K = pk(p[0]), ms = K ? K[4] : MAT.map(function (x) { return x[0]; });
+    return '<div class="pt" data-i="' + i + '"><div class="hd"><span>부품 ' + (i + 1) + '</span><button type="button" class="ib" aria-label="이 부품 빼기">' + XI + '</button></div>' +
+      '<select data-k="0" aria-label="포장"' + (p[0] ? '' : ' class="ph"') + '>' + pkOpt(p[0]) + '</select>' +
+      (p[0] ? '<select data-k="1" aria-label="재질">' + ms.map(function (k) { var m = mat(k); return '<option value="' + k + '"' + (k === p[1] ? ' selected' : '') + '>' + esc(m[1]) + '</option>'; }).join('') + '</select>' : '') +
+      (p[0] ? '<div class="g2"><input type="text" inputmode="numeric" data-k="2" placeholder="가로 mm" value="' + (p[2] || '') + '" aria-label="가로 mm"><input type="text" inputmode="numeric" data-k="3" placeholder="세로 mm" value="' + (p[3] || '') + '" aria-label="세로 mm"></div><p class="hint">작은 봉투 · 케이스면 크기를 넣어요. 100㎠ (필름) · 50㎠ 미만은 생략할 수 있어요.</p>' +
+      '<div class="cks"><label><input type="checkbox" data-k="4"' + (p[4] ? ' checked' : '') + '><span>인쇄 · 스티커 · 각인이 있음<small>무지 필름 · 시트는 표시 대상이 아니에요</small></span></label><label><input type="checkbox" data-k="5"' + (p[5] ? ' checked' : '') + '><span>다른 부품에 붙어 떼어낼 수 없음<small>블리스터 카드 · 창 붙은 상자 · 뚜껑 일체형</small></span></label></div>' : '') + '</div>';
+  }).join('') : '<p class="empty">구성 불러오기에서 품목을 고르거나, 부품 추가를 눌러 포장을 하나씩 넣어요.</p>';
   run();
 }
-// ── 계산
-function krMark(m, att) {
-  var k = m[2], ab = m[3];
-  if (k === 'paper') return { b: [['종이', att || m[0] === 'coat' ? '도포 · 첩합 등' : '']], nt: m[0] === 'coat' || att ? '코팅 · 라미 · 박 등이 붙은 종이는 재질명 아래 \'도포 · 첩합 등\'. ' : '', tb: '종이 포장재가 표시 의무 대상인지 (보통 자율 표시)' };
-  if (k === 'corr') return { b: [['종이', '']], tb: '골판지 상자 표시 의무 여부 (보통 자율 표시)' };
-  if (k === 'pack') return { b: [['종이팩', '일반팩 · 멸균팩']] };
-  if (k === 'film') { if (ab === 'PVC') return { b: [['비닐류', 'PVC']], wn: 'PVC 포장재는 한국에서 사용을 제한하는 쪽이에요. PP · PET 필름으로 바꾸기 권장.', tb: 'PVC 포장재 예외 · 표시 도안' }; return { b: [['비닐류', ab + (att ? ' · 도포 · 첩합 등' : '')]] }; }
-  if (k === 'plas') { if (ab === 'PVC') return { b: [['플라스틱', 'PVC']], wn: 'PVC 블리스터 · 케이스는 한국에서 사용을 제한하는 쪽이에요. PET · PP로 바꾸기 권장.', tb: 'PVC 포장재 예외 · 표시 도안' }; return { b: [['플라스틱', ab + (att ? ' · 도포 · 첩합 등' : '')]] }; }
-  if (k === 'steel') return { b: [['캔류', '철']] };
-  if (k === 'alu') return { b: [['캔류', '알미늄']] };
-  if (k === 'glass') return { b: [['유리', '']] };
-  return { b: [], nt: '분리배출 표시 대상 재질이 아니에요 (종량제 · 일반 쓰레기).' };
-}
-function jpMark(m, att, role) {
-  var k = m[2], ab = m[3];
-  if (k === 'paper') return { b: [['紙', '', role]], nt: att ? '붙은 재질과 무게를 비교해 무거운 쪽 마크. 종이가 더 무거우면 紙.' : '' };
-  if (k === 'corr') return { b: [['段ボール', '', role]], opt: 1, nt: '골판지는 識別マーク 의무 아님 (자율). 紙 마크는 넣지 않기.' };
-  if (k === 'pack') return { b: [['紙パック', '', role]], opt: 1, nt: '알루미늄 없는 음료용 종이팩은 자율.' };
-  if (k === 'film' || k === 'plas') return { b: [['プラ', ab === 'OTHER' ? '' : ab, role]], nt: (ab === 'OTHER' ? '재질 약어는 실제 재질로 (복합이면 주된 재질에 밑줄). ' : '재질 약어 (' + ab + ')는 권장 표기. ') + (att ? '붙은 재질과 무게를 비교해 무거운 쪽 마크.' : '') };
-  if (k === 'steel' || k === 'alu') return { b: [], nt: 'スチール · アルミ 마크는 음료 · 주류 캔만 의무. 굿즈 틴케이스는 넣지 않아도 됨.' };
-  if (k === 'glass') return { b: [], nt: '유리는 識別マーク 없음.' };
-  return { b: [], nt: '識別マーク 대상 재질이 아니에요.' };
-}
-function badge(x, jp, op) { return '<span class="bd' + (jp ? ' jp' : '') + (op ? ' opt' : '') + '"><b>' + esc(x[0]) + '</b>' + (x[1] ? '<i>' + esc(x[1]) + '</i>' : '') + (x[2] ? '<em>' + esc(x[2]) + '</em>' : '') + '</span>'; }
-function prodMarks(c) {
-  var kr = c !== 'jp', jp = c !== 'kr', R = [], F = ST.f;
-  function add(where, mk, nt) { R.push({ w: where, mk: mk, nt: nt }); }
-  if (F.indexOf('kid') > -1) {
-    if (kr) add('한국', [['KC', '어린이제품']], '안전인증 · 안전확인 · 공급자적합성확인 중 하나 + 번호. 사용 연령 · 주의 문구 · 제조연월 · 제조자 · 수입자 함께. ' + T('품목별 인증 구분 · 제조사'));
-    if (jp) add('일본', [['ST', '玩具 · 자율']], '장난감 안전 마크는 자율. 6세 미만 입에 닿는 장난감은 식품위생법 대상일 수 있음 ' + T('일본 판매사'));
+// ── 한국 판정
+function kr(p) {
+  var K = pk(p[0]), m = mat(p[1]), k = m[2], cat = ST.cat || 'goods', W = +p[2] || 0, H = +p[3] || 0, R = { part: K ? K[2] : '부품', law: [], note: [], warn: [] };
+  if (k === 'film') { R.t = '비닐류'; R.m = m[3]; }
+  else if (k === 'plas' || k === 'foam') { if (m[5] === 'dc') { R.dc = 1; R.t = ''; R.m = ''; } else { R.t = '플라스틱'; R.m = m[3]; } }
+  else if (k === 'paper' || k === 'corr') { R.t = '종이'; R.m = ''; }
+  else if (k === 'paper2') { R.t = '플라스틱'; R.m = 'OTHER'; R.note.push('종이 양면에 플라스틱이 붙으면 OTHER (지침 별표 비고 6). 한 면만이면 종이.'); }
+  else if (k === 'kral') { R.t = '비닐류'; R.m = 'OTHER'; R.note.push('종이 · 알루미늄 · PE를 붙인 봉투. 보통 비닐류 OTHER. 종이가 주재질이면 종이 + 일괄로 "안쪽: 비닐류 OTHER" ' + T('주재질 판정 · 업체 재질표')); }
+  else if (k === 'pack') { R.t = '일반팩'; R.m = ''; R.note.push('알루미늄박이 붙은 팩이면 멸균팩.'); }
+  else if (k === 'steel') { R.t = '캔류'; R.m = '철'; } else if (k === 'alu') { R.t = '캔류'; R.m = '알루미늄'; } else if (k === 'glass') { R.t = '유리'; R.m = ''; }
+  else { R.t = null; }
+  // 의무 · 자율
+  var plastic = k === 'film' || k === 'plas' || k === 'foam' || k === 'paper2' || k === 'kral';
+  if (R.t === null) { R.s = 'na'; R.law.push('분리배출 표시 도안이 없는 재질 (종량제 · 일반 쓰레기)'); return R; }
+  if (cat === 'elec') { if (k === 'film' || k === 'foam' || k === 'kral') { R.s = 'must'; R.law.push('전기용품 포장의 필름 · 시트 · 발포 완충재 (시행령 제18조 2호)'); } else if (plastic) { R.s = 'opt'; R.law.push('전기용품 포장의 플라스틱 용기 · 트레이는 의무 목록에 없음 (시행령 제18조 1호 단서 · 2호) ' + T('전기용품 분류 · 제조사')); } else { R.s = 'opt'; R.law.push('종이 · 금속 · 유리는 자율'); } }
+  else if (plastic) { R.s = 'must'; R.law.push(K && K[0] === '쇼핑백' ? '합성수지 쇼핑백 (시행령 제18조 3호)' : '합성수지 포장재 (시행령 제18조 1호)'); }
+  else if (k === 'pack') { R.s = cat === 'food' || cat === 'cos' ? 'must' : 'opt'; R.law.push(R.s === 'must' ? '종이팩 (시행령 제18조 1호)' : '굿즈 포장의 종이팩은 자율'); }
+  else if (k === 'steel' || k === 'alu' || k === 'glass') { R.s = cat === 'goods' ? 'opt' : 'must'; R.law.push(R.s === 'must' ? (k === 'glass' ? '유리병' : '금속캔') + ' (시행령 제18조 1호)' : '굿즈 포장의 ' + (k === 'glass' ? '유리' : '금속') + '은 자율 (시행령 제18조 1호 타목은 합성수지만)'); }
+  else { R.s = 'opt'; R.law.push('종이 포장은 자율 (의무는 종이팩만). 넣으면 지침 도안 · 크기 그대로'); }
+  // 생략
+  if (R.s === 'must') {
+    var film = k === 'film' || k === 'kral', th = film ? 100 : 50, a1 = W * H / 100, a2 = K && K[5] ? a1 * 2 : a1;
+    if (film && !p[4]) { R.s = 'skip'; R.law.push('인쇄 · 각인 · 라벨이 없는 필름 · 시트 → 표시 제외 (시행령 제16조 1호 나목). 로고 · 스티커가 생기면 표시'); }
+    else if (W && H) {
+      if (a2 < th) { R.s = 'skip'; R.law.push('표면적 ' + a2.toFixed(0) + '㎠ < ' + th + '㎠ → 생략 가능 (지침 제6조 1항 1호)'); }
+      else if (a1 < th) { R.s = 'q'; R.law.push('한 면 ' + a1.toFixed(0) + '㎠ · 앞뒤 ' + a2.toFixed(0) + '㎠ → 기준 ' + th + '㎠ ' + T('표면적을 한 면으로 보는지 앞뒤 합으로 보는지')); }
+    }
+    if (ST.cat === 'cos') R.note.push('내용물 30mL · 30g 이하면 생략 가능 (지침 제6조 1항 2호).');
   }
-  if (F.indexOf('elc') > -1) {
-    if (kr) add('한국', [['KC', '전기용품']], '전기생활용품안전법. 충전기 · 보조배터리 · 어댑터는 인증번호 필수. 정격 (V · W) · 제조자 함께. ' + T('제품별 인증 구분'));
-    if (jp) add('일본', [['PSE', '電気用品安全法']], '마름모 (특정 전기용품) 또는 원. 수입 · 판매사 이름 함께. 모바일 배터리도 대상.');
-  }
-  if (F.indexOf('rf') > -1) {
-    if (kr) add('한국', [['KC', '전파법']], '적합성평가 번호 (R- 로 시작). 제품 · 포장 · 설명서. ' + T('제조사 번호'));
-    if (jp) add('일본', [['技適', '電波法']], '기술기준적합증명 마크 + 번호. 없으면 일본에서 전파 사용 불가.');
-  }
-  if (F.indexOf('tex') > -1) {
-    if (kr) add('한국', [['세탁 기호', 'KS K 0021'], ['혼용률', '']], '취급 표시 (물세탁 · 표백 · 건조 · 다림질 · 클리닝), 섬유 혼용률, 제조국, 제조 · 수입자. 케어 라벨 · 택. ' + (F.indexOf('kid') > -1 ? '어린이 섬유제품은 KC 대상 ' + T('제조사') : ''));
-    if (jp) add('일본', [['取扱い表示', 'JIS L 0001'], ['組成', '']], '家庭用品品質表示法: 組成 (섬유 혼용률), 取扱い表示 (세탁 기호), 表示者名 · 連絡先.');
-  }
-  if (F.indexOf('food') > -1) {
-    if (kr) add('한국', [['식품용', '기구 · 용기']], '식품위생법: "식품용" 문구 또는 도안, 재질, 제조 · 수입자. 수입이면 수입 신고. ' + T('품목 · 재질별 기준'));
-    if (jp) add('일본', [['食品衛生法', '輸入届'], ['品質表示', '耐熱温度']], '수입 신고. 플라스틱 식기는 家庭用品品質表示法 (원료 수지 · 내열 온도 · 취급 주의).');
-  }
-  if (kr) add('한국', [['제조국', ''], ['제조 · 수입자', '']], '원산지 (Made in …), 제조 · 수입 · 판매자 이름 · 연락처. 상품 라벨에.');
-  if (jp) add('일본', [['原産国', ''], ['表示者', '']], '原産国, 일본 판매 · 수입사 이름 · 연락처.');
+  if (p[1] === 'p_eva') R.note.push('EVA · 스펀지는 인쇄가 어려우면 표시 불가 포장재 → 박스 쪽에 일괄표시 (지침 제5조 5호 단서) ' + T('기술적 불가 판단'));
+  if (m[5] === 'pvc') R.warn.push('PVC는 표시재질에 없어 OTHER. 재활용을 방해하는 재질이라 PP · PET로 바꾸기 권장. 재활용 어려움 등급이 나올 수 있어요 ' + T('등급 평가'));
+  if (m[5] === 'comp') R.note.push('2가지 이상 플라스틱 · 금속을 붙인 필름 = OTHER (지침 별표 비고 6). 재활용 어려움 등급이면 도안 위 · 아래 · 옆에 "재활용 어려움" ' + T('등급 평가 결과'));
+  if (m[5] === 'dc') R.note.push('플라스틱 트레이에 다른 소재가 떼어낼 수 없게 붙음 → 도포 · 첩합 도안 (지침 별표 1-(2)). 글자 없이 빨강 사선 도안.');
+  if (p[0] === '헤더 OPP 봉투') R.note.push('헤더가 종이 카드를 스테이플로 단 것이면 카드는 종이 부품으로 따로.');
+  if (p[0] === '단상자' || p[0] === '싸바리 박스') R.note.push('PET 창이 붙어 있으면 "창: 비닐류 PET"를 일괄로.');
   return R;
 }
-function run() {
-  var c = ST.c, kr = c !== 'jp', jp = c !== 'kr', h = '', copy = [];
-  var pm = PMAT.filter(function (x) { return x[0] === ST.m; })[0] || PMAT[0], pn = ST.n || '제품';
-  // 제품
-  h += '<div class="grp"><div class="gh">제품에 넣을 것<span class="fl">' + esc(pn) + ' · ' + esc(pm[1]) + '</span></div><div class="rows">';
-  h += '<div class="row"><div class="w">분리배출 · 識別<small>제품 자체</small></div><div><div class="mk"><span class="bd no"><b>없음</b></span></div><p class="nt">제품 자체는 포장재가 아니라서 한국 분리배출 표시 · 일본 識別マーク 대상이 아니에요. 포장에만 넣어요.</p></div></div>';
-  prodMarks(c).forEach(function (r) { h += '<div class="row"><div class="w">' + r.w + '</div><div><div class="mk">' + r.mk.map(function (x) { return badge(x, r.w === '일본'); }).join('') + '</div><p class="nt">' + r.nt + '</p></div></div>'; copy.push('[제품 · ' + r.w + '] ' + r.mk.map(function (x) { return x[0]; }).join(' · ')); });
-  h += '</div></div>';
-  // 포장
-  h += '<div class="grp"><div class="gh">포장에 넣을 것</div>';
-  if (!ST.p.length) h += '<p class="empty">포장 부위를 추가하세요.</p>';
-  else {
-    h += '<div class="rows">';
-    var JG = {}, KL = [];
-    ST.p.forEach(function (p) {
-      var pr = part(p[0]), m = mat(p[1]), att = !!p[2], out = '';
-      if (kr) { var a = krMark(m, att); out += '<div class="mk"><span class="l" style="margin:0 6px 0 0">한국</span>' + (a.b.length ? a.b.map(function (x) { return badge(x); }).join('') : '<span class="bd no"><b>표시 없음</b></span>') + '</div>' + (a.nt ? '<p class="nt">' + a.nt + '</p>' : '') + (a.tb ? '<p class="nt">' + T(a.tb) + '</p>' : '') + (a.wn ? '<p class="wn">' + a.wn + '</p>' : ''); if (a.b.length) { KL.push(a.b[0][0] + (a.b[0][1] ? ' ' + a.b[0][1] : '') + ' (' + pr[1] + ')'); } }
-      if (jp) { var b = jpMark(m, att, pr[2]); out += '<div class="mk" style="margin-top:' + (kr ? 10 : 0) + 'px"><span class="l" style="margin:0 6px 0 0">일본</span>' + (b.b.length ? b.b.map(function (x) { return badge(x, 1, b.opt); }).join('') : '<span class="bd no jp"><b>표시 없음</b></span>') + '</div>' + (b.nt ? '<p class="nt">' + b.nt + '</p>' : ''); if (b.b.length && !b.opt) { var key = b.b[0][0] + (b.b[0][1] ? '|' + b.b[0][1] : ''); (JG[key] = JG[key] || []).push(pr[2]); } }
-      h += '<div class="row"><div class="w">' + esc(pr[1]) + '<small>' + esc(m[1]) + (att ? ' · 붙은 재질 있음' : '') + '</small></div><div>' + out + '</div></div>';
-    });
-    h += '</div>';
-    // 한 면에 모아 쓰기
-    var one = '';
-    if (kr && KL.length) { one += '<div><b>한국</b> · ' + KL.map(esc).join(' / ') + '</div>'; copy.push('[포장 · 한국] ' + KL.join(' / ')); }
-    if (jp && Object.keys(JG).length) { var js = Object.keys(JG).map(function (k) { var s = k.split('|'); return s[0] + (s[1] ? '(' + s[1] + ')' : '') + ' ' + JG[k].filter(function (v, i, a) { return a.indexOf(v) === i; }).join('・'); }); one += '<div><b>일본</b> · ' + js.map(esc).join(' / ') + '</div>'; copy.push('[포장 · 일본] ' + js.join(' / ')); }
-    if (one) h += '<div style="margin-top:14px"><div class="gh">한 면에 모아 쓸 때<button type="button" class="cp" id="cpB">목록 복사</button></div><div class="one">' + one + '</div><p class="nt">상자 뒷면 · 바닥 한 곳에 부위별 마크를 나란히. 일본은 마크마다 역할명 (箱 · 袋 · 台紙). 봉투에 직접 인쇄할 수 있으면 봉투에도. ' + (kr ? T('한국 일괄표시 가능 조건') : '') + '</p></div>';
-    if (kr && jp) h += '<p class="nt" style="margin-top:10px">두 나라 마크를 같이 넣을 땐 큰 기준 (한국 8mm)에 맞추면 둘 다 충족해요.</p>';
-  }
-  h += '</div>';
-  $('#out').innerHTML = '<div class="ct">결과</div>' + h;
-  var cb = $('#cpB'); if (cb) cb.onclick = function () { var t = (pn + ' · ' + { kr: '한국', jp: '일본', both: '한국 + 일본' }[c]) + '\n' + copy.join('\n'); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('복사했어요'); }, function () { toast('복사가 안 돼요'); }); };
-  save();
+// ── 일본 판정 (識別マーク)
+function jp(p) {
+  var K = pk(p[0]), m = mat(p[1]), k = m[2], role = K ? K[3] : '', R = { b: null, note: '' };
+  if (!p[4] && (k === 'film' || k === 'plas' || k === 'paper' || k === 'kral')) R.note = '무지(인쇄 없음)면 識別マーク 의무 없음 ' + T('일본 판매사');
+  if (k === 'paper' || k === 'paper2') R.b = ['紙', '', role];
+  else if (k === 'corr') { R.b = ['段ボール', '', role]; R.opt = 1; R.note = '골판지는 자율. 紙 마크는 넣지 않기.'; }
+  else if (k === 'pack') { R.b = ['紙パック', '', role]; R.opt = 1; }
+  else if (k === 'film' || k === 'plas' || k === 'foam') R.b = ['プラ', m[4] || '', role];
+  else if (k === 'kral') { R.b = ['紙 또는 プラ', '', role]; R.note = '종이와 플라스틱 중 무거운 쪽 마크 하나. 알루미늄은 識別マーク 대상 아님 ' + T('층별 무게'); }
+  else if (k === 'steel' || k === 'alu') R.note = 'スチール · アルミ 마크는 음료 · 주류 캔만 의무. 굿즈 틴케이스는 없어도 됨.';
+  else if (k === 'glass') R.note = '유리는 識別マーク 없음.';
+  else R.note = '識別マーク 대상 재질 아님.';
+  return R;
 }
-function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('on'); }, 1400); }
-// ── 이벤트
-$('#exs').innerHTML = EX.map(function (x, i) { return '<button type="button" data-e="' + i + '">' + esc(x[0]) + '</button>'; }).join('');
-$('#exs').onclick = function (e) { var b = e.target.closest('[data-e]'); if (!b) return; var c = ST.c; ST = JSON.parse(JSON.stringify(EX[+b.dataset.e][1])); ST.c = c; paint(); };
-$('#cty').onclick = function (e) { var b = e.target.closest('[data-c]'); if (!b) return; ST.c = b.dataset.c; paint(); };
-$('#pN').oninput = function () { ST.n = this.value; run(); };
-$('#pM').onchange = function () { ST.m = this.value; run(); };
-$('#pF').onchange = function () { ST.f = $$('#pF input:checked').map(function (x) { return x.dataset.f; }); run(); };
-$('#pts').addEventListener('change', function (e) { var r = e.target.closest('.pt'); if (!r) return; var i = +r.dataset.i, k = +e.target.dataset.k; ST.p[i][k] = k === 2 ? (e.target.checked ? 1 : 0) : e.target.value; run(); });
-$('#pts').addEventListener('click', function (e) { var x = e.target.closest('.x'); if (!x) return; ST.p.splice(+x.closest('.pt').dataset.i, 1); paint(); });
-$('#addP').onclick = function () { ST.p.push(['bag', 'f_pp', 0]); paint(); };
+function jbadge(x, op) { var sub = x[1] || ''; sub = sub.indexOf('_') > -1 ? sub.split(',').map(function (t) { return t.charAt(0) === '_' ? '<u>' + esc(t.slice(1)) + '</u>' : esc(t); }).join(',') : esc(sub); return '<span class="bd jp' + (op ? ' opt' : '') + '"><b>' + esc(x[0]) + '</b>' + (sub ? '<i>' + sub + '</i>' : '') + (x[2] ? '<em>' + esc(x[2]) + '</em>' : '') + '</span>'; }
+var TAG = { must: ['must', '의무'], opt: ['opt', '자율'], skip: ['skip', '생략 가능'], q: ['q', '생략 여부 확인'], na: ['na', '대상 아님'] };
+function krTxt(r) { return r.dc ? '도포 · 첩합 도안' : r.t + (r.m ? ' ' + r.m : ''); }
+// ── 결과
+function run() {
+  save();
+  var c = ST.c, K_ = c !== 'jp', J_ = c !== 'kr', h = '', rows = [], one = [];
+  var P = ST.p.filter(function (p) { return p[0]; });
+  if (!P.length) { $('#out').innerHTML = '<div class="ct">부품마다 넣을 표시</div><p class="empty">왼쪽에서 품목을 불러오거나 포장 부품을 넣으면 여기에 나와요.</p>'; prodOut(); return; }
+  P.forEach(function (p, i) {
+    var r = kr(p), j = jp(p), tg = TAG[r.s];
+    var sym = K_ ? (r.t === null ? '<div class="none">표시<br>없음</div>' : krsym(r.t, r.m, r.dc)) : (j.b ? '<div class="none">' + esc(j.b[0]) + '</div>' : '<div class="none">없음</div>');
+    h += '<div class="ri"><div class="sym">' + sym + '</div><div><div class="nm">' + esc(p[0]) + ' <small>' + esc(mat(p[1])[1]) + '</small></div>';
+    if (K_) h += '<div class="kr">한국 · ' + (r.t === null ? '표시 없음' : esc(krTxt(r))) + ' <span class="tag ' + tg[0] + '">' + tg[1] + '</span>' + (p[5] ? ' <span class="tag opt">일괄로</span>' : '') + '</div><p class="why">' + r.law.concat(r.note).join('<br>') + '</p>' + r.warn.map(function (w) { return '<p class="wn">' + w + '</p>'; }).join('');
+    if (J_) h += '<div class="jpl">일본 · ' + (j.b ? jbadge(j.b, j.opt) : '표시 없음') + (j.note ? '<span>' + j.note + '</span>' : '') + '</div>';
+    h += '<button type="button" class="rq" data-go="refq:' + esc(p[0].replace(/ \(.*\)$/, '')) + '">용어·견본에서 ' + esc(p[0]) + ' 보기</button></div></div>';
+    rows.push({ p: p, r: r, j: j });
+  });
+  // 일괄표시: 떼어낼 수 없는 부품 · 생략 가능 부품을 주요 부분(종이 박스 우선) 옆에 모아 쓰기
+  var main = rows.filter(function (x) { return !x.p[5] && x.r.t === '종이'; })[0] || rows.filter(function (x) { return !x.p[5] && (x.r.s === 'must' || x.r.s === 'opt'); })[0];
+  var KL = [];
+  if (K_) {
+    var sep = rows.filter(function (x) { return x !== main && !x.p[5] && (x.r.s === 'must' || x.r.s === 'q'); });
+    var tie = rows.filter(function (x) { return x !== main && (x.p[5] || x.r.s === 'skip') && x.r.t; });
+    var g = '';
+    if (main && main.r.t) {
+      g += '<div class="ilg">' + krsym(main.r.t, main.r.m, main.r.dc) + '<div class="lines"><span>' + esc(krTxt(main.r)) + (main.r.s === 'opt' ? ' (자율)' : '') + '</span>' + tie.map(function (x) { return '<span>' + esc(x.r.part) + ': ' + esc(krTxt(x.r)) + '</span>'; }).join('') + '</div></div>';
+      KL.push(main.r.part + ' ' + krTxt(main.r)); tie.forEach(function (x) { KL.push(x.r.part + ': ' + krTxt(x.r)); });
+      g += '<p class="nt">' + esc(main.p[0]) + '의 바코드 옆 · 정면 · 측면에 도안 8mm 이상. ' + (tie.length ? '아래 줄은 도안 바로 옆에 (일괄표시, 지침 제2조 5호 · 제5조 5호). ' : '') + (main.r.s === 'opt' ? '종이는 자율이라 빼도 되지만, 일괄표시를 쓰려면 이 자리에 둬요.' : '') + '</p>';
+    }
+    if (sep.length) { g += '<p class="nt" style="margin-top:12px"><b>따로 표시할 부품</b> · ' + sep.map(function (x) { return esc(x.p[0]) + ' → ' + esc(krTxt(x.r)); }).join(' / ') + '<br>떼어 버리는 부품이라 그 부품에 직접 (지침 제5조 5호).</p>'; sep.forEach(function (x) { KL.push(x.r.part + ' ' + krTxt(x.r)); }); }
+    if (g) h += '<div class="grp"><div class="gh">한국 · 넣는 방법</div>' + g + '</div>';
+  }
+  var JL = [];
+  if (J_) { var JG = {}; rows.forEach(function (x) { if (x.j.b) { var key = x.j.b[0] + '|' + (x.j.b[1] || '').replace(/_/g, ''); (JG[key] = JG[key] || []).push(x.j.b[2]); } }); JL = Object.keys(JG).map(function (k) { var s = k.split('|'); return s[0] + ' ' + JG[k].filter(function (v, i, a) { return a.indexOf(v) === i; }).join('・') + (s[1] ? ' (' + s[1] + ')' : ''); }); if (JL.length) h += '<div class="grp"><div class="gh">일본 · 한 면에 모아 쓸 때</div><div class="one">' + JL.map(esc).join('<br>') + '</div><p class="nt">마크 6mm 이상 · 역할명 6pt 이상. 복합 재질은 주재질(밑줄)을 먼저.</p></div>'; }
+  var txt = (ST.n || '제품') + '\n' + (KL.length ? '[분리배출 · 한국] ' + KL.join(' / ') + '\n' : '') + (JL.length ? '[識別マーク · 일본] ' + JL.join(' / ') : '');
+  h += '<div class="acts"><button type="button" class="btn dk" id="cpB"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>문구 복사</button><button type="button" class="btn" id="toL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>상품 정보 라벨 생성기로</button></div>';
+  $('#out').innerHTML = '<div class="ct">부품마다 넣을 표시</div><div class="res">' + h.split('<div class="grp">')[0] + '</div>' + h.slice(h.split('<div class="grp">')[0].length);
+  try { localStorage.setItem('mark:out', JSON.stringify({ at: Date.now(), name: ST.n || '', country: c, kr: KL, jp: JL, text: txt })); } catch (e) {}
+  $('#cpB').onclick = function () { (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('복사했어요'); }, function () { toast('복사가 안 돼요'); }); };
+  $('#toL').onclick = function () { go('formly'); };
+  prodOut();
+}
+// ── 제품 자체 마크 (KC · PSE 등): 포장재가 아니라 제품에
+function prodOut() {
+  var c = ST.c, kr = c !== 'jp', jpn = c !== 'kr', F = ST.f, R = [];
+  function add(w, mk, nt) { R.push('<div class="row"><div class="w">' + w + '</div><div><div class="mk">' + mk.map(function (x) { return '<span class="bd' + (w === '일본' ? ' jp' : '') + '"><b>' + esc(x[0]) + '</b>' + (x[1] ? '<i>' + esc(x[1]) + '</i>' : '') + '</span>'; }).join('') + '</div><p class="nt">' + nt + '</p></div></div>'); }
+  if (F.indexOf('kid') > -1) { if (kr) add('한국', [['KC', '어린이제품']], '안전인증 · 안전확인 · 공급자적합성확인 중 하나 + 번호, 사용 연령 · 주의 문구 · 제조연월 · 제조 · 수입자. ' + T('품목별 인증 구분 · 제조사')); if (jpn) add('일본', [['ST', '玩具 · 자율']], '장난감 안전 마크는 자율. ' + T('일본 판매사')); }
+  if (F.indexOf('elc') > -1) { if (kr) add('한국', [['KC', '전기용품']], '전기생활용품안전법. 인증번호 · 정격 · 제조자. ' + T('제품별 인증 구분')); if (jpn) add('일본', [['PSE', '電気用品安全法']], '마름모(특정) 또는 원 + 수입 · 판매사 이름.'); }
+  if (F.indexOf('rf') > -1) { if (kr) add('한국', [['KC', '전파법']], '적합성평가 번호 (R-). ' + T('제조사 번호')); if (jpn) add('일본', [['技適', '電波法']], '기술기준적합증명 마크 + 번호.'); }
+  if (F.indexOf('tex') > -1) { if (kr) add('한국', [['세탁 기호', 'KS K 0021'], ['혼용률', '']], '취급 표시 · 섬유 혼용률 · 제조국 · 제조 · 수입자. 케어 라벨 · 택.'); if (jpn) add('일본', [['取扱い表示', 'JIS L 0001'], ['組成', '']], '家庭用品品質表示法: 組成 · 取扱い表示 · 表示者名.'); }
+  if (F.indexOf('food') > -1) { if (kr) add('한국', [['식품용', '기구 · 용기']], '식품위생법: "식품용" 문구 또는 도안, 재질, 제조 · 수입자. ' + T('품목 · 재질별 기준')); if (jpn) add('일본', [['食品衛生法', '輸入届']], '수입 신고 · 재질 · 내열 온도 표시.'); }
+  $('#prd').innerHTML = '<div class="ct">제품 자체에 넣는 마크</div>' + (R.length ? '<div class="rows">' + R.join('') + '</div>' : '<p class="empty">제품 특징을 고르면 KC · PSE · 세탁 기호처럼 제품에 넣는 마크가 나와요. 분리배출 표시는 제품이 아니라 포장에만 넣어요.</p>');
+}
+function go(k) { try { if (parent !== window && parent.navGo) { parent.navGo(k); return; } } catch (e) {} if (k.indexOf('gd:') === 0) location.href = '../../guide/' + k.slice(3); else if (k === 'formly') location.href = '../formly/'; }
+var tt; function toast(s) { var t = $('#toast'); t.textContent = s; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 1600); }
+// ── 입력 이벤트
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-go]'); if (b) { e.preventDefault(); go(b.getAttribute('data-go')); return; }
+  var cb = e.target.closest('#cty button'); if (cb) { ST.c = cb.dataset.c; paint(); return; }
+  var x = e.target.closest('.pt .ib'); if (x) { ST.p.splice(+x.closest('.pt').dataset.i, 1); paint(); return; }
+  if (e.target.closest('#addP')) { ST.p.push(['', '', 0, 0, 1, 0]); paint(); }
+});
+$('#exs').addEventListener('change', function () { var x = EX[+this.value]; if (!x) return; var d = JSON.parse(JSON.stringify(x[1])); ST.n = d.n; ST.cat = d.cat; ST.f = d.f; ST.p = d.p; paint(); toast(x[0] + ' 구성을 불러왔어요'); });
+$('#pN').addEventListener('input', function () { ST.n = this.value; run(); });
+$('#pC').addEventListener('change', function () { ST.cat = this.value; paint(); });
+$('#pF').addEventListener('change', function (e) { var k = e.target.dataset.f; if (!k) return; var i = ST.f.indexOf(k); if (e.target.checked && i < 0) ST.f.push(k); if (!e.target.checked && i > -1) ST.f.splice(i, 1); run(); });
+$('#pts').addEventListener('change', function (e) {
+  var pt = e.target.closest('.pt'); if (!pt) return; var p = ST.p[+pt.dataset.i], k = +e.target.dataset.k;
+  if (k === 0) { p[0] = e.target.value; var K = pk(p[0]); p[1] = K ? K[4][0] : ''; paint(); return; }
+  if (k === 1) p[1] = e.target.value; if (k === 4 || k === 5) p[k] = e.target.checked ? 1 : 0;
+  run();
+});
+$('#pts').addEventListener('input', function (e) { var pt = e.target.closest('.pt'); if (!pt) return; var k = +e.target.dataset.k; if (k === 2 || k === 3) { ST.p[+pt.dataset.i][k] = +e.target.value.replace(/[^0-9.]/g, '') || 0; run(); } });
 paint();
 </script>
 </body>

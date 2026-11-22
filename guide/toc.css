@@ -61,3 +61,18 @@ ul.rules .d,.ckl .d{font-weight:400;display:block;color:var(--muted);font-size:.
   .check,.check.ckl{gap:8px}
   .ckl input{margin-top:3px}
 }
+/* 표 안 용어·견본 바로가기 (밑줄 글자) */
+.golink.sm{display:inline;height:auto;padding:0;border:0;border-radius:0;background:none;color:var(--accent);font-size:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.golink.sm:hover{color:var(--ink)}
+/* 마크 견본 격자 · 굿즈 예시 그림 격자 (모바일에서도 글자 크기 유지) */
+.mkg{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:18px 10px;padding:20px 16px;background:var(--surface);border-radius:12px}
+.mkg figure{margin:0;display:grid;justify-items:center;align-content:start;gap:3px;text-align:center}
+.mkg svg{width:72px;height:auto}
+.mkg b{font-size:14.5px;font-weight:700;line-height:1.35}
+.mkg small{font-size:12.5px;color:var(--muted);line-height:1.4}
+.pxg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.pxg figure{margin:0;background:var(--surface);border-radius:12px;padding:12px 12px 16px;display:grid;justify-items:center;gap:4px;text-align:center}
+.pxg svg{width:100%;max-width:280px;height:auto}
+.pxg b{font-size:16px;font-weight:700;line-height:1.35}
+.pxg small{font-size:13.5px;color:var(--muted);line-height:1.45}
+.pxg .lg{display:grid;justify-items:start;gap:2px;font-size:14px;font-weight:700;text-align:left;white-space:nowrap}
