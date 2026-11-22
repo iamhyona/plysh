@@ -2265,9 +2265,11 @@ function refGo(s) { // "파트|분류|용어"
   if (t) setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b'), function (x) { return x.textContent.trim() === t || (x.dataset.cp || '') === t; })[0]; if (e) { var d = e.closest('.gl'); goEl(d, 80); d.classList.add('bkhi'); setTimeout(function () { d.classList.remove('bkhi'); }, 1600); } }, 60);
 }
 // 2026-11-22 실장님: 지류도 MD처럼 소재 · 인쇄 · 후가공 · 제본 · 포장으로 나눔 (용어·견본만, 사양서 고르기는 그대로)
-var JP = { '지류 소재': ['용지', '결·책등'], '지류 인쇄': ['인쇄', '특수 인쇄'], '지류 후가공': ['코팅', '박', '가공', '톰슨', '조립'], '지류 제본': ['제본', '책 구조', '부속'], '지류 포장': ['포장'] };
+var JP = { '지류 소재': ['용지', '결·책등'], '지류 인쇄': ['인쇄', '특수 인쇄'], '지류 후가공': ['코팅', '박', '가공', '톰슨', '조립'], '지류 제본': ['제본', '책 구조', '부속'], '지류 포장': ['비닐 봉투', '밀폐 · 완충', '케이스 · 띠지', '박스'], '지류 납품': ['납품'] };
+// 2026-11-23 실장님: 지류 포장 > '포장' 하나였던 것을 진짜 소메뉴로 나누고, 납품은 따로 중메뉴로
+var PK_C = ['비닐 봉투', '밀폐 · 완충', '케이스 · 띠지', '박스', '납품'];
 function isJ(p) { return /^지류/.test(String(p || '')); }
-function jPart(g) { var k = Object.keys(JP).filter(function (x) { return JP[x].indexOf(g) >= 0; })[0]; return k || '지류 소재'; }
+function jPart(g) { if (g === '포장') return '지류 포장'; var k = Object.keys(JP).filter(function (x) { return JP[x].indexOf(g) >= 0; })[0]; return k || '지류 소재'; }
 // 2026-11-22 실장님: 명칭(상품별 부위 명칭)을 용어·견본에서 빼서 따로 대메뉴로, 하위 카테고리로 나눔
 var NGRP = { 'MD 공통 용어': ['MD 공통 용어'], '책 구조': ['책 구조'], '의류': ['의류 공통 용어', '티셔츠', '링거티', '카라티', '맨투맨', '후디', '파자마 (긴팔)', '파자마 (반팔)'], '모자·양말': ['볼캡', '양말'], '가방': ['에코백', '토트백', '스트링백', '파우치', '백팩'], '부자재': ['부자재 공통 용어', '지퍼', '랜야드'], '굿즈·소품': ['아크릴 키링', '아크릴 스탠드', '인형', '캔 뱃지', '메탈 뱃지', '우산', '머그컵', '쿠션', '담요', '반다나'] };
 var NPARTS = Object.keys(NGRP).map(function (g) { return '명칭 ' + g; });
@@ -2280,17 +2282,17 @@ var RP = ls.get('pr:rp'); if (RP === '부위') RP = nOf(ls.get('pr:refsub:부위
 window.plyshRefHome = function () { RHOME = true; RPH = false; S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
 // 2026-11-22 실장님: 메뉴를 누르면 마지막 세부 분류·위치 대신 항상 첫 화면(용어·개념, 분류 전체, 맨 위)
 function refReset(p, k) { ls.set('pr:rm', 't'); if (k) { ls.set('pr:refsub:' + k, ''); ls.set('pr:rk:' + p + ':' + k, ''); } ls.set('pr:pmk', ''); ls.set('pr:pgb', ''); S.rq = ''; window.scrollTo(0, 0); try { if (window.parent !== window) window.parent.scrollTo(0, 0); } catch (e) {} }
-window.plyshRefPart = function (p) { if (p === '지류') p = '지류 소재'; if (p === '부위') p = NPARTS[0]; refReset(p, ''); if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = !(isN(p) && refCats(p).length === 1); RP = p; ls.set('pr:rp', p); S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
+window.plyshRefPart = function (p) { if (p === '지류') p = '지류 소재'; if (p === '부위') p = NPARTS[0]; refReset(p, ''); if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = !((isN(p) || p === '지류 납품') && refCats(p).length === 1); RP = p; ls.set('pr:rp', p); S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
 window.plyshRefFind = function (q) { RHOME = false; RPH = false; S.rq = q || ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } }; // 안내 문서에서 용어 바로 찾기 (2026-11-22)
 window.plyshRefState = function () { return RHOME ? '' : RP; };
-var REF_DS = { '용지': '일반지 · 고급지 · 색지 · 판지(단면 · 양면 도공) · 스티커 · 필름', '인쇄': '인쇄 방식 · 색 구성 · 별색', '코팅': '라미네이팅 · 기계 · UV · 실크 코팅', '박': '태창 기준 · 금·은·먹 · 컬러박 · 홀로그램 · 투명 홀로그램 · 특수박', '가공': '형압 · 에폭시 · 기타 가공', '톰슨': '목형 · 재단 · 귀도리 · 오시 · 미싱 · 접지 · 타공', '조립': '합지 · 접착', '제본': '접착·표지 · 철심·실 · 노출 책등·수제책 · 링·기계식 · 전통 장정·접지', '부속': '헤드밴드 · 가름끈 · 인덱스 탭 · 포켓', '포장': '비닐 봉투 · 밀폐 · 완충 · 케이스 · 띠지 · 박스 · 납품', '결·책등': '종이 결 방향 · 책등 계산법' };
+var REF_DS = { '용지': '일반지 · 고급지 · 색지 · 판지(단면 · 양면 도공) · 스티커 · 필름', '인쇄': '인쇄 방식 · 색 구성 · 별색', '코팅': '라미네이팅 · 기계 · UV · 실크 코팅', '박': '태창 기준 · 금·은·먹 · 컬러박 · 홀로그램 · 투명 홀로그램 · 특수박', '가공': '형압 · 에폭시 · 기타 가공', '톰슨': '목형 · 재단 · 귀도리 · 오시 · 미싱 · 접지 · 타공', '조립': '합지 · 접착', '제본': '접착·표지 · 철심·실 · 노출 책등·수제책 · 링·기계식 · 전통 장정·접지', '부속': '헤드밴드 · 가름끈 · 인덱스 탭 · 포켓', '포장': '비닐 봉투 · 밀폐 · 완충 · 케이스 · 띠지 · 박스 · 납품', '비닐 봉투': 'OPP · 접착 OPP · 헤더 OPP · 지퍼백 · 은박 · 안전봉투 · 택배봉투 · 쇼핑백', '밀폐 · 완충': '수축포장 · 진공 · 열 봉합 · 스킨 포장 · 에어캡 · 실리카겔', '케이스 · 띠지': 'PET · PVC 케이스 · 종이 슬리브 · 띠지 · 부직포 파우치', '박스': '개별 박스 · 단상자 · 싸바리 · 골판지 · 하도메 등 박스 형태', '납품': 'n종 정합 · 랜덤 포장 · 벌크 납품 · 카톤 박스 · 마스터 카톤', '결·책등': '종이 결 방향 · 책등 계산법' };
 var MKIND = ['소재', '짜임', '기법', '용어', '비교'];
 function refCats(p) {
   if (!isJ(p)) return Object.keys(TT(p));
-  return REFG.filter(function (g) { return g !== '굿즈' && tabsOf([g]).length; }).concat(['결·책등']).filter(function (g) { return JP[p] ? JP[p].indexOf(g) >= 0 : true; });
+  return REFG.filter(function (g) { return g !== '굿즈' && g !== '포장' && tabsOf([g]).length; }).concat(PK_C.filter(function (g) { return tabsOf([refTab(g)]).length; }), ['결·책등']).filter(function (g) { return JP[p] ? JP[p].indexOf(g) >= 0 : true; });
 }
 function refCur(p) { var L = refCats(p), v = ls.get(isJ(p) ? 'pr:ref2' : 'pr:refsub:' + p); return L.indexOf(v) < 0 ? L[0] : v; }
-function refTab(g) { return g === '제본' ? '제본도감' : g === '박' ? '박도감' : g === '용지' && tabsOf(['용지도감']).length ? '용지도감' : g; }
+function refTab(g) { return PK_C.indexOf(g) >= 0 ? '포장_' + g : g === '제본' ? '제본도감' : g === '박' ? '박도감' : g === '용지' && tabsOf(['용지도감']).length ? '용지도감' : g; }
 // 2026-11-22 실장님: 용어사전에서는 숫자만 다른 항목(1공·2공, 오시 1줄·2줄, 1R·3R …)을 개념 하나로. 사양서 고르기 목록은 그대로
 var REF_MERGE = [
   [/^톰슨_귀도리$/, /^모서리 라운딩 \d+R$/, '모서리 라운딩', '귀도리', '모서리를 둥글게 자름. 반지름(R, mm)으로 크기를 부름. 포토카드는 보통 3R.', '사양서에는 반지름 함께 기재 (예 3R)'],
