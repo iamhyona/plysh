@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>/* 승인된 팀원만: 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>단위 환산</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script>try { if (window.self !== window.top) document.documentElement.classList.add('emb'); } catch (e) { document.documentElement.classList.add('emb'); }</script>
+<style>
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --chip:#f2f4f6; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { background:var(--bg); color:var(--txt); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; letter-spacing:-0.01em; }
+main { max-width:1040px; margin:0 auto; padding:20px 16px 80px; }
+html.emb main { padding-top:6px; }
+.phd { margin:0 0 20px; } .phd b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; } .phd small { display:block; margin-top:6px; font-size:14px; color:#6b7684; line-height:1.5; }
+html.emb .phd { display:none; }
+.wrap { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+@media (min-width:900px) { .wrap { grid-template-columns:360px minmax(0,1fr); align-items:start; } .side { position:sticky; top:0; } }
+.card { background:var(--card); border-radius:20px; padding:22px 20px; }
+.ct { font-size:16px; font-weight:800; margin:0 0 14px; }
+label { display:block; font-size:13px; font-weight:600; color:var(--sub); margin:0 0 6px; }
+.f + .f { margin-top:14px; }
+input, select { width:100%; height:52px; border:1px solid var(--line); background:#f7f8fa; border-radius:12px; padding:0 14px; font:inherit; font-size:18px; font-weight:700; color:var(--txt); font-variant-numeric:tabular-nums; }
+select { font-size:15px; font-weight:600; height:46px; }
+input:focus, select:focus { outline:none; border-color:#191f28; background:#fff; }
+.out { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+@media (min-width:640px) { .out { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+.out button { text-align:left; border:0; background:var(--chip); border-radius:12px; padding:12px 14px; min-height:64px; font:inherit; cursor:pointer; }
+.out button small { display:block; font-size:12px; font-weight:600; color:var(--mute); } .out button b { display:block; margin-top:2px; font-size:19px; font-weight:800; font-variant-numeric:tabular-nums; }
+.out button.me { background:#191f28; } .out button.me small { color:#b0b8c1; } .out button.me b { color:#fff; }
+.tbl { width:100%; border-collapse:collapse; font-size:14px; } .tbl td { padding:10px 0; border-top:1px solid var(--line); } .tbl tr:first-child td { border-top:0; } .tbl td:last-child { text-align:right; color:var(--sub); font-variant-numeric:tabular-nums; }
+.nt { font-size:13px; color:var(--mute); line-height:1.6; margin:14px 0 0; }
+.toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:#191f28; color:#fff; font-size:14px; font-weight:600; padding:12px 18px; border-radius:12px; opacity:0; transition:opacity .2s; pointer-events:none; }
+.toast.on { opacity:1; }
+</style>
+</head>
+<body>
+<main>
+  <div class="phd"><b>단위 환산</b><small>mm · pt · 파이카 · 인치 · 급 · 픽셀을 한 번에 바꿔요</small></div>
+  <div class="wrap">
+    <div class="side">
+      <div class="card">
+        <div class="f"><label for="uV">값</label><input id="uV" inputmode="decimal" autocomplete="off"></div>
+        <div class="f"><label for="uU">단위</label><select id="uU"></select></div>
+        <div class="f"><label for="uP">픽셀 해상도 (ppi)</label><select id="uP"><option value="300">300ppi · 인쇄</option><option value="250">250ppi · 인쇄 최소</option><option value="150">150ppi · 대형 출력</option><option value="96">96 · 화면 (CSS)</option><option value="72">72 · 화면 (옛 기준)</option></select></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><div class="ct">결과</div><div class="out" id="uO"></div><p class="nt">값을 누르면 복사돼요 · 픽셀은 위에서 고른 해상도 기준이에요</p></div>
+      <div class="card" style="margin-top:16px"><div class="ct">기준 값</div>
+        <table class="tbl">
+          <tr><td>1인치</td><td>25.4mm = 72pt = 6파이카</td></tr>
+          <tr><td>1포인트 (pt)</td><td>1/72인치 ≈ 0.3528mm ≈ 1.41급</td></tr>
+          <tr><td>1파이카 (pc)</td><td>12pt ≈ 4.233mm</td></tr>
+          <tr><td>1급 (Q) · 1치 (H)</td><td>0.25mm</td></tr>
+          <tr><td>픽셀 → mm</td><td>px ÷ ppi × 25.4</td></tr>
+          <tr><td>mm → 픽셀</td><td>mm ÷ 25.4 × ppi</td></tr>
+        </table>
+        <p class="nt">개념 설명은 용어사전 › 디자인 › 단위에 있어요</p>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+/* 단위 환산 (2026-11-22 실장님: 용어사전에서 도구로 옮김) */
+var U = [['mm', 'mm', 1], ['cm', 'cm', 10], ['in', '인치', 25.4], ['pt', '포인트 pt', 25.4 / 72], ['pc', '파이카 pc', 25.4 / 6], ['Q', '급 Q', 0.25], ['px', '픽셀 px', 0]];
+function g(k) { try { return localStorage.getItem('unit:' + k); } catch (e) { return null; } }
+function s(k, v) { try { localStorage.setItem('unit:' + k, v); } catch (e) {} }
+var $ = function (q) { return document.querySelector(q); }, V = $('#uV'), UU = $('#uU'), PP = $('#uP');
+UU.innerHTML = U.map(function (x) { return '<option value="' + x[0] + '">' + x[1] + '</option>'; }).join('');
+V.value = g('v') || '10'; UU.value = g('u') || 'pt'; PP.value = g('p') || '300';
+function f(u) { return u === 'px' ? 25.4 / (+PP.value || 300) : U.filter(function (x) { return x[0] === u; })[0][2]; }
+function fmt(n) { return Math.abs(n) >= 1000 ? String(Math.round(n)) : Math.abs(n) >= 100 ? String(Math.round(n * 10) / 10) : String(Math.round(n * 1000) / 1000); }
+function run() {
+  s('v', V.value); s('u', UU.value); s('p', PP.value);
+  var mm = (parseFloat(String(V.value).replace(',', '.')) || 0) * f(UU.value);
+  $('#uO').innerHTML = U.map(function (x) { var n = fmt(mm / f(x[0])); return '<button type="button" data-cp="' + n + '"' + (x[0] === UU.value ? ' class="me"' : '') + '><small>' + x[1] + (x[0] === 'px' ? ' · ' + PP.value + 'ppi' : '') + '</small><b>' + n + '</b></button>'; }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cp]'), function (b) { b.onclick = function () { var t = b.dataset.cp; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('‘' + t + '’ 복사했어요'); }, function () { toast(t); }); }; });
+}
+function toast(t) { var e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, 1400); }
+V.oninput = run; UU.onchange = run; PP.onchange = run; run();
+</script>
+</body>
+</html>

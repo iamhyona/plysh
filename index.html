@@ -2130,7 +2130,8 @@ var TOOLS = [
     { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
     { k: 'cut', t: '종이연수·칼선', s: '완성 크기·칼선 형태로 원판 걸이와 필요 전지(연) 수, 전개도 일러스트 파일', f: 'tools/proof/', pv: 'calc' },
     { k: 'paper', t: '용지 크기', s: '규격 용지와 생활 속 인쇄물 크기를 실제 비율로 비교', f: 'tools/paper/' },
-    { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' }] },
+    { k: 'impose', t: '터잡기', s: '대 구성별 앞뒷면 판면, 같은 판에 걸리는 쪽 확인', v: 'impose' },
+    { k: 'unit', t: '단위 환산', s: 'mm · pt · 파이카 · 인치 · 급 · 픽셀 한 번에 바꾸기', f: 'tools/unit/' }] },
   { g: '검수', i: [
     { k: 'review', t: '검수기', s: 'PDF·AI 인쇄 파일 · 사양서', v: 'review' },
     { k: 'checklist', t: '자가점검리스트', s: '컨펌 요청 전 단계별 자가 점검', f: 'tools/design-checklist/' }] },
@@ -2143,7 +2144,7 @@ var TOOLS = [
 ];
 var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut', die: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
-var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', review: 'PREFLIGHT', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
+var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', unit: '단위 환산', review: 'PREFLIGHT', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
 if (TOOL_OLD[S.tk]) S.tk = TOOL_OLD[S.tk]; if (S.view === 'calc') S.view = 'tk', S.tk = 'cut';
 function toolKey() { if (S.view === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === S.view; })[0]; return t ? t.k : ''; }
 function isToolView(v) { return v === 'tools' || v === 'tk' || TOOL_LIST.some(function (x) { return x.v === v; }); }
@@ -2476,10 +2477,10 @@ var SPACES = [
   // 2026-11-22 실장님: 도우미 · 도구 · 용어사전 세 대메뉴로 나눔
   { k: 'tool', t: '도우미', d: '검수기, 로고, 폰트 찾기, 용지 크기, 팬톤, 폴더·파일명 생성기', home: 'space:tool', ic: 'aid', g: [
     { g: '도우미', i: [{ k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'paper', t: '용지 크기', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
-  { k: 'make', t: '도구', d: '사양서 작성, 책등 계산기, 종이연수·칼선, 터잡기, 상품 라벨 생성기', home: 'space:make', ic: 'tool', g: [
-    { g: '도구', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }] }] },
+  { k: 'make', t: '도구', d: '사양서 작성, 책등 계산기, 종이연수·칼선, 터잡기, 단위 환산, 상품 라벨 생성기', home: 'space:make', ic: 'tool', g: [
+    { g: '도구', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }] }] },
   { k: 'gloss', t: '용어사전', d: '지류 · MD · 디자인 용어', home: 'ref', ic: 'ref', g: [
-    { g: '용어사전', i: [{ k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 부속 · 포장' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재의 소재 · 기법 · 용어' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 레이아웃 · 색 · 단위 · 파일' }] }] },
+    { g: '용어사전', i: [{ k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 부속 · 포장' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재의 소재 · 기법 · 용어' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 브릿지 · 아크로뱃' }, { k: 'gl:2', t: '디자인 실무', s: '상품 라벨 스티커 · 시즌그리팅 팩샷 · 포토카드' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '안내', d: '퀵 배차, 사무실 이용, 행정 업무, 업무 시스템', home: 'space:admin', ic: 'office', g: [
@@ -2837,7 +2838,7 @@ function crumbHtml() {
 var PG_DESC = {
   todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
-  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
+  spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', unit: 'mm · pt · 파이카 · 인치 · 급 · 픽셀을 한 번에 바꿔요 · 픽셀은 해상도(ppi)를 골라서', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
   qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '지류 · MD · 디자인 용어 · 영문 · 한자 · 일본어 표기와 함께',
   checklist: '컨펌 요청 전 단계별 자가 점검' };
