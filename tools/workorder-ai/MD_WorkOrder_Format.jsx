@@ -56,15 +56,19 @@ function styles(t) {
     hint: cstyle(p + 'Hint', F_R, b * 0.88, C_MUTE),
     req: cstyle(p + 'Req', F_S, b * 0.88, C_REQ),
     opt: cstyle(p + 'Opt', F_S, b * 0.88, C_MUTE),
-    dim: cstyle(p + 'Dim', F_R, b, C_LEN)
+    dim: cstyle(p + 'Dim', F_R, b, C_LEN),
+    chip: cstyle(p + 'Chip', F_R, b * 1.9, tint(C_CHIP, 60)),
+    box: cstyle(p + 'Box', F_R, b * 1.25, C_TXT)
   };
 }
 
 /* ── 좌표 (mm, 원점 = 현재 대지 왼쪽 위) ── */
 var OX = 0, OY = 0;
 function px(x) { return OX + x * MM; } function py(y) { return OY - y * MM; }
+var BOXST = null;
 function ptext(x, y, s, st, just) {
   var t = CT.textFrames.pointText([px(x), py(y)]); t.contents = s; st.applyTo(t.textRange, true);
+  if (BOXST && s.indexOf('\u25A1') >= 0) { for (var ci = 0; ci < s.length; ci++) if (s.charAt(ci) == '\u25A1') BOXST.applyTo(t.textRange.characters[ci], true); }
   if (just) t.textRange.paragraphAttributes.justification = just; return t;
 }
 function line(x1, y1, x2, y2, col, sw, dash) {
@@ -129,21 +133,14 @@ function placeSvg(f, x, y, w, S) {
 function item(d, ox, oy) {
   OX = ox; OY = oy; CT = layer.groupItems.add(); CT.name = d.k;
   var D = d.D, t = tierOf(D), S = styles(t), b = S.b, U = b * 0.3528; // U = 본문 1em (mm)
-  var LH = U * 1.45, M = Math.max(10, U * 3);
+  var LH = U * 1.45, M = Math.max(10, U * 3); BOXST = S.box;
   var IW = 40 * U;                 // 정보 열 폭
   var x = M, y = M, maxEm = 40;
-  // 머리
-  y += U; ptext(x, y, 'SOUND CONTENTS 디자인4팀 · 상품 작업지시서 · ' + d.g, S.eye);
-  y += U * 2.9; ptext(x, y, d.n, S.title);
-  y += LH * 1.4; ptext(x, y, '파일명  [Artist]ProjectName_Item(yymmdd)', S.body);
-  y += LH; ptext(x, y, '깬 파일(_Outline) · 안 깬 파일 · PDF 3종 저장', S.hint);
-  y += LH * 1.8;
-  var meta = ['아티스트', '프로젝트', '품목 · 버전', '업체', '담당', '작성일', '납기', '수량 (합계)', '멤버 · 버전별 수량', '샘플'];
-  for (var m = 0; m < 10; m += 2) {
-    ptext(x, y, meta[m], S.label); ptext(x + 9 * U, y, '______________', S.hint);
-    ptext(x + 20 * U, y, meta[m + 1], S.label); ptext(x + 30 * U, y, '__________', S.hint);
-    y += LH * 1.25;
-  }
+  // 머리: [아티스트] 프로젝트 이름 / 품목 이름 / 작성자 (줄글, 바로 고쳐 쓰기)
+  y += U * 2.6; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
+  y += U * 3.6; ptext(x, y, d.n, S.sec);
+  y += LH * 1.5; ptext(x, y, '작성자 이름 · 연락처', S.body);
+  y += LH * 1.6;
   line(x, y, x + IW, y, C_CHIP, Math.max(0.3, b * 0.06));
   var GAP = LH * 2.6;              // 큰 구분 사이
   y += GAP * 0.8;
@@ -166,12 +163,11 @@ function item(d, ox, oy) {
   sec('인쇄 · 가공', d.R['인쇄 · 가공']); lines(wrapOpts(d.proc, maxEm, true)); y += GAP;
   sec('컬러 안내', d.R['컬러 안내']); lines(wrapOpts(d.col, maxEm, true)); y += LH * 0.5;
   for (var c = 0; c < 3; c++) {
-    var r = U * 1.1, ch = CT.pathItems.ellipse(py(y - U * 1.05), px(x), r * 2 * MM, r * 2 * MM);
-    ch.filled = false; ch.stroked = true; ch.strokeColor = C_CHIP; ch.strokeWidth = Math.max(0.3, b * 0.06);
-    ptext(x + U * 3.2, y, 'PANTONE ____________   영문 컬러명 ____________', S.body);
-    y += LH; ptext(x + U * 3.2, y, '용도 (인쇄 · 원단 · 자수실 · 도금)', S.hint); y += LH * 1.25;
+    var lt = ptext(x, y + U * 0.35, '\u25CF  PANTONE ____________   영문 컬러명 ____________   용도 ________', S.body);
+    S.chip.applyTo(lt.textRange.characters[0], true);
+    y += LH * 1.7;
   }
-  y += GAP - LH * 1.25;
+  y += GAP - LH * 1.7;
   sec('치수 (정수 mm)', d.R['치수']);
   for (var di = 0; di < d.dims.length; di++) {
     ptext(x, y, d.dims[di], S.body); ptext(x + IW, y, '______ mm', S.dim, Justification.RIGHT); y += LH * 1.15;
