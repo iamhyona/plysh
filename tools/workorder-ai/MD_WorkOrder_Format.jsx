@@ -41,7 +41,7 @@ function cstyle(name, f, size, color) {
   try { a.kerningMethod = AutoKernType.OPTICAL; } catch (e1) {}
   a.autoLeading = false; a.leading = size * 2.0; a.fillColor = color; return st;
 }
-var TIERS = {}, TB = { XS: 14, S: 20, M: 26, L: 36, XL: 54 }, TT = { XS: 20, S: 28, M: 36, L: 52, XL: 76 };
+var TIERS = {}, TB = { XS: 14, S: 20, M: 26, L: 36, XL: 54 }, TT = { XS: 28, S: 40, M: 52, L: 72, XL: 108 };
 function tierOf(D) { return D <= 60 ? 'XS' : D <= 150 ? 'S' : D <= 300 ? 'M' : D <= 700 ? 'L' : 'XL'; }
 function styles(t) {
   if (TIERS[t]) return TIERS[t];
@@ -49,6 +49,8 @@ function styles(t) {
   return TIERS[t] = {
     b: b,
     title: cstyle(p + 'Title', F_B, TT[t], C_TXT),
+    item: lead(cstyle(p + 'Item', F_B, TT[t] * 0.8, C_TXT), TT[t] * 0.8 * 1.2),
+    writer: lead(cstyle(p + 'Writer', F_R, b, C_TXT), b * 1.6),
     eye: cstyle(p + 'Eyebrow', F_R, b * 0.9, C_MUTE),
     sec: cstyle(p + 'Section', F_B, b * 1.2, C_TXT),
     label: cstyle(p + 'Label', F_B, b, C_TXT),
@@ -94,6 +96,7 @@ function wrapText(s, maxEm) {
 }
 function blanks(s) { return String(s).replace(/____/g, '________'); }
 
+function lead(st, l) { st.characterAttributes.leading = l; return st; }
 function opFill(st) { try { st.characterAttributes.overprintFill = true; } catch (e) {} return st; }
 
 /* SVG 도면 → 별색 · 글자 스타일 */
@@ -141,8 +144,8 @@ function item(d, ox, oy) {
   var IW = 40 * U;                 // 정보 열 폭
   var x = M, y = M, maxEm = 40;
   // 제목만 따로, 나머지 정보는 글상자 하나 (엔터로 나눈 단락)
-  var TU = TT[t] * 0.3528; y += TU * 1.3; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
-  y += TU * 1.1 + U * 1.2;
+  var TU = TT[t] * 0.3528; y += TU * 1.1; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
+  y += TU * 0.8 * 1.2;
   var P = [], GAPPT = b * 2.0 * 2.2, KW = 9 * U * MM, IWPT = IW * MM;
   function para(text, st, o) { o = o || {}; o.text = text; o.st = st; P.push(o); }
   function sec(name, lv) { para(name + (lv ? '   ' + (lv == 'r' ? '필수' : '권장') : ''), S.sec, { sb: GAPPT, tag: lv, after: b * 0.5 }); }
@@ -153,8 +156,8 @@ function item(d, ox, oy) {
       for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[KW, 'L']], label: !j, sb: (!j && i) ? b * 0.4 : 0 });
     }
   }
-  para(d.n, S.sec);
-  para('작성자 이름 · 연락처', S.body, { sb: b * 0.4 });
+  para(d.n, S.item);
+  para('작성자 이름 · 연락처', S.writer, { sb: b * 0.3 });
   sec('소재', d.R['소재']); opts(d.mat);
   sec('소재 세부', d.R['소재 세부']); sub(d.det);
   sec('인쇄 · 가공', d.R['인쇄 · 가공']); opts(d.proc);
