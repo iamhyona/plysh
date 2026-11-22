@@ -2747,13 +2747,12 @@ function subItems() {
       if (SUB.glF !== curF) { SUB.glF = curF; SUB.glShut = false; }
       GUIDE_GROUPS[+nc.slice(3)].i.forEach(function (dd) {
         if (dd.f === 'folder-file.html') return;
-        var isCur = dd.f === curF, op = isCur && !SUB.glShut;
-        L.push({ t: dd.t, part: 1, on: isCur, open: op, go: function () { if (isCur) { SUB.glShut = !SUB.glShut; SUB.sig = ''; } else { navGo('gd:' + dd.f); try { navClose(); } catch (e) {} } } });
-        if (op) L = L.concat(gdKids(dd.f, 1));
+        var isCur = dd.f === curF;
+        L.push({ t: dd.t, on: isCur, go: function () { navGo('gd:' + dd.f); try { navClose(); } catch (e) {} } });
       });
     } else if (S.view === 'gdoc') {
       // 소메뉴는 문서 원본에서 미리 읽은 목차로 바로 그린다 (화면 로딩을 기다리면 이전 문서 목차가 잠깐 보였음)
-      L = gdKids(S.gdf || 'folder-file.html', 0);
+      L = []; // 문서 목차는 오른쪽 패널 색인으로 (2026-11-22 실장님)
     } else if (S.view === 'tk' && S.tk === 'ref') {
       var f = subFrame(S.tk), d = f && f.contentDocument; if (!d) return L;
       if (S.tk === 'ref') {
@@ -2812,7 +2811,7 @@ function subPaint(box, cur, cls) {
 function subTick() {
   var sd = document.getElementById('nsd'), pc = !!(sd && sd.offsetWidth);
   var L = subItems(), sig = S.view + '|' + (S.tk || '') + '|' + L.map(function (x) { return (x.h || x.t) + (x.n || '') + (x.on ? '*' : ''); }).join(',');
-  subHide(pc && (S.view === 'tk' && S.tk === 'ref' || S.view === 'gdoc') && L.length > 0);
+  subHide(pc && S.view === 'tk' && S.tk === 'ref' && L.length > 0);
   if (sig === SUB.sig && (!sd || !L.length || $('.s3', sd))) return; SUB.sig = sig;
   if (sd) subPaint(sd, null, '.si');
   var fm = document.getElementById('nfm'); if (fm && fm.classList.contains('open')) subPaint(fm, null, '.lk');
@@ -2821,7 +2820,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:|gd:)/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
@@ -2842,7 +2841,7 @@ function sideHtml() {
       h += '<div class="sx">';
       if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
-      } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:|gd:)/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
+      } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
 }
