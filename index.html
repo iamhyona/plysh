@@ -1658,7 +1658,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm146';
+var APP_VER = '20261122hm147';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2820,8 +2820,9 @@ function subItems() {
           var sm = e.querySelector('small'), tt = (sm ? e.firstChild.textContent : e.textContent).trim(), eon = e.classList.contains('on');
           if (S.refP === '디자인') { // 2026-11-22 실장님: 디자인 > 사조 등 소메뉴를 열면 세부 분류가 왼쪽에 블릿으로 (오른쪽 색인 말고)
             var ks = eon ? $$('.rix .ixv button[data-rk]', d).filter(function (k) { return k.dataset.rk; }) : [];
-            L.push({ t: tt, part: ks.length ? 1 : 0, open: eon, on: eon && !ks.length, n: ks.length ? '' : (sm ? sm.textContent : ''), go: function () { if (e.classList.contains('on')) { var a = d.querySelector('.rix .ixv button[data-rk=""]'); if (a && !a.classList.contains('on')) { a.click(); return; } } e.click(); } });
-            ks.forEach(function (k) { var km = k.querySelector('small'); L.push({ t: (km ? k.firstChild.textContent : k.textContent).trim(), n: km ? km.textContent : '', lv: 1, on: k.classList.contains('on'), go: function () { k.click(); } }); });
+            var dzo = eon && !NAV.dzShut; // 2026-11-22 실장님: 다시 누르면 닫힘 (토글)
+            L.push({ t: tt, part: ks.length ? 1 : 0, open: dzo, on: eon && !ks.length, n: ks.length ? '' : (sm ? sm.textContent : ''), go: function () { if (e.classList.contains('on')) { NAV.dzShut = !NAV.dzShut; SUB.sig = ''; subTick(); return; } NAV.dzShut = false; e.click(); } });
+            if (dzo) ks.forEach(function (k) { var km = k.querySelector('small'); L.push({ t: (km ? k.firstChild.textContent : k.textContent).trim(), n: km ? km.textContent : '', lv: 1, on: k.classList.contains('on'), go: function () { k.click(); } }); });
             return;
           }
           L.push({ t: tt, n: sm ? sm.textContent : '', on: eon, go: function () { e.click(); } });
