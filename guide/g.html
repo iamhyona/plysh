@@ -287,6 +287,8 @@ td{font-size:14.5px;padding:10px 12px}th{font-size:12.5px}
 td{word-break:keep-all}
 @media (max-width:640px){td:first-child,td.k{white-space:normal;min-width:6em;max-width:44%}}
 @media (max-width:640px){.golink{height:40px;font-size:14.5px;padding:0 14px}}
+/* 이중선 방지: 섹션 맨 끝 표의 마지막 줄 선 없앰 (섹션 구분선과 겹침) */
+section>table:last-child tr:last-child>td,section>:last-child>table:last-child tr:last-child>td,section>:last-child>:last-child>table:last-child tr:last-child>td{border-bottom:0}
 </style>
 <link rel="stylesheet" href="toc.css?v=20261122i">
 </head>
