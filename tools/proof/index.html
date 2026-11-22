@@ -2231,9 +2231,9 @@ function ptSearch(hit) {
   return o;
 }
 function refGo(s) { // "파트|분류|용어"
-  var a = String(s).split('|'), p = a[0], g = a[1], t = a[2]; if (p === '지류') p = jPart(g);
+  var a = String(s).split('|'), p = a[0], g = a[1], t = a[2]; if (p === '지류') p = jPart(g); if (p === '부위') p = nOf(g);
   if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = false; RP = p; ls.set('pr:rp', p); ls.set(isJ(p) ? 'pr:ref2' : 'pr:refsub:' + p, g);
-  if (t && !isJ(p) && p !== '부위') { var R = TT(p)[g] || [], row = R.filter(function (r) { return r[1] === t; })[0]; if (row) { ls.set('pr:rm', 's'); ls.set('pr:rk:' + p + ':' + g, row[0]); } }
+  if (t && !isJ(p) && !isN(p)) { var R = TT(p)[g] || [], row = R.filter(function (r) { return r[1] === t; })[0]; if (row) { ls.set('pr:rm', 's'); ls.set('pr:rk:' + p + ':' + g, row[0]); } }
   window.scrollTo(0, 0); renderRef();
   if (t) setTimeout(function () { var e = [].filter.call(document.querySelectorAll('.glt b'), function (x) { return x.textContent.trim() === t || (x.dataset.cp || '') === t; })[0]; if (e) { var d = e.closest('.gl'); goEl(d, 80); d.classList.add('bkhi'); setTimeout(function () { d.classList.remove('bkhi'); }, 1600); } }, 60);
 }
@@ -2241,13 +2241,19 @@ function refGo(s) { // "파트|분류|용어"
 var JP = { '지류 소재': ['용지', '결·책등'], '지류 인쇄': ['인쇄', '특수 인쇄'], '지류 후가공': ['코팅', '박', '가공', '톰슨', '조립'], '지류 제본': ['제본', '책 구조', '부속'], '지류 포장': ['포장'] };
 function isJ(p) { return /^지류/.test(String(p || '')); }
 function jPart(g) { var k = Object.keys(JP).filter(function (x) { return JP[x].indexOf(g) >= 0; })[0]; return k || '지류 소재'; }
-var RHOME = true, RPH = false, RPARTS = Object.keys(JP).concat(['음반', 'MD', '부자재', '포장', '부위', '디자인']), RPL = { '지류 제본': '지류 제본 · 부속', MD: 'MD 소재', '부자재': 'MD 부자재', '포장': 'MD 포장', '부위': '상품별 부위 명칭' }; function rpl(p) { return RPL[p] || p; }
-function TT(p) { return p === '부위' ? PTT : p === 'MD' ? MTERMS : p === '부자재' ? PTERMS : p === '포장' ? KTERMS : p === '음반' ? ATERMS : DTERMS; }
-var RP = ls.get('pr:rp'); if (RP === '지류') RP = jPart(ls.get('pr:ref2')); if (RPARTS.indexOf(RP) < 0) RP = '지류 소재';
+// 2026-11-22 실장님: 명칭(상품별 부위 명칭)을 용어·견본에서 빼서 따로 대메뉴로, 하위 카테고리로 나눔
+var NGRP = { '공통': ['MD 공통 용어', '책 구조'], '의류': ['티셔츠', '링거티', '카라티', '맨투맨', '후디'], '모자·양말': ['볼캡', '양말'], '가방': ['에코백', '토트백', '스트링백', '파우치', '백팩'], '부자재': ['지퍼', '랜야드'], '굿즈·소품': ['인형', '아크릴 키링', '캔뱃지', '핀 뱃지', '아크릴 스탠드', '우산', '머그컵', '쿠션', '담요'] };
+var NPARTS = Object.keys(NGRP).map(function (g) { return '명칭 ' + g; });
+function isN(p) { return String(p).indexOf('명칭 ') === 0; }
+function nOf(k) { var r = ''; Object.keys(NGRP).forEach(function (g) { if (NGRP[g].indexOf(k) >= 0) r = '명칭 ' + g; }); return r || NPARTS[0]; }
+function rGrp(p) { return RPARTS.filter(function (x) { return isN(x) === isN(p); }); }
+var RHOME = true, RPH = false, RPARTS = Object.keys(JP).concat(['음반', 'MD', '부자재', '포장'], NPARTS, ['디자인']), RPL = { '지류 제본': '지류 제본 · 부속', MD: 'MD 소재', '부자재': 'MD 부자재', '포장': 'MD 포장', '부위': '상품별 부위 명칭', '명칭 공통': '공통 용어', '명칭 의류': '의류', '명칭 모자·양말': '모자 · 양말', '명칭 가방': '가방', '명칭 부자재': '부자재', '명칭 굿즈·소품': '굿즈 · 소품' }; function rpl(p) { return RPL[p] || p; }
+function TT(p) { if (isN(p)) { var o = {}; (NGRP[p.slice(3)] || []).forEach(function (k) { o[k] = PTT[k] || []; }); return o; } return p === '부위' ? PTT : p === 'MD' ? MTERMS : p === '부자재' ? PTERMS : p === '포장' ? KTERMS : p === '음반' ? ATERMS : DTERMS; }
+var RP = ls.get('pr:rp'); if (RP === '부위') RP = nOf(ls.get('pr:refsub:부위')); if (RP === '지류') RP = jPart(ls.get('pr:ref2')); if (RPARTS.indexOf(RP) < 0) RP = '지류 소재';
 window.plyshRefHome = function () { RHOME = true; RPH = false; S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
 // 2026-11-22 실장님: 메뉴를 누르면 마지막 세부 분류·위치 대신 항상 첫 화면(용어·개념, 분류 전체, 맨 위)
 function refReset(p, k) { ls.set('pr:rm', 't'); if (k) { ls.set('pr:refsub:' + k, ''); ls.set('pr:rk:' + p + ':' + k, ''); } ls.set('pr:pmk', ''); ls.set('pr:pgb', ''); S.rq = ''; window.scrollTo(0, 0); try { if (window.parent !== window) window.parent.scrollTo(0, 0); } catch (e) {} }
-window.plyshRefPart = function (p) { if (p === '지류') p = '지류 소재'; refReset(p, ''); if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = true; RP = p; ls.set('pr:rp', p); S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
+window.plyshRefPart = function (p) { if (p === '지류') p = '지류 소재'; if (p === '부위') p = NPARTS[0]; refReset(p, ''); if (RPARTS.indexOf(p) < 0) return; RHOME = false; RPH = true; RP = p; ls.set('pr:rp', p); S.rq = ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } };
 window.plyshRefFind = function (q) { RHOME = false; RPH = false; S.rq = q || ''; if (S.view === 'ref') { window.scrollTo(0, 0); renderRef(); } }; // 안내 문서에서 용어 바로 찾기 (2026-11-22)
 window.plyshRefState = function () { return RHOME ? '' : RP; };
 var REF_DS = { '용지': '일반지 · 고급지 · 색지 · 판지(단면 · 양면 도공) · 스티커 · 필름', '인쇄': '인쇄 방식 · 색 구성 · 별색', '코팅': '라미네이팅 · 기계 · UV · 실크 코팅', '박': '태창 기준 · 금·은·먹 · 컬러박 · 홀로그램 · 투명 홀로그램 · 특수박', '가공': '형압 · 에폭시 · 기타 가공', '톰슨': '목형 · 재단 · 귀도리 · 오시 · 미싱 · 접지 · 타공', '조립': '합지 · 접착', '제본': '접착·표지 · 철심·실 · 노출 책등·수제책 · 링·기계식 · 전통 장정·접지', '부속': '헤드밴드 · 가름끈 · 인덱스 탭 · 포켓', '포장': '비닐 봉투 · 밀폐 · 완충 · 케이스 · 띠지 · 박스 · 납품', '결·책등': '종이 결 방향 · 책등 계산법' };
@@ -2287,7 +2293,7 @@ function refCnt(p, g) {
 }
 function refDs(p, g) {
   var nm = function (r) { return String(r).replace(/\s*\([^)]*\)/g, ''); };
-  if (p === '부위') return PARTS[g] ? PARTS[g].ds : g === 'MD 공통 용어' ? '현장 말 → 표준 표기 · 생산 · 발주 · 치수 · 단위' : '양장 책 부위 · 지류 › 책 구조와 같은 내용';
+  if (isN(p)) return PARTS[g] ? PARTS[g].ds : g === 'MD 공통 용어' ? '현장 말 → 표준 표기 · 생산 · 발주 · 치수 · 단위' : '양장 책 부위 · 지류 › 책 구조와 같은 내용';
   if (p === '디자인' || p === '음반' || p === '부자재' || p === '포장') return kGroups(p, g).join(' · ');
   if (p === 'MD') return MKIND.map(function (kd) { return MTERMS[g].filter(function (r) { return r[0] === kd; }); }).reduce(function (a, b) { return a.concat(b); }, []).slice(0, 5).map(function (r) { return nm(r[1]); }).join(' · ');
   return REF_DS[g] || tabsOf([g]).map(sub).join(' · ');
@@ -2368,16 +2374,16 @@ function renderRef() {
     h += '<div class="card">' + dh.join('') + hits.slice(0, 120).map(function (x) { return glossEntry(x[0], x[1], true); }).join('') + (hits.length || dh.length ? '' : '<div class="empty2">찾는 용어가 없어요</div>') + '</div><div class="nt c">' + (hits.length + dh.length) + '개 · 굵은 이름을 누르면 표준 표기가 복사돼요</div>';
   } else {
     // 색인: PC 오른쪽(PLYSH 안에서는 왼쪽 메뉴 소메뉴로 옮겨지고 숨김) · 모바일 = 파트 세그먼트 + 그 파트 분류 칩
-    h += '<div class="rfx' + (home ? ' rhx' : phome ? ' rhx rpx' : '') + '"><aside class="rnav"><div class="chips rpseg">' + RPARTS.map(function (p) { return '<button data-rpp="' + p + '"' + (p === RP && !home ? ' class="on"' : '') + '>' + rpl(p) + '</button>'; }).join('') + '</div><div class="chips rtab">' +
-      RPARTS.map(function (p) { return '<b class="rph" data-p="' + p + '">' + rpl(p) + '</b>' + refCats(p).map(function (g) { var on = !home && !phome && p === RP && g === k; return '<button data-rp="' + p + '" data-rc="' + esc(g) + '" class="' + (p !== RP || home ? 'rx' : '') + (on ? ' on' : '') + '">' + esc(g) + (refCnt(p, g) ? '<small>' + refCnt(p, g) + '</small>' : '') + '</button>'; }).join(''); }).join('') + '</div></aside><div class="rbody">';
+    h += '<div class="rfx' + (home ? ' rhx' : phome ? ' rhx rpx' : '') + '"><aside class="rnav"><div class="chips rpseg">' + rGrp(home ? '' : RP).map(function (p) { return '<button data-rpp="' + p + '"' + (p === RP && !home ? ' class="on"' : '') + '>' + rpl(p) + '</button>'; }).join('') + '</div><div class="chips rtab">' +
+      rGrp(home ? '' : RP).map(function (p) { return '<b class="rph" data-p="' + p + '">' + rpl(p) + '</b>' + refCats(p).map(function (g) { var on = !home && !phome && p === RP && g === k; return '<button data-rp="' + p + '" data-rc="' + esc(g) + '" class="' + (p !== RP || home ? 'rx' : '') + (on ? ' on' : '') + '">' + esc(g) + (refCnt(p, g) ? '<small>' + refCnt(p, g) + '</small>' : '') + '</button>'; }).join(''); }).join('') + '</div></aside><div class="rbody">';
     var bi = h.length, RF = '';
     var card = function (p, g) { var n = refCnt(p, g); return '<button class="rhc" type="button" data-rp="' + p + '" data-rc="' + esc(g) + '"><b>' + esc(g) + (n ? '<small>' + n + '</small>' : '') + '</b><span>' + esc(refDs(p, g)) + '</span></button>'; };
     var grp = function (rows, gi) { var o = {}, order = []; rows.forEach(function (r) { var key = r[gi]; if (!o[key]) { o[key] = []; order.push(key); } o[key].push(r); }); return order.map(function (g) { return [g, o[g]]; }); };
     if (home) {
-      h += '<div class="rhm">' + RPARTS.map(function (p) { return '<h4>' + rpl(p) + '</h4><div class="rhl">' + refCats(p).map(function (g) { return card(p, g); }).join('') + '</div>'; }).join('') + '</div>';
+      h += '<div class="rhm">' + RPARTS.filter(function (p) { return !isN(p); }).map(function (p) { return '<h4>' + rpl(p) + '</h4><div class="rhl">' + refCats(p).map(function (g) { return card(p, g); }).join('') + '</div>'; }).join('') + '</div>';
     } else if (phome) {
       h += '<div class="rhm"><div class="rhl">' + refCats(RP).map(function (g) { return card(RP, g); }).join('') + '</div></div>';
-    } else if (RP === '부위') {
+    } else if (isN(RP)) {
       h += partsPage(k) + '<div class="nt c">굵은 이름을 누르면 복사돼요 · 치수는 통상 예시라 최종 사양은 제작 업체 기준으로 확인</div>';
     } else if (!isJ(RP)) {
       // 2026-11-22 실장님: 소재·기법·용어(MD) · 하위 분류(디자인)를 스크롤 대신 위쪽 탭으로 바로 전환
