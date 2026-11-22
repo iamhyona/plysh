@@ -1172,7 +1172,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 /* 2026-11-22 실장님 (3): 5단계 — 소분류(꺾쇠, 블릿 자리) 밑 항목은 속 빈 블릿 · 14px 더 들여씀 */
 .s3 button.pt2 .cv { margin-left:auto; margin-right:4px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(45deg); opacity:.55; } .s3 button.pt2.op .cv { transform:rotate(-135deg); margin-top:3px; }
 .s3 button.pt2.op { font-weight:700 !important; color:var(--txt) !important; } .s3 button.pt2.op:before { background:var(--txt) !important; }
-.s3 button.s5 { padding-left:40px !important; }
+.s3 button.s5 { padding-left:34px !important; }
 /* 2026-11-22 실장님: 블릿 밑에 또 하위가 있으면 기호 없이 들여쓰기만 (세로선 > 블릿 > 기호 없음) */
 .s3 button.s5:before, .s3 button.s5.on:before { display:none !important; }
 #nfm .s3, #nfm .stg { padding-left:0 !important; } #nfm .stg .s3 { padding-left:0 !important; }
@@ -1658,7 +1658,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm142';
+var APP_VER = '20261122hm143';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
