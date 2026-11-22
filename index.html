@@ -1013,7 +1013,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .tmsum .tdsh { margin-left:auto; }
 /* 정보 구조 시안 (2026-11-19 2차): 오늘 · 프로젝트 · 도구 · 자료 네 공간 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
    html[data-nav] = w 왼쪽 메뉴 · t 위 메뉴. 데스크탑 우선, 1023px 이하는 모바일 */
-:root { --pvh:0px; --sw:264px; }
+:root { --pvh:0px; --sw:288px; }
 /* 2026-11-22 실장님 "작업 영역이 늘었다 줄었다": 스크롤바 자리 항상 비워 둠 → 내용 길이가 바뀌어도 폭 그대로 */
 html { scrollbar-gutter:stable; }
 @media (min-width:1024px) { #gdL { grid-template-columns:minmax(0, 1fr) 184px; gap:20px; } #gdL .gdtoc { order:0; display:block; } } /* 목차 칸을 처음부터 잡아 둠 (불러온 뒤 줄어들지 않게) */
@@ -1156,6 +1156,15 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .s3 button.s4 { padding-left:24px; min-height:32px; font-size:13.5px; } .s3 button.s4:before { left:12px; }
 /* 2026-11-22 실장님: 4단계 메뉴는 세로 막대 대신 블릿 */
 .s3.bl button:not(.pt), .s3 button.s4 { padding-left:24px; } .s3.bl button:not(.pt):before, .s3 button.s4:before { left:10px; top:50%; bottom:auto; width:4px; height:4px; margin-top:-2px; border-radius:50%; background:var(--faint); } .s3.bl button.on:before, .s3 button.s4.on:before { background:var(--txt); }
+/* 2026-11-22 실장님: 왼쪽 메뉴 하이어라키 통일 — 단계마다 18px 들여쓰기, 묶음(꺾쇠)은 표시 없음, 마지막 항목은 모두 블릿. 글이 넘치면 메뉴 너비를 늘림 */
+.s3, .stg { padding-left:40px !important; }
+.s3 button, .stg button { position:relative; padding-left:18px !important; }
+.s3 button:before, .stg button:before { left:7px !important; top:50% !important; bottom:auto !important; width:4px !important; height:4px !important; margin-top:-2px; border-radius:50% !important; background:var(--faint) !important; display:block; }
+.s3 button.on:before, .stg button.on:before { background:var(--txt) !important; }
+.s3 button.pt:before, .stg button.tgh:before { display:none !important; }
+.s3 button.s4 { padding-left:36px !important; } .s3 button.s4:before { left:25px !important; }
+.stg .s3 { padding-left:18px !important; }
+#nfm .s3, #nfm .stg { padding-left:0 !important; } #nfm .stg .s3 { padding-left:18px !important; }
 html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid-template-columns:minmax(0, 1fr) !important; }
 /* ── W: 왼쪽 메뉴 ── */
 #nsd, #ntb { display:none; }
@@ -1638,7 +1647,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm121';
+var APP_VER = '20261122hm123';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
