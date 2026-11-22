@@ -1147,7 +1147,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .s3 button small, .stg button small { margin-left:auto; font-size:11.5px; font-weight:600; color:var(--faint); }
 #nfm .s3, #nfm .stg { padding-left:12px; }
 .tgh .cv { display:inline-block; flex:none; margin-left:auto; margin-right:6px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(45deg); opacity:.55; transition:transform .15s; } .tgh.op .cv { transform:rotate(-135deg); } .lk.tgh { display:flex; align-items:center; width:100%; } .stg[hidden] { display:none; }
-.s3 button.pt { color:var(--sub); font-weight:600; } .s3 button.pt.op { color:var(--txt); font-weight:700; } .s3 button.pt:before { display:none; }
+.s3 button.pt { color:var(--sub); font-weight:600; } .s3 button.pt.op { color:var(--txt); font-weight:700; }
 .s3 button.pt .cv { margin-left:auto; margin-right:4px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(45deg); opacity:.55; }
 .s3 button.pt.op .cv { transform:rotate(-135deg); margin-top:3px; }
 #nfm .col button.lk.tgh { display:flex; align-items:center; }
@@ -1159,11 +1159,11 @@ html[data-nav="t"] #nsub.has { display:flex; }
 /* 2026-11-22 실장님: 왼쪽 메뉴 하이어라키 통일 — 단계마다 18px 들여쓰기, 묶음(꺾쇠)은 표시 없음, 마지막 항목은 모두 블릿. 글이 넘치면 메뉴 너비를 늘림 */
 /* 2026-11-22 실장님 (2): 중메뉴 밑 소메뉴 = 세로선, 소메뉴 밑 항목 = 블릿. 소메뉴 18px · 항목 14px 더 들여씀 */
 .s3, .stg { padding-left:40px !important; }
-.s3 button, .stg button { position:relative; padding-left:18px !important; }
-.s3 button:before, .stg button:before { display:block; left:4px !important; top:9px !important; bottom:9px !important; width:2px !important; height:auto !important; margin:0 !important; border-radius:1px !important; background:var(--line) !important; }
+.s3 button, .stg button { position:relative; padding-left:12px !important; }
+.s3 button:before, .stg button:before { display:block; left:0 !important; top:8px !important; bottom:8px !important; width:2px !important; height:auto !important; margin:0 !important; border-radius:1px !important; background:var(--line) !important; }
 .s3 button.on:before, .stg button.on:before, .stg button.si3.op:before, .s3 button.pt.op:before { background:var(--txt) !important; }
-.s3 button.s4, .stg .s3 button { padding-left:32px !important; }
-.s3 button.s4:before, .stg .s3 button:before { left:20px !important; top:50% !important; bottom:auto !important; width:4px !important; height:4px !important; margin:-2px 0 0 !important; border-radius:50% !important; background:var(--faint) !important; }
+.s3 button.s4, .stg .s3 button { padding-left:26px !important; }
+.s3 button.s4:before, .stg .s3 button:before { left:14px !important; top:50% !important; bottom:auto !important; width:4px !important; height:4px !important; margin:-2px 0 0 !important; border-radius:50% !important; background:var(--faint) !important; }
 .s3 button.s4.on:before, .stg .s3 button.on:before { background:var(--txt) !important; }
 .stg .s3 { padding-left:0 !important; }
 #nfm .s3, #nfm .stg { padding-left:0 !important; } #nfm .stg .s3 { padding-left:0 !important; }
@@ -1649,7 +1649,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm131';
+var APP_VER = '20261122hm132';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
