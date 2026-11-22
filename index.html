@@ -1142,8 +1142,9 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #nfm .s3, #nfm .stg { padding-left:12px; }
 .tgh .cv { display:inline-block; flex:none; margin-left:auto; margin-right:6px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(45deg); opacity:.55; transition:transform .15s; } .tgh.op .cv { transform:rotate(-135deg); } .lk.tgh { display:flex; align-items:center; width:100%; } .stg[hidden] { display:none; }
 .s3 button.pt { color:var(--sub); font-weight:600; } .s3 button.pt.op { color:var(--txt); font-weight:700; } .s3 button.pt:before { display:none; }
-.s3 button.pt .cv { margin-left:auto; margin-right:4px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(-45deg); opacity:.55; }
-.s3 button.pt.op .cv { transform:rotate(45deg); margin-top:-3px; }
+.s3 button.pt .cv { margin-left:auto; margin-right:4px; width:7px; height:7px; border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; transform:rotate(45deg); opacity:.55; }
+.s3 button.pt.op .cv { transform:rotate(-135deg); margin-top:3px; }
+#nfm .col button.lk.tgh { display:flex; align-items:center; }
 .s3 button.s4 { padding-left:24px; min-height:32px; font-size:13.5px; } .s3 button.s4:before { left:12px; }
 html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid-template-columns:minmax(0, 1fr) !important; }
 /* ── W: 왼쪽 메뉴 ── */
@@ -1203,6 +1204,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 #nsd .si { display:flex; align-items:center; width:100%; min-height:40px; border:0; background:none; text-align:left; padding:0 12px 0 40px; margin-top:2px; border-radius:12px; font-size:15px; font-weight:500; color:var(--sub); }
 #nsd .si:hover { background:var(--bg); }
 #nsd .si.on { background:var(--txt); color:#fff; font-weight:600; }
+#nsd .si.tgh.on, #nsd .si.tgh.op { background:var(--bg); color:var(--txt); font-weight:700; } .s3[hidden] { display:none !important; }
 #nsd .si small { margin-left:auto; font-size:11px; color:var(--faint); }
 #nsd .sg { font-size:12px; font-weight:700; color:var(--faint); padding:8px 12px 3px 40px; letter-spacing:.03em; }
 #nsd .sx { padding-bottom:6px; }
@@ -2803,6 +2805,8 @@ function subPaint(box, cur, cls) {
   var w = document.createElement('div'); w.className = 's3';
   w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '" class="' + (x.part ? 'pt' + (x.open ? ' op' : '') : x.lv ? 's4' + (x.on ? ' on' : '') : (x.on ? 'on' : '')) + '">' + esc(x.t) + (x.part ? '<i class="cv"></i>' : '') + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
   on.parentNode.insertBefore(w, on.nextSibling);
+  if (on.classList.contains('tgh')) { if (SUB.shutK !== navCur()) { SUB.shutK = navCur(); SUB.shut = false; } w.hidden = !!SUB.shut; on.classList.toggle('op', !SUB.shut);
+    on.onclick = function () { SUB.shut = !SUB.shut; w.hidden = SUB.shut; on.classList.toggle('op', !SUB.shut); }; }
   $$('[data-s3]', w).forEach(function (b) { b.onclick = function () { var x = L[+b.dataset.s3]; if (x && x.go) x.go(); if (box.id === 'nfm' && !x.part) navClose(); setTimeout(subTick, 60); }; });
 }
 function subTick() {
@@ -2817,7 +2821,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:|gd:)/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
@@ -2838,7 +2842,7 @@ function sideHtml() {
       h += '<div class="sx">';
       if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
-      } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { return '<button type="button" class="si' + (x.k === cur && !inWs() ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '</button>'; }).join(''); });
+      } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:|gd:)/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
 }
