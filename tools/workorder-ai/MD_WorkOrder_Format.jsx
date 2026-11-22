@@ -39,16 +39,16 @@ function cstyle(name, f, size, color) {
   var a = st.characterAttributes;
   if (f) a.textFont = f; a.size = size; a.tracking = -15;
   try { a.kerningMethod = AutoKernType.OPTICAL; } catch (e1) {}
-  a.autoLeading = false; a.leading = size * 1.45; a.fillColor = color; return st;
+  a.autoLeading = false; a.leading = size * 1.75; a.fillColor = color; return st;
 }
-var TIERS = {}, TB = { XS: 8, S: 10, M: 14, L: 20, XL: 30 };
+var TIERS = {}, TB = { XS: 11, S: 14, M: 18, L: 26, XL: 38 };
 function tierOf(D) { return D <= 60 ? 'XS' : D <= 150 ? 'S' : D <= 300 ? 'M' : D <= 700 ? 'L' : 'XL'; }
 function styles(t) {
   if (TIERS[t]) return TIERS[t];
   var b = TB[t], p = 'HYONA_' + t + '_';
   return TIERS[t] = {
     b: b,
-    title: cstyle(p + 'Title', F_B, b * 2.4, C_TXT),
+    title: cstyle(p + 'Title', F_B, b * 2, C_TXT),
     eye: cstyle(p + 'Eyebrow', F_R, b * 0.9, C_MUTE),
     sec: cstyle(p + 'Section', F_B, b * 1.35, C_TXT),
     label: cstyle(p + 'Label', F_B, b, C_TXT),
@@ -133,13 +133,13 @@ function placeSvg(f, x, y, w, S) {
 function item(d, ox, oy) {
   OX = ox; OY = oy; CT = layer.groupItems.add(); CT.name = d.k;
   var D = d.D, t = tierOf(D), S = styles(t), b = S.b, U = b * 0.3528; // U = 본문 1em (mm)
-  var LH = U * 1.45, M = Math.max(10, U * 3); BOXST = S.box;
+  var LH = U * 1.75, M = Math.max(10, U * 3); BOXST = S.box;
   var IW = 40 * U;                 // 정보 열 폭
   var x = M, y = M, maxEm = 40;
   // 제목만 따로, 나머지 정보는 글상자 하나 (엔터로 나눈 단락)
   y += U * 2.6; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
   y += U * 3.6;
-  var P = [], GAPPT = b * 1.45 * 2.6, KW = 9 * U * MM, IWPT = IW * MM;
+  var P = [], GAPPT = b * 1.75 * 2.2, KW = 9 * U * MM, IWPT = IW * MM;
   function para(text, st, o) { o = o || {}; o.text = text; o.st = st; P.push(o); }
   function sec(name, lv) { para(name + (lv ? '   ' + (lv == 'r' ? '필수' : '권장') : ''), S.sec, { sb: GAPPT, tag: lv, after: b * 0.5 }); }
   function opts(arr) { var ls = wrapOpts(arr, maxEm, true); for (var i = 0; i < ls.length; i++) para(blanks(ls[i]), S.body); }
