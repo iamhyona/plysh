@@ -1657,7 +1657,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm137';
+var APP_VER = '20261122hm138';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2399,7 +2399,7 @@ function fsTick() {
   var d; try { d = f.contentDocument; } catch (e) { return; } if (!d || !d.documentElement) return;
   fmWatch(f, d); if (f.classList.contains('fmon')) return;
   if (!d.getElementById('plyOne')) { var st = d.createElement('style'); st.id = 'plyOne'; st.textContent = 'html { overflow:hidden !important; scrollbar-width:none !important; } html::-webkit-scrollbar { display:none !important; }'; (d.head || d.documentElement).appendChild(st);
-    d.defaultView.addEventListener('scroll', function () { if (FS.lock) return; var r = FS.w.getBoundingClientRect(), y = d.defaultView.scrollY; var want = window.scrollY + r.top - fsTop() + y; if (Math.abs(fsInner() - y) > 1) { FS.lock = 1; window.scrollTo(0, Math.max(0, want)); FS.lock = 0; } }, { passive: true }); }
+    d.defaultView.addEventListener('scroll', function () { if (FS.lock || fsBusy('in')) return; var r = FS.w.getBoundingClientRect(), y = d.defaultView.scrollY; var want = window.scrollY + r.top - fsTop() + y; if (Math.abs(fsInner() - y) > 1) { FS.lock = 1; window.scrollTo(0, Math.max(0, want)); FS.lock = 0; } }, { passive: true }); }
   var ch = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0), fh = f.offsetHeight;
   var cs = getComputedStyle(w), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
   var nb = $('#ntb'), bot = window.innerHeight; if (nb && getComputedStyle(nb).display !== 'none' && nb.getBoundingClientRect().top < bot) bot = nb.getBoundingClientRect().top;
@@ -2410,7 +2410,10 @@ function fsTick() {
   fsSync();
 }
 function fsInner() { if (!FS.w) return 0; var cs = getComputedStyle(FS.w); return Math.max(0, fsTop() - FS.w.getBoundingClientRect().top - parseFloat(cs.paddingTop)); }
-function fsSync() { var f = FS.f; if (!f || FS.lock || f.classList.contains('fmon')) return; try { var win = f.contentWindow, y = fsInner(); if (Math.abs(win.scrollY - y) > 1) { FS.lock = 1; win.scrollTo(0, y); FS.lock = 0; } } catch (e) {} }
+/* 2026-11-22 모바일 스크롤 버벅임: 아이폰은 손가락으로 도구(iframe) 안쪽이 직접 스크롤됨 → 안쪽이 바깥을 옮기고, 바깥 스크롤 이벤트가 한 박자 늦게 와서
+   안쪽을 예전 위치로 되돌리는 핑퐁이 생겼음. 지금 움직이는 쪽(in/out)을 잠깐(160ms) 주인으로 정해, 반대쪽 메아리는 무시. */
+function fsBusy(me) { var t = Date.now(); if (FS.drv && FS.drv !== me && t - FS.dt < 160) return true; FS.drv = me; FS.dt = t; return false; }
+function fsSync(e) { var f = FS.f; if (!f || FS.lock || f.classList.contains('fmon')) return; if (e && fsBusy('out')) return; if (!e && FS.drv === 'in' && Date.now() - FS.dt < 160) return; try { var win = f.contentWindow, y = fsInner(); if (Math.abs(win.scrollY - y) > 1) { FS.lock = 1; win.scrollTo(0, y); FS.lock = 0; } } catch (e) {} }
 window.addEventListener('scroll', fsSync, { passive: true });
 setInterval(fsTick, 400);
 /* 도구 안 팝업 (2026-11-20 실장님 "팝업 열 때 뒤 화면 레이아웃 절대 변하지 않음, 전체 딤, 정중앙"):
