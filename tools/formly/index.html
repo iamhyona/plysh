@@ -489,9 +489,52 @@ html.emb .tg-pick .pk-g + .pk-g { margin-top:24px; }
 .tg-f .field-lbl{width:120px;flex:0 0 120px;font-size:14px;color:#4e5968}
 .tg-f>input,.tg-f>textarea{flex:1;min-width:0}
 .tg-ta{min-height:92px;padding:12px 14px;line-height:1.6;resize:vertical;font-family:inherit}
-.tg-lbh{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.tg-lbh{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-bottom:14px !important}
 .tg-rs{margin-left:auto;height:32px;padding:0 12px;border:1px solid #e5e8eb;border-radius:8px;background:#fff;color:#4e5968;font:inherit;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 @media (max-width:640px){.tg-f{flex-direction:column;align-items:stretch;gap:6px}.tg-f .field-lbl{width:auto !important;max-width:none !important;flex:none;padding-top:0 !important;white-space:normal}.tg-rs{margin-left:0}}
+
+/* 부착 라벨 PC 배치 (2026-11-23): 라벨 고르기 3열, 내용 칸 2열 격자, 칸은 라벨 위 · 입력 아래 */
+.tg-fs{display:grid !important;grid-template-columns:1fr;gap:16px}
+.tg-f{flex-direction:column;align-items:stretch !important;gap:8px;background:none;border:0;padding:0;border-radius:0}
+.tg-f .field-lbl{width:auto !important;max-width:none !important;flex:none !important;padding-top:0 !important;white-space:normal}
+.tg-ta{min-height:96px}
+@media (min-width:760px){
+ .tg-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+ .tg-pick .pk-g + .pk-g, html.emb .tg-pick .pk-g + .pk-g{margin-top:0 !important}
+ .tg-pick .pk-g{display:flex;flex-direction:column}
+ .tg-pick .msd{flex:1;display:flex;flex-direction:column}
+ .tg-pick .msd-b{margin-top:auto}
+ .tg-pick .msd-p{min-width:300px}
+ .tg-pick .pk-g:last-child .msd-p{left:auto;right:0}
+ .tg-fs{grid-template-columns:1fr 1fr;gap:18px 16px}
+ .tg-f.ta{grid-column:1 / -1}
+}
+
+.tg-secs{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;margin-top:28px}
+.tg-sec{display:flex;flex-direction:column;min-width:0}
+.tg-sec > .fxsec{flex:1}
+.tg-f .field-lbl{padding-left:0 !important;margin:0 !important}
+.tg-ta.form-input{padding:12px 14px !important;height:auto !important}
+.tg-lv + .tg-lv{margin-top:24px;padding-top:24px;border-top:1px solid #e5e8eb}
+.tg-lvh{font-size:15px;font-weight:700;color:#191f28;margin-bottom:12px}
+#tgLive .tg-syms{margin-bottom:12px}
+
+.fxact .fxset{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:0;border-radius:12px;background:#fff;color:#191f28;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.fxact .fxset.on{box-shadow:inset 0 0 0 1.5px #4e5968}
+.fxact .fxsave{display:inline-flex;align-items:center;gap:6px}
+
+/* 기본값 설정 팝업 (2026-11-23) */
+.set-ov{align-items:center !important;background:rgba(0,0,0,.5) !important;padding:16px;z-index:300}
+.set-box{display:flex;flex-direction:column;max-width:880px !important;width:100%;height:min(86vh,900px);max-height:none !important;border-radius:20px !important;border:0 !important;background:#f2f4f6 !important;overflow:hidden !important;padding-bottom:0 !important}
+.set-box .modal-header{background:#fff;border-bottom:0;padding:20px 24px 12px}
+.set-box .modal-title{font-size:18px;font-weight:700}
+.set-box .modal-close{width:40px;height:40px;border:0;border-radius:12px;background:#f2f4f6;color:#4e5968}
+.set-tabs{flex:none !important;display:flex;flex-wrap:wrap;overflow:visible;gap:8px;padding:4px 24px 16px;background:#fff;border-bottom:1px solid #e5e8eb}
+.set-body{flex:1;overflow:auto;padding:20px 24px 28px !important}
+@media (max-width:640px){.set-ov{padding:12px}.set-tabs{flex-wrap:nowrap;overflow-x:auto;padding:4px 16px 14px}.set-tabs button{flex:none}.set-body{padding:16px !important}.set-box .modal-header{padding:16px 16px 10px}}
+
+html.emb .lbwrap{display:block !important;max-width:760px}
+html.emb .lbcard .copy-btn.secondary{height:46px !important;font-size:15px !important}
 </style>
 </head>
 <body>
@@ -612,6 +655,14 @@ html.emb .tg-pick .pk-g + .pk-g { margin-top:24px; }
       <button class="modal-close" onclick="closeFieldPicker()"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="modal-body" id="fieldPickerBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay set-ov" id="setModal" onclick="if(event.target===this)closeSet()">
+  <div class="modal-box set-box">
+    <div class="modal-header"><div class="modal-title">기본값 설정</div><button class="modal-close" aria-label="닫기" onclick="closeSet()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="set-tabs fxchips fxsub" id="setModalTabs"></div>
+    <div class="modal-body set-body" id="setModalBody"></div>
   </div>
 </div>
 
@@ -977,7 +1028,7 @@ function resetFieldLabel(key){
 function save(){try{localStorage.setItem('mdspec_v5',JSON.stringify({products:S.products,cur:S.cur,settings:S.settings}));}catch(e){}fxLiveSoon();}
 // PC 작성 화면 오른쪽 라벨 문구: 입력할 때마다 잠깐 뒤 새로 그림
 var _fxLiveT=null;function fxLiveSoon(){if(!document.getElementById('fxLive'))return;clearTimeout(_fxLiveT);_fxLiveT=setTimeout(function(){var el=document.getElementById('fxLive'),p=cur();if(el&&p)el.innerHTML=fxLiveBody(p);},250);}
-function fxLiveBody(p){return '<h3>표시사항 미리보기</h3><p class="d">입력하면 바로 바뀌어요 · 모든 상품 CSV는 문구 복사 탭에서</p>'+tabPrevBody(p);}
+function fxLiveBody(p){return '<h3>상품 정보 미리보기</h3><p class="d">입력하면 바로 바뀌어요 · 모든 상품 CSV는 더보기에서</p>'+tabPrevBody(p);}
 
 // ── 되돌리기 (Undo) ──
 var _undoStack=[];
@@ -1370,18 +1421,18 @@ function trSettingsTab(btnId){
   var langs=['en','ja','zh-cn','zh-tw'];
   function done(){save();renderContent();showToast('번역 완료');if(btn){btn.disabled=false;btn.innerHTML='번역';}}
   var tasks=[];
-  if(S.tab==='materials'){
+  if(_setT==='materials'){
     var mg=matGroups();
     mg.forEach(function(g,gi){g.items.forEach(function(item,ii){langs.forEach(function(lang){if(item.ko)tasks.push({type:'mat',gi:gi,ii:ii,ko:item.ko,lang:lang});});});});
     if(!tasks.length){done();return;}
     var i=0;function nxt(){if(i>=tasks.length){done();return;}var t=tasks[i++];var preset=PRESET_TR[t.ko];if(preset&&preset[t.lang]){matGroups()[t.gi].items[t.ii][t.lang]=preset[t.lang];nxt();return;}if(!isKorean(t.ko)){matGroups()[t.gi].items[t.ii][t.lang]=t.ko;nxt();return;}trText(t.ko,t.lang).then(function(r){matGroups()[t.gi].items[t.ii][t.lang]=r;nxt();});}nxt();
-  } else if(S.tab==='labels'){
+  } else if(_setT==='labels'){
     var allKeys=FIELD_DEFS.map(function(fd){return fd.key;});allKeys.push('caution');(S.settings.customFieldLabels||[]).forEach(function(cl){allKeys.push(cl.key);});
     allKeys.forEach(function(key){var koVal=getFieldLabel(key,'ko');if(!koVal)return;langs.forEach(function(lang){if(!getFieldLabel(key,lang))tasks.push({key:key,ko:koVal,lang:lang});});});
     if(!tasks.length){done();return;}
     var i=0;function nxt(){if(i>=tasks.length){done();return;}var t=tasks[i++];var preset=PRESET_TR[t.ko];if(preset&&preset[t.lang]){setFieldLabel(t.key,t.lang,preset[t.lang]);nxt();return;}if(!isKorean(t.ko)){setFieldLabel(t.key,t.lang,t.ko);nxt();return;}trText(t.ko,t.lang).then(function(r){setFieldLabel(t.key,t.lang,r);nxt();});}nxt();
   } else {
-    var dm=DROP_FS_MAP[S.tab];if(!dm){done();return;}var optKey=dm[0];var opts=S.settings[optKey]||[];
+    var dm=DROP_FS_MAP[_setT];if(!dm){done();return;}var optKey=dm[0];var opts=S.settings[optKey]||[];
     opts.forEach(function(opt){langs.forEach(function(lang){tasks.push({optKey:optKey,ko:opt,lang:lang});});});
     if(!tasks.length){done();return;}
     var i=0;function nxt(){if(i>=tasks.length){done();return;}var t=tasks[i++];if(!isKorean(t.ko)){setOptTr(t.optKey,t.ko,t.lang,t.ko);nxt();return;}var preset=PRESET_TR[t.ko];if(preset&&preset[t.lang]){setOptTr(t.optKey,t.ko,t.lang,preset[t.lang]);nxt();return;}trText(t.ko,t.lang).then(function(r){setOptTr(t.optKey,t.ko,t.lang,r);nxt();});}nxt();
@@ -1657,8 +1708,12 @@ function onProdCauDrop(e,lang,i){
 }
 
 // ═══════════════ NAVIGATION ═══════════════
+var _setOpen=false,_setT='labels';
+function isSetTab(t){return FX_SET.some(function(o){return o[0]===t;});}
+function closeSet(){_setOpen=false;_msdOpen='';if(_settingsEditMode){_settingsEditMode=false;_settEditSnapshot=null;}renderContent();}
 function setTab(t){
-  S.tab=t;if(FX_SET.some(function(o){return o[0]===t;}))S._lastSet=t;
+  if(isSetTab(t)){_setT=t;S._lastSet=t;_setOpen=true;if(isSetTab(S.tab))S.tab='fields';renderContent();return;}
+  S.tab=t;
   document.querySelectorAll('.gnb-tab').forEach(function(b){
     b.classList.toggle('active',b.getAttribute('data-tab')===t);
   });
@@ -2546,26 +2601,26 @@ function renderSidebar(){
 }
 // PLYSH 안 위 막대: 상품 칩 / 작성 · 라벨 · 설정 + 파일 버튼 / (설정일 때) 설정 항목 칩
 // 2026-11-22 실장님: '작성 · 라벨 · 설정'이 헷갈림 → 상품 후면 표시사항(문구) / 부착 라벨(케어 · 주의 · 원산지 등)을 나눔
-var FX_SET=[['caution','주의사항 문구'],['labels','항목 이름'],['materials','소재 목록'],['mfr','제조사'],['importer','수입사'],['origin','제조국'],['age','사용연령'],['settings','단위']];
-function fxMode(){return S.tab==='label'?'label':(S.tab==='fields'?'fields':(S.tab==='tags'?'tags':'set'));}
+var FX_SET=[['labels','항목 이름'],['materials','소재 목록'],['mfr','제조사'],['importer','수입사'],['origin','제조국'],['age','사용연령'],['settings','단위'],['caution','주의사항 문구']];
+function fxMode(){return S.tab==='label'?'label':(S.tab==='tags'?'tags':'fields');}
 function renderFxBar(items){
   var el=document.getElementById('fxBar');if(!el||!document.documentElement.classList.contains('emb'))return;
   var m=fxMode();
-  var segs=[['fields','상품 정보 작성'],['tags','부착 라벨'],['label','문구 복사'],['set','기본값 설정']].map(function(o){return '<button class="'+(m===o[0]?'on':'')+'" onclick="fxGo(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
-  el.innerHTML='<div class="fxr fxm"><div class="emb-seg">'+segs+'</div><div class="fxact">'+(m==='fields'||m==='tags'?'<button class="fxsave" onclick="saveFieldsSnapshot()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3M8 21v-7h8v7"/></svg>입력 저장</button>':'')+'<button class="fxmore" onclick="fxMenu(event)">더보기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button></div></div>'
+  var segs=[['fields','상품 정보 작성'],['tags','부착 라벨']].map(function(o){return '<button class="'+(m===o[0]?'on':'')+'" onclick="fxGo(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
+  el.innerHTML='<div class="fxr fxm"><div class="emb-seg">'+segs+'</div><div class="fxact">'+(m==='fields'||m==='tags'?'<button class="fxsave" onclick="saveFieldsSnapshot()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3M8 21v-7h8v7"/></svg>입력 저장</button>':'')+'<button class="fxset'+(_setOpen?' on':'')+'" onclick="fxGo(\'set\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>기본값 설정</button><button class="fxmore" onclick="fxMenu(event)">더보기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button></div></div>'
     +'<div class="fxr"><div class="fxchips" title="두 번 누르면 이름 바꾸기">'+items+'<button class="fxadd" onclick="addProduct()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>새 상품</button></div></div>'
-    +(m==='set'?'<div class="fxr"><div class="fxchips fxsub">'+FX_SET.map(function(o){return '<button class="'+(S.tab===o[0]?'on':'')+'" onclick="setTab(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div></div>':'');
+    ;
 }
 function fxMenu(e){
   e.stopPropagation();var old=document.getElementById('fxPop');if(old){old.remove();return;}
   var b=e.currentTarget.getBoundingClientRect(),d=document.createElement('div');d.id='fxPop';d.className='fxpop';
-  d.innerHTML='<button onclick="fxPopGo(openGsImportModal)">불러오기</button><button onclick="fxPopGo(exportFile)">엑셀 저장</button><button onclick="fxPopGo(openGsModal)">시트로 보내기</button><i></i>'
+  d.innerHTML='<button onclick="fxPopGo(function(){setTab(\'label\')})">모든 상품 CSV</button><i></i><button onclick="fxPopGo(openGsImportModal)">불러오기</button><button onclick="fxPopGo(exportFile)">엑셀 저장</button><button onclick="fxPopGo(openGsModal)">시트로 보내기</button><i></i>'
     +'<button onclick="fxPopGo(openHistoryModal)">저장 기록</button><button onclick="fxPopGo(undo)">실행 취소</button><i></i><button class="red" onclick="fxPopGo(resetCurrentProduct)">전체 초기화</button>';
   d.style.top=(b.bottom+window.scrollY+6)+'px';d.style.right=(document.documentElement.clientWidth-b.right)+'px';document.body.appendChild(d);
   setTimeout(function(){document.addEventListener('click',function h(){var x=document.getElementById('fxPop');if(x)x.remove();document.removeEventListener('click',h);});},0);
 }
 function fxPopGo(fn){var x=document.getElementById('fxPop');if(x)x.remove();fn();}
-function fxGo(m){setTab(m==='set'?(FX_SET.some(function(o){return o[0]===S._lastSet;})?S._lastSet:'caution'):m);}
+function fxGo(m){setTab(m==='set'?(isSetTab(S._lastSet)?S._lastSet:'labels'):m);}
 function renderContent(){
   renderSidebar();
   var p=cur();var el=document.getElementById('ci');
@@ -2573,20 +2628,30 @@ function renderContent(){
     el.innerHTML='<div style="text-align:center;padding:72px 0;color:var(--text3);font-size:13px">왼쪽에서 상품을 추가하세요</div>';
     return;
   }
-  var _ST=['settings','age','origin','mfr','importer','labels','materials'];
-  if(_ST.indexOf(S.tab)>=0){
-    var _b;
-    if(S.tab==='settings')_b=tabSettings();
-    else if(S.tab==='age')_b=tabAgeSettings();
-    else if(S.tab==='origin')_b=tabDropSetting('originOptions','origin','제조국');
-    else if(S.tab==='mfr')_b=tabDropSetting('mfrOptions','mfr','제조사');
-    else if(S.tab==='importer')_b=tabDropSetting('importerOptions','importer','수입사');
-    else if(S.tab==='labels')_b=tabLabels();
-    else _b=tabMaterials();
-    el.innerHTML='<div class="'+(_settingsEditMode?'':'settings-locked')+'">'+_b+'</div>';
-  } else if(S.tab==='caution') el.innerHTML='<div class="'+(_settingsEditMode?'':'settings-locked')+'">'+tabCaution(p)+'</div>';
-  else if(S.tab==='label')   el.innerHTML=tabLabelOut(p);
-  else if(S.tab==='tags')    el.innerHTML=tabTags(p);
+  if(isSetTab(S.tab)){_setT=S.tab;S.tab='fields';}
+  var sm=document.getElementById('setModal');
+  if(sm){
+    if(_setOpen){
+      var _b,t=_setT;
+      if(t==='settings')_b=tabSettings();
+      else if(t==='age')_b=tabAgeSettings();
+      else if(t==='origin')_b=tabDropSetting('originOptions','origin','제조국');
+      else if(t==='mfr')_b=tabDropSetting('mfrOptions','mfr','제조사');
+      else if(t==='importer')_b=tabDropSetting('importerOptions','importer','수입사');
+      else if(t==='labels')_b=tabLabels();
+      else if(t==='caution')_b=tabCaution(p);
+      else _b=tabMaterials();
+      var bd=document.getElementById('setModalBody'),st=bd?bd.scrollTop:0;
+      document.getElementById('setModalTabs').innerHTML=FX_SET.map(function(o){return '<button class="'+(t===o[0]?'on':'')+'" onclick="setTab(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
+      bd.innerHTML='<div class="'+(_settingsEditMode?'':'settings-locked')+'">'+_b+'</div>';
+      if(sm.classList.contains('open'))bd.scrollTop=st;else bd.scrollTop=0;
+      var vh=window.innerHeight;try{if(window.parent!==window)vh=Math.min(vh,window.parent.innerHeight);}catch(e){}
+      sm.querySelector('.set-box').style.height=Math.round(Math.min(vh*0.86,900))+'px';
+      sm.classList.add('open');
+    } else sm.classList.remove('open');
+  }
+  if(S.tab==='label')   el.innerHTML=tabLabelOut(p);
+  else if(S.tab==='tags')    el.innerHTML=tagsIO(p);
   else                       el.innerHTML=tabFieldsIO(p);
   setTimeout(function(){document.querySelectorAll('textarea').forEach(ar);},30);
 }
@@ -2612,7 +2677,7 @@ function tabFields(p){
     +'<div class="fx-langw"><span class="fx-ll">입력 언어</span><div class="lang-pills fx-lang">'+langPills+'</div></div>'
     +'</div>'
     +'<div class="fx-hide" style="height:1px;background:var(--border);margin-bottom:12px"></div>'
-    +'<div class="sect-hdr fx-sh"><span>상품 후면 표시사항</span><label class="fx-lsel">입력 언어<select onchange="switchEditLang(this.value)">'+LANGS.map(function(l){return '<option value="'+l.code+'"'+(l.code===lang?' selected':'')+'>'+l.label+'</option>';}).join('')+'</select></label></div><div class="fxsec">'
+    +'<div class="sect-hdr fx-sh"><span>상품 정보</span><label class="fx-lsel">입력 언어<select onchange="switchEditLang(this.value)">'+LANGS.map(function(l){return '<option value="'+l.code+'"'+(l.code===lang?' selected':'')+'>'+l.label+'</option>';}).join('')+'</select></label></div><div class="fxsec">'
     +p.fields.map(function(f){return renderFieldCard(f);}).join('')
     +renderCauRow(p)
     +'<button class="add-row-btn" onclick="openFieldPicker()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>표시 항목 추가</button></div>'
@@ -2623,7 +2688,7 @@ function tabFieldsIO(p){
   if(!document.documentElement.classList.contains('emb')||window.innerWidth<760) return tabFields(p);
   return '<div class="fxio"><div class="fxio-l">'+tabFields(p)+'</div><div class="fxio-r"><div class="lbcard" id="fxLive">'+fxLiveBody(p)+'</div></div></div>';
 }
-window.addEventListener('resize',function(){var w=window.innerWidth>=760;if(w!==window._fxW){window._fxW=w;if(S.tab==='fields')renderContent();}});
+window.addEventListener('resize',function(){var w=window.innerWidth>=760;if(w!==window._fxW){window._fxW=w;if(S.tab==='fields'||S.tab==='tags')renderContent();}});
 window._fxW=window.innerWidth>=760;
 
 function _da(fid){
@@ -2839,8 +2904,7 @@ function tabLabelOut(p){
   var langs='<div class="lblangs2">'+msd('lbl','',LANGS.map(function(l){return {v:l.code,l:l.label};}),ls,'lbTog','언어 고르기')+'</div>';
   var rows=S.products.map(function(q){return '<tr><td>'+eh(q.name)+'</td><td class="lbtx">'+eh(genTextProse(q,ls[0]||'ko')).slice(0,140)+'…</td></tr>';}).join('');
   return '<div class="lbwrap">'
-    +'<div class="lbcard"><h3>'+eh(p.name)+' 표시사항 문구</h3><p class="d">상품 정보 작성 칸 내용으로 바로 만들어져요 · 언어를 골라 복사</p>'+tabPrevBody(p)+'</div>'
-    +'<div class="lbcard"><h3>모든 상품 표시사항 데이터</h3><p class="d">상품 '+S.products.length+'개 · 고른 언어마다 줄글 문구 한 칸 · 일러스트 데이터 병합용 CSV</p>'+langs
+        +'<div class="lbcard"><h3>모든 상품 정보 데이터</h3><p class="d">상품 '+S.products.length+'개 · 고른 언어마다 줄글 문구 한 칸 · 일러스트 데이터 병합용 CSV</p>'+langs
     +'<table class="lbtbl"><tr><th>상품</th><th>'+eh((LANGS.filter(function(l){return l.code===(ls[0]||'ko');})[0]||{}).label||'')+' 미리보기</th></tr>'+rows+'</table>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">'
     +'<button class="copy-btn" onclick="lbCsv()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg>CSV 저장</button>'
@@ -2920,7 +2984,7 @@ function _cautEditBtn(){
       +'<button class="preset-btn" style="flex:none;padding:0 14px" onclick="openHistoryModal()">저장기록</button>'
       +'<button class="preset-btn" style="flex:none;padding:0 14px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveFieldsSnapshot()">저장</button>'
       +'<button class="preset-btn" style="flex:none;padding:0 14px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="cancelSettingsEdit()">취소</button>'
-      +'<button class="preset-btn" style="flex:none;padding:0 14px;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="toggleSettingsEditMode()">완료</button>'
+      +'<button class="preset-btn" style="flex:none;padding:0 14px;background:#191f28;color:#fff;border-color:#191f28;font-weight:600" onclick="toggleSettingsEditMode()">완료</button>'
       +'</div>';
   }
   return '<div style="display:flex;gap:5px;align-items:center;flex-shrink:0">'
@@ -3155,14 +3219,14 @@ function cancelSettingsEdit(){
 function _settToolbar(){return '';}
 function _settEditBtn(){
   if(_settingsEditMode){
-    var hasTr=S.tab!=='settings';
+    var hasTr=_setT!=='settings';
     return '<div style="display:flex;gap:5px;align-items:center;flex-shrink:0;flex-wrap:wrap">'
       +(hasTr?'<button class="preset-btn" id="btnTrSett" style="flex:none;padding:0 14px" onclick="trSettingsTab(\'btnTrSett\')">번역</button>':'')
       +'<button class="preset-btn" style="flex:none;padding:0 14px" onclick="undo()">이전실행</button>'
       +'<button class="preset-btn" style="flex:none;padding:0 14px" onclick="openHistoryModal()">저장기록</button>'
       +'<button class="preset-btn" style="flex:none;padding:0 14px;border-color:rgba(49,130,246,.5);color:var(--accent)" onclick="saveSettingsSnapshot()">저장</button>'
       +'<button class="preset-btn" style="flex:none;padding:0 14px;color:var(--danger);border-color:rgba(255,95,95,.3)" onclick="cancelSettingsEdit()">취소</button>'
-      +'<button class="preset-btn" style="flex:none;padding:0 14px;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="toggleSettingsEditMode()">완료</button>'
+      +'<button class="preset-btn" style="flex:none;padding:0 14px;background:#191f28;color:#fff;border-color:#191f28;font-weight:600" onclick="toggleSettingsEditMode()">완료</button>'
       +'</div>';
   }
   return '<button class="preset-btn" style="flex:none;padding:0 17px" onclick="toggleSettingsEditMode()">편집</button>';
@@ -3336,7 +3400,7 @@ function renderExtraInfoSection(p){
     return '<label class="pk-ck">'
       +'<input type="checkbox"'+chk+' onchange="togglePackaging(\''+eh(v)+'\')">'+eh(v)+'</label>';
   }).join('');
-  return '<div class="sect-hdr fx-sh" style="margin-top:18px"><span>관리 정보</span><small class="fxsm">표시사항 문구에는 안 들어가요</small></div>'
+  return '<div class="sect-hdr fx-sh" style="margin-top:18px"><span>관리 정보</span><small class="fxsm">상품 정보 문구에는 안 들어가요</small></div>'
     +'<div class="field-card pk-card">'
     +'<div class="pk-2">'
 
@@ -3519,17 +3583,28 @@ function renderCauRow(p){
   return '<div class="field-card"><div class="field-row-inner"><span class="drag-handle" style="visibility:hidden">⠿</span><span class="field-lbl">주의사항</span>'
     +'<div class="sel-wrap" style="flex:1;min-width:0"><select class="form-input sm" style="width:100%" onchange="setCauVer(this.value)">'+cv.map(function(v){return '<option value="'+v.v+'"'+(v.v===p.cautions.version?' selected':'')+'>'+eh(v.l)+'</option>';}).join('')+'</select></div></div></div>';
 }
-function tabTags(p){
+function tagsIO(p){
+  if(!document.documentElement.classList.contains('emb')||window.innerWidth<760) return tabTags(p);
+  return '<div class="fxio"><div class="fxio-l">'+tabTags(p,1)+'</div><div class="fxio-r"><div class="lbcard" id="tgLive">'+tagLiveBody(p)+'</div></div></div>';
+}
+function tagLiveBody(p){
+  var li=tagLi(p),h='<h3>부착 라벨 미리보기</h3><p class="d">입력하면 바로 바뀌어요 · 라벨마다 복사</p>',n=0;
+  TAG_GROUPS.forEach(function(G){G.items.forEach(function(it){if(li.types.indexOf(it.id)<0)return;n++;
+    h+='<div class="tg-lv"><div class="tg-lvh">'+it.n+'</div><div id="tgOut_'+it.id+'">'+(it.id==='care'?tagCareOut(p):tagOut(p,it.id))+'</div></div>';});});
+  if(!n)h+='<p class="tg-empty">왼쪽에서 쓸 라벨을 고르면 라벨마다 문구가 여기 정리돼요</p>';
+  return h;
+}
+function tabTags(p,split){
   var li=tagLi(p),h='';
   h+='<div class="sect-hdr fx-sh" style="margin-top:8px"><span>쓸 라벨 고르기</span></div><div class="fxsec tg-pick">';
   TAG_GROUPS.forEach(function(G){
     h+='<div class="pk-g">'+msd('tg_'+G.k,G.g,G.items.map(function(it){return {v:it.id,l:it.n,s:(it.a?it.a+' · ':'')+it.w};}),li.types,'tagToggle',G.g+' 고르기',G.d)+'</div>';
   });
   h+='</div>';
-  var any=0;
+  var any=0;h+='<div class="tg-secs">';
   TAG_GROUPS.forEach(function(G){G.items.forEach(function(it){
     if(li.types.indexOf(it.id)<0)return;any=1;
-    h+='<div class="sect-hdr fx-sh" style="margin-top:28px"><span>'+it.n+'</span>'+(it.a?'<small class="fxsm">'+it.a+'</small>':'')+'</div><div class="fxsec">'
+    h+='<div class="tg-sec'+(it.id==='care'||it.id==='sticker'||it.id==='kc'?' wide':'')+'"><div class="sect-hdr fx-sh"><span>'+it.n+'</span>'+(it.a?'<small class="fxsm">'+it.a+'</small>':'')+'</div><div class="fxsec">'
       +'<div class="tg-2"><div><div class="pk-lb">다는 곳</div><div class="tg-v">'+it.w+'</div></div>'
       +'<div><div class="pk-lb">라벨 소재</div><div class="sel-wrap"><select class="form-input sm" style="width:100%" onchange="tagMat(\''+it.id+'\',this.value)"><option value="">소재 고르기</option>'+TAG_MAT[G.k].map(function(m){return '<option'+(li.mat[it.id]===m?' selected':'')+'>'+eh(m)+'</option>';}).join('')+'</select></div></div></div>'
       +'<div class="pk-lb tg-lbh" style="margin-top:24px">라벨 내용<small>상품 정보 작성 칸에서 불러와요 · 여기서 고치면 이 라벨에만 적용</small>'+((tagLi(p).vals[it.id])?'<button type="button" class="tg-rs" onclick="tagReset(\''+it.id+'\')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>다시 불러오기</button>':'')+'</div>'+tagFieldsHtml(p,it.id)
@@ -3543,11 +3618,12 @@ function tabTags(p){
       CARE_G.forEach(function(g){
         h+='<div class="tg-cg"><div class="tg-cgn">'+g.n+'</div><div class="tg-cs">'+g.o.map(function(o){var on=li.care[g.k]===o[0];return '<button type="button" class="tg-sym'+(on?' on':'')+'" onclick="tagCare(\''+g.k+'\',\''+o[0]+'\')"><img src="../../logo/svg/Laundry_'+o[0]+'.svg" alt=""><span>'+o[1]+'</span></button>';}).join('')+'</div></div>';
       });
-      h+='<div class="pk-lb" style="margin-top:24px">케어 라벨 미리보기</div><div id="tgOut_care">'+tagCareOut(p)+'</div>';
+      if(!split)h+='<div class="pk-lb" style="margin-top:24px">케어 라벨 미리보기</div><div id="tgOut_care">'+tagCareOut(p)+'</div>';
     }
-    if(it.id!=='care')h+='<div class="pk-lb" style="margin-top:24px">'+it.n+' 미리보기</div><div id="tgOut_'+it.id+'">'+tagOut(p,it.id)+'</div>';
-    h+='</div>';
+    if(it.id!=='care'&&!split)h+='<div class="pk-lb" style="margin-top:24px">'+it.n+' 미리보기</div><div id="tgOut_'+it.id+'">'+tagOut(p,it.id)+'</div>';
+    h+='</div></div>';
   });});
+  h+='</div>';
   if(!any)h+='<p class="tg-empty" style="margin-top:20px">쓸 라벨을 고르면 라벨마다 다는 곳 · 소재 · 내용 칸이 나와요. 케어 라벨은 섬유 혼용률과 세탁 기호도 정리해요.</p>';
   return '<div class="tg-wrap">'+h+'</div>';
 }
