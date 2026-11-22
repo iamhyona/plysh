@@ -56,29 +56,32 @@ var S = {
 };
 
 /* ── 그리기 도우미 (mm, 대지 왼쪽 위 기준) ── */
-var L = 0, T = 0, layer;
+var L = 0, T = 0, layer, BUF = null;
+function keep(it) { if (BUF) BUF.push(it); return it; }
+function rowStart() { BUF = []; }
+function rowEnd(name) { var b = BUF; BUF = null; if (!b || b.length < 2) return; var g = layer.groupItems.add(); g.name = name || 'row'; for (var i = b.length - 1; i >= 0; i--) b[i].move(g, ElementPlacement.PLACEATBEGINNING); }
 function px(x) { return L + x * MM; } function py(y) { return T - y * MM; }
 function rect(x, y, w, h, stroke, fill, sw) {
   var r = layer.pathItems.rectangle(py(y), px(x), w * MM, h * MM);
   r.filled = !!fill; if (fill) r.fillColor = fill;
   r.stroked = !!stroke; if (stroke) { r.strokeColor = stroke; r.strokeWidth = sw || 0.4; }
-  return r;
+  return keep(r);
 }
 function line(x1, y1, x2, y2, col, sw, dash) {
   var p = layer.pathItems.add(); p.setEntirePath([[px(x1), py(y1)], [px(x2), py(y2)]]);
   p.filled = false; p.stroked = true; p.strokeColor = col; p.strokeWidth = sw || 0.5;
-  if (dash) p.strokeDashes = dash; return p;
+  if (dash) p.strokeDashes = dash; return keep(p);
 }
 function ptext(x, y, s, st, just) {
   var t = layer.textFrames.pointText([px(x), py(y)]); t.contents = s; st.applyTo(t.textRange, true);
-  if (just) t.textRange.paragraphAttributes.justification = just; return t;
+  if (just) t.textRange.paragraphAttributes.justification = just; return keep(t);
 }
 // 영역 문자: 높이 0 이면 내용에 맞춰 높이 계산 → 실제 높이(mm) 반환
 function atext(x, y, w, h, s, st, inset) {
   inset = inset == null ? 1.6 : inset;
   var hh = h || 60;
   var r = layer.pathItems.rectangle(py(y + inset * 0.6), px(x + inset), (w - inset * 2) * MM, hh * MM);
-  var t = layer.textFrames.areaText(r); t.contents = s; st.applyTo(t.textRange, true);
+  var t = keep(layer.textFrames.areaText(r)); t.contents = s; st.applyTo(t.textRange, true);
   if (!h) {
     var n = 1; try { n = Math.max(1, t.lines.length); } catch (e) {}
     var need = n * st.characterAttributes.leading / MM + 1.2;
@@ -92,21 +95,23 @@ function blanks(s) { return String(s).replace(/____/g, '______'); }
 
 /* 표: 머리 행 (회색) */
 function headRow(x, y, w, title, lv) {
-  var h = 6.5; rect(x, y, w, h, C_CHIP, C_FILL, 0.4);
+  rowStart(); var h = 6.5; rect(x, y, w, h, C_CHIP, C_FILL, 0.4);
   ptext(x + 1.8, y + 4.4, title, S.head);
   if (lv) { var tx = x + w - 2; ptext(tx, y + 4.3, lv == 'r' ? '필수' : '권장', lv == 'r' ? S.req : S.opt, Justification.RIGHT); }
-  return h;
+  rowEnd('head ' + title); return h;
 }
 /* 표: 내용 한 칸 (전체 폭) */
 function fullRow(x, y, w, s, st) {
+  rowStart();
   var h = atext(x, y + 0.8, w, 0, s, st || S.body); h = Math.max(h + 0.8, 6.5);
-  rect(x, y, w, h, C_CHIP, null, 0.4); return h;
+  rect(x, y, w, h, C_CHIP, null, 0.4); rowEnd('row'); return h;
 }
 /* 표: 이름 | 내용 */
 function kvRow(x, y, w, kw, k, s, st) {
+  rowStart();
   var h = atext(x + kw, y + 0.8, w - kw, 0, s, st || S.body); h = Math.max(h + 0.8, 6.5);
   atext(x, y + 0.8, kw, h - 1, k, S.label);
-  rect(x, y, kw, h, C_CHIP, C_SOFT, 0.4); rect(x + kw, y, w - kw, h, C_CHIP, null, 0.4); return h;
+  rect(x, y, kw, h, C_CHIP, C_SOFT, 0.4); rect(x + kw, y, w - kw, h, C_CHIP, null, 0.4); rowEnd(k); return h;
 }
 
 /* SVG 도면 → 별색으로 다시 칠하기 */
