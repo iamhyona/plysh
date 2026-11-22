@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>/* 승인된 팀원만: 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>포장재 찾기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script>try { if (window.self !== window.top) document.documentElement.classList.add('emb'); } catch (e) { document.documentElement.classList.add('emb'); }</script>
+<style>
+
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --line2:#f2f4f6; --t1:#191f28; --t2:#4e5968; --t3:#8b95a1; --t4:#b0b8c1; --blue:#3182f6; --bluebg:#e8f3ff; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { background:var(--bg); color:var(--t1); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; font-size:14px; line-height:1.5; letter-spacing:0; }
+button, input { font:inherit; color:inherit; }
+svg.i { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+main { max-width:1120px; margin:0 auto; padding:20px 16px 80px; }
+html.emb main { padding-top:16px; }
+.phd { margin:0 0 20px; } .phd b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; } .phd small { display:block; margin-top:6px; font-size:14px; color:var(--t3); }
+html.emb .phd { display:none; }
+.lay { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; align-items:start; }
+.side { display:none; }
+@media (min-width:760px) {
+  .lay { grid-template-columns:minmax(0,1fr) 272px; }
+  .side { display:block; position:sticky; top:0; max-height:100vh; overflow:auto; scrollbar-width:none; }
+  .side::-webkit-scrollbar { display:none; }
+  .fbtn { display:none !important; }
+}
+/* 검색 + 칩 한 줄 (PC) · 모바일은 두 줄 */
+.bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 12px; }
+.q { position:relative; flex:1 1 0; min-width:0; }
+@media (min-width:760px) { .qrow { flex:1 1 260px !important; max-width:360px !important; } }
+.q svg { position:absolute; left:14px; top:13px; color:var(--t3); }
+.q input { width:100%; height:46px; border:0; background:#fff; border-radius:12px; padding:0 40px 0 44px; font-size:16px; outline:none; }
+.q input:focus { box-shadow:inset 0 0 0 1.5px #4e5968; }
+.q .x { position:absolute; right:8px; top:9px; width:28px; height:28px; border:0; border-radius:50%; background:#e5e8eb; color:var(--t2); display:none; align-items:center; justify-content:center; cursor:pointer; }
+.q .x svg { position:static; width:14px; height:14px; color:var(--t2); }
+.q.on .x { display:flex; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { height:36px; padding:0 16px; border:0; border-radius:18px; background:#fff; color:var(--t2); font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; }
+.chip small { font-size:12px; color:var(--t3); font-weight:600; }
+.chip.on { background:var(--t1); color:#fff; } .chip.on small { color:#b0b8c1; }
+.fbtn { flex:none; width:46px; height:46px; padding:0; border-radius:12px; justify-content:center; position:relative; }
+.fbtn em { position:absolute; top:6px; right:6px; }
+.chips#kind { flex:1 1 100%; }
+@media (min-width:760px) { .chips#kind { flex:0 1 auto; } }
+.fbtn em { font-style:normal; min-width:18px; height:18px; border-radius:9px; background:var(--t1); color:#fff; font-size:11px; display:none; align-items:center; justify-content:center; padding:0 5px; }
+.fbtn.has em { display:inline-flex; }
+/* 제품 크기로 찾기 */
+.pbox { margin:0 0 12px; }
+.pbox .pt { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.pbox .pt b { font-size:16px; font-weight:800; }
+.pbox .pt button { height:36px; padding:0 16px; border:0; border-radius:10px; background:var(--line2); color:var(--t2); font-size:13px; font-weight:700; cursor:pointer; }
+.pbox > p { margin-top:6px; font-size:13px; color:var(--t3); }
+.pin { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:18px; }
+@media (min-width:640px) { .pin { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+.pin label { display:block; font-size:13px; font-weight:600; color:var(--t2); margin:0 0 8px; }
+.pin span { position:relative; display:block; }
+.pin input { width:100%; height:46px; border:0; border-radius:12px; background:var(--line2); padding:0 40px 0 14px; font-size:16px; font-weight:700; font-variant-numeric:tabular-nums; outline:none; }
+.pin input:focus { box-shadow:inset 0 0 0 1.5px #4e5968; background:#fff; }
+.pin input::placeholder { color:var(--t4); font-weight:600; }
+.pin em { position:absolute; right:14px; top:14px; font-style:normal; font-size:13px; color:var(--t3); }
+.tg.warn { background:#fdecec; color:#f04452; }
+/* 결과 머리 */
+.box { background:var(--card); border-radius:20px; padding:20px; }
+@media (max-width:519px) { .box { padding:16px; } }
+.fit { margin:0 0 12px; }
+.fit b { display:block; font-size:16px; font-weight:800; }
+.fit p { margin-top:6px; font-size:13px; color:var(--t3); }
+.cnt { margin:4px 0 12px; font-size:13px; color:var(--t3); }
+.cnt b { color:var(--t2); font-weight:700; }
+.grp { margin:28px 0 12px; font-size:16px; font-weight:800; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; } .grp span { white-space:nowrap; }
+.grp:first-child { margin-top:0; } .grp small { font-size:13px; color:var(--t3); font-weight:600; }
+.grid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+@media (min-width:640px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (min-width:1180px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+.card { background:var(--card); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:14px; }
+@media (max-width:519px) { .card { padding:16px; } }
+.ch { display:flex; gap:14px; align-items:center; }
+.pic { width:48px; height:48px; flex:none; display:flex; align-items:center; justify-content:center; }
+.pic svg { overflow:visible; }
+.sz { min-width:0; flex:1; }
+.sz b { display:block; font-size:19px; font-weight:800; letter-spacing:-0.01em; font-variant-numeric:tabular-nums; cursor:copy; }
+.sz b span { font-size:14px; font-weight:700; color:var(--t3); }
+.sz .how { margin-top:4px; display:block; font-size:13px; color:var(--t2); line-height:1.5; }
+.sz div { margin-top:2px; display:flex; flex-wrap:wrap; gap:4px 8px; font-size:13px; color:var(--t3); }
+.tg { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; background:var(--line2); color:var(--t2); font-size:12px; font-weight:700; white-space:nowrap; }
+.tg.rec { background:var(--bluebg); color:var(--blue); }
+.buys { display:flex; flex-direction:column; gap:6px; }
+.buy { display:flex; align-items:center; gap:10px; min-height:40px; padding:8px 12px 8px 14px; border-radius:12px; background:var(--line2); text-decoration:none; color:var(--t1); }
+.buy:hover { background:#e9ecef; }
+.buy b { font-size:14px; font-weight:700; white-space:nowrap; }
+.buy span { flex:1; min-width:0; font-size:13px; color:var(--t3); text-align:right; line-height:1.4; }
+.buy svg { width:16px; height:16px; color:var(--t3); }
+.empty { padding:48px 20px; text-align:center; color:var(--t3); font-size:14px; line-height:1.6; }
+.more { display:flex; justify-content:center; margin-top:12px; }
+.btn2 { height:40px; padding:0 18px; border:0; border-radius:12px; background:#fff; color:var(--t2); font-size:14px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; text-decoration:none; }
+/* 필터 패널 */
+.fp { background:var(--card); border-radius:20px; padding:20px; }
+.fs + .fs { margin-top:28px; }
+.fs h5 { font-size:13px; font-weight:700; color:var(--t2); margin:0 0 8px; display:flex; justify-content:space-between; }
+.fs h5 small { font-weight:600; color:var(--t3); }
+.fp .chip { background:var(--line2); }
+.fp .chip.on { background:var(--t1); }
+.use { display:flex; flex-direction:column; gap:4px; }
+.use button { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:40px; padding:0 12px; border:0; border-radius:10px; background:none; text-align:left; cursor:pointer; font-size:14px; font-weight:600; color:var(--t2); }
+.use button small { font-size:12px; color:var(--t3); font-weight:600; font-variant-numeric:tabular-nums; }
+.use button.on { background:var(--line2); color:var(--t1); box-shadow:inset 0 0 0 1.5px #4e5968; }
+.cus { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:8px; }
+.cus label { display:block; font-size:12px; font-weight:600; color:var(--t3); margin:0 0 6px; }
+.cus span { position:relative; display:block; }
+.cus input { width:100%; height:46px; border:0; border-radius:10px; background:var(--line2); padding:0 26px 0 10px; font-size:16px; font-weight:700; font-variant-numeric:tabular-nums; outline:none; }
+.cus input:focus { box-shadow:inset 0 0 0 1.5px #4e5968; background:#fff; }
+.cus em { position:absolute; right:8px; top:14px; font-style:normal; font-size:12px; color:var(--t3); }
+.rst { margin-top:28px; width:100%; height:40px; border:0; border-radius:12px; background:var(--line2); color:var(--t2); font-size:14px; font-weight:700; cursor:pointer; }
+/* 안내 */
+.notes { margin-top:28px; }
+.notes details { background:var(--card); border-radius:20px; }
+.notes details + details { margin-top:12px; }
+.notes summary { list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:18px 20px; font-size:15px; font-weight:700; }
+.notes summary::-webkit-details-marker { display:none; }
+.notes summary svg { color:var(--t3); transition:transform .15s; }
+.notes details[open] summary svg { transform:rotate(180deg); }
+.nb { padding:0 20px 20px; font-size:14px; color:var(--t2); line-height:1.7; }
+.nb li { list-style:none; position:relative; padding-left:12px; } .nb li + li { margin-top:6px; }
+.nb li::before { content:''; position:absolute; left:0; top:11px; width:4px; height:4px; border-radius:50%; background:var(--t4); }
+.nb a { color:var(--blue); text-decoration:none; }
+.src { margin-top:12px; font-size:12px; color:var(--t3); line-height:1.6; }
+.glo { margin-top:12px; }
+/* 모바일 필터 시트 */
+.dim { position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .2s; z-index:40; }
+.sheet { position:fixed; left:0; right:0; bottom:0; max-height:86vh; overflow:auto; background:#fff; border-radius:20px 20px 0 0; padding:20px 16px calc(24px + env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform .22s; z-index:41; }
+.sheet .fp { padding:0; }
+.sheet .sh { display:flex; align-items:center; justify-content:space-between; margin:0 0 20px; font-size:18px; font-weight:800; }
+.cls { width:40px; height:40px; border:0; border-radius:50%; background:#191f28; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.cls svg { width:18px; height:18px; }
+body.sopen .dim { opacity:1; pointer-events:auto; } body.sopen .sheet { transform:none; }
+.toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:#191f28; color:#fff; font-size:14px; font-weight:600; padding:12px 18px; border-radius:12px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:50; white-space:nowrap; }
+.toast.on { opacity:1; }
+
+/* 포장재 찾기 추가 */
+.types { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 16px; }
+.types button { height:40px; padding:0 18px; border:0; border-radius:12px; background:#fff; color:var(--t2); font-size:15px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+.types button small { font-size:12px; color:var(--t3); font-weight:600; }
+.types button.on { background:var(--t1); color:#fff; } .types button.on small { color:#b0b8c1; }
+.pin.p3 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (min-width:640px) { .pin.p3 { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+.dims { display:grid; grid-template-columns:auto 1fr; gap:2px 10px; font-size:13px; color:var(--t2); }
+.dims dt { color:var(--t3); font-weight:600; }
+.dims dd { font-variant-numeric:tabular-nums; }
+.tg.jp { background:#fff4e5; color:#c26a00; }
+.tg.q { background:#fdecec; color:#f04452; }
+.buy { display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:10px 12px 10px 14px; }
+.buy b { white-space:normal; }
+.buy span { grid-column:1; grid-row:2; text-align:left; }
+.buy svg { grid-column:2; grid-row:1 / span 2; }
+</style>
+</head>
+<body>
+<main>
+  <div class="phd"><b>포장재 찾기</b><small>기성 블리스터 · 투명 케이스 규격과 구매 링크 · 조사 2026.11.22</small></div>
+  <div class="types" id="types"></div>
+  <div class="lay">
+    <div>
+      <div class="bar">
+        <div style="display:flex;gap:8px;flex:1 1 100%;max-width:100%" class="qrow"><label class="q" id="qw"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" inputmode="search" autocomplete="off" placeholder="예: 70 90 · 가로 70 · 깊이 25"><button type="button" class="x" id="qx" aria-label="지우기"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label><button type="button" class="chip fbtn" id="fb" aria-label="필터"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg><em id="fbn"></em></button></div>
+        <div class="chips" id="kind"></div>
+      </div>
+      <div class="box pbox"><div class="pt"><b>제품 크기로 찾기</b><button type="button" id="pclr">비우기</button></div><p id="phint"></p>
+        <div class="pin p3"><div><label for="pw">제품 가로</label><span><input id="pw" data-p="pw" inputmode="decimal" autocomplete="off" placeholder="예: 50"><em>mm</em></span></div><div><label for="ph">제품 세로</label><span><input id="ph" data-p="ph" inputmode="decimal" autocomplete="off" placeholder="비워도 돼요"><em>mm</em></span></div><div><label for="pt" id="ptl">두께</label><span><input id="pt" data-p="pt" inputmode="decimal" autocomplete="off" placeholder="비워도 돼요"><em>mm</em></span></div><div><label for="pm">여백 (한쪽)</label><span><input id="pm" data-p="pm" inputmode="decimal" autocomplete="off" placeholder="2"><em>mm</em></span></div></div></div>
+      <div id="out"></div>
+      <div class="notes" id="notes"></div>
+    </div>
+    <aside class="side" id="side"></aside>
+  </div>
+</main>
+<div class="dim" id="dim"></div>
+<div class="sheet" id="sheet"><div class="sh">필터<button type="button" class="cls" id="sx" aria-label="닫기"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="sbody"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+var D = [{"t":"bl","k":"슬라이드","w":55,"h":115,"d":0,"o":"80×135","c":"75×130","m":"PET","v":"pd","id":"909","q":"200 · 1,000 · 5,000개","p":66000,"cur":"원","nm":"키링 블리스터","n":"키링 전체 길이 95mm까지 · 케이스 · 속지 따로 주문"},{"t":"bl","k":"걸이형 접이","w":85,"h":95,"d":0,"m":"PET","v":"pd","id":"829","q":"200 · 500 · 1,000개","p":66000,"cur":"원","nm":"스마트톡 걸이식 블리스터","n":"상하 접이 · 스마트톡 자리 지름 40mm 성형 · 인쇄 속지(아트 · 로얄아이보리) 선택"},{"t":"bl","k":"걸이형 접이","w":50,"h":60,"d":20,"m":"PET","v":"pd","id":"360","q":"200 · 1,000 · 5,000개","p":55000,"cur":"원","nm":"걸이형 접이식 01","n":"안쪽 기준 · 위 걸이 구멍"},{"t":"bl","k":"걸이형 접이","w":70,"h":70,"d":25,"m":"PET","v":"pd","id":"360","q":"200 · 1,000 · 5,000개","p":null,"cur":"원","nm":"걸이형 접이식 02","n":"안쪽 기준 · 위 걸이 구멍"},{"t":"bl","k":"걸이형 접이","w":110,"h":140,"d":30,"m":"PET","v":"pd","id":"360","q":"200 · 1,000 · 5,000개","p":null,"cur":"원","nm":"걸이형 접이식 03","n":"안쪽 기준 · 위 걸이 구멍"},{"t":"bl","k":"슬라이드","w":90,"h":115,"d":20,"o":"90×135 (헤더 20)","m":"PET","v":"at","id":"2176","q":"1개부터","p":200,"cur":"원","nm":"블리스터 (스마트톡 · 마그넷 전용)","n":"바깥 90×135×20 · 헤더 20mm · 안쪽은 헤더 뺀 대략값 · 배경지(무지 · 투명) + 젤테이프 부착 선택"},{"t":"bl","k":"클램쉘","w":60,"h":89,"d":20,"o":"80×124","m":"PVC","th":0.4,"v":"ti","id":"","q":"1,000개 1상자","p":33500,"cur":"엔","nm":"BLK0005","n":"걸이형 끼움식 · 개당 33.5엔"},{"t":"bl","k":"클램쉘","w":55,"h":87,"d":40,"o":"80×124","m":"PVC","th":0.35,"v":"ti","id":"","q":"1,000개 1상자","p":34000,"cur":"엔","nm":"BLK0006","n":"걸이형 끼움식 · 개당 34엔 · 재고 끝나면 단종"},{"t":"bl","k":"클램쉘","w":43,"h":53,"d":15,"o":"59×105","m":"PVC","th":0.4,"v":"ti","id":"","q":"1,800개 1상자","p":37800,"cur":"엔","nm":"BLK0007","n":"걸이형 끼움식 · 개당 21엔"},{"t":"bl","k":"클램쉘","w":40,"h":50,"d":30,"o":"59×105","m":"PVC","th":0.35,"v":"ti","id":"","q":"2,000개 1상자","p":42000,"cur":"엔","nm":"BLK0008","n":"걸이형 끼움식 · 개당 21엔"},{"t":"bl","k":"클램쉘","w":73,"h":55,"d":15,"o":"90×105","m":"PVC","th":0.4,"v":"ti","id":"","q":"1,500개 1상자","p":42000,"cur":"엔","nm":"BLK0009","n":"걸이형 끼움식 · 개당 28엔"},{"t":"bl","k":"클램쉘","w":70,"h":50,"d":30,"o":"90×103","m":"PVC","th":0.4,"v":"ti","id":"","q":"1,200개 1상자","p":37200,"cur":"엔","nm":"BLK0010","n":"걸이형 끼움식 · 개당 31엔"},{"t":"bl","k":"클램쉘","w":100,"h":50,"d":20,"o":"118×103","m":"PVC","th":0.4,"v":"ti","id":"","q":"1,000개 1상자","p":34500,"cur":"엔","nm":"BLK0011","n":"걸이형 끼움식 · 개당 34.5엔"},{"t":"bl","k":"클램쉘","w":37,"h":59,"d":20,"o":"50×85","m":"PET","th":0.25,"v":"ti","id":"","q":"2,500개 1상자","p":33750,"cur":"엔","nm":"BLK0012","n":"걸이형 끼움식 · 개당 13.5엔"},{"t":"bl","k":"클램쉘","w":32,"h":94,"d":12,"m":"PET","th":0.4,"v":"le","id":"157547129","q":"2,700개 1상자","p":69660,"cur":"엔","nm":"더블팩 CL3294-1","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":32,"h":94,"d":17,"m":"PET","th":0.4,"v":"le","id":"157547130","q":"2,700개 1상자","p":64260,"cur":"엔","nm":"더블팩 CL3294-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":33,"h":68,"d":12,"m":"PET","th":0.4,"v":"le","id":"157547131","q":"3,600개 1상자","p":81360,"cur":"엔","nm":"더블팩 CL3368-1","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":32,"h":68,"d":18,"m":"PET","th":0.4,"v":"le","id":"157547132","q":"3,600개 1상자","p":81360,"cur":"엔","nm":"더블팩 CL3368-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":41,"h":120,"d":15,"m":"PET","th":0.5,"v":"le","id":"157547133","q":"1,000개 1상자","p":34000,"cur":"엔","nm":"더블팩 CL40120-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":41,"h":120,"d":20,"m":"PET","th":0.5,"v":"le","id":"157547134","q":"1,000개 1상자","p":34000,"cur":"엔","nm":"더블팩 CL40120-3","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":41,"h":120,"d":30,"m":"PET","th":0.6,"v":"le","id":"157547135","q":"1,000개 1상자","p":34000,"cur":"엔","nm":"더블팩 CL40120-4","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":60,"h":90,"d":10,"m":"PET","th":0.5,"v":"le","id":"157547136","q":"1,200개 1상자","p":35640,"cur":"엔","nm":"더블팩 CL6090-1","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":60,"h":90,"d":15,"m":"PET","th":0.5,"v":"le","id":"157547137","q":"1,200개 1상자","p":35640,"cur":"엔","nm":"더블팩 CL6090-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":60,"h":90,"d":20,"m":"PET","th":0.5,"v":"le","id":"157547138","q":"1,200개 1상자","p":36840,"cur":"엔","nm":"더블팩 CL6090-3","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":110,"d":15,"m":"PET","th":0.5,"v":"le","id":"157547139","q":"800개 1상자","p":33200,"cur":"엔","nm":"더블팩 CL70110-1","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":110,"d":22,"m":"PET","th":0.5,"v":"le","id":"157547140","q":"800개 1상자","p":33200,"cur":"엔","nm":"더블팩 CL70110-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":110,"d":30,"m":"PET","th":0.5,"v":"le","id":"157547141","q":"800개 1상자","p":34800,"cur":"엔","nm":"더블팩 CL70110-3","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":110,"d":38,"m":"PET","th":0.6,"v":"le","id":"157547142","q":"800개 1상자","p":34800,"cur":"엔","nm":"더블팩 CL70110-4","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":150,"d":20,"m":"PET","th":0.5,"v":"le","id":"157547143","q":"600개 1상자","p":33840,"cur":"엔","nm":"더블팩 CL70150-1","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":150,"d":30,"m":"PET","th":0.5,"v":"le","id":"157547144","q":"600개 1상자","p":33840,"cur":"엔","nm":"더블팩 CL70150-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":70,"h":150,"d":40,"m":"PET","th":0.6,"v":"le","id":"157547145","q":"600개 1상자","p":33840,"cur":"엔","nm":"더블팩 CL70150-3","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":90,"h":110,"d":22,"m":"PET","th":0.5,"v":"le","id":"157547146","q":"600개 1상자","p":35040,"cur":"엔","nm":"더블팩 CL90110-2","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":90,"h":110,"d":30,"m":"PET","th":0.6,"v":"le","id":"157547147","q":"600개 1상자","p":35040,"cur":"엔","nm":"더블팩 CL90110-3","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"클램쉘","w":90,"h":110,"d":35,"m":"PET","th":0.6,"v":"le","id":"157547148","q":"600개 1상자","p":36840,"cur":"엔","nm":"더블팩 CL90110-4","n":"끼움식 (대지 없이도 닫힘)"},{"t":"bl","k":"슬라이드","w":50,"h":60,"d":10,"m":"PET","th":0.3,"v":"le","id":"157548597","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-1","c":"75×110","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":50,"h":60,"d":20,"m":"PET","th":0.3,"v":"le","id":"157548598","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-2","c":"75×110","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":50,"h":80,"d":10,"m":"PET","th":0.3,"v":"le","id":"157548599","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-3","c":"75×130","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":50,"h":80,"d":20,"m":"PET","th":0.3,"v":"le","id":"157548600","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-4","c":"75×130","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":60,"h":80,"d":15,"m":"PET","th":0.3,"v":"le","id":"157548601","q":"1,000개 1상자","p":100000,"cur":"엔","nm":"슬라이드팩 JA-5","c":"90×140","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":60,"h":80,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548603","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-6","c":"90×140","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":70,"h":90,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548604","q":"1,000개 1상자","p":95000,"cur":"엔","nm":"슬라이드팩 JA-7","c":"100×160","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":70,"h":90,"d":35,"m":"PET","th":0.3,"v":"le","id":"157548605","q":"1,000개 1상자","p":126000,"cur":"엔","nm":"슬라이드팩 JA-8","c":"100×160","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":70,"h":110,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548607","q":"1,000개 1상자","p":100000,"cur":"엔","nm":"슬라이드팩 JA-9","c":"100×180","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":70,"h":110,"d":35,"m":"PET","th":0.3,"v":"le","id":"157548608","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-10","c":"100×180","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":100,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548609","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-11","c":"110×170","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":100,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548610","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-12","c":"110×170","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":130,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548611","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-13","c":"110×200","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":130,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548613","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-14","c":"110×200","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":180,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548614","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-15","c":"110×250","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":180,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548615","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-16","c":"110×250","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":60,"h":195,"d":20,"m":"PET","th":0.3,"v":"le","id":"157548617","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-17","c":"80×255","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":140,"d":20,"m":"PET","th":0.3,"v":"le","id":"157548618","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-18","c":"100×195","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":100,"h":150,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548619","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-19","c":"130×220","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":110,"h":160,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548620","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-20","c":"140×220","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":60,"h":70,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548622","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-21","c":"76×125","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":100,"h":80,"d":50,"m":"PET","th":0.3,"v":"le","id":"157548623","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-22","c":"125×134","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":90,"h":150,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548624","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-24","c":"120×220","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":90,"h":150,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548626","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-25","c":"120×220","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":90,"h":190,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548627","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-26","c":"120×260","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":90,"h":190,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548628","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-27","c":"120×260","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":100,"h":120,"d":20,"m":"PET","th":0.3,"v":"le","id":"157548630","q":"1,000개 1상자","p":100000,"cur":"엔","nm":"슬라이드팩 JA-28","c":"130×180","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":100,"h":120,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548631","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-29","c":"130×180","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":100,"h":120,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548632","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-30","c":"130×180","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":110,"h":130,"d":45,"m":"PET","th":0.3,"v":"le","id":"157548634","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-31","c":"140×210","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":120,"h":150,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548635","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-32","c":"155×230","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":120,"h":150,"d":50,"m":"PET","th":0.3,"v":"le","id":"157548636","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-33","c":"155×230","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":120,"h":210,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548637","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-34","c":"155×280","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":120,"h":210,"d":50,"m":"PET","th":0.3,"v":"le","id":"157548638","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-35","c":"155×280","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":140,"h":170,"d":40,"m":"PET","th":0.3,"v":"le","id":"157548639","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-36","c":"175×260","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":140,"h":170,"d":50,"m":"PET","th":0.3,"v":"le","id":"157548640","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-37","c":"175×260","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":45,"h":115,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548641","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-38","c":"80×170","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":65,"h":155,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548642","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-39","c":"100×220","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":155,"d":30,"m":"PET","th":0.3,"v":"le","id":"157548643","q":"1,000개 1상자","p":131000,"cur":"엔","nm":"슬라이드팩 JA-40","c":"115×230","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":60,"h":110,"d":25,"m":"PET","th":0.3,"v":"le","id":"157548644","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-41","c":"95×200","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":80,"d":35,"m":"PET","th":0.3,"v":"le","id":"157548645","q":"1,000개 1상자","p":126000,"cur":"엔","nm":"슬라이드팩 JA-42","c":"104×134","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":90,"h":110,"d":50,"m":"PET","th":0.3,"v":"le","id":"157548646","q":"1,000개 1상자","p":126000,"cur":"엔","nm":"슬라이드팩 JA-43","c":"125×175","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":80,"h":150,"d":60,"m":"PET","th":0.3,"v":"le","id":"157548647","q":"1,000개 1상자","p":126000,"cur":"엔","nm":"슬라이드팩 JA-44","c":"110×200","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":110,"h":130,"d":45,"m":"PET","th":0.3,"v":"le","id":"157548648","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 JA-45","c":"140×210","n":"대지 별매"},{"t":"bl","k":"슬라이드","w":142,"h":125,"d":11,"m":"PET","th":0.3,"v":"le","id":"157548650","q":"1,000개 1상자","p":171000,"cur":"엔","nm":"슬라이드팩 CD용","c":"182×256","n":"대지 별매"}];
+var SEL = {"pd": {"n": "포장닥터", "c": "국내", "u": "https://packagedr.cafe24.com/product/detail.html?product_no="}, "at": {"n": "올댓프린팅", "c": "국내", "u": "https://allthatprinting.co.kr/product/detail.html?product_no="}, "ti": {"n": "石田紙工 (이시다시코)", "c": "일본", "u": "https://www.tpishida.co.jp/off-the-shelf/blister-case/"}, "le": {"n": "ロジカルアイ (로지컬아이)", "c": "일본", "u": "https://logicaleye-shop.com/?pid="}};
+var CHEV = '<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+var EXT = '<svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
+// 종류별 설정 · mode: flat = 제품을 눕혀 넣고 두께는 깊이로 (블리스터)
+var TYPES = {
+  bl: { n: '블리스터', ref: '블리스터 포장', mode: 'flat', dn: ['가로', '세로', '깊이'],
+    kinds: [['슬라이드', '슬라이드', '대지를 레일에 밀어 끼움'], ['클램쉘', '클램쉘 (끼움식)', '두 쪽을 눌러 닫음'], ['걸이형 접이', '걸이형 접이', '위 걸이 구멍 · 상하 접이']],
+    hint: '안쪽(제품이 들어가는 칸) 크기로 비교해요. 제품은 눕혀서 넣고 두께는 깊이와 비교해요. 키링은 고리 · 체인까지 포함한 길이로 넣어요. 한쪽만 넣어도 돼요.',
+    uses: [
+      { k: 'k50', n: '아크릴 키링 50mm', w: 50, h: 75, t: 8 },
+      { k: 'k70', n: '아크릴 키링 70mm', w: 70, h: 95, t: 8 },
+      { k: 'b32', n: '캔뱃지 32mm', w: 32, h: 32, t: 9 },
+      { k: 'b44', n: '캔뱃지 44mm', w: 44, h: 44, t: 10 },
+      { k: 'b58', n: '캔뱃지 58mm', w: 58, h: 58, t: 12 },
+      { k: 'b75', n: '캔뱃지 75mm', w: 75, h: 75, t: 13 },
+      { k: 'st', n: '스마트톡 40mm', w: 40, h: 40, t: 8 },
+      { k: 'mg', n: '아크릴 마그넷 50mm', w: 50, h: 50, t: 5 },
+      { k: 'pc', n: '포토카드 55×85', w: 55, h: 85, t: 1 },
+      { k: 'fg', n: '미니 피규어 50mm', w: 45, h: 50, t: 30 }
+    ] }
+};
+var TORD = ['bl'];
+var S = { ty: 'bl', q: '', k: [], s: [], c: [], u: '', pw: '', ph: '', pt: '', pm: '2', all: 0 };
+try { var sv = JSON.parse(localStorage.getItem('pack:st') || 'null'); if (sv) for (var x in sv) if (x in S) S[x] = sv[x]; S.all = 0; if (!TYPES[S.ty]) S.ty = 'bl'; } catch (e) {}
+function save() { try { localStorage.setItem('pack:st', JSON.stringify(S)); } catch (e) {} }
+function $(s) { return document.querySelector(s); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function rd(v) { return Math.round(v * 10) / 10; }
+function T() { return TYPES[S.ty]; }
+function DT() { return D.filter(function (r) { return r.t === S.ty; }); }
+function item() {
+  var w = +S.pw || 0, h = +S.ph || 0; if (!w && !h) return null;
+  var u = T().uses.filter(function (x) { return x.k === S.u; })[0];
+  if (!w) { w = h; h = 0; }
+  return { n: u && u.w === w && u.h === h ? u.n : '제품', w: w, h: h, t: +S.pt || 0, m: S.pm === '' ? 2 : (+S.pm || 0) };
+}
+function selOk(r) { return (!S.s.length || S.s.indexOf(r.v) >= 0) && (!S.c.length || S.c.indexOf(SEL[r.v].c) >= 0); }
+function qMatch(r) {
+  var q = S.q.trim(); if (!q) return true;
+  var md = /^(가로|w)\s*/i.test(q) ? 'w' : /^(세로|h|높이)\s*/i.test(q) ? 'h' : /^(깊이|d)\s*/i.test(q) ? 'd' : '';
+  var n = q.match(/\d+(\.\d+)?/g);
+  if (!n) return (r.k + ' ' + (r.nm || '') + ' ' + (r.m || '') + ' ' + SEL[r.v].n + ' ' + SEL[r.v].c).toLowerCase().indexOf(q.toLowerCase()) >= 0;
+  n = n.map(Number); var near = function (a, b) { return Math.abs(a - b) <= 5; };
+  if (md) return near(r[md], n[0]);
+  if (n.length === 1) return near(r.w, n[0]) || near(r.h, n[0]);
+  var ok2 = (near(r.w, n[0]) && near(r.h, n[1])) || (near(r.w, n[1]) && near(r.h, n[0]));
+  return n.length > 2 && r.d ? ok2 && near(r.d, n[2]) : ok2;
+}
+// 맞추기: 가로 · 세로 = 제품 + 양쪽 여백 ≤ 안쪽, 두께 ≤ 깊이 (깊이 모르면 '확인')
+var GOOD_W = 15, GOOD_H = 25, GOOD_D = 15;
+function fitOf(r, it) {
+  var best = null, os = it.h ? [[it.w, it.h, 0], [it.h, it.w, 1]] : [[it.w, 0, 0], [0, it.w, 1]];
+  os.forEach(function (o) {
+    var nw = o[0] ? o[0] + 2 * it.m : 0, nh = o[1] ? o[1] + 2 * it.m : 0;
+    var dw = r.w - nw, dh = r.h - nh; if (dw < 0 || dh < 0) return;
+    var dd = it.t && r.d ? r.d - it.t : null; if (dd != null && dd < 1) return; // 성형 벽 · 대지 두께 몫 1mm
+    var f = { rot: o[2], lw: o[0] ? r.w - o[0] : null, lh: o[1] ? r.h - o[1] : null, ld: dd, one: !it.h, dq: it.t && !r.d };
+    var g = (!o[0] || dw <= GOOD_W) && (!o[1] || dh <= GOOD_H) && (dd == null || dd <= GOOD_D);
+    f.c = g ? 0 : 1; f.sc = (o[0] ? dw : 0) + (o[1] ? dh * 0.6 : 0) + (dd != null ? dd * 0.5 : 0) + (f.dq ? 8 : 0);
+    if (!best || f.c < best.c || (f.c === best.c && f.sc < best.sc)) best = f;
+  });
+  return best;
+}
+function nearOf(r, it) {
+  var best = null, os = it.h ? [[it.w, it.h, 0], [it.h, it.w, 1]] : [[it.w, 0, 0], [0, it.w, 1]];
+  os.forEach(function (o) {
+    var mw = o[0] ? Math.max(0, o[0] + 2 * it.m - r.w) : 0, mh = o[1] ? Math.max(0, o[1] + 2 * it.m - r.h) : 0, md = it.t && r.d ? Math.max(0, it.t - r.d) : 0, sc = mw * 2 + mh + md * 2;
+    if (!best || sc < best.sc) best = { c: 2, sc: sc, rot: o[2], miss: [mw ? '가로 ' + rd(mw) : '', mh ? '세로 ' + rd(mh) : '', md ? '깊이 ' + rd(md) : ''].filter(Boolean).join(' · ') + 'mm 모자라요' };
+  });
+  return best;
+}
+var FCLS = [['잘 맞아요', '여백을 두고 알맞은 크기'], ['넉넉해요', '남는 공간이 커요 · 속지 · 완충으로 채우거나 그대로 써요'], ['가장 가까운 크기', '맞는 기성품이 없어요 · 맞춤 성형(금형)을 생각해요']];
+function rows() {
+  var it = item(), L = [];
+  DT().forEach(function (r) {
+    if (S.k.length && S.k.indexOf(r.k) < 0) return;
+    if (!selOk(r) || !qMatch(r)) return;
+    var f = it ? fitOf(r, it) : null; if (it && !f) return;
+    L.push({ r: r, f: f });
+  });
+  if (it && !L.length) { DT().forEach(function (r) { if (S.k.length && S.k.indexOf(r.k) < 0) return; if (!selOk(r) || !qMatch(r)) return; L.push({ r: r, f: nearOf(r, it) }); }); L.sort(function (a, b) { return a.f.sc - b.f.sc; }); L = L.slice(0, 6); }
+  if (it) { L.sort(function (a, b) { return a.f.c - b.f.c || a.f.sc - b.f.sc; }); L.slice(0, 3).forEach(function (x) { if (x.f.c < 2) x.rec = 1; }); }
+  else L.sort(function (a, b) { return a.r.w * a.r.h - b.r.w * b.r.h || a.r.d - b.r.d; });
+  return L;
+}
+// 작은 그림: 바깥 · 대지(점선) + 안쪽 칸(진한 선) + 걸이 구멍
+function pic(r) {
+  var ow = r.w + 24, oh = r.h + 40; if (r.c) { var c = r.c.split('×'); ow = +c[0]; oh = +c[1]; } else if (r.o) { var o = r.o.split(/[×\s]/); ow = +o[0]; oh = +o[1]; }
+  var sc = 40 / Math.max(ow, oh), W = ow * sc, Hh = oh * sc, x = (48 - W) / 2, y = (48 - Hh) / 2, iw = r.w * sc, ih = r.h * sc, ix = 24 - iw / 2, iy = y + Hh - ih - Math.max(2, (Hh - ih) * 0.25);
+  var s = '<svg width="48" height="48" viewBox="0 0 48 48">';
+  s += '<rect x="' + x + '" y="' + y + '" width="' + W + '" height="' + Hh + '" rx="2" fill="#fff" stroke="#b0b8c1" stroke-width="1.2"' + (r.k === '클램쉘' && !r.c ? '' : ' stroke-dasharray="3 2"') + '/>';
+  s += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" rx="2.5" fill="#e8f3ff" stroke="#4e5968" stroke-width="1.5"/>';
+  if (r.k !== '클램쉘' || r.c) s += '<ellipse cx="24" cy="' + (y + Math.min(5, (iy - y) / 2)) + '" rx="3" ry="1.6" fill="none" stroke="#4e5968" stroke-width="1"/>';
+  return s + '</svg>';
+}
+function szTxt(r) { return r.w + ' × ' + r.h + (r.d ? ' × ' + r.d : ''); }
+function price(r) { if (r.p == null) return ''; return r.cur === '엔' ? fmt(r.p) + '엔 (세금 별도)' : fmt(r.p) + '원~'; }
+function link(r) { var u = SEL[r.v].u; return /=$/.test(u) ? u + r.id : u; }
+function card(x) {
+  var r = x.r, sl = SEL[r.v];
+  var tags = '<span class="tg">' + esc(r.k) + '</span>' + (sl.c === '일본' ? '<span class="tg jp">일본</span>' : '') + (x.rec ? '<span class="tg rec">추천</span>' : '') + (x.f && x.f.c === 2 ? '<span class="tg warn">작아요</span>' : '') + (x.f && x.f.dq ? '<span class="tg q">깊이 확인</span>' : '');
+  var sub = [r.m ? r.m + (r.th ? ' ' + r.th + 'mm' : '') : ''].filter(Boolean).join(' · ');
+  var how = '';
+  if (x.f) { var f = x.f; how = f.c === 2 ? f.miss : (f.one ? '' : (f.rot ? '눕혀서 · ' : '세로로 · ')) + '남는 공간 ' + [f.lw != null ? '가로 ' + rd(f.lw) : '', f.lh != null ? '세로 ' + rd(f.lh) : '', f.ld != null ? '깊이 ' + rd(f.ld) : ''].filter(Boolean).join(' · ') + 'mm' + (f.dq ? ' · 깊이 표기 없음' : ''); }
+  var dl = '<dl class="dims"><dt>안쪽</dt><dd>' + esc(szTxt(r)) + (r.d ? '' : ' (깊이 표기 없음)') + ' mm</dd>' + (r.o ? '<dt>바깥</dt><dd>' + esc(r.o) + ' mm</dd>' : '') + (r.c ? '<dt>대지</dt><dd>' + esc(r.c) + ' mm</dd>' : '') + (r.n ? '<dt>참고</dt><dd>' + esc(r.n) + '</dd>' : '') + '</dl>';
+  var cp = '블리스터 ' + r.k + ' 안쪽 ' + szTxt(r) + 'mm' + (r.m ? ' · ' + r.m + (r.th ? ' ' + r.th + 'mm' : '') : '') + ' · ' + sl.n + ' ' + (r.nm || '');
+  var m = [r.nm || '', r.q || '', price(r)].filter(Boolean).join(' · ');
+  return '<div class="card"><div class="ch"><div class="pic">' + pic(r) + '</div><div class="sz"><b data-cp="' + esc(cp) + '">' + esc(szTxt(r)) + '<span> mm</span></b><div>' + tags + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</div>' + (how ? '<div class="how">' + esc(how) + '</div>' : '') + '</div></div>' + dl +
+    '<div class="buys"><a class="buy" href="' + esc(link(r)) + '" target="_blank" rel="noopener"><b>' + esc(sl.n) + '</b><span>' + esc(m) + '</span>' + EXT + '</a></div></div>';
+}
+function render() {
+  var L = rows(), it = item(), h = '', t = T();
+  if (it) h += '<div class="box fit"><b>' + esc(it.n) + ' ' + (it.h ? it.w + ' × ' + it.h : '가로 ' + it.w) + 'mm' + (it.t ? ' · 두께 ' + it.t + 'mm' : '') + '에 맞는 ' + t.n + '</b><p>안쪽 가로 · 세로 = 제품 + 양쪽 여백 ' + it.m + 'mm' + (it.t ? ' · 깊이 ≥ 두께' : '') + ' · 세로로 넣기와 눕혀 넣기 중 맞는 쪽으로 계산해요.</p></div>';
+  var nv = {}; DT().forEach(function (r) { nv[r.v] = 1; });
+  h += '<div class="cnt"><b>규격 ' + L.length + '개</b> · 판매처 ' + Object.keys(nv).length + '곳 · 조사 2026.11.22</div>';
+  if (!L.length) h += '<div class="box empty">조건에 맞는 규격이 없어요.<br>필터를 줄이거나 검색어를 바꿔 보세요.</div>';
+  else if (it) {
+    var hid = 0;
+    FCLS.forEach(function (c, ci) {
+      var g = L.filter(function (x) { return x.f.c === ci; }); if (!g.length) return;
+      var cap = S.all ? 999 : ci === 0 ? 24 : 12, show = g.slice(0, cap); hid += g.length - show.length;
+      h += '<div class="grp"><span>' + esc(c[0]) + '</span><small>' + g.length + '개 · ' + esc(c[1]) + '</small></div><div class="grid">' + show.map(card).join('') + '</div>';
+    });
+    if (hid) h += '<div class="more"><button type="button" class="btn2" id="all">' + hid + '개 더 보기</button></div>';
+  } else {
+    var n = 0, cap = S.all || S.q || S.k.length ? 9999 : 60;
+    t.kinds.forEach(function (k) {
+      var g = L.filter(function (x) { return x.r.k === k[0]; }); if (!g.length || n >= cap) return;
+      var show = g.slice(0, Math.max(0, cap - n)); n += show.length;
+      h += '<div class="grp"><span>' + esc(k[1]) + '</span><small>' + g.length + '개 · ' + esc(k[2]) + '</small></div><div class="grid">' + show.map(card).join('') + '</div>';
+    });
+    if (n < L.length) h += '<div class="more"><button type="button" class="btn2" id="all">' + (L.length - n) + '개 더 보기</button></div>';
+  }
+  $('#out').innerHTML = h;
+  var a = $('#all'); if (a) a.onclick = function () { S.all = 1; render(); };
+  document.querySelectorAll('[data-cp]').forEach(function (b) { b.onclick = function () { copy(b.dataset.cp); }; });
+  bar(); panel();
+}
+function cntBy(fn) { var c = {}; DT().forEach(function (r) { fn(r).forEach(function (k) { c[k] = (c[k] || 0) + 1; }); }); return c; }
+function types() {
+  $('#types').innerHTML = TORD.map(function (k) { var n = D.filter(function (r) { return r.t === k; }).length; return '<button type="button" data-ty="' + k + '"' + (S.ty === k ? ' class="on"' : '') + '>' + esc(TYPES[k].n) + '<small>' + n + '</small></button>'; }).join('');
+  $('#types').style.display = TORD.length > 1 ? '' : 'none';
+  document.querySelectorAll('[data-ty]').forEach(function (b) { b.onclick = function () { setType(b.dataset.ty); }; });
+}
+function setType(k) { if (!TYPES[k]) return; S.ty = k; S.k = []; S.s = []; S.c = []; S.u = ''; S.pw = S.ph = S.pt = ''; S.q = ''; $('#q').value = ''; S.all = 0; pSync(); save(); types(); hint(); notes(); render(); }
+function hint() { var t = T(); $('#phint').textContent = t.hint; $('#ptl').textContent = t.mode === 'flat' ? '두께' : '높이'; }
+function bar() {
+  var c = cntBy(function (r) { return [r.k]; });
+  $('#kind').innerHTML = '<button type="button" class="chip' + (!S.k.length ? ' on' : '') + '" data-k="">전체</button>' + T().kinds.filter(function (k) { return c[k[0]]; }).map(function (k) { return '<button type="button" class="chip' + (S.k.indexOf(k[0]) >= 0 ? ' on' : '') + '" data-k="' + esc(k[0]) + '">' + esc(k[1]) + '<small>' + c[k[0]] + '</small></button>'; }).join('');
+  document.querySelectorAll('#kind [data-k]').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; S.k = k ? tog(S.k, k) : []; S.all = 0; save(); render(); }; });
+  var n = (S.u ? 1 : 0) + S.s.length + S.c.length; $('#fb').classList.toggle('has', !!n); $('#fbn').textContent = n || '';
+  $('#qw').classList.toggle('on', !!S.q);
+}
+function panelHtml() {
+  var t = T(), sc = cntBy(function (r) { return [r.v]; }), cc = cntBy(function (r) { return [SEL[r.v].c]; });
+  return '<div class="fp"><div class="fs"><h5>용도<small>넣을 물건 크기</small></h5><div class="use">' +
+    '<button type="button" data-u=""' + (!S.u && !S.pw && !S.ph ? ' class="on"' : '') + '>전체 규격</button>' +
+    t.uses.map(function (u) { return '<button type="button" data-u="' + u.k + '"' + (S.u === u.k ? ' class="on"' : '') + '>' + esc(u.n) + '<small>' + u.w + '×' + u.h + (u.t ? '×' + u.t : '') + '</small></button>'; }).join('') + '</div></div>' +
+    '<div class="fs"><h5>판매 국가</h5><div class="chips">' + ['국내', '일본'].filter(function (c) { return cc[c]; }).map(function (c) { return '<button type="button" class="chip' + (S.c.indexOf(c) >= 0 ? ' on' : '') + '" data-c="' + c + '">' + c + '<small>' + cc[c] + '</small></button>'; }).join('') + '</div></div>' +
+    '<div class="fs"><h5>판매처</h5><div class="chips">' + Object.keys(SEL).filter(function (k) { return sc[k]; }).map(function (k) { return '<button type="button" class="chip' + (S.s.indexOf(k) >= 0 ? ' on' : '') + '" data-s="' + k + '">' + esc(SEL[k].n) + '<small>' + sc[k] + '</small></button>'; }).join('') + '</div></div>' +
+    '<button type="button" class="rst" data-rst="1">필터 초기화</button></div>';
+}
+function tog(arr, v) { return arr.indexOf(v) >= 0 ? arr.filter(function (x) { return x !== v; }) : arr.concat([v]); }
+function setUse(k) { var u = T().uses.filter(function (x) { return x.k === k; })[0]; S.u = k; if (u) { S.pw = String(u.w); S.ph = String(u.h); S.pt = String(u.t || ''); } else { S.pw = S.ph = S.pt = ''; } pSync(); S.all = 0; save(); render(); document.body.classList.remove('sopen'); }
+function pSync() { ['pw', 'ph', 'pt', 'pm'].forEach(function (k) { var i = document.getElementById(k); if (i) i.value = S[k]; }); }
+function panel() {
+  var h = panelHtml(); $('#side').innerHTML = h; $('#sbody').innerHTML = h;
+  ['#side', '#sbody'].forEach(function (root) {
+    var R = $(root);
+    R.querySelectorAll('[data-u]').forEach(function (b) { b.onclick = function () { setUse(b.dataset.u); }; });
+    R.querySelectorAll('[data-s]').forEach(function (b) { b.onclick = function () { S.s = tog(S.s, b.dataset.s); S.all = 0; save(); render(); }; });
+    R.querySelectorAll('[data-c]').forEach(function (b) { b.onclick = function () { S.c = tog(S.c, b.dataset.c); S.all = 0; save(); render(); }; });
+    R.querySelector('[data-rst]').onclick = function () { S.u = ''; S.pw = S.ph = S.pt = ''; S.pm = '2'; pSync(); S.s = []; S.c = []; S.k = []; S.q = ''; $('#q').value = ''; S.all = 0; save(); render(); };
+  });
+}
+// 안내 (종류별)
+var NOTES = {
+  bl: [
+    ['규격 읽는 법 · 고르는 법', [
+      '여기 크기는 <b>안쪽(제품이 들어가는 칸) 가로 × 세로 × 깊이</b> (mm)예요. 바깥 · 대지 크기는 카드 아래에 따로 적었어요.',
+      '제품 가로 · 세로 + 양쪽 여백(기본 2mm)이 안쪽보다 작고, 제품 두께가 깊이보다 작아야 들어가요. 키링은 고리 · 체인까지 포함한 전체 길이로 재요.',
+      '<b>슬라이드</b> = 대지를 레일에 밀어 끼움 (대지 별도 인쇄) · <b>클램쉘</b> = 두 쪽을 눌러 닫음 · <b>걸이형 접이</b> = 위 걸이 구멍이 있는 상하 접이.',
+      '두께는 원래 시트 두께예요. 성형하면 늘어나 실제 벽은 더 얇아요. 무거운 제품은 0.4mm 이상.',
+      '<b>일본</b> 표시 판매처는 1상자(600~3,600개) 단위 · 엔화 · 세금 별도예요. 해외 배송 대행(ZenMarket 등)으로 사요. 국내 소량은 포장닥터 · 올댓프린팅.',
+      '맞는 기성품이 없으면 국내 성형 업체에 맞춤(금형) 제작해요. 금형비가 들고 1~2주 걸려요.'
+    ]],
+    ['대지(속지) · 디자인 주의', [
+      '대지 크기는 <b>판매처 도면 기준</b>으로 잡아요. 기성품은 칼선 · 대지 도면(AI)을 요청해 그 위에 작업해요.',
+      '슬라이드는 레일에 가려지는 가장자리 3~5mm, 열접착은 붙는 테두리 5~8mm에 글자 · 로고를 넣지 않아요.',
+      '블리스터 몸체 뒤에는 작은 글자 · 바코드를 두지 않아요 (굴절 · 반사). 바코드 · 표시사항은 뒷면에.',
+      '열접착 대지는 앞면 히트실(블리스터) 코팅을 지정하고, 붙는 자리에 박 · 라미네이팅 · 부분 UV를 넣지 않아요.',
+      '걸이 구멍은 블리스터와 대지 위치를 맞춰요 (유로홀 폭 약 30mm · 원형 지름 6~8mm).',
+      '분리배출 표시는 플라스틱(PET · PVC)과 종이를 따로 적어요. 도구 › 분리배출 · 표시 마크에서 확인.'
+    ]],
+    ['출처 · 조사 날짜', [
+      '<a href="https://packagedr.cafe24.com/category/블리스터/76/" target="_blank" rel="noopener">포장닥터</a> · 기성 키링 · 스마트톡 · 걸이형 접이 블리스터 (상세 이미지의 안쪽 · 바깥 치수)',
+      '<a href="https://allthatprinting.co.kr/product/detail.html?product_no=2176" target="_blank" rel="noopener">올댓프린팅</a> · 스마트톡 · 마그넷 전용 블리스터 90×135×20 (헤더 20mm)',
+      '<a href="https://www.tpishida.co.jp/off-the-shelf/blister-case/" target="_blank" rel="noopener">石田紙工</a> · 기성 클램쉘 8종 (D · W · H · 대지 Wb · Hb)',
+      '<a href="https://logicaleye-shop.com/?mode=cate&cbid=2674731&csid=5" target="_blank" rel="noopener">ロジカルアイ</a> · スライドパック (PET 0.3mm · 대지 별매) · ダブルパック (PET 0.4~0.6mm)'
+    ], '2026.11.22 각 판매처 상품 페이지에서 모았어요. 가격 · 재고는 바뀔 수 있으니 주문 전에 다시 확인해요. 국내 블리스터는 대부분 맞춤 제작이라 기성 규격이 적어요.']
+  ]
+};
+function notes() {
+  var N = NOTES[S.ty] || [], t = T();
+  $('#notes').innerHTML = N.map(function (n) { return '<details><summary>' + esc(n[0]) + CHEV + '</summary><div class="nb"><ul>' + n[1].map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul>' + (n[2] ? '<p class="src">' + esc(n[2]) + '</p>' : '') + '</div></details>'; }).join('') +
+    '<div class="glo"><button type="button" class="btn2" id="glo"><svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h8"/></svg>용어·견본에서 ' + esc(t.ref) + ' 보기</button></div>';
+  $('#glo').onclick = function () { try { if (window.parent !== window && window.parent.plyshOpenRef) return window.parent.plyshOpenRef('포장', t.ref); } catch (e) {} location.href = '../../#ref'; };
+}
+function copy(t) { var done = function () { toast('복사했어요 · ' + t); }; try { navigator.clipboard.writeText(t).then(done, function () { fb(); }); } catch (e) { fb(); } function fb() { var a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); done(); } catch (e) {} a.remove(); } }
+var tt; function toast(m) { var e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { e.classList.remove('on'); }, 1600); }
+$('#q').value = S.q; pSync();
+document.querySelectorAll('[data-p]').forEach(function (i) { i.oninput = function () { var v = i.value.replace(/[^\d.]/g, ''); if (v !== i.value) i.value = v; S[i.dataset.p] = v; var u = T().uses.filter(function (x) { return x.k === S.u; })[0]; if (u && (String(u.w) !== S.pw || String(u.h) !== S.ph)) S.u = ''; S.all = 0; save(); render(); }; });
+$('#pclr').onclick = function () { setUse(''); };
+$('#q').oninput = function () { S.q = this.value; S.all = 0; save(); render(); };
+$('#qx').onclick = function (e) { e.preventDefault(); S.q = ''; $('#q').value = ''; save(); render(); $('#q').focus(); };
+$('#fb').onclick = function () { document.body.classList.add('sopen'); };
+$('#dim').onclick = $('#sx').onclick = function () { document.body.classList.remove('sopen'); };
+// 용어사전 '규격 보기'에서 들어오면 종류 고르기 (예: bl)
+window.plyshPackKind = function (k) { if (k && TYPES[k]) setType(k); window.scrollTo(0, 0); };
+try { var hs = decodeURIComponent(location.hash.slice(1)); if (TYPES[hs]) S.ty = hs; } catch (e) {}
+types(); hint(); notes(); render();
+</script>
+</body>
+</html>
