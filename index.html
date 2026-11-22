@@ -1658,7 +1658,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm153';
+var APP_VER = '20261122hm154';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2183,7 +2183,7 @@ var TOOLS = [
     { k: 'logo', t: '로고', s: '소속사·아티스트·인쇄·세탁·분리배출 로고 .ai', v: 'logo' },
     { k: 'fonts', t: '폰트', s: '무료 폰트를 분류·시대·분위기별로 찾기', f: 'tools/fonts/' },
     { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 국내 판매 규격 · 구매 링크', f: 'tools/opp/' },
-    { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 투명 케이스 · 안전봉투 · 무지 박스 · 지관통 · 틴케이스 · PVC 슬라이드 지퍼백 기성 규격 · 추천 · 구매 링크', f: 'tools/pack/' }] }
+    { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 투명 케이스 · 안전봉투 · 택배봉투 · 무지 박스 · 지관통 · 틴케이스 · PVC 슬라이드 지퍼백 기성 규격 · 추천 · 구매 링크', f: 'tools/pack/' }] }
 ];
 var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut', die: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
@@ -2775,7 +2775,7 @@ function megaOpen(k) {
 /* 소메뉴 (2026-11-20 실장님): 필터가 아닌 하위 구분은 왼쪽 메뉴에 대메뉴 > 중메뉴 > 소메뉴로.
    지금 열린 중메뉴 아래에 그 화면의 구분(안내 문서 목차, 용어사전 분류, 자가점검리스트 분류)을 펼쳐 보여 준다.
    PC는 왼쪽 메뉴, 모바일은 전체 메뉴(서랍) 안. PC에서는 화면 안 오른쪽 색인을 숨긴다. 필터(팬톤·폰트)는 오른쪽 그대로 */
-var PACK_SUB = [['opp', 'OPP 봉투'], ['bl', '블리스터'], ['pet', '투명 케이스'], ['env', '안전봉투 · 택배봉투'], ['box', '무지 박스'], ['tube', '지관통'], ['tin', '틴케이스'], ['zip', 'PVC 슬라이드 지퍼백']];
+var PACK_SUB = [['opp', 'OPP 봉투'], ['bl', '블리스터'], ['pet', '투명 케이스'], ['env', '안전봉투'], ['mail', '택배봉투'], ['box', '무지 박스'], ['tube', '지관통'], ['tin', '틴케이스'], ['zip', 'PVC 슬라이드 지퍼백']];
 function packCur() { if (S.tk === 'opp') return 'opp'; var f = subFrame('pack'); try { return (f && f.contentWindow.plyshPackTy && f.contentWindow.plyshPackTy()) || NAV.packK || ''; } catch (e) { return ''; } }
 function subFrame(tk) { var t = TOOL_LIST.filter(function (x) { return x.k === tk; })[0]; return t && t.f ? $('#tkWrap iframe[data-f="' + t.f + '"]') : null; }
 function gdKids(gf, lv) { // 안내 문서 목차 → 소메뉴 항목
@@ -2936,7 +2936,7 @@ var PG_DESC = {
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', unit: 'mm · cm · m · in · ft · yd · pt · pc · Q · px를 한 번에 바꿔요 · px는 해상도(ppi)를 골라서', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
   qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '지류 · MD · 디자인 용어 · 영문 · 한자 · 일본어 표기와 함께',
-  checklist: '컨펌 요청 전 단계별 자가 점검', opp: '제품 크기를 넣으면 맞는 OPP 봉투를 추천해요 · 국내 판매처 규격과 구매 링크 · 조사 2026.11.22', pack: '제품 크기를 넣으면 맞는 기성 포장재를 추천해요 · OPP 봉투 · 블리스터 · 투명 케이스 · 안전봉투 · 무지 박스 · 지관통 · 틴케이스 · PVC 슬라이드 지퍼백 · 판매처 규격과 구매 링크 · 조사 2026.11.22' };
+  checklist: '컨펌 요청 전 단계별 자가 점검', opp: '제품 크기를 넣으면 맞는 OPP 봉투를 추천해요 · 국내 판매처 규격과 구매 링크 · 조사 2026.11.22', pack: '제품 크기를 넣으면 맞는 기성 포장재를 추천해요 · OPP 봉투 · 블리스터 · 투명 케이스 · 안전봉투 · 택배봉투 · 무지 박스 · 지관통 · 틴케이스 · PVC 슬라이드 지퍼백 · 판매처 규격과 구매 링크 · 조사 2026.11.22' };
 function pgInfo() {
   var v = S.view; if (v === 'start' || inWs()) return null;
   var sp = SPACES.filter(function (x) { return x.k === spOf(); })[0], cur = navCur();
