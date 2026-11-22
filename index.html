@@ -2498,8 +2498,8 @@ var SPACES = [
     { g: 'MD', i: [{ k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 구매 링크', tool: 1 }] },
     { g: '디자인', i: [{ k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }] },
     { g: '공통', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
-  { k: 'gloss', t: '용어·견본', d: '지류 · 음반 · MD · 디자인 — 개념과 견본', home: 'ref', ic: 'ref', g: [
-    { g: '용어·견본', i: [{ k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 특수 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 책 구조 · 부속 · 포장' }, { k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · 포장 · 마감 · 실물 포맷 · 엔터 · 팬 굿즈' }, { k: 'ref:MD', t: 'MD', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 부자재 · 비즈의 소재 · 기법 · 용어' }, { k: 'opp', t: 'OPP 봉투', s: 'MD 포장 견본 · 규격 · 구매 링크' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
+  { k: 'gloss', t: '용어·견본', d: '지류 · 음반 · MD 소재 · 부자재 · 포장 · 디자인 — 개념과 견본', home: 'ref', ic: 'ref', g: [
+    { g: '용어·견본', i: [{ k: 'ref:지류', t: '지류', s: '용지 · 인쇄 · 특수 인쇄 · 코팅 · 박 · 가공 · 톰슨 · 조립 · 제본 · 책 구조 · 부속 · 포장' }, { k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · 포장 · 마감 · 실물 포맷 · 엔터 · 팬 굿즈' }, { k: 'ref:MD', t: 'MD 소재', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 소재 · 기법 · 용어' }, { k: 'ref:부자재', t: 'MD 부자재', s: '고리 · 체인 · 끈 · 여밈 · 장식 · 비즈 · 주얼리 사이즈' }, { k: 'ref:포장', t: 'MD 포장', s: '봉투 · 필름 · 완충 · 박스 · 택 · 마감' }, { k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 기본 · 오버프린트 · 포토카드 · 팩샷 · 상품 라벨 · 바코드 · QR · FSC 로고 · 표시사항 · 사진 촬영 · 인쇄 감리' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   { k: 'admin', t: '안내', d: '퀵 배차, 사무실 이용, 행정 업무, 업무 시스템', home: 'space:admin', ic: 'office', g: [
@@ -2764,7 +2764,7 @@ function subItems() {
         // 용어사전 > 지류 · MD · 디자인(중메뉴) > 분류(소메뉴). 지금 파트의 분류만 (2026-11-22 실장님)
         var cur = null;
         $$('.rnav .rtab > *', d).forEach(function (e) {
-          if (e.classList.contains('rph')) { cur = e.textContent.trim(); return; }
+          if (e.classList.contains('rph')) { cur = e.dataset.p || e.textContent.trim(); return; }
           if (cur !== S.refP || e.tagName !== 'BUTTON') return;
           var sm = e.querySelector('small'); L.push({ t: (sm ? e.firstChild.textContent : e.textContent).trim(), n: sm ? sm.textContent : '', on: e.classList.contains('on'), go: function () { e.click(); } });
         });
