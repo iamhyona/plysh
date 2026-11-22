@@ -1011,7 +1011,11 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .tmsum .tdsh { margin-left:auto; }
 /* 정보 구조 시안 (2026-11-19 2차): 오늘 · 프로젝트 · 도구 · 자료 네 공간 + 프로젝트 작업 공간 + 어디서나 찾기(⌘K)
    html[data-nav] = w 왼쪽 메뉴 · t 위 메뉴. 데스크탑 우선, 1023px 이하는 모바일 */
-:root { --pvh:0px; --sw:264px; } /* 2026-11-22 실장님: 메뉴 이름이 두 줄 되지 않게 넓힘 */
+:root { --pvh:0px; --sw:264px; }
+/* 2026-11-22 실장님 "작업 영역이 늘었다 줄었다": 스크롤바 자리 항상 비워 둠 → 내용 길이가 바뀌어도 폭 그대로 */
+html { scrollbar-gutter:stable; }
+@media (min-width:1024px) { #gdL { grid-template-columns:minmax(0, 1fr) 184px; gap:20px; } #gdL .gdtoc { order:0; display:block; } } /* 목차 칸을 처음부터 잡아 둠 (불러온 뒤 줄어들지 않게) */
+.gdin iframe:not(.rdy) { visibility:hidden; } #tkWrap iframe:not(.rdy), #rvF:not(.rdy), #imF:not(.rdy) { visibility:hidden; } /* 정돈 끝난 뒤 보이기 */ /* 2026-11-22 실장님: 메뉴 이름이 두 줄 되지 않게 넓힘 */
 html[data-nav] #nav, html[data-nav] #tkBar { display:none !important; }
 .nvi { width:16px; height:16px; flex:none; }
 /* 찾기 칸 (머리줄) */
@@ -1203,7 +1207,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 #nsd .ss.on { color:var(--txt); } #nsd .ss.on .nvi { color:var(--txt); }
 #nsd .si { display:flex; align-items:center; width:100%; min-height:40px; border:0; background:none; text-align:left; padding:0 12px 0 40px; margin-top:2px; border-radius:12px; font-size:15px; font-weight:500; color:var(--sub); }
 #nsd .si:hover { background:var(--bg); }
-#nsd .si.on { background:var(--txt); color:#fff; font-weight:600; }
+#nsd .si.on { background:var(--bg); color:var(--txt); font-weight:700; } /* 2026-11-22 실장님: 중메뉴 선택 = 토글 메뉴처럼 연한 회색 */
 #nsd .si.tgh.on, #nsd .si.tgh.op { background:var(--bg); color:var(--txt); font-weight:700; } .s3[hidden] { display:none !important; }
 #nsd .si small { margin-left:auto; font-size:11px; color:var(--faint); }
 #nsd .sg { font-size:12px; font-weight:700; color:var(--faint); padding:8px 12px 3px 40px; letter-spacing:.03em; }
@@ -1628,7 +1632,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm84';
+var APP_VER = '20261122hm86';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2189,13 +2193,13 @@ function renderTk() {
   var f = $('#tkWrap iframe[data-f="' + t.f + '"]');
   if (!f) {
     f = document.createElement('iframe'); f.dataset.f = t.f; f.title = t.t;
-    f.onload = function () { f._ok = 1; embTidy(f); tkGo(f); setTimeout(pgSync, 50); };
+    f.onload = function () { f._ok = 1; embTidy(f); tkGo(f); try { fsTick(); } catch (e) {} f.classList.add('rdy'); setTimeout(pgSync, 50); }; setTimeout(function () { f.classList.add('rdy'); }, 4000);
     f.src = t.f + '?v=' + APP_VER + (t.pv ? '#' + t.pv : ''); $('#tkWrap').appendChild(f);
   }
   f._pv = t.pv || ''; if (f._ok) tkGo(f);
   rvSize(); window.scrollTo(0, 0);
 }
-function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) { if (f._pv === 'ref' && NAV.refHome && f.contentWindow.plyshRefHome) { NAV.refHome = 0; f.contentWindow.plyshRefHome(); } if (f._pv === 'ref' && NAV.refPart && f.contentWindow.plyshRefPart) { f.contentWindow.plyshRefPart(NAV.refPart); NAV.refPart = ''; } if (f._pv === 'ref' && NAV.refQ && f.contentWindow.plyshRefFind) { f.contentWindow.plyshRefFind(NAV.refQ); NAV.refQ = ''; } f.contentWindow.plyshGo(f._pv); } if (f.dataset.f === 'tools/opp/' && NAV.oppK != null && f.contentWindow.plyshOppKind) { f.contentWindow.plyshOppKind(NAV.oppK); NAV.oppK = null; } } catch (e) {} }
+function tkGo(f) { try { if (f._pv && f.contentWindow.plyshGo) { if (f._pv === 'ref' && NAV.refHome && f.contentWindow.plyshRefHome) { NAV.refHome = 0; f.contentWindow.plyshRefHome(); } if (f._pv === 'ref' && NAV.refPart && f.contentWindow.plyshRefPart) { f.contentWindow.plyshRefPart(NAV.refPart); NAV.refPart = ''; } if (f._pv === 'ref' && NAV.refQ && f.contentWindow.plyshRefFind) { f.contentWindow.plyshRefFind(NAV.refQ); NAV.refQ = ''; } f.contentWindow.plyshGo(f._pv); } if (f.dataset.f === 'tools/opp/' && NAV.oppK != null && f.contentWindow.plyshOppKind) { f.contentWindow.plyshOppKind(NAV.oppK); NAV.oppK = null; } } catch (e) {} try { subTick(); } catch (e) {} } // 화면 바꾼 즉시 색인 숨김까지 맞춰 폭이 흔들리지 않게
 // 도구 ↔ 용어사전 서로 이동 (2026-11-22 OPP 봉투 규격): 용어 검색으로 열기 / 도구 열기
 window.plyshOpenRef = function (part, q) { navGo('refq:' + (q || '')); };
 window.plyshOpenTool = function (k, arg) { if (k === 'opp') NAV.oppK = arg || ''; navGo(k); };
@@ -2347,11 +2351,11 @@ var GD_TIDY = ':root { --accent:#3182f6 !important; --ok:#3182f6 !important; --n
   + '@media (max-width:640px) { .wrap { padding:18px 18px 40px !important; } }';
 function embTidy(f, css) { try { var d = f.contentDocument; if (!d || d.getElementById('plyTidy')) return; var st = d.createElement('style'); st.id = 'plyTidy'; st.textContent = css || EMB_TIDY; (d.head || d.documentElement).appendChild(st); } catch (e) {} }
 function renderReview() {
-  var f = $('#rvF'); if (!f.getAttribute('src')) { f.onload = function () { embTidy(f); }; f.setAttribute('src', 'review/?v=' + APP_VER); }
+  var f = $('#rvF'); if (!f.getAttribute('src')) { f.onload = function () { embTidy(f); try { fsTick(); } catch (e) {} f.classList.add('rdy'); }; setTimeout(function () { f.classList.add('rdy'); }, 4000); f.setAttribute('src', 'review/?v=' + APP_VER); }
   rvSize(); window.scrollTo(0, 0);
 }
 function renderImpose() {
-  var f = $('#imF'); if (!f.getAttribute('src')) { f.onload = function () { embTidy(f); }; f.setAttribute('src', 'impose/?v=' + APP_VER); }
+  var f = $('#imF'); if (!f.getAttribute('src')) { f.onload = function () { embTidy(f); try { fsTick(); } catch (e) {} f.classList.add('rdy'); }; setTimeout(function () { f.classList.add('rdy'); }, 4000); f.setAttribute('src', 'impose/?v=' + APP_VER); }
   rvSize(); window.scrollTo(0, 0);
 }
 window.addEventListener('resize', function () { if (S.view === 'review' || S.view === 'impose' || S.view === 'tk') rvSize(); });
@@ -2670,15 +2674,16 @@ function renderGdoc() {
   $('#main').innerHTML = back + '<div class="gdl" id="gdL"><div class="gdin"><iframe id="gdIn" title="' + esc(doc ? doc.t : '안내') + '"></iframe></div><nav class="gdtoc" id="gdToc" aria-label="목차"></nav></div>';
   bindGo($('#main'));
   var fr = $('#gdIn');
+  setTimeout(function () { fr.classList.add('rdy'); }, 2500);
   fr.onload = function () {
     try {
       var d = fr.contentDocument; d.documentElement.setAttribute('data-theme', 'light'); var bk = d.querySelector('.back'); if (bk) bk.style.display = 'none';
       embTidy(fr, GD_TIDY);
       var ld = d.querySelector('header .lede'); S.gdLede = ld ? ld.textContent.trim() : ''; var pp = $('#npg p'); if (pp) pp.textContent = S.gdLede;
-      var fit = function () { var h = Math.max(d.body ? d.body.scrollHeight : 0, d.documentElement.scrollHeight) + 4; if (Math.abs(fr.offsetHeight - h) > 2) fr.style.height = h + 'px'; }; fit(); setTimeout(fit, 400); setTimeout(fit, 1200);
-      var so = d.createElement('style'); so.textContent = 'html, body { overflow:hidden !important; scrollbar-width:none !important; }'; d.head.appendChild(so); if (window.ResizeObserver && d.body) new ResizeObserver(fit).observe(d.body); d.querySelectorAll('img').forEach(function (im) { im.addEventListener('load', fit); });
+      var so = d.createElement('style'); so.textContent = 'html, body { overflow:hidden !important; scrollbar-width:none !important; }'; d.head.appendChild(so);
+      var fit = function () { var h = Math.max(d.body ? d.body.scrollHeight : 0, d.documentElement.scrollHeight) + 4; if (Math.abs(fr.offsetHeight - h) > 2) fr.style.height = h + 'px'; }; fit(); fr.classList.add('rdy'); setTimeout(fit, 400); setTimeout(fit, 1200); if (window.ResizeObserver && d.body) new ResizeObserver(fit).observe(d.body); d.querySelectorAll('img').forEach(function (im) { im.addEventListener('load', fit); });
       setTimeout(function () { gdToc(fr); }, 80);
-    } catch (e) { fr.style.height = '80vh'; }
+    } catch (e) { fr.style.height = '80vh'; fr.classList.add('rdy'); }
   };
   fr.setAttribute('src', 'guide/' + f + (f.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now());
 }
