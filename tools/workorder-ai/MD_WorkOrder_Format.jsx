@@ -56,7 +56,7 @@ function styles(t) {
     hint: cstyle(p + 'Hint', F_R, b * 0.88, C_MUTE),
     req: cstyle(p + 'Req', F_S, b * 0.88, C_REQ),
     opt: cstyle(p + 'Opt', F_S, b * 0.88, C_MUTE),
-    dim: cstyle(p + 'Dim', F_R, b, C_LEN),
+    dim: opFill(cstyle(p + 'Dim', F_R, b, C_LEN)),
     chip: cstyle(p + 'Chip', F_R, b * 1.5, tint(C_CHIP, 60)),
     box: cstyle(p + 'Box', F_R, b * 1.25, C_TXT)
   };
@@ -94,6 +94,8 @@ function wrapText(s, maxEm) {
 }
 function blanks(s) { return String(s).replace(/____/g, '________'); }
 
+function opFill(st) { try { st.characterAttributes.overprintFill = true; } catch (e) {} return st; }
+
 /* SVG 도면 → 별색 · 글자 스타일 */
 function mapCol(c) {
   if (!c || c.typename != 'CMYKColor') return null;
@@ -108,6 +110,7 @@ function recolor(it, S, k, kd) {
   if (it.typename == 'CompoundPathItem') { for (var j = 0; j < it.pathItems.length; j++) recolor(it.pathItems[j], S, k, kd); return; }
   if (it.typename == 'PathItem') {
     if (it.stroked) { it.strokeWidth = it.strokeWidth * k; var m = mapCol(it.strokeColor); if (m) { it.strokeColor = m; it.strokeOverprint = true; } }
+    if (it.filled) { var mf = mapCol(it.fillColor); if (mf) { it.fillColor = mf; it.fillOverprint = true; } }
     if (it.strokeDashes && it.strokeDashes.length) { var d = it.strokeDashes, nd = []; for (var q = 0; q < d.length; q++) nd.push(d[q] * kd); it.strokeDashes = nd; }
   }
   if (it.typename == 'TextFrame') {
@@ -115,6 +118,7 @@ function recolor(it, S, k, kd) {
     var m2 = mapCol(fc); var cx = it.left + it.width / 2, cy = it.top;
     (m2 == C_LEN ? S.dim : S.hint).applyTo(it.textRange, true);
     if (m2 && m2 != C_LEN) it.textRange.characterAttributes.fillColor = m2;
+    if (m2) it.textRange.characterAttributes.overprintFill = true;
     it.left = cx - it.width / 2; it.top = cy;
   }
 }
@@ -187,7 +191,7 @@ function item(d, ox, oy) {
       if (o.val && tab > 0) for (var c2 = tab + 1; c2 < tx.length; c2++) o.val.applyTo(pr.characters[c2], true);
       if (o.tag) { var tl = 2; for (var c3 = tx.length - tl; c3 < tx.length; c3++) (o.tag == 'r' ? S.req : S.opt).applyTo(pr.characters[c3], true); }
       if (o.chip) S.chip.applyTo(pr.characters[0], true);
-      if (o.lineCol) for (var c4 = 0; c4 < tab; c4++) { var ch4 = pr.characters[c4]; S.label.applyTo(ch4, true); ch4.characterAttributes.fillColor = o.lineCol; }
+      if (o.lineCol) for (var c4 = 0; c4 < tab; c4++) { var ch4 = pr.characters[c4]; S.label.applyTo(ch4, true); ch4.characterAttributes.fillColor = o.lineCol; ch4.characterAttributes.overprintFill = true; }
       for (var c5 = 0; c5 < tx.length; c5++) if (tx.charAt(c5) == '□') S.box.applyTo(pr.characters[c5], true);
     } catch (eS) { NOTE.push(d.n + ' 글자 스타일: ' + eS); }
   }
