@@ -3217,6 +3217,11 @@ function toggleRecycling(val){
   p.extraInfo.recycling=arr;
   save();
 }
+// 분리배출 · 표시 마크 계산기 마지막 결과 (localStorage 'mark:out') 보여 주기 · 복사
+function markOut(){try{return JSON.parse(localStorage.getItem('mark:out')||'null');}catch(e){return null;}}
+function markOutHtml(){var o=markOut();if(!o||!o.text)return '';var d=new Date(o.at),ds=(d.getMonth()+1)+'.'+d.getDate()+' '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2);
+  return '<div class="pk-note pk-col" style="margin-top:12px"><span>마크 계산 결과'+(o.name?' · '+eh(o.name):'')+' <small class="fxsm">'+ds+'</small></span><div style="white-space:pre-line">'+eh(o.text)+'</div></div>'
+    +'<button class="fxbtn" id="cpBtn_mark" style="margin-top:8px;margin-right:8px" onclick="_cpWithBtn(markOut().text,\'cpBtn_mark\',\'마크 계산 결과 복사됨\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>결과 복사</button>';}
 function renderPackagingSection(p){
   var ei=p.extraInfo||{};
   var pkgChks=_PKG_OPTS.map(function(v){
@@ -3233,7 +3238,7 @@ function renderPackagingSection(p){
     +'<div class="field-card pk-card">'
     +'<div class="pk-g"><div class="pk-lb">포장 방식</div><div class="pk-grid">'+pkgChks+'</div></div>'
     +'<div class="pk-g"><div class="pk-lb">분리배출 표시 재질</div><div class="pk-grid">'+recChks+'</div>'
-    +(window.parent!==window&&window.parent.navGo?'<button class="fxbtn" style="margin-top:12px" onclick="window.parent.navGo(\'mark\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10H7z"/><path d="M4 12h3M17 12h3M12 4v3M12 17v3"/></svg>분리배출 · 표시 마크 계산하기</button>':'')+'</div>'
+    +markOutHtml()+(window.parent!==window&&window.parent.navGo?'<button class="fxbtn" style="margin-top:12px" onclick="window.parent.navGo(\'mark\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10H7z"/><path d="M4 12h3M17 12h3M12 4v3M12 17v3"/></svg>분리배출 · 표시 마크 계산하기</button>':'')+'</div>'
     +'<div class="pk-g"><div class="pk-lb">증지</div><div class="pk-grid">'
     +'<label class="pk-ck"><input type="checkbox"'+(ei.hasJungji?' checked':'')+' onchange="setExtraInfo(\'hasJungji\',this.checked)">증지 사용</label></div></div>'
     +'</div>';
