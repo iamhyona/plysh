@@ -1166,6 +1166,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .s3 button.s4:before, .stg .s3 button:before { left:14px !important; top:50% !important; bottom:auto !important; width:4px !important; height:4px !important; margin:-2px 0 0 !important; border-radius:50% !important; background:var(--faint) !important; }
 .s3 button.s4.on:before, .stg .s3 button.on:before { background:var(--txt) !important; }
 .stg .s3 { padding-left:0 !important; }
+.s3 button, .stg button { font-size:14px !important; font-weight:500 !important; color:var(--mute) !important; } /* 같은 단계는 펼침 여부와 상관없이 같은 글자 */
+.s3 button.on, .stg button.on, .s3 button.pt.op, .stg button.si3.op { font-weight:700 !important; color:var(--txt) !important; }
 #nfm .s3, #nfm .stg { padding-left:0 !important; } #nfm .stg .s3 { padding-left:0 !important; }
 html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid-template-columns:minmax(0, 1fr) !important; }
 /* ── W: 왼쪽 메뉴 ── */
@@ -1649,7 +1651,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm132';
+var APP_VER = '20261122hm133';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
