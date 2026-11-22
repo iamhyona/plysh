@@ -57,7 +57,7 @@ function styles(t) {
     req: cstyle(p + 'Req', F_S, b * 0.88, C_REQ),
     opt: cstyle(p + 'Opt', F_S, b * 0.88, C_MUTE),
     dim: cstyle(p + 'Dim', F_R, b, C_LEN),
-    chip: cstyle(p + 'Chip', F_R, b * 1.9, tint(C_CHIP, 60)),
+    chip: cstyle(p + 'Chip', F_R, b * 1.5, tint(C_CHIP, 60)),
     box: cstyle(p + 'Box', F_R, b * 1.25, C_TXT)
   };
 }
@@ -154,7 +154,7 @@ function item(d, ox, oy) {
   sec('소재', d.R['소재']); opts(d.mat);
   sec('소재 세부', d.R['소재 세부']); sub(d.det);
   sec('인쇄 · 가공', d.R['인쇄 · 가공']); opts(d.proc);
-  sec('컬러', d.R['컬러 안내']); para('자유롭게 작성', S.hint);
+  sec('컬러', d.R['컬러 안내']); var CL = ['PANTONE 23 C (백그라운드 판)', 'PANTONE ____ C (________)', 'PANTONE ____ C (________)']; for (var c = 0; c < 3; c++) para('●\t' + CL[c], S.body, { chip: true, tabs: [[U * 2.4 * MM, 'L']], sb: c ? b * 0.3 : 0 });
   sec('치수 (정수 mm)', d.R['치수']);
   var dk = 0; for (var dj = 0; dj < d.dims.length; dj++) dk = Math.max(dk, emw(d.dims[dj]));
   for (var di = 0; di < d.dims.length; di++) para(d.dims[di] + '\t______ mm', S.body, { tabs: [[(dk + 2) * U * MM, 'L']], val: S.dim });
