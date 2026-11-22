@@ -192,7 +192,7 @@ details.ck { border-top:1px solid var(--line); }
 details.ck:first-of-type { border-top:0; }
 details.ck > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px; padding:12px 2px; font-weight:800; font-size:15px; }
 details.ck > summary::-webkit-details-marker { display:none; }
-details.ck > summary::before { content:'›'; display:inline-block; width:14px; color:var(--mute); transition:transform .15s; font-size:18px; line-height:1; }
+details.ck > summary::before { content:''; display:inline-block; flex:none; width:16px; height:16px; background:var(--mute); -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center/contain no-repeat; transition:transform .15s; }
 details.ck[open] > summary::before { transform:rotate(90deg); }
 details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 .bd i { font-style:normal; font-size:11.5px; font-weight:800; border-radius:6px; padding:2px 7px; }
@@ -333,7 +333,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 <div id="sheet"></div>
 
 <div class="ov" id="ov"><div class="vw">
-  <div class="vh"><button class="ib" id="vPrev" aria-label="이전 페이지">‹</button><b id="vT"></b><button class="ib" id="vZoom">확대</button><button class="ib" id="vNext" aria-label="다음 페이지">›</button><button class="ib" id="vX" aria-label="닫기"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="vh"><button class="ib" id="vPrev" aria-label="이전 페이지"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto"><path d="M15 6l-6 6 6 6"/></svg></button><b id="vT"></b><button class="ib" id="vZoom">확대</button><button class="ib" id="vNext" aria-label="다음 페이지"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto"><path d="M9 6l6 6-6 6"/></svg></button><button class="ib" id="vX" aria-label="닫기"><svg class="pic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;flex:none"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div class="vb"><div class="vc" id="vc"><div class="stage" id="stage"></div></div><div class="vl" id="vl"></div></div>
 </div></div>
 
