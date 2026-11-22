@@ -294,6 +294,9 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 #gBtn { min-height:44px; margin-bottom:22px; display:flex; justify-content:center; } #gBtn.hide { display:none; }
 #lgWait { display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:22px; } #lgWait.hide { display:none; }
 #lgErr { color:#f04452; font-size:13px; margin:-12px 0 14px; } #lgErr.hide, #lgPin.hide { display:none; } #lgPin { margin-bottom:12px; }
+#lgCodeBox { display:flex; flex-direction:column; align-items:center; gap:8px; margin:0 0 14px; width:100%; max-width:320px; } #lgCodeBox.hide, #lgCode.hide { display:none; }
+.lgHint { font-size:13px; color:var(--mute); line-height:1.5; margin:0 0 4px; }
+#lgCodeIn { width:100%; border:1px solid #e5e8eb; border-radius:12px; padding:12px 14px; font:inherit; font-size:14px; }
 #lgWait b { font-size:15px; } #lgWait span { color:var(--mute); font-size:14px; }
 .btn2 { border:1px solid #e5e8eb; background:#fff; border-radius:12px; padding:11px 22px; font-weight:700; font-size:14px; color:var(--txt); }
 .lnk { border:0; background:none; color:var(--mute); font-size:13px; text-decoration:underline; padding:6px; }
@@ -1362,6 +1365,8 @@ html[data-nav] #cvSeg { display:none !important; }
   <p id="lgMsg"></p>
   <div id="gBtn"></div>
   <p id="lgErr" class="hide"></p>
+  <div id="lgCodeBox" class="hide"><p class="lgHint">Claude 앱 같은 앱 안 화면에서는 구글이 로그인을 막아요.<br>로그인된 브라우저의 PLYSH에서 <b>접속 승인 → 연결 코드 복사</b> 후 여기에 붙여넣어 주세요.</p><input id="lgCodeIn" placeholder="연결 코드 붙여넣기" autocomplete="off"><button class="btn2" id="lgCodeOk">들어가기</button></div>
+  <button class="lnk" id="lgCode">연결 코드로 들어가기</button>
   <button class="lnk" id="lgPin">팀 PIN으로 들어가기</button>
   <div id="lgWait" class="hide"><b id="lgWho"></b><span>승인되면 자동으로 열려요.</span><button class="btn2" id="lgRe">다시 확인</button><button class="lnk" id="lgOut">다른 계정으로 로그인</button></div>
   <small class="lgFoot">한 번 승인된 기기는 다음부터 바로 열려요 · <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></small>
@@ -1619,7 +1624,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm54';
+var APP_VER = '20261122lg5';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4575,7 +4580,7 @@ function gsiLoad() {
 }
 function showLogin(wait) {
   $('#pinScr').classList.add('hide'); $('#lgScr').classList.remove('hide');
-  $('#lgWait').classList.toggle('hide', !wait); $('#gBtn').classList.toggle('hide', !!wait); $('#lgPin').classList.toggle('hide', !!wait); $('#lgErr').classList.add('hide');
+  $('#lgWait').classList.toggle('hide', !wait); $('#gBtn').classList.toggle('hide', !!wait); $('#lgPin').classList.toggle('hide', !!wait); $('#lgCode').classList.toggle('hide', !!wait); $('#lgCodeBox').classList.add('hide'); $('#lgErr').classList.add('hide');
   $('#lgMsg').innerHTML = wait ? '실장님께 승인 요청을 보냈어요.' : '디자인4팀 전용 공간이에요.<br>구글 계정으로 로그인하면 실장님 승인 후 들어올 수 있어요.';
   clearInterval(showLogin.t);
   if (wait) { $('#lgWho').textContent = ls.get('d4:who') || ''; showLogin.t = setInterval(lgCheck, 15000); return; }
@@ -4607,6 +4612,18 @@ function authErr(e) {
 }
 function lgErr(m) { var x = $('#lgErr'); x.textContent = m; x.classList.remove('hide'); toast(m); }
 $('#lgPin').onclick = showPin;
+/* 연결 코드 (2026-11-22): 구글 로그인이 막힌 앱 안 화면(Claude 앱 등)용. 로그인된 기기에서 복사한 코드로 들어옴 */
+$('#lgCode').onclick = function () { $('#lgCodeBox').classList.remove('hide'); $('#lgCode').classList.add('hide'); $('#lgCodeIn').focus(); };
+$('#lgCodeOk').onclick = function () {
+  var t = $('#lgCodeIn').value.trim(), b = $('#lgCodeOk');
+  if (!/^dv1\.\w+\.\w+$/.test(t)) return lgErr('연결 코드가 맞지 않아요. 다시 복사해 주세요');
+  b.classList.add('busy');
+  call('appMe', t).then(function (o) {
+    if (o.st !== 'ok') return lgErr('아직 승인 전인 코드예요');
+    S.tok = t; S.pin = t; ls.set('d4:tok', t); ls.set('d4:who', (o.n ? o.n + ' · ' : '') + o.e); $('#lgCodeIn').value = ''; lgEnter();
+  }).catch(function (e) { lgErr(errMsg(e)); }).then(function () { b.classList.remove('busy'); });
+};
+$('#lgCodeIn').onkeydown = function (e) { if (e.key === 'Enter') $('#lgCodeOk').click(); };
 $('#lgRe').onclick = function () { lgCheck(true); };
 $('#lgOut').onclick = lgOut;
 
@@ -4630,6 +4647,7 @@ function dvDraw(r) {
   }
   var h = '<div class="dvg">승인 대기 ' + W.length + '</div>' + (W.length ? W.map(row).join('') : '<p class="mnote" style="margin:6px 0 0">새 요청이 없어요</p>');
   h += '<div class="dvg">승인된 기기 ' + O.length + '</div>' + O.map(row).join('');
+  h += '<div class="dvpin"><span>앱 안 화면(Claude 앱 등)에서 열 때</span><button class="btn2" id="dvCode">연결 코드 복사</button></div>';
   h += '<div class="dvpin"><span>예전 팀 PIN 접속 · <b>' + (r.pinOff ? '막힘' : '허용 중') + '</b></span><button class="btn2" id="dvPin">' + (r.pinOff ? '다시 허용' : '막기') + '</button></div>';
   $('#dvB').innerHTML = h;
   $$('#dvB [data-dv]').forEach(function (b) {
@@ -4639,6 +4657,11 @@ function dvDraw(r) {
         .catch(function (e) { toast(errMsg(e)); b.classList.remove('busy'); });
     };
   });
+  $('#dvCode').onclick = function () {
+    var t = S.tok, done = function () { toast('복사했어요. 앱 안 PLYSH 로그인 화면의 연결 코드에 붙여넣어 주세요'); };
+    function old() { var x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('복사하지 못했어요'); } x.remove(); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, old); else old();
+  };
   $('#dvPin').onclick = function () {
     var b = $('#dvPin'); b.classList.add('busy');
     call('appPinOff', S.tok, !r.pinOff).then(function (r2) { dvDraw(r2); toast(r2.pinOff ? '팀 PIN 접속을 막았어요' : '팀 PIN 접속을 다시 열었어요'); })
