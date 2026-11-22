@@ -346,12 +346,17 @@
     if (font instanceof PDFArray) { gs.font = doc.font(font.get(0), res); gs.fs = N(doc.get(font.get(1))); }
   };
 
+  function edges(segs) { // 바코드 한 패스: 세로 변 x · 가로 변 y 모음 (바 · 칸 폭 실측용)
+    function u(a) { a.sort(function (p, q) { return p - q; }); var o = []; a.forEach(function (v) { if (!o.length || v - o[o.length - 1] > 0.02) o.push(v); }); return o; }
+    var xs = [], ys = []; segs.forEach(function (s) { if (Math.abs(s[0] - s[2]) < 0.05 && Math.abs(s[1] - s[3]) > 0.05) xs.push(s[0]); else if (Math.abs(s[1] - s[3]) < 0.05 && Math.abs(s[0] - s[2]) > 0.05) ys.push(s[1]); });
+    return { x: u(xs), y: u(ys) };
+  }
   Interp.prototype.paint = function (gs, box, fill, stroke, segs, mc) {
     var vis = gs.clip ? isect(box, gs.clip) : box;
     if (fill) {
       var fi = this.patInks(gs, true);
       var rect = segs.length >= 3 && segs.length <= 5 && segs.every(function (s) { return Math.abs(s[0] - s[2]) < 0.05 || Math.abs(s[1] - s[3]) < 0.05; }); // 네모 칠 (가림 판정용)
-      this.emit('fill', { box: box, vis: vis, ink: fi, op: gs.op, ca: gs.ca, rect: rect, layer: this.layer(mc), segs: fi.spots ? segs.slice() : null, vb: segs.length >= 80 && segs.every(function (s) { return Math.abs(s[0] - s[2]) < 0.05 || Math.abs(s[1] - s[3]) < 0.05; }) ? segs.length : 0 }); // vb = 네모 여러 개를 한 덩어리로 칠함 (바코드 한 패스)
+      this.emit('fill', { box: box, vis: vis, ink: fi, op: gs.op, ca: gs.ca, rect: rect, layer: this.layer(mc), segs: fi.spots ? segs.slice() : null, vb: segs.length >= 80 && segs.every(function (s) { return Math.abs(s[0] - s[2]) < 0.05 || Math.abs(s[1] - s[3]) < 0.05; }) ? segs.length : 0, ve: segs.length >= 80 ? edges(segs) : null }); // vb = 네모 여러 개를 한 덩어리로 칠함 (바코드 한 패스)
     }
     if (stroke) {
       var si = this.patInks(gs, false), w = gs.lw * scaleOf(gs.ctm), hw = Math.max(w / 2, 0.25), sb = [box[0] - hw, box[1] - hw, box[2] + hw, box[3] + hw];

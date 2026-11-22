@@ -387,9 +387,9 @@ async function barcodes(R, pdfjs) {
     function cluster(list, minN) { // 붙어 있는 덩어리
       var out = []; list.forEach(function (f) { var c = out.find(function (o) { return f.box[0] < o[2] + 4 * MM && f.box[2] > o[0] - 4 * MM && f.box[1] < o[3] + 4 * MM && f.box[3] > o[1] - 4 * MM; }); if (c) { c[0] = Math.min(c[0], f.box[0]); c[1] = Math.min(c[1], f.box[1]); c[2] = Math.max(c[2], f.box[2]); c[3] = Math.max(c[3], f.box[3]); c.n++; } else { var o = f.box.slice(); o.n = 1; out.push(o); } }); return out.filter(function (o) { return o.n >= minN; });
     }
-    cluster(bars, 20).forEach(function (b) { cands.push({ P: P, b: b, kind: 'bar' }); });
-    cluster(barsH, 20).forEach(function (b) { if (!cands.some(function (c) { return c.P === P && b[0] < c.b[2] && b[2] > c.b[0] && b[1] < c.b[3] && b[3] > c.b[1]; })) cands.push({ P: P, b: b, kind: 'bar', rot: true }); });
-    P.fills.forEach(function (f) { if (!f.vb || !f.box || f.ink.white) return; var w = f.box[2] - f.box[0], h = f.box[3] - f.box[1]; if (Math.max(w, h) < 12 * MM || Math.max(w, h) > 90 * MM || Math.min(w, h) < 3 * MM) return; if (cands.some(function (c) { return c.P === P && f.box[0] < c.b[2] && f.box[2] > c.b[0] && f.box[1] < c.b[3] && f.box[3] > c.b[1]; })) return; var o = f.box.slice(); o.n = f.vb; cands.push({ P: P, b: o, kind: 'bar', one: true }); }); // 한 패스로 된 바코드 (읽힐 때만 알림)
+    cluster(bars, 20).forEach(function (b) { cands.push({ P: P, b: b, kind: 'bar', mem: bars.filter(function (f) { return f.box[0] >= b[0] - 0.1 && f.box[2] <= b[2] + 0.1 && f.box[1] >= b[1] - 0.1 && f.box[3] <= b[3] + 0.1; }) }); });
+    cluster(barsH, 20).forEach(function (b) { if (!cands.some(function (c) { return c.P === P && b[0] < c.b[2] && b[2] > c.b[0] && b[1] < c.b[3] && b[3] > c.b[1]; })) cands.push({ P: P, b: b, kind: 'bar', rot: true, mem: barsH.filter(function (f) { return f.box[0] >= b[0] - 0.1 && f.box[2] <= b[2] + 0.1 && f.box[1] >= b[1] - 0.1 && f.box[3] <= b[3] + 0.1; }) }); });
+    P.fills.forEach(function (f) { if (!f.vb || !f.box || f.ink.white) return; var w = f.box[2] - f.box[0], h = f.box[3] - f.box[1]; if (Math.max(w, h) < 12 * MM || Math.max(w, h) > 90 * MM || Math.min(w, h) < 3 * MM) return; if (cands.some(function (c) { return c.P === P && f.box[0] < c.b[2] && f.box[2] > c.b[0] && f.box[1] < c.b[3] && f.box[3] > c.b[1]; })) return; var o = f.box.slice(); o.n = f.vb; cands.push({ P: P, b: o, kind: 'bar', one: true, ve: f.ve, rot: (f.box[3] - f.box[1]) > (f.box[2] - f.box[0]) }); }); // 한 패스로 된 바코드 (읽힐 때만 알림)
     cluster(sq, 60).forEach(function (b) { // QR은 정사각형 · 모듈 크기 일정 · 채움 30~75% (FSC 같은 로고 제외)
       var w = b[2] - b[0], h = b[3] - b[1]; if (w < 6 * MM || h / w < 0.8 || h / w > 1.25) return;
       var inb = sq.filter(function (f) { return f.box[0] >= b[0] - 0.01 && f.box[2] <= b[2] + 0.01 && f.box[1] >= b[1] - 0.01 && f.box[3] <= b[3] + 0.01; });
@@ -461,16 +461,37 @@ async function barcodes(R, pdfjs) {
     var bw = mm(c.b[2] - c.b[0]), bh = mm(c.b[3] - c.b[1]);
     var msg = res.fmt + ' · ' + res.text + ' · ' + bw.toFixed(1) + '×' + bh.toFixed(1) + 'mm' + (chk === null ? '' : chk ? ' · 체크 숫자 맞음' : ' · 체크 숫자 틀림'), bad = chk === false ? '바코드 체크 숫자 틀림' : '';
     if (/EAN_13/.test(res.fmt) && c.P._isbn) { var t = c.P._isbn.map(function (s) { return s.t.replace(/\D/g, ''); }).join(' '); if (t.indexOf(res.text) < 0) bad = '바코드 번호(' + res.text + ')가 ISBN 글자와 달라요'; }
-    issue({ page: c.P.i, sev: bad ? 'err' : 'info', cat: 'print', code: 'bcok', title: bad || ((c.kind === 'qr' ? 'QR코드' : '바코드') + ' 읽힘'), detail: msg, fix: bad ? '바코드와 번호를 다시 확인해 주세요.' : (c.kind === 'qr' ? '주소가 맞는지 열어 봐 주세요.' : ''), boxes: [c.b], bc: { fmt: res.fmt, text: res.text, w: bw, h: bh, chk: chk, kind: c.kind } });
     var nMod = /EAN_13|UPC_A/.test(res.fmt) ? 95 : /EAN_8/.test(res.fmt) ? 67 : /UPC_E/.test(res.fmt) ? 51 : 0;
-    if (nMod && c.kind !== 'qr') { // 배율 = 가장 가는 바 폭(X) 기준 (GS1 소매 POS 최소 X 0.264mm = 80%), 높이 줄이기(트렁케이션) 따로
-      var Lb = Math.max(bw, bh), Sb = Math.min(bw, bh), xm = Lb / nMod, mag = xm / 0.33, hNom = (nMod === 95 ? 22.85 : nMod === 67 ? 18.23 : 22.85) * mag, hr = Math.max(0, Sb - 5 * xm) / hNom; // 가드 바가 5X 더 길게 내려옴
-      var xs = 'X(가장 가는 바) ' + xm.toFixed(3) + 'mm · 배율 약 ' + Math.round(mag * 100) + '% · 높이 ' + Sb.toFixed(1) + 'mm (그 배율 기준 ' + Math.round(hr * 100) + '%)';
-      if (mag < 0.6) issue({ page: c.P.i, sev: 'err', cat: 'print', code: 'bcsize', title: '바코드 배율 약 ' + Math.round(mag * 100) + '% · 바가 너무 가늘어요', detail: xs, fix: '권장 X 0.264mm(80%) 이상. 최소 0.2mm(60%). 출력물 스캔 테스트 · 인쇄소 BWR 확인', boxes: [c.b] });
-      else if (mag < 0.795) issue({ page: c.P.i, sev: 'warn', cat: 'print', code: 'bcsize', title: '바코드 배율 약 ' + Math.round(mag * 100) + '% · GS1 소매 최소(80%) 미만', detail: xs, fix: '출력물로 휴대폰 · 납품처 스캐너 테스트. 인쇄소 BWR 반영. 비도공지 · 실크 인쇄면 80% 이상 권장', boxes: [c.b] });
+    if (nMod && c.kind !== 'qr') { // 기준 = 가장 가는 검은 바 · 가장 좁은 흰 칸 실측 mm (GS1 소매 POS X 0.264mm 이상), 높이 줄이기(트렁케이션) 따로
+      var rot = !!c.rot, iv = [];
+      if (c.ve) { var E = rot ? c.ve.y : c.ve.x; if (E && E.length >= 4 && E.length % 2 === 0) for (var ei = 0; ei < E.length; ei += 2) iv.push([E[ei], E[ei + 1]]); }
+      else if (c.mem && c.mem.length) { c.mem.forEach(function (f) { iv.push(rot ? [f.box[1], f.box[3]] : [f.box[0], f.box[2]]); }); }
+      iv.sort(function (p, q) { return p[0] - q[0]; }); var mg = []; iv.forEach(function (v) { var l = mg[mg.length - 1]; if (l && v[0] <= l[1] + 0.01) l[1] = Math.max(l[1], v[1]); else mg.push(v.slice()); });
+      var minB = 0, minS = 0;
+      if (mg.length >= 10) { minB = Math.min.apply(null, mg.map(function (v) { return v[1] - v[0]; })); var sp = []; for (var gi = 1; gi < mg.length; gi++) sp.push(mg[gi][0] - mg[gi - 1][1]); minS = Math.min.apply(null, sp); minB = mm(minB); minS = mm(minS); }
+      var Lb = Math.max(bw, bh), Sb = Math.min(bw, bh), xm = minB > 0 && minS > 0 ? (minB + minS) / 2 : Lb / nMod, mag = xm / 0.33, hNom = (nMod === 95 ? 22.85 : nMod === 67 ? 18.23 : 22.85) * mag, hr = Math.max(0, Sb - 5 * xm) / hNom; // 가드 바가 5X 더 길게 내려옴
+      var bwr = minB > 0 ? (minS - minB) / 2 : null;
+      // 양옆 여백 (콰이어트 존): 바코드 옆에 붙은 다른 그림 · 글자 (배경 · 흰 상자 · 숫자 글자는 제외)
+      var B0 = rot ? c.b[1] : c.b[0], B1 = rot ? c.b[3] : c.b[2], C0 = rot ? c.b[0] : c.b[1], C1 = rot ? c.b[2] : c.b[3], gapL = 99, gapR = 99;
+      var others = c.P.fills.concat(c.P.strokes, c.P.images || []).filter(function (f) { return f.box && !(f.ink && f.ink.white) && (c.mem ? c.mem.indexOf(f) < 0 : true) && !(f.vb && f.box[0] === c.b[0] && f.box[1] === c.b[1]); }).map(function (f) { return f.box; })
+        .concat(segsOf(c.P).filter(function (t) { return !/^[\d\s>-]*$/.test(t.t); }).map(function (t) { return t.b; }));
+      others.forEach(function (o) {
+        if (o[0] <= c.b[0] + 0.1 && o[1] <= c.b[1] + 0.1 && o[2] >= c.b[2] - 0.1 && o[3] >= c.b[3] - 0.1) return; // 바코드를 감싼 배경
+        var a0 = rot ? o[1] : o[0], a1 = rot ? o[3] : o[2], d0 = rot ? o[0] : o[1], d1 = rot ? o[2] : o[3];
+        if (d1 <= C0 || d0 >= C1) return;
+        if (a1 <= B0 + 0.1) gapL = Math.min(gapL, mm(B0 - a1)); else if (a0 >= B1 - 0.1) gapR = Math.min(gapR, mm(a0 - B1));
+      });
+      var qL = 11 * xm, qR = 7 * xm, qBad = (gapL < qL - 0.15 ? '왼쪽 ' + gapL.toFixed(1) + 'mm (필요 ' + qL.toFixed(1) + ')' : '') + (gapR < qR - 0.15 ? (gapL < qL - 0.15 ? ' · ' : '') + '오른쪽 ' + gapR.toFixed(1) + 'mm (필요 ' + qR.toFixed(1) + ')' : '');
+      var xs = (minB > 0 ? '가장 가는 검은 바 ' + minB.toFixed(3) + 'mm · 가장 좁은 흰 칸 ' + minS.toFixed(3) + 'mm · ' : '') + 'X 약 ' + xm.toFixed(3) + 'mm (배율 약 ' + Math.round(mag * 100) + '%)' + (bwr !== null && Math.abs(bwr) >= 0.005 ? ' · 바 폭 보정(BWR) 약 ' + bwr.toFixed(3) + 'mm' : '') + ' · 높이 ' + Sb.toFixed(1) + 'mm (그 배율 기준 ' + Math.round(hr * 100) + '%)';
+      msg += ' · ' + xs;
+      if (mag < 0.6) issue({ page: c.P.i, sev: 'err', cat: 'print', code: 'bcsize', title: '바코드 바가 너무 가늘어요 (X 약 ' + xm.toFixed(2) + 'mm)', detail: xs, fix: '권장 가장 가는 바 · 흰 칸 0.264mm 이상 (80%). 0.2mm 아래는 번짐으로 칸이 메워짐. 출력물 스캔 테스트 · 인쇄소 BWR 확인', boxes: [c.b] });
+      else if (mag < 0.795) issue({ page: c.P.i, sev: 'warn', cat: 'print', code: 'bcsize', title: '바코드 X 약 ' + xm.toFixed(3) + 'mm · GS1 소매 최소(0.264mm) 미만', detail: xs, fix: '출력물로 휴대폰 · 납품처 스캐너 테스트. 인쇄소 BWR 반영. 비도공지 · 실크 인쇄면 0.264mm 이상 권장', boxes: [c.b] });
+      if (minB > 0 && minS > 0 && minS < minB - 0.01) issue({ page: c.P.i, sev: 'warn', cat: 'print', code: 'bcbwr', title: '바코드 흰 칸이 검은 바보다 좁아요', detail: xs, fix: '인쇄하면 잉크가 번져 바가 굵어지고 흰 칸은 더 좁아짐. 바 폭 보정(BWR)은 검은 바를 가늘게, 흰 칸은 넓게', boxes: [c.b] });
+      if (qBad) issue({ page: c.P.i, sev: 'warn', cat: 'print', code: 'bcquiet', title: '바코드 양옆 여백(콰이어트 존)이 좁아요', detail: qBad + ' · 여백 = 왼쪽 11X · 오른쪽 7X', fix: '여백 안 글자 · 선 · 무늬 · 재단선 치우기. 숫자(사람이 읽는 번호)는 괜찮음', boxes: [c.b] });
       if (hr < 0.5) issue({ page: c.P.i, sev: 'warn', cat: 'print', code: 'bctrunc', title: '바코드 높이를 많이 줄였어요 (약 ' + Math.round(hr * 100) + '%)', detail: xs, fix: '권장 원래 높이의 50% 이상. 대형마트 평판(전방향) 스캐너는 짧으면 못 읽음. 손 스캐너 납품처면 출력 테스트로 확인', boxes: [c.b] });
       else if (hr < 0.9) issue({ page: c.P.i, sev: 'adv', cat: 'print', code: 'bctrunc', title: '바코드 높이 줄임 (약 ' + Math.round(hr * 100) + '%)', detail: xs, fix: 'GS1 소매 기준은 높이 줄이기 불가. 평판 스캐너 납품처면 높이 유지', boxes: [c.b] });
     }
+    issue({ page: c.P.i, sev: bad ? 'err' : 'info', cat: 'print', code: 'bcok', title: bad || ((c.kind === 'qr' ? 'QR코드' : '바코드') + ' 읽힘'), detail: msg, fix: bad ? '바코드와 번호를 다시 확인해 주세요.' : (c.kind === 'qr' ? '주소가 맞는지 열어 봐 주세요.' : ''), boxes: [c.b], bc: { fmt: res.fmt, text: res.text, w: bw, h: bh, chk: chk, kind: c.kind } });
   }
   var pageHit = {};
   for (var si = 0; si < scanPages.length; si++) {
