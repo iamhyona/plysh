@@ -2258,13 +2258,13 @@ function renderRef() {
       var khas = EE.some(function (x) { return x.sw; }), md = khas ? RM() : 'x';
       h += refModeBar(khas) + (md === 's' ? '' : refIntro(k));
       if (md === 't') {
-        var KD = KG.map(function (g) { return [g, g, EE.filter(function (x) { return x.g === g && x.sw; }).map(function (x) { return [x.r[1], x.r[3]]; })]; }).filter(function (g) { return g[2].length; });
+        var KD = KG.map(function (g) { return [g, g, EE.filter(function (x) { return x.g === g; }).map(function (x) { return [x.r[1], x.r[3]]; })]; }).filter(function (g) { return g[2].length; });
         h += kindsCard(KD);
         KG.forEach(function (g) { var N = EE.filter(function (x) { return x.g === g && !x.sw; }); if (N.length) h += '<div class="rkh">' + esc(g) + '<small>' + N.length + '</small></div><div class="card glc mterm">' + N.map(function (x) { return x.e; }).join('') + '</div>'; });
       } else {
-        var KF = md === 's' ? KG.filter(function (g) { return EE.some(function (x) { return x.g === g && x.sw; }); }) : KG; if (KF.indexOf(kg) < 0) kg = KF[0];
-        RF = rFilt('data-rk', KF, kg, function (g) { return EE.filter(function (x) { return x.g === g && (md !== 's' || x.sw); }).length; });
-        h += '<div class="card glc">' + EE.filter(function (x) { return x.g === kg && (md !== 's' || x.sw); }).map(function (x) { return x.e; }).join('') + '</div>';
+        var KF = KG; if (KF.indexOf(kg) < 0) kg = KF[0];
+        RF = rFilt('data-rk', KF, kg, function (g) { return EE.filter(function (x) { return x.g === g; }).length; });
+        h += '<div class="card glc">' + EE.filter(function (x) { return x.g === kg; }).map(function (x) { return x.e; }).join('') + '</div>';
       }
       h += '<div class="nt c">' + (RP === 'MD' ? '굵은 이름을 누르면 복사돼요 · 수치는 일반 기준이라 최종 사양은 제작 업체 기준으로 확인' : '굵은 이름을 누르면 복사돼요') + '</div>';
     } else if (k === '용지 크기') {
@@ -2282,13 +2282,13 @@ function renderRef() {
       var rows = refRows(st);
       h += refModeBar(ghas) + (md === 's' ? '' : refIntro(k));
       if (md === 't') {
-        var KD = tabs.map(function (n) { var di = hcol(n, /^설명/), it = isP ? uniq(refRows(n).map(function (r) { return String(r[1]).trim(); })).map(function (x) { return [x, '']; }) : E[n].filter(function (x) { return x.sw; }).map(function (x) { return [String(x.r[0]).trim(), di >= 0 ? x.r[di] : '']; }); return [n, flat ? k : sub(n), it]; }).filter(function (g) { return g[2].length; });
+        var KD = tabs.map(function (n) { var di = hcol(n, /^설명/), it = isP ? uniq(refRows(n).map(function (r) { return String(r[1]).trim(); })).map(function (x) { return [x, '']; }) : E[n].map(function (x) { return [String(x.r[0]).trim(), di >= 0 ? x.r[di] : '']; }); return [n, flat ? k : sub(n), it]; }).filter(function (g) { return g[2].length; });
         h += kindsCard(KD);
         var N = isP ? [] : [].concat.apply([], tabs.map(function (n) { return E[n].filter(function (x) { return !x.sw; }); }));
         if (N.length) h += '<div class="rkh">용어<small>' + N.length + '</small></div><div class="card glc mterm">' + N.map(function (x) { return x.e; }).join('') + '</div>';
       } else {
-        var TF = isP || md !== 's' ? tabs : tabs.filter(function (n) { return E[n].some(function (x) { return x.sw; }); }); if (TF.indexOf(st) < 0) { st = TF[0]; rows = refRows(st); }
-        var pick = function (n) { return E[n].filter(function (x) { return md !== 's' || x.sw; }); };
+        var TF = tabs; if (TF.indexOf(st) < 0) { st = TF[0]; rows = refRows(st); }
+        var pick = function (n) { return E[n]; };
         if (!flat) RF = rFilt('data-rs', TF, st, function (n) { return isP ? refRows(n).length : pick(n).length; });
         if (isP) {
           var G = grp(rows, 1);
