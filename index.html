@@ -1160,10 +1160,10 @@ html[data-nav="t"] #nsub.has { display:flex; }
 /* 2026-11-22 실장님 (2): 중메뉴 밑 소메뉴 = 세로선, 소메뉴 밑 항목 = 블릿. 소메뉴 18px · 항목 14px 더 들여씀 */
 .s3, .stg { padding-left:40px !important; }
 .s3 button, .stg button { position:relative; padding-left:18px !important; }
-.s3 button:before, .stg button:before { display:block; left:7px !important; top:50% !important; bottom:auto !important; width:2px !important; height:14px !important; margin-top:-7px; border-radius:1px !important; background:var(--line) !important; }
+.s3 button:before, .stg button:before { display:block; left:4px !important; top:9px !important; bottom:9px !important; width:2px !important; height:auto !important; margin:0 !important; border-radius:1px !important; background:var(--line) !important; }
 .s3 button.on:before, .stg button.on:before, .stg button.si3.op:before, .s3 button.pt.op:before { background:var(--txt) !important; }
 .s3 button.s4, .stg .s3 button { padding-left:32px !important; }
-.s3 button.s4:before, .stg .s3 button:before { left:21px !important; width:4px !important; height:4px !important; margin-top:-2px; border-radius:50% !important; background:var(--faint) !important; }
+.s3 button.s4:before, .stg .s3 button:before { left:20px !important; top:50% !important; bottom:auto !important; width:4px !important; height:4px !important; margin:-2px 0 0 !important; border-radius:50% !important; background:var(--faint) !important; }
 .s3 button.s4.on:before, .stg .s3 button.on:before { background:var(--txt) !important; }
 .stg .s3 { padding-left:0 !important; }
 #nfm .s3, #nfm .stg { padding-left:0 !important; } #nfm .stg .s3 { padding-left:0 !important; }
@@ -1649,7 +1649,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm129';
+var APP_VER = '20261122hm130';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
