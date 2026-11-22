@@ -39,18 +39,18 @@ function cstyle(name, f, size, color) {
   var a = st.characterAttributes;
   if (f) a.textFont = f; a.size = size; a.tracking = -15;
   try { a.kerningMethod = AutoKernType.OPTICAL; } catch (e1) {}
-  a.autoLeading = false; a.leading = size * 1.75; a.fillColor = color; return st;
+  a.autoLeading = false; a.leading = size * 2.0; a.fillColor = color; return st;
 }
-var TIERS = {}, TB = { XS: 11, S: 14, M: 18, L: 26, XL: 38 };
+var TIERS = {}, TB = { XS: 14, S: 20, M: 26, L: 36, XL: 54 }, TT = { XS: 20, S: 28, M: 36, L: 52, XL: 76 };
 function tierOf(D) { return D <= 60 ? 'XS' : D <= 150 ? 'S' : D <= 300 ? 'M' : D <= 700 ? 'L' : 'XL'; }
 function styles(t) {
   if (TIERS[t]) return TIERS[t];
   var b = TB[t], p = 'HYONA_' + t + '_';
   return TIERS[t] = {
     b: b,
-    title: cstyle(p + 'Title', F_B, b * 2, C_TXT),
+    title: cstyle(p + 'Title', F_B, TT[t], C_TXT),
     eye: cstyle(p + 'Eyebrow', F_R, b * 0.9, C_MUTE),
-    sec: cstyle(p + 'Section', F_B, b * 1.35, C_TXT),
+    sec: cstyle(p + 'Section', F_B, b * 1.2, C_TXT),
     label: cstyle(p + 'Label', F_B, b, C_TXT),
     body: cstyle(p + 'Body', F_R, b, C_TXT),
     hint: cstyle(p + 'Hint', F_R, b * 0.88, C_MUTE),
@@ -133,20 +133,20 @@ function placeSvg(f, x, y, w, S) {
 function item(d, ox, oy) {
   OX = ox; OY = oy; CT = layer.groupItems.add(); CT.name = d.k;
   var D = d.D, t = tierOf(D), S = styles(t), b = S.b, U = b * 0.3528; // U = 본문 1em (mm)
-  var LH = U * 1.75, M = Math.max(10, U * 3); BOXST = S.box;
+  var LH = U * 2.0, M = Math.max(10, U * 3); BOXST = S.box;
   var IW = 40 * U;                 // 정보 열 폭
   var x = M, y = M, maxEm = 40;
   // 제목만 따로, 나머지 정보는 글상자 하나 (엔터로 나눈 단락)
-  y += U * 2.6; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
-  y += U * 3.6;
-  var P = [], GAPPT = b * 1.75 * 2.2, KW = 9 * U * MM, IWPT = IW * MM;
+  var TU = TT[t] * 0.3528; y += TU * 1.3; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
+  y += TU * 1.1 + U * 1.2;
+  var P = [], GAPPT = b * 2.0 * 2.2, KW = 9 * U * MM, IWPT = IW * MM;
   function para(text, st, o) { o = o || {}; o.text = text; o.st = st; P.push(o); }
   function sec(name, lv) { para(name + (lv ? '   ' + (lv == 'r' ? '필수' : '권장') : ''), S.sec, { sb: GAPPT, tag: lv, after: b * 0.5 }); }
   function opts(arr) { var ls = wrapOpts(arr, maxEm, true); for (var i = 0; i < ls.length; i++) para(blanks(ls[i]), S.body); }
   function sub(rows) {
     for (var i = 0; i < rows.length; i++) {
       var ls = wrapOpts(rows[i][1], maxEm - 9, true);
-      for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[KW, 'L']], label: !j });
+      for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[KW, 'L']], label: !j, sb: (!j && i) ? b * 0.4 : 0 });
     }
   }
   para(d.n, S.sec);
@@ -154,8 +154,7 @@ function item(d, ox, oy) {
   sec('소재', d.R['소재']); opts(d.mat);
   sec('소재 세부', d.R['소재 세부']); sub(d.det);
   sec('인쇄 · 가공', d.R['인쇄 · 가공']); opts(d.proc);
-  sec('컬러 안내', d.R['컬러 안내']); opts(d.col);
-  for (var c = 0; c < 3; c++) para('●\tPANTONE ____________   영문 컬러명 ____________   용도 ________', S.body, { chip: true, tabs: [[U * 2.6 * MM, 'L']], sb: b * 0.35 });
+  sec('컬러', d.R['컬러 안내']); para('자유롭게 작성', S.hint);
   sec('치수 (정수 mm)', d.R['치수']);
   var dk = 0; for (var dj = 0; dj < d.dims.length; dj++) dk = Math.max(dk, emw(d.dims[dj]));
   for (var di = 0; di < d.dims.length; di++) para(d.dims[di] + '\t______ mm', S.body, { tabs: [[(dk + 2) * U * MM, 'L']], val: S.dim });
