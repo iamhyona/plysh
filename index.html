@@ -1632,7 +1632,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm95';
+var APP_VER = '20261122hm96';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2137,7 +2137,7 @@ function openGd(g, anchor) {
 var TOOLS = [
   { g: '작성', i: [
     { k: 'doc', t: '지류 사양서', s: '품목을 모아 MASTER 양식 순서로 사양서 만들기', f: 'tools/proof/', pv: 'doc' },
-    { k: 'formly', t: '상품 라벨 생성기', s: '굿즈 상품 사양서와 라벨 문구, 엑셀·시트로 저장', f: 'tools/formly/', nw: 1 },
+    { k: 'formly', t: '상품 정보 라벨 생성기', s: '상품 후면 표시사항 문구와 케어 · 주의 · 원산지 같은 부착 라벨 정리', f: 'tools/formly/', nw: 1 },
     { k: 'filename', t: '폴더·파일명 생성기', s: '규칙에 맞는 파일명·작업폴더명·하위폴더명 복사', f: 'tools/filename/' }] },
   { g: '계산', i: [
     { k: 'spine', t: '책등 계산기', s: '쪽수·종이·제본으로 책등 두께와 표지 펼친 크기', v: 'spine' },
@@ -2160,7 +2160,7 @@ var TOOLS = [
 ];
 var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut', die: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
-var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 사양서', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', unit: '단위 환산', opp: 'OPP 봉투 찾기', mark: '분리배출 마크', review: 'PREFLIGHT', gcheck: '상품 검수기', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
+var TOOL_SHORT = { doc: '지류 사양서', formly: '상품 정보 라벨', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', unit: '단위 환산', opp: 'OPP 봉투 찾기', mark: '분리배출 마크', review: 'PREFLIGHT', gcheck: '상품 검수기', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
 if (TOOL_OLD[S.tk]) S.tk = TOOL_OLD[S.tk]; if (S.view === 'calc') S.view = 'tk', S.tk = 'cut';
 function toolKey() { if (S.view === 'tk') return S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === S.view; })[0]; return t ? t.k : ''; }
 function isToolView(v) { return v === 'tools' || v === 'tk' || TOOL_LIST.some(function (x) { return x.v === v; }); }
@@ -2496,7 +2496,7 @@ var SPACES = [
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
   { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
     { g: '지류', i: [{ k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }, { k: 'paper', t: '용지 크기', tool: 1 }] },
-    { g: 'MD', i: [{ k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 라벨 생성기', s: '상품 사양서와 라벨 문구', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 구매 링크', tool: 1 }] },
+    { g: 'MD', i: [{ k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 구매 링크', tool: 1 }] },
     { g: '디자인', i: [{ k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }, { k: 'logo', t: '로고', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }] },
     { g: '공통', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
   { k: 'gloss', t: '용어·견본', d: '지류 · 음반 · MD 소재 · 부자재 · 포장 · 디자인 — 개념과 견본', home: 'ref', ic: 'ref', g: [
@@ -2866,7 +2866,7 @@ function crumbHtml() {
 }
 var PG_DESC = {
   todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
-  review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '굿즈 상품 사양서와 라벨 문구, 엑셀 · 시트로 저장',
+  review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '상품 후면 표시사항 문구와 케어 · 주의 · 원산지 같은 부착 라벨 정리',
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', unit: 'mm · cm · m · in · ft · yd · pt · pc · Q · px를 한 번에 바꿔요 · px는 해상도(ppi)를 골라서', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
   qk: '카카오 T 퀵 주문 · 거래처 주소와 연락처', logo: '소속사 · 아티스트 · 인쇄 · 세탁 · 분리배출 로고 .ai', fonts: '무료 폰트를 분류 · 시대 · 분위기별로 찾기', pt: '팬톤 번호와 CMYK 근사값 · 최종 확인은 실물 컬러칩으로', ref: '지류 · MD · 디자인 용어 · 영문 · 한자 · 일본어 표기와 함께',

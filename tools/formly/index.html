@@ -5,7 +5,7 @@
 <script>/* 승인된 팀원만 (2026-11-19): 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>상품 라벨 생성기</title>
+<title>상품 정보 라벨 생성기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <link href="./Formly_files/css2" rel="stylesheet">
@@ -234,7 +234,7 @@ select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .field-card.no-hover:hover{border-color:var(--border)!important;}
 .field-card.no-hover:hover .field-row-inner{background:rgba(255,255,255,.04);}
 .sett-hdr{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);margin-bottom:14px;padding-bottom:10px;}
-.sett-hdr-label{font-size:17px;font-weight:700;color:var(--accent);flex:1;letter-spacing:-.02em;}
+.sett-hdr-label{font-size:17px;font-weight:700;color:#191f28;flex:1;letter-spacing:-.02em;}
 .settings-locked select{pointer-events:none;opacity:.6;cursor:default;}
 .settings-locked .cau-sel select{pointer-events:auto!important;opacity:1!important;cursor:pointer!important;}
 .settings-locked .default-radio{pointer-events:none;opacity:.6;}
@@ -406,6 +406,44 @@ html.emb .fx-lsel select { height:36px; padding:0 30px 0 12px; border:0; border-
 .pk-note.pk-col > span { display:block; margin:0 0 6px; }
 .pk-hint { margin-top:12px; font-size:13px; color:#8b95a1; }
 .fxadd { height:40px !important; padding:0 16px !important; border:0 !important; border-radius:999px !important; background:none !important; box-shadow:inset 0 0 0 1.5px #d1d6db !important; color:#4e5968 !important; font-weight:600 !important; }
+
+/* 2026-11-22 상품 정보 라벨 생성기: 부착 라벨 · 단추 픽토그램 · 간격 */
+html.emb .fxact button, html.emb .copy-btn, html.emb .add-row-btn, .fxbtn, html.emb .fxchips .fxadd { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+html.emb .fxact button { padding:0 16px; } html.emb .fxchips .fxadd { padding:0 14px; background:#fff; }
+.fxbtn { height:40px; padding:0 16px; border:0; border-radius:12px; background:#f2f4f6; color:#4e5968; font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.fxbtn:hover { background:#e5e8eb; color:#191f28; }
+.fxsm { font-size:13px; font-weight:500; color:#8b95a1; letter-spacing:0; }
+.pk-lb small { display:block; margin-top:4px; font-size:13px; font-weight:500; color:#8b95a1; line-height:1.5; }
+.tg-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; }
+.tg-card { display:grid; grid-template-columns:20px minmax(0,1fr); column-gap:12px; align-items:start; text-align:left; padding:13px 14px; border:0; border-radius:14px; background:#f2f4f6; font:inherit; color:#191f28; cursor:pointer; line-height:1.5; }
+.tg-card.on { background:#fff; box-shadow:inset 0 0 0 1.5px #4e5968; }
+.tg-ck { width:20px; height:20px; margin-top:1px; border:2px solid #b0b8c1; border-radius:3px; background:#fff; position:relative; }
+.tg-card.on .tg-ck { background:#191f28; border-color:#191f28; }
+.tg-card.on .tg-ck::after { content:""; position:absolute; left:5px; top:1px; width:5px; height:10px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); }
+.tg-tx b { display:block; font-size:15px; font-weight:600; } .tg-tx b i { font-style:normal; font-weight:500; color:#8b95a1; font-size:13px; margin-left:6px; }
+.tg-tx small { display:block; margin-top:2px; font-size:13px; color:#8b95a1; }
+.tg-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 16px; } @media (max-width:520px) { .tg-2 { grid-template-columns:1fr; } }
+.tg-v { font-size:15px; line-height:1.6; color:#191f28; }
+.tg-note { margin:12px 0 0; font-size:13px; line-height:1.6; color:#8b95a1; }
+.tg-empty { font-size:14px; line-height:1.6; color:#8b95a1; }
+.tg-fb { display:grid; gap:8px; }
+.tg-fr { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr) 32px; gap:8px; align-items:center; }
+.tg-fr .del-btn { display:inline-flex; align-items:center; justify-content:center; }
+html.emb .tg-fb .add-row-btn { margin-top:0; }
+.tg-cg + .tg-cg { margin-top:16px; }
+.tg-cgn { font-size:13px; font-weight:600; color:#4e5968; margin:0 0 8px; }
+.tg-cs { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; }
+.tg-sym { display:flex; align-items:center; gap:10px; min-height:52px; padding:8px 12px; border:0; border-radius:12px; background:#f2f4f6; font:inherit; font-size:13px; font-weight:600; color:#4e5968; text-align:left; line-height:1.4; cursor:pointer; }
+.tg-sym img { width:32px; height:32px; flex:none; }
+.tg-sym.on { background:#fff; color:#191f28; box-shadow:inset 0 0 0 1.5px #4e5968; }
+.tg-syms { display:flex; flex-wrap:wrap; gap:10px; align-items:center; min-height:52px; padding:12px 14px; border-radius:14px; background:#f2f4f6; margin-bottom:10px; }
+.tg-syms img { width:40px; height:40px; }
+html.emb .fxsec .pv-section { margin-top:0; }
+.lblangs input { position:absolute; opacity:0; width:0; height:0; pointer-events:none; }
+.lblangs label { position:relative; height:36px; padding:0 16px; background:#f2f4f6; color:#4e5968; font-weight:600; }
+.lblangs label:has(input:checked) { background:#191f28; color:#fff; }
+.sett-hdr { border-bottom:0 !important; margin-bottom:16px !important; }
+@media (max-width:640px) { html.emb .fxr.fxm { flex-wrap:wrap !important; } html.emb .fxr.fxm .emb-seg { flex:1 1 100%; width:100%; } html.emb .fxr.fxm .emb-seg > * { flex:1 1 auto; justify-content:center; padding:8px 10px; } }
 </style>
 </head>
 <body>
@@ -891,7 +929,7 @@ function resetFieldLabel(key){
 function save(){try{localStorage.setItem('mdspec_v5',JSON.stringify({products:S.products,cur:S.cur,settings:S.settings}));}catch(e){}fxLiveSoon();}
 // PC 작성 화면 오른쪽 라벨 문구: 입력할 때마다 잠깐 뒤 새로 그림
 var _fxLiveT=null;function fxLiveSoon(){if(!document.getElementById('fxLive'))return;clearTimeout(_fxLiveT);_fxLiveT=setTimeout(function(){var el=document.getElementById('fxLive'),p=cur();if(el&&p)el.innerHTML=fxLiveBody(p);},250);}
-function fxLiveBody(p){return '<h3>라벨 문구 미리보기</h3><p class="d">입력하면 바로 바뀌어요 · 복사는 라벨 칸에서도 할 수 있어요</p>'+tabPrevBody(p);}
+function fxLiveBody(p){return '<h3>표시사항 미리보기</h3><p class="d">입력하면 바로 바뀌어요 · 모든 상품 CSV는 문구 복사 탭에서</p>'+tabPrevBody(p);}
 
 // ── 되돌리기 (Undo) ──
 var _undoStack=[];
@@ -2459,14 +2497,15 @@ function renderSidebar(){
   renderFxBar(items);
 }
 // PLYSH 안 위 막대: 상품 칩 / 작성 · 라벨 · 설정 + 파일 버튼 / (설정일 때) 설정 항목 칩
-var FX_SET=[['caution','주의사항'],['labels','항목명'],['materials','소재'],['mfr','제조사'],['importer','수입사'],['origin','제조국'],['age','사용연령'],['settings','단위']];
-function fxMode(){return S.tab==='label'?'label':(S.tab==='fields'?'fields':'set');}
+// 2026-11-22 실장님: '작성 · 라벨 · 설정'이 헷갈림 → 상품 후면 표시사항(문구) / 부착 라벨(케어 · 주의 · 원산지 등)을 나눔
+var FX_SET=[['caution','주의사항 문구'],['labels','항목 이름'],['materials','소재 목록'],['mfr','제조사'],['importer','수입사'],['origin','제조국'],['age','사용연령'],['settings','단위']];
+function fxMode(){return S.tab==='label'?'label':(S.tab==='fields'?'fields':(S.tab==='tags'?'tags':'set'));}
 function renderFxBar(items){
   var el=document.getElementById('fxBar');if(!el||!document.documentElement.classList.contains('emb'))return;
   var m=fxMode();
-  var segs=[['fields','작성'],['label','라벨'],['set','설정']].map(function(o){return '<button class="'+(m===o[0]?'on':'')+'" onclick="fxGo(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
-  el.innerHTML='<div class="fxr fxm"><div class="emb-seg">'+segs+'</div><div class="fxact">'+(m==='fields'?'<button class="fxsave" onclick="saveFieldsSnapshot()">입력 저장</button>':'')+'<button class="fxmore" onclick="fxMenu(event)">더보기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button></div></div>'
-    +'<div class="fxr"><div class="fxchips" title="두 번 누르면 이름 바꾸기">'+items+'<button class="fxadd" onclick="addProduct()">+ 새 상품</button></div></div>'
+  var segs=[['fields','표시사항 작성'],['tags','부착 라벨'],['label','문구 복사'],['set','기본값 설정']].map(function(o){return '<button class="'+(m===o[0]?'on':'')+'" onclick="fxGo(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
+  el.innerHTML='<div class="fxr fxm"><div class="emb-seg">'+segs+'</div><div class="fxact">'+(m==='fields'||m==='tags'?'<button class="fxsave" onclick="saveFieldsSnapshot()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3M8 21v-7h8v7"/></svg>입력 저장</button>':'')+'<button class="fxmore" onclick="fxMenu(event)">더보기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button></div></div>'
+    +'<div class="fxr"><div class="fxchips" title="두 번 누르면 이름 바꾸기">'+items+'<button class="fxadd" onclick="addProduct()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>새 상품</button></div></div>'
     +(m==='set'?'<div class="fxr"><div class="fxchips fxsub">'+FX_SET.map(function(o){return '<button class="'+(S.tab===o[0]?'on':'')+'" onclick="setTab(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div></div>':'');
 }
 function fxMenu(e){
@@ -2499,6 +2538,7 @@ function renderContent(){
     el.innerHTML='<div class="'+(_settingsEditMode?'':'settings-locked')+'">'+_b+'</div>';
   } else if(S.tab==='caution') el.innerHTML='<div class="'+(_settingsEditMode?'':'settings-locked')+'">'+tabCaution(p)+'</div>';
   else if(S.tab==='label')   el.innerHTML=tabLabelOut(p);
+  else if(S.tab==='tags')    el.innerHTML=tabTags(p);
   else                       el.innerHTML=tabFieldsIO(p);
   setTimeout(function(){document.querySelectorAll('textarea').forEach(ar);},30);
 }
@@ -2524,12 +2564,12 @@ function tabFields(p){
     +'<div class="fx-langw"><span class="fx-ll">입력 언어</span><div class="lang-pills fx-lang">'+langPills+'</div></div>'
     +'</div>'
     +'<div class="fx-hide" style="height:1px;background:var(--border);margin-bottom:12px"></div>'
-    +'<div class="sect-hdr fx-sh"><span>상품 기본 정보</span><label class="fx-lsel">입력 언어<select onchange="switchEditLang(this.value)">'+LANGS.map(function(l){return '<option value="'+l.code+'"'+(l.code===lang?' selected':'')+'>'+l.label+'</option>';}).join('')+'</select></label></div><div class="fxsec">'
+    +'<div class="sect-hdr fx-sh"><span>상품 후면 표시사항</span><label class="fx-lsel">입력 언어<select onchange="switchEditLang(this.value)">'+LANGS.map(function(l){return '<option value="'+l.code+'"'+(l.code===lang?' selected':'')+'>'+l.label+'</option>';}).join('')+'</select></label></div><div class="fxsec">'
     +p.fields.map(function(f){return renderFieldCard(f);}).join('')
-    +'<button class="add-row-btn" onclick="openFieldPicker()">+ 상품 정보 항목 추가</button></div>'
-    +renderExtraInfoSection(p)
+    +renderCauRow(p)
+    +'<button class="add-row-btn" onclick="openFieldPicker()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>표시 항목 추가</button></div>'
     +renderPackagingSection(p)
-    +renderLabelInfoSection(p);
+    +renderExtraInfoSection(p);
 }
 function tabFieldsIO(p){
   if(!document.documentElement.classList.contains('emb')||window.innerWidth<760) return tabFields(p);
@@ -2730,16 +2770,16 @@ function tabPrevBody(p){
     +'<div class="sect-hdr" style="margin-top:17px">항목별 미리보기</div>'
     +'<div class="pv-section" style="margin-top:0">'+rows+cauRows+'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">'
-    +'<button class="copy-btn secondary" id="cpBtn_lines_cur" onclick="copyLinesCur(\''+lang+'\')">해당 언어 복사</button>'
-    +'<button class="copy-btn secondary" id="cpBtn_lines_all" onclick="copyLinesAll()">전체 언어 복사</button>'
+    +'<button class="copy-btn secondary" id="cpBtn_lines_cur" onclick="copyLinesCur(\''+lang+'\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>해당 언어 복사</button>'
+    +'<button class="copy-btn secondary" id="cpBtn_lines_all" onclick="copyLinesAll()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>전체 언어 복사</button>'
     +'</div>'
 
     // ── 줄글용 미리보기
     +'<div class="sect-hdr" style="margin-top:24px">줄글용 미리보기</div>'
     +'<div class="pv-prose-box">'+eh(proseText)+'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">'
-    +'<button class="copy-btn" id="cpBtn_prose_cur" onclick="copyProseCur(\''+lang+'\')">해당 언어 복사</button>'
-    +'<button class="copy-btn secondary" id="cpBtn_prose_all" onclick="copyProseAll()">전체 언어 복사</button>'
+    +'<button class="copy-btn" id="cpBtn_prose_cur" onclick="copyProseCur(\''+lang+'\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>해당 언어 복사</button>'
+    +'<button class="copy-btn secondary" id="cpBtn_prose_all" onclick="copyProseAll()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>전체 언어 복사</button>'
     +'</div>';
 }
 // ── 라벨 (2026-11-19, 상품 라벨 생성기를 합침): 지금 상품 문구 + 모든 상품 라벨 데이터(CSV)
@@ -2751,12 +2791,12 @@ function tabLabelOut(p){
   var langs='<div class="lblangs">'+LANGS.map(function(l){return '<label><input type="checkbox"'+(ls.indexOf(l.code)>=0?' checked':'')+' onchange="lbToggle(\''+l.code+'\',this.checked)">'+l.label+'</label>';}).join('')+'</div>';
   var rows=S.products.map(function(q){return '<tr><td>'+eh(q.name)+'</td><td class="lbtx">'+eh(genTextProse(q,ls[0]||'ko')).slice(0,140)+'…</td></tr>';}).join('');
   return '<div class="lbwrap">'
-    +'<div class="lbcard"><h3>'+eh(p.name)+' 라벨 문구</h3><p class="d">작성 칸 내용으로 바로 만들어져요 · 언어를 골라 복사</p>'+tabPrevBody(p)+'</div>'
-    +'<div class="lbcard"><h3>모든 상품 라벨 데이터</h3><p class="d">상품 '+S.products.length+'개 · 고른 언어마다 줄글 문구 한 칸 · 일러스트 데이터 병합용 CSV</p>'+langs
+    +'<div class="lbcard"><h3>'+eh(p.name)+' 표시사항 문구</h3><p class="d">표시사항 작성 칸 내용으로 바로 만들어져요 · 언어를 골라 복사</p>'+tabPrevBody(p)+'</div>'
+    +'<div class="lbcard"><h3>모든 상품 표시사항 데이터</h3><p class="d">상품 '+S.products.length+'개 · 고른 언어마다 줄글 문구 한 칸 · 일러스트 데이터 병합용 CSV</p>'+langs
     +'<table class="lbtbl"><tr><th>상품</th><th>'+eh((LANGS.filter(function(l){return l.code===(ls[0]||'ko');})[0]||{}).label||'')+' 미리보기</th></tr>'+rows+'</table>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">'
-    +'<button class="copy-btn" onclick="lbCsv()">CSV 저장</button>'
-    +'<button class="copy-btn secondary" id="cpBtn_lb_all" onclick="lbCopyAll()">전체 복사</button></div></div>'
+    +'<button class="copy-btn" onclick="lbCsv()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg>CSV 저장</button>'
+    +'<button class="copy-btn secondary" id="cpBtn_lb_all" onclick="lbCopyAll()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>전체 복사</button></div></div>'
     +'</div>';
 }
 function lbCell(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
@@ -3189,12 +3229,13 @@ function renderPackagingSection(p){
     return '<label class="pk-ck">'
       +'<input type="checkbox"'+chk+' onchange="toggleRecycling(\''+eh(v)+'\')">'+eh(v)+'</label>';
   }).join('');
-  return '<div class="sect-hdr" style="margin-top:18px">상품 포장 정보</div>'
+  return '<div class="sect-hdr" style="margin-top:18px">포장 · 분리배출</div>'
     +'<div class="field-card pk-card">'
+    +'<div class="pk-g"><div class="pk-lb">포장 방식</div><div class="pk-grid">'+pkgChks+'</div></div>'
+    +'<div class="pk-g"><div class="pk-lb">분리배출 표시 재질</div><div class="pk-grid">'+recChks+'</div>'
+    +(window.parent!==window&&window.parent.navGo?'<button class="fxbtn" style="margin-top:12px" onclick="window.parent.navGo(\'mark\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10H7z"/><path d="M4 12h3M17 12h3M12 4v3M12 17v3"/></svg>분리배출 · 표시 마크 계산하기</button>':'')+'</div>'
     +'<div class="pk-g"><div class="pk-lb">증지</div><div class="pk-grid">'
     +'<label class="pk-ck"><input type="checkbox"'+(ei.hasJungji?' checked':'')+' onchange="setExtraInfo(\'hasJungji\',this.checked)">증지 사용</label></div></div>'
-    +'<div class="pk-g"><div class="pk-lb">포장 방식</div><div class="pk-grid">'+pkgChks+'</div></div>'
-    +'<div class="pk-g"><div class="pk-lb">재활용 정보</div><div class="pk-grid">'+recChks+'</div></div>'
     +'</div>';
 }
 
@@ -3226,13 +3267,13 @@ function renderExtraInfoSection(p){
     return '<label class="pk-ck">'
       +'<input type="checkbox"'+chk+' onchange="togglePackaging(\''+eh(v)+'\')">'+eh(v)+'</label>';
   }).join('');
-  return '<div class="sect-hdr" style="margin-top:18px">상품 추가 정보</div>'
+  return '<div class="sect-hdr fx-sh" style="margin-top:18px"><span>관리 정보</span><small class="fxsm">표시사항 문구에는 안 들어가요</small></div>'
     +'<div class="field-card pk-card">'
     +'<div class="pk-2">'
 
     +'<div><div class="pk-lb" style="margin-bottom:8px">상품 카테고리</div>'
     +'<div class="sel-wrap"><select class="form-input sm" style="width:100%" onchange="setExtraInfo(\'category\',this.value)">'
-    +'<option value="">-- 선택 --</option>'+catOpts+'</select></div></div>'
+    +'<option value="">카테고리 고르기</option>'+catOpts+'</select></div></div>'
 
     +'<div><div class="pk-lb" style="margin-bottom:8px">제작수량</div>'
     +'<input class="form-input sm" type="number" min="0" style="width:100%" value="'+eh(ei.qty||'')+'" placeholder="수량 입력" oninput="setExtraInfo(\'qty\',this.value)"></div>'
@@ -3290,6 +3331,112 @@ function renderLabelInfoSection(p){
     +'</div>';
 }
 
+// ═══════════════ 부착 라벨 (2026-11-22 실장님: 후면 표시사항과 라벨을 나눠 정리) ═══════════════
+// 근거: 전기용품 및 생활용품 안전관리법(가정용 섬유제품 안전기준준수 — 섬유 조성 · 취급 표시 · 제조국 · 제조자/수입자),
+// 어린이제품 안전 특별법(KC 표시), 대외무역법(원산지), KS K 0021 / ISO 3758(세탁 취급 기호). 법 해석은 '확인 필요'.
+var TAG_GROUPS=[
+ {g:'봉제 라벨',d:'의류 · 에코백 · 인형 · 쿠션처럼 천으로 만든 제품에 꿰매는 라벨',k:'sew',items:[
+  {id:'brand',n:'브랜드 라벨',a:'메인 라벨 · 넥 라벨',w:'옷 목 뒤 안쪽 · 가방 안쪽 솔기 · 인형 옆선',info:['브랜드 · 아티스트 로고'],tip:'넥 라벨에 사이즈를 같이 넣기도 해요'},
+  {id:'size',n:'사이즈 라벨',a:'',w:'브랜드 라벨 아래 · 옆 솔기',info:['사이즈 (S · M · L · FREE)'],f:['size']},
+  {id:'care',n:'케어 라벨',a:'취급 표시 라벨 · 세탁 라벨',w:'옆 솔기 · 인형 다리나 옆선 · 가방 안쪽',info:['섬유 혼용률','세탁 기호','취급 주의 문구'],f:['origin','mfr','importer','dist','mfgDate'],tip:'가정용 섬유제품은 섬유 조성(혼용률) · 취급 표시 · 제조국 · 제조자/수입자를 표시해요'},
+  {id:'origin',n:'원산지 라벨',a:'Made in 라벨',w:'케어 라벨 옆 · 브랜드 라벨 아래',info:['원산지 (Made in …)'],f:['origin'],tip:'케어 라벨에 함께 넣으면 따로 안 달아도 돼요'}]},
+ {g:'안전 · 인증 라벨',d:'사용 연령 · 위험을 알리는 라벨',k:'safe',items:[
+  {id:'warn',n:'주의 라벨',a:'경고 라벨 · 사용상 주의',w:'제품 · 포장 뒷면 · 케어 라벨 뒷면',info:['주의사항 문구 (표시사항 작성의 주의사항)'],f:['age']},
+  {id:'kc',n:'KC 인증 라벨',a:'어린이제품 표시',w:'제품에 지워지지 않게 (봉제 라벨 · 각인 · 인쇄)',info:['KC 마크 + 인증번호','모델명'],f:['name','mfgDate','mfr','importer','dist','origin','age'],tip:'만 13세 이하가 쓰는 제품. 사용연령을 14세 이상으로 정한 굿즈는 대상이 아니에요',chk:'품목별 인증 구분 · 번호는 제조사에 확인'}]},
+ {g:'종이 · 스티커 라벨',d:'걸거나 붙이는 라벨',k:'paper',items:[
+  {id:'hang',n:'행택',a:'Hang Tag · 택',w:'끈 · 택핀으로 제품에 걸기',info:['브랜드 · 로고','바코드 · 가격 (필요할 때)'],f:['name']},
+  {id:'sticker',n:'표시사항 스티커',a:'후면 라벨 스티커',w:'포장 · 제품 뒷면 (인쇄로 못 넣을 때)',info:['표시사항 작성의 모든 항목 + 주의사항'],f:['name','size','age','contents','material','mfgDate','origin','mfr','importer','dist']},
+  {id:'barcode',n:'바코드 스티커',a:'',w:'포장 뒷면 · 바닥',info:['바코드 (EAN-13)','품명 · 옵션']}]}];
+var TAG_MAT={sew:['날염 새틴 (인쇄)','나일론 타프타 (인쇄 · 케어 라벨용)','면 테이프 (인쇄)','직조 라벨 (우븐)','열전사 라벨 (TPU · 심리스)','실리콘 · 고무 패치','가죽 · PU 패치'],safe:['날염 새틴 (인쇄)','나일론 타프타 (인쇄)','유포지 스티커','아트지 스티커'],paper:['아트지','스노우지','모조지','크라프트지','유포지 (합성지)','아트지 스티커','유포 스티커','투명 PET 스티커']};
+// 세탁 기호 (KS K 0021 · ISO 3758): 그림은 로고 메뉴의 세탁기호 원본 SVG
+var CARE_G=[
+ {k:'wash',n:'물세탁',o:[['Wash_95','95°C 세탁'],['Wash_70','70°C 세탁'],['Wash_60','60°C 세탁'],['Wash_60_Gentle','60°C 약하게'],['Wash_50','50°C 세탁'],['Wash_50_Gentle','50°C 약하게'],['Wash_40','40°C 세탁'],['Wash_40_Gentle','40°C 약하게'],['Wash_40_VeryGentle','40°C 매우 약하게'],['Wash_30','30°C 세탁'],['Wash_30_Gentle','30°C 약하게'],['Wash_30_VeryGentle','30°C 매우 약하게'],['Wash_Hand','손세탁 (40°C 이하)'],['Wash_DoNot','물세탁 안 됨']]},
+ {k:'bleach',n:'표백',o:[['Bleach_Any','모든 표백제'],['Bleach_NonChlorine','산소계 표백제만'],['Bleach_DoNot','표백 안 됨']]},
+ {k:'tumble',n:'건조기 (텀블 건조)',o:[['TumbleDry_Normal','보통 온도'],['TumbleDry_Low','낮은 온도'],['TumbleDry_DoNot','건조기 안 됨']]},
+ {k:'dry',n:'자연 건조',o:[['Dry_Line','줄에 걸어 건조'],['Dry_Line_Shade','그늘에 걸어 건조'],['Dry_DripLine','짜지 않고 걸어 건조'],['Dry_DripLine_Shade','짜지 않고 그늘에 걸어 건조'],['Dry_Flat','뉘어서 건조'],['Dry_Flat_Shade','그늘에 뉘어 건조'],['Dry_DripFlat','짜지 않고 뉘어 건조'],['Dry_DripFlat_Shade','짜지 않고 그늘에 뉘어 건조']]},
+ {k:'iron',n:'다림질',o:[['Iron_High','200°C 이하'],['Iron_Medium','150°C 이하'],['Iron_Low','110°C 이하 (스팀 없이)'],['Iron_DoNot','다림질 안 됨']]},
+ {k:'dc',n:'드라이클리닝',o:[['DryClean_P','드라이 (P 용제)'],['DryClean_P_Gentle','드라이 P 약하게'],['DryClean_P_VeryGentle','드라이 P 매우 약하게'],['DryClean_F','드라이 (석유계 F)'],['DryClean_F_Gentle','드라이 F 약하게'],['DryClean_F_VeryGentle','드라이 F 매우 약하게'],['DryClean_DoNot','드라이 안 됨']]},
+ {k:'wc',n:'웻클리닝',o:[['WetClean_W','웻클리닝'],['WetClean_W_Gentle','웻클리닝 약하게'],['WetClean_W_VeryGentle','웻클리닝 매우 약하게'],['WetClean_DoNot','웻클리닝 안 됨']]}];
+var CARE_TXT={Wash_95:'95°C 이하 물로 세탁할 수 있습니다.',Wash_70:'70°C 이하 물로 세탁할 수 있습니다.',Wash_60:'60°C 이하 물로 세탁할 수 있습니다.',Wash_60_Gentle:'60°C 이하 물로 약하게 세탁하십시오.',Wash_50:'50°C 이하 물로 세탁할 수 있습니다.',Wash_50_Gentle:'50°C 이하 물로 약하게 세탁하십시오.',Wash_40:'40°C 이하 물로 세탁할 수 있습니다.',Wash_40_Gentle:'40°C 이하 물로 약하게 세탁하십시오.',Wash_40_VeryGentle:'40°C 이하 물로 매우 약하게 세탁하십시오.',Wash_30:'30°C 이하 물로 세탁할 수 있습니다.',Wash_30_Gentle:'30°C 이하 물로 약하게 세탁하십시오.',Wash_30_VeryGentle:'30°C 이하 물로 매우 약하게 세탁하십시오.',Wash_Hand:'40°C 이하 물로 손세탁하십시오.',Wash_DoNot:'물세탁하지 마십시오.',
+ Bleach_Any:'모든 표백제를 쓸 수 있습니다.',Bleach_NonChlorine:'산소계 표백제만 쓰십시오 (염소계 금지).',Bleach_DoNot:'표백제를 쓰지 마십시오.',TumbleDry_Normal:'건조기를 보통 온도로 쓸 수 있습니다.',TumbleDry_Low:'건조기는 낮은 온도로만 쓰십시오.',TumbleDry_DoNot:'건조기를 쓰지 마십시오.',
+ Dry_Line:'줄에 걸어 말리십시오.',Dry_Line_Shade:'그늘에서 줄에 걸어 말리십시오.',Dry_DripLine:'짜지 말고 걸어서 말리십시오.',Dry_DripLine_Shade:'짜지 말고 그늘에 걸어서 말리십시오.',Dry_Flat:'뉘어서 말리십시오.',Dry_Flat_Shade:'그늘에서 뉘어서 말리십시오.',Dry_DripFlat:'짜지 말고 뉘어서 말리십시오.',Dry_DripFlat_Shade:'짜지 말고 그늘에서 뉘어서 말리십시오.',
+ Iron_High:'200°C 이하로 다림질하십시오.',Iron_Medium:'150°C 이하로 다림질하십시오.',Iron_Low:'110°C 이하로 스팀 없이 다림질하십시오.',Iron_DoNot:'다림질하지 마십시오.',
+ DryClean_P:'드라이클리닝할 수 있습니다 (퍼클로로에틸렌 · 석유계).',DryClean_P_Gentle:'드라이클리닝은 약하게 하십시오.',DryClean_P_VeryGentle:'드라이클리닝은 매우 약하게 하십시오.',DryClean_F:'석유계 용제로만 드라이클리닝하십시오.',DryClean_F_Gentle:'석유계 용제로 약하게 드라이클리닝하십시오.',DryClean_F_VeryGentle:'석유계 용제로 매우 약하게 드라이클리닝하십시오.',DryClean_DoNot:'드라이클리닝하지 마십시오.',
+ WetClean_W:'전문 웻클리닝할 수 있습니다.',WetClean_W_Gentle:'전문 웻클리닝은 약하게 하십시오.',WetClean_W_VeryGentle:'전문 웻클리닝은 매우 약하게 하십시오.',WetClean_DoNot:'전문 웻클리닝하지 마십시오.'};
+var _CARE_OLD={wash30:['wash','Wash_30'],wash40:['wash','Wash_40'],wash_hand:['wash','Wash_Hand'],no_wash:['wash','Wash_DoNot'],bleach_ok:['bleach','Bleach_Any'],no_bleach:['bleach','Bleach_DoNot'],tumble_low:['tumble','TumbleDry_Low'],no_tumble:['tumble','TumbleDry_DoNot'],iron_low:['iron','Iron_Low'],iron_med:['iron','Iron_Medium'],no_iron:['iron','Iron_DoNot'],dryclean:['dc','DryClean_P'],no_dryclean:['dc','DryClean_DoNot'],dry_flat:['dry','Dry_Flat'],dry_shade:['dry','Dry_Line_Shade']};
+function tagLi(p){
+  var li=p.labelInfo||(p.labelInfo={});
+  if(!li.types){ // 예전 저장값(원산지 · 넥 · 케어 + 세탁기호 목록) 옮기기
+    li.types=[];if(li.originLabel)li.types.push('origin');if(li.neckLabel)li.types.push('brand');if(li.careLabel)li.types.push('care');
+    li.care={};(li.careSymbols||[]).forEach(function(o){var m=_CARE_OLD[o];if(m)li.care[m[0]]=m[1];});
+    li.fiber=[{p:'겉감',v:''}];li.mat={};
+  }
+  if(!li.care)li.care={};if(!li.fiber)li.fiber=[{p:'겉감',v:''}];if(!li.mat)li.mat={};
+  return li;
+}
+function tagToggle(id){pushUndoDebounced();var li=tagLi(cur());var i=li.types.indexOf(id);if(i>=0)li.types.splice(i,1);else li.types.push(id);save();renderContent();}
+function tagMat(id,v){pushUndoDebounced();tagLi(cur()).mat[id]=v;save();}
+function tagCare(k,v){pushUndoDebounced();var li=tagLi(cur());if(li.care[k]===v)delete li.care[k];else li.care[k]=v;save();renderContent();}
+function tagFiber(i,k,v){pushUndoDebounced();tagLi(cur()).fiber[i][k]=v;save();var o=document.getElementById('tgCareOut');if(o)o.innerHTML=tagCareOut(cur());}
+function tagFiberAdd(){pushUndoDebounced();tagLi(cur()).fiber.push({p:'',v:''});save();renderContent();}
+function tagFiberDel(i){pushUndoDebounced();tagLi(cur()).fiber.splice(i,1);save();renderContent();}
+function tagFv(p,key){var f=p.fields.find(function(x){return x.defKey===key;});if(!f)return null;var v=fmtWithUnit(getFieldVal(f,'ko'),f.unit);return {l:getLabel(f,'ko'),v:v,h:f.hidden};}
+function tagCareSyms(p){var li=tagLi(p);return CARE_G.map(function(g){return li.care[g.k];}).filter(Boolean);}
+function tagCareText(p){
+  var li=tagLi(p),L=[];
+  var fb=li.fiber.filter(function(r){return (r.v||'').trim();});
+  if(fb.length)L.push('혼용률 · '+fb.map(function(r){return (r.p?r.p+' ':'')+r.v;}).join(' / '));
+  tagCareSyms(p).forEach(function(id){L.push(CARE_TXT[id]);});
+  ['origin','mfr','importer','dist','mfgDate'].forEach(function(k){var x=tagFv(p,k);if(x&&!x.h&&x.v)L.push(x.l+' · '+x.v);});
+  return L.join('\n');
+}
+function tagCareOut(p){
+  var syms=tagCareSyms(p),t=tagCareText(p);
+  return '<div class="tg-syms">'+(syms.length?syms.map(function(id){return '<img src="../../logo/svg/Laundry_'+id+'.svg" alt="'+eh(id)+'">';}).join(''):'<span class="tg-empty">세탁 기호를 고르면 여기 순서대로 놓여요 (물세탁 → 표백 → 건조 → 다림질 → 전문 클리닝)</span>')+'</div>'
+    +(t?'<div class="pv-prose-box" style="white-space:pre-line">'+eh(t)+'</div><button class="copy-btn" id="cpBtn_care" style="margin-top:12px;width:100%" onclick="_cpWithBtn(tagCareText(cur()),\'cpBtn_care\',\'케어 라벨 문구 복사됨\')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>케어 라벨 문구 복사</button>':'');
+}
+function tagInfoRows(p,it){
+  var rows=(it.info||[]).map(function(t){return '<div class="pv-row"><span class="pv-key">라벨 내용</span><span class="pv-val">'+eh(t)+'</span></div>';});
+  (it.f||[]).forEach(function(k){var x=tagFv(p,k);if(!x)return;rows.push('<div class="pv-row"><span class="pv-key">'+eh(x.l)+'</span><span class="pv-val">'+(x.h?'<span class="pv-empty">숨김 · 표시사항 작성에서 켜기</span>':(x.v?eh(x.v):'<span class="pv-empty">미입력</span>'))+'</span></div>');});
+  return rows.join('');
+}
+function renderCauRow(p){
+  var cv=S.settings.cauVersions||CAU_VER_DEF.map(function(v){return{v:v.v,l:v.l};});
+  return '<div class="field-card"><div class="field-row-inner"><span class="drag-handle" style="visibility:hidden">⠿</span><span class="field-lbl">주의사항</span>'
+    +'<div class="sel-wrap" style="flex:1;min-width:0"><select class="form-input sm" style="width:100%" onchange="setCauVer(this.value)">'+cv.map(function(v){return '<option value="'+v.v+'"'+(v.v===p.cautions.version?' selected':'')+'>'+eh(v.l)+'</option>';}).join('')+'</select></div></div></div>';
+}
+function tabTags(p){
+  var li=tagLi(p),h='';
+  h+='<div class="sect-hdr fx-sh" style="margin-top:8px"><span>쓸 라벨 고르기</span></div><div class="fxsec tg-pick">';
+  TAG_GROUPS.forEach(function(G){
+    h+='<div class="pk-g"><div class="pk-lb">'+G.g+'<small>'+G.d+'</small></div><div class="tg-grid">'
+      +G.items.map(function(it){var on=li.types.indexOf(it.id)>=0;return '<button type="button" class="tg-card'+(on?' on':'')+'" onclick="tagToggle(\''+it.id+'\')"><span class="tg-ck"></span><span class="tg-tx"><b>'+it.n+(it.a?'<i>'+it.a+'</i>':'')+'</b><small>'+it.w+'</small></span></button>';}).join('')+'</div></div>';
+  });
+  h+='</div>';
+  var any=0;
+  TAG_GROUPS.forEach(function(G){G.items.forEach(function(it){
+    if(li.types.indexOf(it.id)<0)return;any=1;
+    h+='<div class="sect-hdr fx-sh" style="margin-top:28px"><span>'+it.n+'</span>'+(it.a?'<small class="fxsm">'+it.a+'</small>':'')+'</div><div class="fxsec">'
+      +'<div class="tg-2"><div><div class="pk-lb">다는 곳</div><div class="tg-v">'+it.w+'</div></div>'
+      +'<div><div class="pk-lb">라벨 소재</div><div class="sel-wrap"><select class="form-input sm" style="width:100%" onchange="tagMat(\''+it.id+'\',this.value)"><option value="">소재 고르기</option>'+TAG_MAT[G.k].map(function(m){return '<option'+(li.mat[it.id]===m?' selected':'')+'>'+eh(m)+'</option>';}).join('')+'</select></div></div></div>'
+      +'<div class="pk-lb" style="margin-top:20px">들어갈 정보</div><div class="pv-section" style="margin-top:0">'+tagInfoRows(p,it)+'</div>'
+      +(it.tip?'<p class="tg-note">참고 · '+it.tip+'</p>':'')+(it.chk?'<p class="tg-note">확인 필요 · '+it.chk+'</p>':'');
+    if(it.id==='care'){
+      h+='<div class="pk-lb" style="margin-top:24px">섬유 혼용률</div><div class="tg-fb">'
+        +li.fiber.map(function(r,i){return '<div class="tg-fr"><input class="form-input sm" value="'+eh(r.p)+'" placeholder="예: 겉감" oninput="tagFiber('+i+',\'p\',this.value)"><input class="form-input sm" value="'+eh(r.v)+'" placeholder="예: 폴리에스터 100%" oninput="tagFiber('+i+',\'v\',this.value)"><button class="del-btn" aria-label="줄 빼기" onclick="tagFiberDel('+i+')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>';}).join('')
+        +'<button class="add-row-btn" onclick="tagFiberAdd()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>부위 추가</button></div>'
+        +'<p class="tg-note">참고 · 부위별로 (겉감 · 안감 · 충전재 · 장식). 섬유 이름은 KS 표준 이름으로, 합계 100%</p>';
+      h+='<div class="pk-lb" style="margin-top:24px">세탁 기호<small>항목마다 하나씩 · 한 번 더 누르면 빼기</small></div>';
+      CARE_G.forEach(function(g){
+        h+='<div class="tg-cg"><div class="tg-cgn">'+g.n+'</div><div class="tg-cs">'+g.o.map(function(o){var on=li.care[g.k]===o[0];return '<button type="button" class="tg-sym'+(on?' on':'')+'" onclick="tagCare(\''+g.k+'\',\''+o[0]+'\')"><img src="../../logo/svg/Laundry_'+o[0]+'.svg" alt=""><span>'+o[1]+'</span></button>';}).join('')+'</div></div>';
+      });
+      h+='<div class="pk-lb" style="margin-top:24px">케어 라벨 미리보기</div><div id="tgCareOut">'+tagCareOut(p)+'</div>';
+    }
+    h+='</div>';
+  });});
+  if(!any)h+='<p class="tg-empty" style="margin-top:20px">쓸 라벨을 고르면 라벨마다 다는 곳 · 소재 · 들어갈 정보가 나와요. 케어 라벨은 섬유 혼용률과 세탁 기호도 정리해요.</p>';
+  return '<div class="tg-wrap">'+h+'</div>';
+}
 // ═══════════════ 표기법 설정 탭 ═══════════════
 function tabLabels(){
   var langs=['ko','en','ja','zh-cn','zh-tw'];
