@@ -37,25 +37,28 @@ input:focus, select:focus { outline:none; border-color:#191f28; background:#fff;
 </head>
 <body>
 <main>
-  <div class="phd"><b>단위 환산</b><small>mm · pt · 파이카 · 인치 · 급 · 픽셀을 한 번에 바꿔요</small></div>
+  <div class="phd"><b>단위 환산</b><small>mm · cm · m · in · ft · yd · pt · pc · Q · px를 한 번에 바꿔요</small></div>
   <div class="wrap">
     <div class="side">
       <div class="card">
         <div class="f"><label for="uV">값</label><input id="uV" inputmode="decimal" autocomplete="off"></div>
         <div class="f"><label for="uU">단위</label><select id="uU"></select></div>
-        <div class="f"><label for="uP">픽셀 해상도 (ppi)</label><select id="uP"><option value="300">300ppi · 인쇄</option><option value="250">250ppi · 인쇄 최소</option><option value="150">150ppi · 대형 출력</option><option value="96">96 · 화면 (CSS)</option><option value="72">72 · 화면 (옛 기준)</option></select></div>
+        <div class="f"><label for="uP">px (픽셀) 해상도 · ppi</label><select id="uP"><option value="300">300ppi · 인쇄</option><option value="250">250ppi · 인쇄 최소</option><option value="150">150ppi · 대형 출력</option><option value="96">96 · 화면 (CSS)</option><option value="72">72 · 화면 (옛 기준)</option></select></div>
       </div>
     </div>
     <div>
-      <div class="card"><div class="ct">결과</div><div class="out" id="uO"></div><p class="nt">값을 누르면 복사돼요 · 픽셀은 위에서 고른 해상도 기준이에요</p></div>
+      <div class="card"><div class="ct">결과</div><div class="out" id="uO"></div><p class="nt">값을 누르면 복사돼요 · px는 위에서 고른 해상도 기준이에요</p></div>
       <div class="card" style="margin-top:16px"><div class="ct">기준 값</div>
         <table class="tbl">
-          <tr><td>1인치</td><td>25.4mm = 72pt = 6파이카</td></tr>
-          <tr><td>1포인트 (pt)</td><td>1/72인치 ≈ 0.3528mm ≈ 1.41급</td></tr>
-          <tr><td>1파이카 (pc)</td><td>12pt ≈ 4.233mm</td></tr>
-          <tr><td>1급 (Q) · 1치 (H)</td><td>0.25mm</td></tr>
-          <tr><td>픽셀 → mm</td><td>px ÷ ppi × 25.4</td></tr>
-          <tr><td>mm → 픽셀</td><td>mm ÷ 25.4 × ppi</td></tr>
+          <tr><td>1m (미터)</td><td>100cm = 1,000mm ≈ 39.37in</td></tr>
+          <tr><td>1yd (야드)</td><td>3ft = 36in = 914.4mm</td></tr>
+          <tr><td>1ft (피트)</td><td>12in = 304.8mm</td></tr>
+          <tr><td>1in (인치)</td><td>25.4mm = 72pt = 6pc</td></tr>
+          <tr><td>1pc (파이카)</td><td>12pt ≈ 4.233mm</td></tr>
+          <tr><td>1pt (포인트)</td><td>1/72in ≈ 0.3528mm ≈ 1.41Q</td></tr>
+          <tr><td>1Q (급) · 1H (치)</td><td>0.25mm · 일본 사진식자 글자 단위</td></tr>
+          <tr><td>px → mm</td><td>px ÷ ppi × 25.4</td></tr>
+          <tr><td>mm → px</td><td>mm ÷ 25.4 × ppi</td></tr>
         </table>
         <p class="nt">개념 설명은 용어사전 › 디자인 › 단위에 있어요</p>
       </div>
@@ -65,14 +68,14 @@ input:focus, select:focus { outline:none; border-color:#191f28; background:#fff;
 <div class="toast" id="toast"></div>
 <script>
 /* 단위 환산 (2026-11-22 실장님: 용어사전에서 도구로 옮김) */
-var U = [['mm', 'mm', 1], ['cm', 'cm', 10], ['in', '인치', 25.4], ['pt', '포인트 pt', 25.4 / 72], ['pc', '파이카 pc', 25.4 / 6], ['Q', '급 Q', 0.25], ['px', '픽셀 px', 0]];
+var U = [['mm', 'mm (밀리미터)', 1], ['cm', 'cm (센티미터)', 10], ['m', 'm (미터)', 1000], ['in', 'in (인치)', 25.4], ['ft', 'ft (피트)', 304.8], ['yd', 'yd (야드)', 914.4], ['pt', 'pt (포인트)', 25.4 / 72], ['pc', 'pc (파이카)', 25.4 / 6], ['Q', 'Q (급)', 0.25], ['px', 'px (픽셀)', 0]];
 function g(k) { try { return localStorage.getItem('unit:' + k); } catch (e) { return null; } }
 function s(k, v) { try { localStorage.setItem('unit:' + k, v); } catch (e) {} }
 var $ = function (q) { return document.querySelector(q); }, V = $('#uV'), UU = $('#uU'), PP = $('#uP');
 UU.innerHTML = U.map(function (x) { return '<option value="' + x[0] + '">' + x[1] + '</option>'; }).join('');
 V.value = g('v') || '10'; UU.value = g('u') || 'pt'; PP.value = g('p') || '300';
 function f(u) { return u === 'px' ? 25.4 / (+PP.value || 300) : U.filter(function (x) { return x[0] === u; })[0][2]; }
-function fmt(n) { return Math.abs(n) >= 1000 ? String(Math.round(n)) : Math.abs(n) >= 100 ? String(Math.round(n * 10) / 10) : String(Math.round(n * 1000) / 1000); }
+function fmt(n) { var a = Math.abs(n); return a >= 1000 ? String(Math.round(n)) : a >= 100 ? String(Math.round(n * 10) / 10) : a >= 1 || a === 0 ? String(Math.round(n * 1000) / 1000) : String(+n.toPrecision(4)); }
 function run() {
   s('v', V.value); s('u', UU.value); s('p', PP.value);
   var mm = (parseFloat(String(V.value).replace(',', '.')) || 0) * f(UU.value);
