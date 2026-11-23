@@ -55,9 +55,10 @@ function styles(t) {
     writer: st2(p + 'Writer', F_R, 60 * k, C_TXT, 93 * k, -15),
     eye: st2(p + 'Eyebrow', F_XB, 40 * k, C_TXT, L, -25),
     item: st2(p + 'Item', F_B, 70 * k, C_TXT, 100 * k, -15),
-    sec: st2(p + 'Section', F_XB, 40 * k, C_TXT, 130 * k, -25),
-    req: st2(p + 'Req', F_XB, 40 * k, C_REQ, 130 * k, -25),
-    opt: st2(p + 'Opt', F_XB, 40 * k, C_MUTE, 130 * k, -25),
+    sec: st2(p + 'Section', F_XB, 40 * k, C_TXT, 56 * k, -25),
+    req: st2(p + 'Req', F_XB, 40 * k, C_REQ, 56 * k, -25),
+    opt: st2(p + 'Opt', F_XB, 40 * k, C_MUTE, 56 * k, -25),
+    rule: st2(p + 'Rule', F_R, b, tint(C_TXT, 30), 84 * k, -60),
     label: st2(p + 'Label', F_B, b, C_TXT, L, -25),
     body: st2(p + 'Body', F_R, b, C_TXT, L, -25),
     hint: st2(p + 'Hint', F_R, b, C_MUTE, L, -25),
@@ -159,9 +160,9 @@ function item(d, ox, oy) {
   var boxTop = M + hd.height / MM + 43 * k;
 
   // 정보: 글자 하나, 엔터로 나눈 단락
-  var P = [], LB = 42 * k;
+  var P = [], IND = 30 * k, RULE = ''; for (var rr = 0; rr < 34; rr++) RULE += '\u2014'; // 구분 줄 = 엠대시 34개 (자간 -60)
   function para(text, st, o) { o = o || {}; o.text = text; o.st = st; P.push(o); }
-  function sec(name, tag, tagSt) { para(name + (tag ? '   ' + tag : ''), S.sec, { tag: tag, tagSt: tagSt, isSec: true }); }
+  function sec(name, tag, tagSt) { para(RULE, S.rule, { noInd: true }); para(name + (tag ? '    ' + tag : ''), S.sec, { tag: tag, tagSt: tagSt, isSec: true, noInd: true }); }
   function lv(x) { return x == 'r' ? ['필수', S.req] : ['권장', S.opt]; }
   function secR(name, x) { var a = lv(x); sec(name, a[0], a[1]); }
   function opts(arr) { var ls = wrapOpts(arr, maxEm, true); for (var i = 0; i < ls.length; i++) para(blanks(ls[i]), S.body); }
@@ -173,8 +174,8 @@ function item(d, ox, oy) {
       for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[tw, 'L']], label: !j });
     }
   }
-  para('품목', S.eye);
-  para(d.n, S.item);
+  para('품목', S.eye, { noInd: true });
+  para(d.n, S.item, { noInd: true });
   sec('가이드별색', '필수', S.req);
   var lg = [['——', C_LEN, '길이'], ['——', C_FOLD, '접지'], ['- - -', C_MAR, '여백 · 안전'], ['——', C_CUT, '재단 · 칼선']];
   for (var g = 0; g < lg.length; g++) para(lg[g][0] + '\t' + lg[g][2], S.body, { lineCol: lg[g][1], tabs: [[24.1 * k * MM, 'L']] });
@@ -206,7 +207,8 @@ function item(d, ox, oy) {
     setSt(pr, o.st);
     var pa = pr.paragraphAttributes;
     pa.spaceBefore = 0; pa.spaceAfter = o.isSec ? 12 * k : 0; // 앞 간격 없음 · 소제목만 뒤 간격, 나머지는 행간
-    if (o.tabs) { var arr = []; for (var ti = 0; ti < o.tabs.length; ti++) { var ts = new TabStopInfo(); ts.position = o.tabs[ti][0]; ts.alignment = TabStopAlignment.Left; arr.push(ts); } pa.tabStops = arr; }
+    var ind = o.noInd ? 0 : IND; pa.leftIndent = ind; pa.firstLineIndent = 0;
+    if (o.tabs) { var arr = []; for (var ti = 0; ti < o.tabs.length; ti++) { var ts = new TabStopInfo(); ts.position = o.tabs[ti][0] + ind; ts.alignment = TabStopAlignment.Left; arr.push(ts); } pa.tabStops = arr; }
     var tab = tx.indexOf('\t');
     try {
       if (o.label && tab > 0) for (var c1 = 0; c1 < tab; c1++) S.label.applyTo(pr.characters[c1], true);
