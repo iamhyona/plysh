@@ -1081,8 +1081,21 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wsr .tx { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--sub); }
 .wsr .ck { width:16px; height:16px; border-radius:5px; box-shadow:inset 0 0 0 1.5px var(--faint); flex:none; }
 .wsr.done .tx { text-decoration:line-through; color:var(--faint); }
+.wsc.wgo { cursor:pointer; } .wsc.wgo:hover { box-shadow:inset 0 0 0 1.5px var(--line); }
+.wtg { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px; }
+.wtp { background:var(--bg); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+.wtp .nm { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--sub); }
+.wtp .nm i { width:8px; height:8px; border-radius:50%; flex:none; }
+.wtp b { font-size:20px; font-weight:800; letter-spacing:-0.02em; color:var(--txt); }
+.wtp b small { font-size:12px; font-weight:600; color:var(--mute); margin-left:1px; }
+.wtp b.x40 { color:#FF7300; } .wtp b.x52 { color:#f04452; }
+.wtp .bar { position:relative; height:6px; border-radius:3px; background:#e5e8eb; }
+.wtp .bar i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--txt); }
+.wtp .bar i.x40 { background:#FF7300; } .wtp .bar i.x52 { background:#f04452; }
+.wtp .bar em { position:absolute; top:-2px; bottom:-2px; width:1.5px; background:var(--faint); }
+.wtn { margin:10px 0 0; font-size:12px; color:var(--mute); }
 .wsq { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
-.wsq button { border:0; background:var(--bg); border-radius:12px; padding:12px; text-align:left; display:flex; flex-direction:column; gap:10px; font-size:13px; font-weight:700; color:var(--txt); }
+.wsq button { word-break:keep-all; border:0; background:var(--bg); border-radius:12px; padding:12px; text-align:left; display:flex; flex-direction:column; gap:10px; font-size:13px; font-weight:700; color:var(--txt); }
 .wsq button .nvi { width:18px; height:18px; color:var(--sub); }
 .wsq button.add { background:none; box-shadow:inset 0 0 0 1.5px var(--line); color:var(--mute); justify-content:center; align-items:center; font-weight:600; }
 .wpc { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
@@ -1667,7 +1680,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm188';
+var APP_VER = '20261122hm189';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2589,7 +2602,7 @@ function navGo(k) {
 function navClose() { document.documentElement.style.overflow = ''; ['#npl', '#nmg', '#nbd', '#nfm', '#nfb'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
 function navEl(id, tag, where, html) { var e = document.getElementById(id); if (!e) { e = document.createElement(tag || 'div'); e.id = id; where(e); } if (html != null) e.innerHTML = html; return e; }
 function lk(x, cur) { return '<button type="button" class="lk' + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (x.s ? '<span>' + esc(x.s) + '</span>' : '') + '</button>'; }
-function bindGo(root) { $$('[data-ng]', root).forEach(function (b) { b.onclick = function () { navGo(b.dataset.ng); }; }); $$('[data-wsr]', root).forEach(function (b) { b.onclick = function () { var r = NAV.rec[+b.dataset.wsr]; if (r) wsOpen(r); }; }); }
+function bindGo(root) { $$('[data-ng]', root).forEach(function (b) { b.onclick = function (ev) { if (ev) ev.stopPropagation(); navGo(b.dataset.ng); }; }); $$('[data-wsr]', root).forEach(function (b) { b.onclick = function () { var r = NAV.rec[+b.dataset.wsr]; if (r) wsOpen(r); }; }); }
 
 /* ── 프로젝트 작업 공간 ── */
 function wsName(n) { n = String(n || ''); var i = n.indexOf(' '); return i < 0 ? '<b>' + esc(n) + '</b>' : esc(n.slice(0, i)) + ' <span>' + esc(n.slice(i + 1)) + '</span>'; }
@@ -2700,15 +2713,37 @@ function renderStart() {
   var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small class="wwx">' + wxHtml() + '</small></div>' +
     '<div class="wsg"><div class="wsc"><h3>이번 주 마감<button type="button" data-ng="sched">일정</button></h3>' +
     (E.length ? E.map(function (e) { return '<button type="button" class="wsr" data-wf="' + e.f + '"><span class="dd' + (e.d === TODAY ? ' td' : '') + '">' + dot(e.d).slice(3) + '</span><span class="pn">' + esc(e.file.short) + '</span><span class="tx">' + esc(e.t) + '</span></button>'; }).join('') : '<div class="emp">이번 주 마감이 없어요</div>') + '</div>' +
-    '<div class="wsc"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
+    '<div class="wsc wgo" data-ng="todo"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? Td.map(function (x) { return '<div class="wsr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span>' + (x.j ? '<span class="dd" style="width:auto">' + esc(sgFix(x.j)) + '</span>' : '') + '</div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>' +
-    '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
+    wtCard() + '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
-  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['todo', 'todo', '할 일'], ['wl', 'today', '근태'], ['review', 'chk', '인쇄파일 검수기'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
+  var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['review', 'chk', '인쇄파일 검수기'], ['gcheck', 'chk', '작업지시서 검수기'], ['wo', 'doc', '작업지시서 양식'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
   $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
+}
+// 2026-11-23 실장님: 홈에 근무시간 통계 (근무표 기준 이번 주) · 누르면 근태로
+function wtLoad(ymK, v) {
+  if (S.wtWl !== S.D.wl) { S.wt = {}; S.wtWl = S.D.wl; }
+  S.wt = S.wt || {}; var WT = S.wt[ymK];
+  if (!WT && S.wtBusy !== ymK) { S.wtBusy = ymK; call('appWlWt', S.pin, ymK).then(function (r) { S.wt[ymK] = r; }, function (e) { S.wt[ymK] = { err: errMsg(e), people: [] }; }).then(function () { S.wtBusy = ''; if (S.view === v) render(); }); }
+  return WT;
+}
+function wtCard() {
+  var WT = wtLoad(TODAY.slice(0, 7), 'start'), T = team();
+  var hm = function (n) { n = +n || 0; return Math.floor(n / 60) + '<small>시간</small>' + (n % 60 ? ' ' + (n % 60) + '<small>분</small>' : ''); };
+  var body;
+  if (!WT) body = '<div class="emp">근무표 불러오는 중…</div>';
+  else if (WT.err && !(WT.people || []).length) body = '<div class="emp">' + esc(WT.err) + '</div>';
+  else body = '<div class="wtg">' + T.map(function (n) {
+    var x = (WT.people || []).filter(function (q) { return q.p === n; })[0];
+    var w = x && !x.none && !x.err ? (x.weeks || []).filter(function (w) { return w.s <= TODAY && TODAY <= w.e; })[0] : null;
+    var t = w ? +w.tot || 0 : 0, c = w && (w.over > 0 || t > 52 * 60) ? 'x52' : w && (w.ot > 0 || t > 40 * 60) ? 'x40' : '';
+    return '<div class="wtp"><span class="nm"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span><b class="' + c + '">' + (w ? hm(t) : '<small>기록 없음</small>') + '</b>' +
+      '<span class="bar"><i class="' + c + '" style="width:' + Math.min(100, t / (52 * 60) * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span></div>';
+  }).join('') + '</div><p class="wtn">이번 주 · 근무표 기준 · 선은 40시간, 끝은 52시간</p>';
+  return '<div class="wsc wfull wgo" data-ng="wl"><h3>근무시간 통계<button type="button" data-ng="wl">근태</button></h3>' + body + '</div>';
 }
 /* ── 도구 · 자료 공간 첫 화면 ── */
 function renderSpace(k) {
