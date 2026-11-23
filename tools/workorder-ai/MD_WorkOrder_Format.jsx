@@ -10,7 +10,7 @@ var OUTNAME = '[PLYSH]MDWorkOrderFormat_Template(261123)';
 var NOTE = [];
 app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
 var doc = app.documents.add(DocumentColorSpace.CMYK, 420 * MM, 297 * MM);
-var layer = doc.layers[0]; layer.name = 'HYONA_WorkOrder'; var CT = layer;
+var LBOX = doc.layers[0]; LBOX.name = 'info box'; var LINFO = doc.layers.add(); LINFO.name = 'info'; var LDES = doc.layers.add(); LDES.name = 'design'; var CT = LDES, CTI = LINFO, CTB = LBOX;
 
 /* ── 별색 ── */
 function spot(name, c, m, y, k) {
@@ -33,6 +33,7 @@ var C_MUTE = tint(C_TXT, 55);
 function font(names) { for (var i = 0; i < names.length; i++) { try { return app.textFonts.getByName(names[i]); } catch (e) {} } NOTE.push('폰트 없음: ' + names[0]); return null; }
 var F_R = font(['Pretendard-Regular', 'PretendardVariable-Regular', 'AppleSDGothicNeo-Regular']);
 var F_B = font(['Pretendard-Bold', 'PretendardVariable-Bold', 'AppleSDGothicNeo-Bold']);
+var F_XB = font(['Pretendard-ExtraBold', 'Pretendard-Bold', 'AppleSDGothicNeo-ExtraBold']) || F_B;
 var F_S = font(['Pretendard-SemiBold', 'Pretendard-Bold', 'AppleSDGothicNeo-SemiBold']) || F_B;
 function cstyle(name, f, size, color) {
   var st; try { st = doc.characterStyles.getByName(name); } catch (e) { st = doc.characterStyles.add(name); }
@@ -41,26 +42,30 @@ function cstyle(name, f, size, color) {
   try { a.kerningMethod = AutoKernType.OPTICAL; } catch (e1) {}
   a.autoLeading = false; a.leading = size * 2.0; a.fillColor = color; return st;
 }
-var TIERS = {}, TB = { XS: 18, S: 26, M: 34, L: 46, XL: 70 }, TT = { XS: 36, S: 50, M: 66, L: 90, XL: 136 };
+// 기준 = 실장님 수정본 (아크릴 스탠드, 본문 25pt). 다른 단계는 본문 크기 비율로 전부 같이 커지고 작아짐.
+var TIERS = {}, TB = { XS: 18, S: 25, M: 32, L: 42, XL: 60 };
 function tierOf(D) { return D <= 60 ? 'XS' : D <= 150 ? 'S' : D <= 300 ? 'M' : D <= 700 ? 'L' : 'XL'; }
+function st2(name, f, size, color, ld, trk) { var s = cstyle(name, f, size, color); var a = s.characterAttributes; a.leading = ld; a.tracking = trk; return s; }
 function styles(t) {
   if (TIERS[t]) return TIERS[t];
-  var b = TB[t], p = 'HYONA_' + t + '_';
+  var b = TB[t], k = b / 25, p = 'HYONA_' + t + '_', L = 42 * k;
   return TIERS[t] = {
-    b: b,
-    title: cstyle(p + 'Title', F_B, TT[t], C_TXT),
-    item: lead(cstyle(p + 'Item', F_B, TT[t] * 0.8, C_TXT), TT[t] * 0.8 * 1.2),
-    writer: lead(cstyle(p + 'Writer', F_R, b, C_TXT), b * 1.6),
-    eye: cstyle(p + 'Eyebrow', F_R, b * 0.9, C_MUTE),
-    sec: cstyle(p + 'Section', F_B, b * 1.45, C_TXT),
-    label: cstyle(p + 'Label', F_B, b, C_TXT),
-    body: cstyle(p + 'Body', F_R, b, C_TXT),
-    hint: cstyle(p + 'Hint', F_R, b * 0.88, C_MUTE),
-    req: cstyle(p + 'Req', F_S, b * 0.88, C_REQ),
-    opt: cstyle(p + 'Opt', F_S, b * 0.88, C_MUTE),
-    dim: opFill(cstyle(p + 'Dim', F_R, b, C_LEN)),
-    chip: cstyle(p + 'Chip', F_R, b * 1.5, tint(C_CHIP, 60)),
-    box: cstyle(p + 'Box', F_R, b * 1.25, C_TXT)
+    b: b, k: k,
+    title: st2(p + 'Title', F_B, 90 * k, C_TXT, 93 * k, -15),
+    writer: st2(p + 'Writer', F_R, 60 * k, C_TXT, 93 * k, -15),
+    eye: st2(p + 'Eyebrow', F_XB, 40 * k, C_TXT, L, -25),
+    item: st2(p + 'Item', F_B, 70 * k, C_TXT, 100 * k, -15),
+    sec: st2(p + 'Section', F_XB, 40 * k, C_TXT, 130 * k, -25),
+    req: st2(p + 'Req', F_XB, 40 * k, C_REQ, 130 * k, -25),
+    opt: st2(p + 'Opt', F_XB, 40 * k, C_MUTE, 130 * k, -25),
+    label: st2(p + 'Label', F_B, b, C_TXT, L, -25),
+    body: st2(p + 'Body', F_R, b, C_TXT, L, -25),
+    hint: st2(p + 'Hint', F_R, b, C_MUTE, L, -25),
+    chip: st2(p + 'Chip', F_R, b, tint(C_CHIP, 60), L, -25),
+    box: st2(p + 'Box', F_R, b, C_TXT, L, -25),
+    dim: opFill(st2(p + 'Dim', F_R, b * 46 / 25, C_LEN, b * 92 / 25, -15)),
+    view: st2(p + 'View', F_B, b * 46 / 25, C_TXT, b * 92 / 25, -15),
+    vhint: st2(p + 'ViewHint', F_R, b * 40.5 / 25, C_MUTE, b * 81 / 25, -15)
   };
 }
 
@@ -70,6 +75,7 @@ function px(x) { return OX + x * MM; } function py(y) { return OY - y * MM; }
 var BOXST = null;
 function ptext(x, y, s, st, just) {
   var t = CT.textFrames.pointText([px(x), py(y)]); t.contents = s; st.applyTo(t.textRange, true);
+  try { var ca = st.characterAttributes, ta = t.textRange.characterAttributes; if (ca.textFont) ta.textFont = ca.textFont; ta.size = ca.size; ta.autoLeading = false; ta.leading = ca.leading; ta.fillColor = ca.fillColor; ta.tracking = ca.tracking; } catch (eF) {}
   if (BOXST && s.indexOf('\u25A1') >= 0) { for (var ci = 0; ci < s.length; ci++) if (s.charAt(ci) == '\u25A1') BOXST.applyTo(t.textRange.characters[ci], true); }
   if (just) t.textRange.paragraphAttributes.justification = just; return t;
 }
@@ -96,6 +102,7 @@ function wrapText(s, maxEm) {
 }
 function blanks(s) { return String(s).replace(/____/g, '________'); }
 
+function setSt(rng, st) { st.applyTo(rng, true); try { var ca = st.characterAttributes, ta = rng.characterAttributes; if (ca.textFont) ta.textFont = ca.textFont; ta.size = ca.size; ta.autoLeading = false; ta.leading = ca.leading; ta.fillColor = ca.fillColor; ta.tracking = ca.tracking; } catch (e) {} }
 function lead(st, l) { st.characterAttributes.leading = l; return st; }
 function opFill(st) { try { st.characterAttributes.overprintFill = true; } catch (e) {} return st; }
 
@@ -119,7 +126,7 @@ function recolor(it, S, k, kd) {
   if (it.typename == 'TextFrame') {
     var fc = null; try { fc = it.textRange.characterAttributes.fillColor; } catch (e) {}
     var m2 = mapCol(fc); var cx = it.left + it.width / 2, cy = it.top;
-    (m2 == C_LEN ? S.dim : S.hint).applyTo(it.textRange, true);
+    setSt(it.textRange, m2 == C_LEN ? S.dim : S.vhint);
     if (m2 && m2 != C_LEN) it.textRange.characterAttributes.fillColor = m2;
     if (m2) it.textRange.characterAttributes.overprintFill = true;
     it.left = cx - it.width / 2; it.top = cy;
@@ -138,82 +145,101 @@ function placeSvg(f, x, y, w, S) {
 
 /* ── 품목 하나 ── */
 function item(d, ox, oy) {
-  OX = ox; OY = oy; CT = layer.groupItems.add(); CT.name = d.k;
-  var D = d.D, t = tierOf(D), S = styles(t), b = S.b, U = b * 0.3528; // U = 본문 1em (mm)
-  var LH = U * 2.0, M = Math.max(10, U * 3); BOXST = S.box;
-  var IW = 40 * U;                 // 정보 열 폭
-  var x = M, y = M, maxEm = 40;
-  // 제목만 따로, 나머지 정보는 글상자 하나 (엔터로 나눈 단락)
-  var TU = TT[t] * 0.3528; y += TU * 1.1; ptext(x, y, '[아티스트] 프로젝트 이름', S.title);
-  y += TU * 0.8 * 1.2;
-  var P = [], GAPPT = b * 2.0 * 2.2, KW = 9 * U * MM, IWPT = IW * MM;
+  OX = ox; OY = oy;
+  CT = LDES.groupItems.add(); CT.name = d.k; CTI = LINFO.groupItems.add(); CTI.name = d.k; CTB = LBOX.groupItems.add(); CTB.name = d.k;
+  var D = d.D, t = tierOf(D), S = styles(t), b = S.b, k = S.k, U = b * 0.3528; // U = 본문 1em (mm)
+  BOXST = S.box;
+  var M = 59 * k, PAD = 40 * k, maxEm = 40;
+  function tabsFor(min, list) { var e = 0; for (var i = 0; i < list.length; i++) e = Math.max(e, emw(list[i])); return Math.max(min * k, (e * 0.8 + 0.8) * U); }
+
+  // 머리: [아티스트] 프로젝트 이름 / 작성자 이름 · 연락처 (글자 하나, 두 단락)
+  var hd = CTI.textFrames.pointText([px(M), py(M)]); hd.contents = '[아티스트] 프로젝트 이름\r작성자 이름 · 연락처'; hd.name = '머리';
+  setSt(hd.paragraphs[0], S.title); setSt(hd.paragraphs[1], S.writer);
+  hd.top = py(M); hd.left = px(M);
+  var boxTop = M + hd.height / MM + 43 * k;
+
+  // 정보: 글자 하나, 엔터로 나눈 단락
+  var P = [], LB = 42 * k;
   function para(text, st, o) { o = o || {}; o.text = text; o.st = st; P.push(o); }
-  function sec(name, lv) { para(name + (lv ? '   ' + (lv == 'r' ? '필수' : '권장') : ''), S.sec, { sb: GAPPT, tag: lv, after: b * 0.5 }); }
+  function sec(name, tag, tagSt) { para(name + (tag ? '   ' + tag : ''), S.sec, { tag: tag, tagSt: tagSt, isSec: true }); }
+  function lv(x) { return x == 'r' ? ['필수', S.req] : ['권장', S.opt]; }
+  function secR(name, x) { var a = lv(x); sec(name, a[0], a[1]); }
   function opts(arr) { var ls = wrapOpts(arr, maxEm, true); for (var i = 0; i < ls.length; i++) para(blanks(ls[i]), S.body); }
   function sub(rows) {
+    var names = []; for (var n = 0; n < rows.length; n++) names.push(rows[n][0]);
+    var tw = tabsFor(63.9, names) * MM;
     for (var i = 0; i < rows.length; i++) {
-      var ls = wrapOpts(rows[i][1], maxEm - 9, true);
-      for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[KW, 'L']], label: !j, sb: (!j && i) ? b * 0.4 : 0 });
+      var ls = wrapOpts(rows[i][1], maxEm - 7, true);
+      for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[tw, 'L']], label: !j });
     }
   }
+  para('품목', S.eye);
   para(d.n, S.item);
-  para('작성자 이름 · 연락처', S.writer, { sb: b * 0.3 });
-  sec('소재', d.R['소재']); opts(d.mat);
-  sec('소재 세부', d.R['소재 세부']); sub(d.det);
-  sec('인쇄 · 가공', d.R['인쇄 · 가공']); opts(d.proc);
-  sec('컬러', d.R['컬러 안내']); var CL = ['PANTONE 231C (백그라운드 판)', 'PANTONE C ()', 'PANTONE C ()']; for (var c = 0; c < 3; c++) para('●\t' + CL[c], S.body, { chip: true, tabs: [[U * 2.4 * MM, 'L']], sb: c ? b * 0.3 : 0 });
-  sec('치수 (정수 mm)', d.R['치수']);
-  var dk = 0; for (var dj = 0; dj < d.dims.length; dj++) dk = Math.max(dk, emw(d.dims[dj]));
-  for (var di = 0; di < d.dims.length; di++) para(d.dims[di] + '\t______ mm', S.body, { tabs: [[(dk + 2) * U * MM, 'L']], val: S.dim });
-  sec('부자재', d.R['부자재']); sub(d.acc);
-  sec('포장', 'o'); opts(d.pack);
-  sec('주의사항', d.R['주의사항']);
-  for (var w = 0; w < d.warn.length; w++) { var wl = wrapText(d.warn[w], maxEm - 2); for (var k = 0; k < wl.length; k++) para((k ? '' : '•') + '\t' + wl[k], S.body, { tabs: [[U * 1.4 * MM, 'L']] }); }
-  sec('발주 전 확인');
-  for (var q = 0; q < d.chk.length; q++) para('□\t' + d.chk[q], S.body, { tabs: [[U * 1.6 * MM, 'L']] });
+  sec('가이드별색', '필수', S.req);
   var lg = [['——', C_LEN, '길이'], ['——', C_FOLD, '접지'], ['- - -', C_MAR, '여백 · 안전'], ['——', C_CUT, '재단 · 칼선']];
-  for (var g = 0; g < lg.length; g++) para(lg[g][0] + '\t' + lg[g][2], S.body, { lineCol: lg[g][1], tabs: [[U * 3.4 * MM, 'L']], sb: g ? 0 : GAPPT });
+  for (var g = 0; g < lg.length; g++) para(lg[g][0] + '\t' + lg[g][2], S.body, { lineCol: lg[g][1], tabs: [[24.1 * k * MM, 'L']] });
   var hasNet = false; for (var z = 0; z < d.views.length; z++) if (d.views[z].t == '전개도') hasNet = true;
-  para((hasNet ? '전개도는 조립도와 함께 · ' : '') + '치수 0.5 올림 · 가이드 · 후가공 별색 오버프린트', S.hint, { sb: b * 0.8 });
-  para('기준: 작업 기초 지침 › ' + d.src, S.hint);
+  para((hasNet ? '전개도는 조립도와 함께 · ' : '') + '치수 0.5 올림 · 가이드 · 후가공 별색 오버프린트', S.hint);
+  secR('소재', d.R['소재']); opts(d.mat);
+  secR('소재 세부', d.R['소재 세부']); sub(d.det);
+  secR('인쇄 · 가공', d.R['인쇄 · 가공']); opts(d.proc);
+  secR('컬러', d.R['컬러 안내']);
+  var CL = ['PANTONE 231C (백그라운드 판)', 'PANTONE C ()', 'PANTONE C ()'];
+  for (var c = 0; c < 3; c++) para('●\t' + CL[c], S.body, { chip: true, tabs: [[17 * k * MM, 'L']] });
+  secR('치수 (정수 mm)', d.R['치수']);
+  var dtw = tabsFor(95, d.dims) * MM;
+  for (var di = 0; di < d.dims.length; di++) para(d.dims[di] + '\tmm', S.body, { tabs: [[dtw, 'L']] });
+  secR('부자재', d.R['부자재']); sub(d.acc);
+  secR('포장', 'o'); opts(d.pack);
+  sec('발주 전 확인');
+  for (var q = 0; q < d.chk.length; q++) para('□\t' + d.chk[q], S.body, { tabs: [[11.4 * k * MM, 'L']] });
+  sec('작성 주의사항', '필독 읽고 삭제', S.req);
+  for (var w = 0; w < d.warn.length; w++) { var wl = wrapText(d.warn[w], maxEm - 2); for (var kk = 0; kk < wl.length; kk++) para((kk ? '' : '•') + '\t' + wl[kk], S.body, { tabs: [[9.9 * k * MM, 'L']] }); }
 
   var all = []; for (var pi = 0; pi < P.length; pi++) all.push(P[pi].text);
-  var tf = CT.textFrames.pointText([px(x), py(y)]); tf.contents = all.join('\r'); tf.name = '정보';
+  var tf = CTI.textFrames.pointText([px(M + PAD), py(boxTop + PAD)]); tf.contents = all.join('\r'); tf.name = '정보';
   S.body.applyTo(tf.textRange, true);
   var pars = tf.paragraphs;
   if (pars.length != P.length) NOTE.push(d.n + ': 단락 수 다름 ' + pars.length + '/' + P.length);
   for (var i2 = 0; i2 < P.length && i2 < pars.length; i2++) {
     var o = P[i2], pr = pars[i2], tx = o.text;
-    o.st.applyTo(pr, true);
+    setSt(pr, o.st);
     var pa = pr.paragraphAttributes;
-    pa.spaceBefore = o.sb || 0; pa.spaceAfter = o.after || 0;
-    if (o.tabs) { var arr = []; for (var ti = 0; ti < o.tabs.length; ti++) { var ts = new TabStopInfo(); ts.position = o.tabs[ti][0]; ts.alignment = o.tabs[ti][1] == 'R' ? TabStopAlignment.Right : TabStopAlignment.Left; arr.push(ts); } pa.tabStops = arr; }
+    pa.spaceBefore = 0; pa.spaceAfter = o.isSec ? 12 * k : 0; // 앞 간격 없음 · 소제목만 뒤 간격, 나머지는 행간
+    if (o.tabs) { var arr = []; for (var ti = 0; ti < o.tabs.length; ti++) { var ts = new TabStopInfo(); ts.position = o.tabs[ti][0]; ts.alignment = TabStopAlignment.Left; arr.push(ts); } pa.tabStops = arr; }
     var tab = tx.indexOf('\t');
     try {
       if (o.label && tab > 0) for (var c1 = 0; c1 < tab; c1++) S.label.applyTo(pr.characters[c1], true);
-      if (o.val && tab > 0) for (var c2 = tab + 1; c2 < tx.length; c2++) o.val.applyTo(pr.characters[c2], true);
-      if (o.tag) { var tl = 2; for (var c3 = tx.length - tl; c3 < tx.length; c3++) (o.tag == 'r' ? S.req : S.opt).applyTo(pr.characters[c3], true); }
+      if (o.tag) { var tl = o.tag.length; for (var c3 = tx.length - tl; c3 < tx.length; c3++) o.tagSt.applyTo(pr.characters[c3], true); }
       if (o.chip) S.chip.applyTo(pr.characters[0], true);
       if (o.lineCol) for (var c4 = 0; c4 < tab; c4++) { var ch4 = pr.characters[c4]; S.label.applyTo(ch4, true); ch4.characterAttributes.fillColor = o.lineCol; ch4.characterAttributes.overprintFill = true; }
       for (var c5 = 0; c5 < tx.length; c5++) if (tx.charAt(c5) == '□') S.box.applyTo(pr.characters[c5], true);
     } catch (eS) { NOTE.push(d.n + ' 글자 스타일: ' + eS); }
   }
-  var infoBottom = y + tf.height / MM + M;
+  tf.top = py(boxTop + PAD); tf.left = px(M + PAD);
+  var boxW = Math.max(360 * k, tf.width / MM + PAD * 2), boxH = tf.height / MM + PAD * 2;
+  var bx = CTB.pathItems.rectangle(py(boxTop), px(M), boxW * MM, boxH * MM);
+  bx.name = '정보 바탕'; bx.stroked = false; bx.filled = true; bx.fillColor = tint(C_TXT, 5);
+  var infoBottom = boxTop + boxH + M;
 
   // 오른쪽: 디자인 자리 (1:1)
-  var dx = M + IW + Math.max(15, U * 6), vy = M + U, vw = D * 1.35, right = dx, viewBottom = 0;
+  CTI = CT; // 도면 캡션은 design 레이어
+  var dx = M + boxW + 150 * k, vy = boxTop + 23 * k, vw = D * 1.35, right = dx, viewBottom = 0, VL = S.view.characterAttributes.leading * 0.3528;
+  var vx = dx;
   for (var v = 0; v < d.views.length; v++) {
-    var V = d.views[v], vx = dx + v * (vw + Math.max(10, U * 4));
-    ptext(vx, vy, '디자인 ' + (v + 1) + ' · ' + V.t + (V.note ? '  (' + V.note + ')' : ''), S.label);
-    ptext(vx, vy + LH, '실제 크기 1:1로 배치', S.hint);
-    var h = placeSvg(V.f, vx, vy + LH * 1.8, vw, S);
-    if (vy + LH * 1.8 + h > viewBottom) viewBottom = vy + LH * 1.8 + h;
-    right = vx + vw;
+    var V = d.views[v];
+    var c1 = ptext(vx, vy, '디자인 ' + (v + 1) + ' · ' + V.t + (V.note ? '  (' + V.note + ')' : ''), S.view);
+    var c2 = ptext(vx, vy + VL * 0.75, '실제 크기 1:1로 배치', S.vhint);
+    var h = placeSvg(V.f, vx, vy + VL * 1.5, vw, S);
+    if (vy + VL * 1.5 + h > viewBottom) viewBottom = vy + VL * 1.5 + h;
+    var cw = Math.max(vw, c1.width / MM, c2.width / MM);
+    right = Math.max(right, vx + cw); vx += cw + Math.max(20, 60 * k);
   }
-  ptext(dx, viewBottom + LH * 1.5, '디자인이 여러 개면 오른쪽 · 아래로 이어서 배치하고, 이 대지를 늘려 쓰기', S.hint);
-  var W = right + M, H = Math.max(infoBottom, viewBottom + LH * 3 + M);
+  var c3 = ptext(dx, viewBottom + VL * 1.2, '디자인이 여러 개면 오른쪽 · 아래로 이어서 배치하고, 이 대지를 늘려 쓰기', S.vhint);
+  right = Math.max(right, dx + c3.width / MM);
+  var W = right + M, H = Math.max(infoBottom, viewBottom + VL * 2 + M);
   var ab = doc.artboards.add([px(0), py(0), px(W), py(H)]); ab.name = d.k;
-  return [W, H, CT];
+  return [W, H, [CT, CTB, LINFO.groupItems.getByName(d.k)]];
 }
 
 // 배치: 한 줄에 5,000mm까지, 넘으면 다음 줄
@@ -226,7 +252,7 @@ for (var i = 0; i < DATA.length; i++) {
     var abN = doc.artboards[doc.artboards.length - 1], rr = abN.artboardRect;
     var mdx = -curX * MM, mdy = -(rowH + GAPB) * MM;
     abN.artboardRect = [rr[0] + mdx, rr[1] + mdy, rr[2] + mdx, rr[3] + mdy];
-    sz[2].translate(mdx, mdy);
+    for (var gi = 0; gi < sz[2].length; gi++) sz[2][gi].translate(mdx, mdy);
     curY += rowH + GAPB; curX = 0; rowH = 0;
   }
   curX += sz[0] + GAPB; if (sz[1] > rowH) rowH = sz[1];
