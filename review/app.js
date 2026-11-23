@@ -29,7 +29,7 @@ function pl(i) { var P = R && R.pages[i]; return R && R.isImg && P ? P.name : (i
 function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src + ' 불러오기 실패')); }; document.head.appendChild(s); }); }
 var libsP = null;
 function libs() {
-  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261123b2'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
+  if (!libsP) libsP = Promise.all([window.pdfjsLib ? 0 : loadScript(LIBS.pdfjs), window.PDFLib ? 0 : loadScript(LIBS.pdflib)]).then(function () { return window.PRV ? 0 : loadScript('engine.js?v=20261123d1'); }).then(function () { pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.worker; });
   return libsP;
 }
 var faceP = null;
@@ -404,8 +404,13 @@ function pageChecks(P) {
     } else
     if (Math.abs(tw - ew) > 0.6 || Math.abs(th - WO.h) > 0.6) { if (!(Math.abs(tw - WO.h) < 0.6 && Math.abs(th - ew) < 0.6)) add('err', 'print', 'trimsize', '재단 사이즈가 사양서와 달라요', '파일 ' + f1(tw) + '×' + f1(th) + 'mm · 사양서 ' + f1(ew) + '×' + WO.h + 'mm', '문서 크기를 사양서에 맞춰 주세요.', [T]); }
   }
-  // 도련 상자
-  if (!isAI) {
+  // 칼선(닫힌 선) · 가름선(접는 선) — 일러스트 PDF·AI 패키지·스티커 칼선 파일
+  var FL = finLines(P), dieIn = false;
+  if (FL.outl.length) { var db = FL.outl.reduce(function (a, o) { var b = o.o.box; return a ? [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])] : b.slice(); }, null), gm = SET.bleed * MM * 0.8; dieIn = db[0] > T[0] + gm && db[1] > T[1] + gm && db[2] < T[2] - gm && db[3] < T[3] - gm; }
+  if (FL.outl.length && dieIn) dieBleed(P, FL, add); // 칼선 = 재단선이면 재단선 도련 검사가 대신 봄
+  if (FL.folds.length) foldAlign(P, FL, add);
+  // 도련 상자 (인디자인·일러스트 PDF 모두. 칼선이 재단선 안쪽에 넉넉히 있으면 도련은 칼선 기준으로만 봄)
+  if (R.kind !== 'ai' && !dieIn) {
     var bl = P.bleed || P.crop, d = [mm(T[0] - bl[0]), mm(T[1] - bl[1]), mm(bl[2] - T[2]), mm(bl[3] - T[3])], mn = Math.min.apply(null, d);
     if (!P.hasTrim && !P.hasBleed) add('warn', 'print', 'nobox', '재단선 정보가 없는 PDF예요', '도련 포함 여부를 판단하기 어려워요.', '인디자인 내보내기 > 표시 및 도련 > “문서 도련 설정 사용(3mm)”을 켜 주세요.');
     else if (mn < SET.bleed - 0.2) add('err', 'print', 'bleedbox', '도련이 ' + SET.bleed + 'mm보다 작아요', '도련 위·아래·왼쪽·오른쪽: ' + [d[3], d[1], d[0], d[2]].map(f1).join(' / ') + 'mm', '내보내기에서 도련 ' + SET.bleed + 'mm를 넣어 주세요.', [T]);
@@ -584,6 +589,85 @@ function nearSegs(b, segs, d) {
   return false;
 }
 
+// ── 칼선 · 가름선 분류 ──
+// 후가공 별색 선 중 닫힌 선 = 칼선 외곽, 접는 선 이름(Crease·Fold·오시·가름…)·점선·외곽 안쪽의 열린 선 = 가름선
+function finLines(P) {
+  var outl = [], cand = [];
+  P.strokes.forEach(function (o) {
+    if (!o.ink || !o.ink.spots || !o.segs || !o.segs.length) return; var n = null; for (var s in o.ink.spots) if (PRV.isFin(s)) n = s; if (!n) return;
+    var cutN = /die|cut|칼|톰슨|thomson|도무송|knife|contour|crease|fold|score|오시|접|가름|미싱|perf/i.test(n);
+    if (!cutN && /foil|박|emboss|deboss|형압|uv|varnish|코팅|에폭|epoxy|glitter|white|화이트|백색|holo|홀로|pearl|펄|scodix|raised|유광|무광|양각|음각|부식/i.test(n)) return; // 박·형압·코팅 판은 선이 아님
+    var foldN = /fold|crease|score|오시|접지|접는|가름|미싱|perf/i.test(n);
+    if (foldN || o.dash) cand.push({ o: o, n: n, segs: o.segs, named: true });
+    else if (isClosed(o.segs)) outl.push({ o: o, n: n, segs: o.segs });
+    else cand.push({ o: o, n: n, segs: o.segs });
+  });
+  // 이름 없는 열린 실선은 칼선 외곽 안쪽에 있을 때만 가름선 (바깥 칼선 조각은 제외)
+  var folds = cand.filter(function (f) { if (f.named) return true; if (!outl.length) return false; var b = f.o.box, c = [(b[0] + b[2]) / 2, (b[1] + b[3]) / 2]; return f.segs.every(function (g) { var nx = -(g[3] - g[1]), ny = g[2] - g[0], L = Math.hypot(nx, ny) || 1, mx = (g[0] + g[2]) / 2, my = (g[1] + g[3]) / 2, d = 1.5 * MM; return inDie([mx + nx / L * d, my + ny / L * d], outl) && inDie([mx - nx / L * d, my - ny / L * d], outl); }); });
+  return { outl: outl, folds: folds };
+}
+function isClosed(segs) { var c = {}; segs.forEach(function (g) { [[g[0], g[1]], [g[2], g[3]]].forEach(function (p) { var k = Math.round(p[0] * 2) + ',' + Math.round(p[1] * 2); c[k] = (c[k] || 0) + 1; }); }); return segs.length >= 3 && Object.keys(c).every(function (k) { return c[k] % 2 === 0; }); }
+function inDie(pt, outl) { return outl.some(function (o) { var b = o.o.box; if (pt[0] < b[0] || pt[0] > b[2] || pt[1] < b[1] || pt[1] > b[3]) return false; var n = 0; o.segs.forEach(function (g) { if ((g[1] > pt[1]) !== (g[3] > pt[1]) && pt[0] < g[0] + (pt[1] - g[1]) * (g[2] - g[0]) / (g[3] - g[1])) n++; }); return n % 2 === 1; }); }
+
+// 칼선 기준 도련: 칼선 안쪽엔 색이 있는데 칼선 바깥 2.4mm가 흰색이면 → 도련 부족
+function dieBleed(P, FL, add) {
+  if (!P.px) return;
+  var C = P.crop, out = SET.bleed * MM * 0.8, inn = 1 * MM, step = 1.5 * MM, runs = [], tot = 0;
+  FL.outl.forEach(function (o) {
+    o.segs.forEach(function (g) {
+      var dx = g[2] - g[0], dy = g[3] - g[1], L = Math.hypot(dx, dy); if (L < 2 * MM) return;
+      var ux = dx / L, uy = dy / L, nx = -uy, ny = ux, run = null;
+      var mid = [(g[0] + g[2]) / 2, (g[1] + g[3]) / 2];
+      if (inDie([mid[0] + nx * inn, mid[1] + ny * inn], FL.outl) === inDie([mid[0] - nx * inn, mid[1] - ny * inn], FL.outl)) return; // 안·밖 구분 안 되는 선
+      var sg = inDie([mid[0] + nx * inn, mid[1] + ny * inn], FL.outl) ? 1 : -1; // n 방향이 안쪽이면 1
+      for (var t = Math.min(step, L / 2); t < L; t += step) {
+        var x = g[0] + ux * t, y = g[1] + uy * t, pi = [x + sg * nx * inn, y + sg * ny * inn], po = [x - sg * nx * out, y - sg * ny * out];
+        if (po[0] < C[0] || po[0] > C[2] || po[1] < C[1] || po[1] > C[3]) { if (run) { runs.push(run); run = null; } continue; }
+        var qi = ptPx(P, pi[0], pi[1]), qo = ptPx(P, po[0], po[1]), ci = avgPix(P, qi[0], qi[1], 1), co = avgPix(P, qo[0], qo[1], 1);
+        var miss = co[0] > 250 && co[1] > 250 && co[2] > 250 && lum(ci) < 232 && Math.abs(lum(ci) - lum(co)) > 25;
+        if (miss) { if (!run) run = { a: [x, y], b: [x, y], n: [sg * nx, sg * ny], len: 0 }; else { run.b = [x, y]; run.len += step; } }
+        else if (run) { runs.push(run); run = null; }
+      }
+      if (run) runs.push(run);
+    });
+  });
+  runs = runs.filter(function (r) { return r.len >= 3 * MM; }); if (!runs.length) return;
+  runs.forEach(function (r) { tot += r.len; });
+  if (tot < 5 * MM) return;
+  var boxes = runs.slice(0, 30).map(function (r) { var p1 = [r.a[0] + r.n[0] * 2 * MM, r.a[1] + r.n[1] * 2 * MM], p2 = [r.b[0] - r.n[0] * SET.bleed * MM, r.b[1] - r.n[1] * SET.bleed * MM]; return [Math.min(p1[0], p2[0], r.a[0], r.b[0]), Math.min(p1[1], p2[1], r.a[1], r.b[1]), Math.max(p1[0], p2[0], r.a[0], r.b[0]), Math.max(p1[1], p2[1], r.a[1], r.b[1])]; });
+  add('err', 'print', 'diebleed', '칼선 바깥 도련이 부족해요', runs.length + '곳 · 약 ' + Math.round(mm(tot)) + 'mm 구간 · 칼선 밖 ' + f1(SET.bleed * 0.8) + 'mm 지점이 흰색', '권장 배경·사진을 칼선 밖 ' + SET.bleed + 'mm까지 확장', boxes);
+}
+
+// 가름선(접는 선) 정렬: 색 면·사진 경계가 가름선에서 0.3~3mm 비켜 있으면 → 접었을 때 옆 면으로 넘어가거나 흰 줄
+function foldAlign(P, FL, add) {
+  var T = P.trim, hits = [], seen = {};
+  var objs = P.fills.filter(function (f) { var k = f.ink; if (!k || k.white || k.reg || k.none || f.shade && !f.vis) return false; if (k.spots) for (var s in k.spots) if (PRV.isFin(s)) return false; var b = f.vis || f.box; return b && b[2] - b[0] > 4 * MM && b[3] - b[1] > 4 * MM && !(b[0] <= T[0] && b[1] <= T[1] && b[2] >= T[2] && b[3] >= T[3]); }).map(function (f) { return f.vis || f.box; })
+    .concat(P.images.filter(function (im) { return !im.mask && im.vis && !PRV.empty(im.vis); }).map(function (im) { return im.vis; }));
+  FL.folds.forEach(function (F) {
+    F.segs.forEach(function (g) {
+      var vert = Math.abs(g[0] - g[2]) < 0.3, horz = Math.abs(g[1] - g[3]) < 0.3; if (!vert && !horz) return;
+      var f = vert ? (g[0] + g[2]) / 2 : (g[1] + g[3]) / 2, a = vert ? Math.min(g[1], g[3]) : Math.min(g[0], g[2]), b = vert ? Math.max(g[1], g[3]) : Math.max(g[0], g[2]);
+      if (b - a < 8 * MM) return;
+      objs.forEach(function (bx) {
+        var lo = vert ? bx[1] : bx[0], hi = vert ? bx[3] : bx[2], ov = Math.min(b, hi) - Math.max(a, lo); if (ov < Math.min(8 * MM, (b - a) * 0.5)) return;
+        [vert ? bx[0] : bx[1], vert ? bx[2] : bx[3]].forEach(function (e) {
+          var d = e - f; if (Math.abs(d) < 0.3 * MM || Math.abs(d) > 3 * MM) return;
+          // 화면에서 실제로 경계가 보이는지 (다른 면에 덮였으면 제외)
+          var s0 = Math.max(a, lo), s1 = Math.min(b, hi), m = (s0 + s1) / 2, e1 = e - 0.25 * MM, e2 = e + 0.25 * MM;
+          var vis = !P.px || [0.2, 0.35, 0.5, 0.65, 0.8].some(function (q) { var mq = s0 + (s1 - s0) * q, p1 = vert ? ptPx(P, e1, mq) : ptPx(P, mq, e1), p2 = vert ? ptPx(P, e2, mq) : ptPx(P, mq, e2), c1 = avgPix(P, p1[0], p1[1], 1), c2 = avgPix(P, p2[0], p2[1], 1); return Math.abs(c1[0] - c2[0]) + Math.abs(c1[1] - c2[1]) + Math.abs(c1[2] - c2[2]) >= 40; });
+          if (!vis) return;
+          var k = Math.round(f) + '|' + Math.round(e) + '|' + Math.round(m / 20); if (seen[k]) return; seen[k] = 1;
+          var y0 = Math.max(a, lo), y1 = Math.min(b, hi);
+          hits.push({ d: Math.abs(mm(d)), n: F.n, b: vert ? [Math.min(e, f) - MM, y0, Math.max(e, f) + MM, y1] : [y0, Math.min(e, f) - MM, y1, Math.max(e, f) + MM] });
+        });
+      });
+    });
+  });
+  if (!hits.length) return;
+  hits.sort(function (p, q) { return q.d - p.d; });
+  add('warn', 'print', 'foldalign', '가름선과 디자인 경계가 어긋나요', hits.length + '곳 · 가름선에서 ' + uniq(hits.map(function (h) { return f1(h.d) + 'mm'; })).slice(0, 6).join(', ') + ' 비켜남 (' + uniq(hits.map(function (h) { return h.n; })).join(', ') + ')', '권장 색 면·사진 경계를 가름선에 맞춤 (어긋나면 접었을 때 옆 면으로 색이 넘어가거나 흰 줄이 보임)', hits.slice(0, 30).map(function (h) { return h.b; }));
+}
+
 // 도련 채움: 재단선 안쪽엔 색이 있는데 바깥(도련)이 흰색이면 → 도련 미적용
 function bleedFill(P, add) {
   var T = P.trim, C = P.crop, out = SET.bleed * MM * 0.6, inn = 0.7 * MM, step = MM, runs = [];
@@ -739,6 +823,16 @@ function dupPhotos() {
     g.forEach(function (x) { used.add(x); });
     groups.push({ items: g, exact: true, repeat: rep });
   });
+  // 같은 원본 사진 (사진 안 원본 파일 이름 · 원본 ID가 같음 = 같은 파일을 자르기·크기만 바꿔 다시 씀)
+  var bySrc = {}, withSrc = I.filter(function (x) { return x.src && (x.src.raw || x.src.id); });
+  withSrc.forEach(function (x) { var k = x.src.raw ? 'f:' + x.src.raw.toLowerCase() : 'i:' + x.src.id; (bySrc[k] = bySrc[k] || []).push(x); });
+  Object.keys(bySrc).forEach(function (k) {
+    var g = bySrc[k]; if (g.length < 2 || g.length > Math.max(3, withSrc.length * 0.4)) return; // 전부 같은 ID면 (일괄 저장 등) 믿지 않음
+    if (g.every(function (x) { return x.hash && x.hash === g[0].hash; })) return; // 이미 '똑같은 사진'으로 잡힘
+    if (g.every(function (x) { return x.page === g[0].page; }) && g.length === 2 && overlaps(g[0].vis, g[1].vis)) return;
+    g.forEach(function (x) { used.add(x); });
+    groups.push({ items: g, exact: false, src: k.charAt(0) === 'f' ? g[0].src.raw : '원본 ID 같음' });
+  });
   // 비슷한 사진 (해시 거리)
   var C = I.filter(function (x) { return x.hashV && x.hashV.sd > 9; });
   var parent = new Map(); function find(x) { while (parent.get(x) !== x) x = parent.get(x); return x; }
@@ -750,12 +844,12 @@ function dupPhotos() {
     if (d <= 5 && dc < 25) parent.set(find(A), find(B));
   }
   var near = {}; C.forEach(function (x) { var r = find(x); if (r !== x || C.some(function (y) { return y !== x && find(y) === r; })) (near[C.indexOf(r)] = near[C.indexOf(r)] || []).push(x); });
-  Object.keys(near).forEach(function (k) { var g = near[k]; if (g.length > 1 && !g.every(function (x) { return used.has(x) && byHash[x.hash] && byHash[x.hash].length === g.length; })) groups.push({ items: g, exact: false }); });
+  Object.keys(near).forEach(function (k) { var g = near[k]; if (g.length > 1 && g.every(function (x) { return x.src && g[0].src && (x.src.raw || x.src.id) === (g[0].src.raw || g[0].src.id); }) && used.has(g[0])) return; if (g.length > 1 && !g.every(function (x) { return used.has(x) && byHash[x.hash] && byHash[x.hash].length === g.length; })) groups.push({ items: g, exact: false }); });
   R.dups = groups.filter(function (g) { return !g.repeat; });
   R.repeats = groups.filter(function (g) { return g.repeat; });
   R.dups.forEach(function (g) {
     var pages = uniq(g.items.map(function (x) { return x.page + 1; }));
-    issue({ page: null, sev: g.exact ? 'err' : 'warn', cat: 'photo', code: g.exact ? 'dup' : 'dupnear', title: g.exact ? (R.isImg ? '똑같은 이미지 파일이 ' + g.items.length + '개 있어요' : '같은 사진이 ' + g.items.length + '번 쓰였어요') : '같은 사진으로 보여요', detail: R.isImg ? uniq(g.items.map(function (x) { return pl(x.page); })).join(', ') : pages.join(', ') + '쪽', fix: g.exact ? '의도한 반복이 아니면 다른 사진으로 바꿔 주세요.' : '자르기·크기만 다른 같은 컷인지 확인해 주세요.', boxes: [], pages: pages, group: g, sus: !g.exact, top: true });
+    issue({ page: null, sev: g.exact || g.src ? 'err' : 'warn', cat: 'photo', code: g.exact ? 'dup' : 'dupnear', title: g.exact ? (R.isImg ? '똑같은 이미지 파일이 ' + g.items.length + '개 있어요' : '같은 사진이 ' + g.items.length + '번 쓰였어요') : g.src ? '같은 원본 사진이 ' + g.items.length + '번 쓰였어요' : '같은 사진으로 보여요', detail: (R.isImg ? uniq(g.items.map(function (x) { return pl(x.page); })).join(', ') : pages.join(', ') + '쪽') + (g.src ? ' · 원본: ' + g.src : ''), fix: g.exact ? '의도한 반복이 아니면 다른 사진으로 바꿔 주세요.' : '자르기·크기만 다른 같은 컷인지 확인해 주세요.', boxes: [], pages: pages, group: g, sus: !g.exact, top: true });
     g.items.forEach(function (x) { issue({ page: x.page, sev: g.exact ? 'err' : 'warn', cat: 'photo', code: g.exact ? 'dupP' : 'dupnearP', title: g.exact ? '중복 사진' : '중복 의심 사진', detail: '같은 사진: ' + pages.join(', ') + '쪽', fix: '', boxes: [x.vis], hidden: true }); });
   });
 }
@@ -896,7 +990,7 @@ function faceAdvice() {
   P.forEach(function (p, i) { p.name = nP === 1 && R.artist ? R.artist : '인물 ' + String.fromCharCode(65 + (i % 26)) + (i >= 26 ? Math.floor(i / 26) : ''); p.id = i; });
   R.solo = nP === 1;
   R.people = P;
-  var card = R.prod === 'photocard', coat = !!R.WO.coat || card, book = R.prod === 'photobook';
+  var card = R.prod === 'photocard' || /엽서|포스트\s*카드|post\s*card|폴라로이드|polaroid|증명\s*사진|id\s*photo|트레카|티켓|ticket|포카/i.test((R.prodName || '') + ' ' + (R.file || '')), coat = !!R.WO.coat || card, book = R.prod === 'photobook';
   // 같은 사람 + 같은 옷끼리 톤 비교
   P.forEach(function (p) {
     if (p.items.length < 2) return;
@@ -917,7 +1011,7 @@ function faceAdvice() {
   });
   // 얼굴 크기 (포토카드: 카드끼리 / 포토북: 한 명 나오는 사진끼리)
   var single = R.pages.filter(function (Pg) { return Pg.faces && Pg.faces.length === 1; }).map(function (Pg) { var f = Pg.faces[0]; return { f: f, r: (f.box[3] - f.box[1]) / (Pg.trim[3] - Pg.trim[1]) / (Pg.spread ? 1 : 1) }; });
-  if ((card || book) && single.length >= 4) {
+  if (card && single.length >= 4) { // 얼굴 크기는 카드류만 (포토북은 안 봄, 2026-11-23 실장님)
     var mr = median(single.map(function (x) { return x.r; })), th = card ? 0.2 : 0.35;
     single.forEach(function (x) {
       var d = x.r / mr - 1; if (Math.abs(d) <= th) return;

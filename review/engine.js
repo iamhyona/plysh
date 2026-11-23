@@ -14,14 +14,14 @@
   function mm(pt) { return pt / MM; }
 
   // ── 후가공(별색) 이름 판별 ──
-  var FIN_RE = /(die|cut|kiss|knife|trim|contour|crop|guide|커팅|칼\s*선|칼라인|재단선|thomson|dieline|crease|fold|perf|score|foil|hot.?stamp|stamp|emboss|deboss|varnish|spot.?uv|uv|epoxy|glitter|white|laser|hologram|칼선|도무송|톰슨|재단|접지|오시|미싱|타공|박|금박|은박|홀로그램|형압|엠보|에폭시|부분.?코팅|코팅|화이트|백색|글리터|투명|레이저)/i;
+  var FIN_RE = /(die|cut|kiss|knife|trim|contour|crop|guide|커팅|칼\s*선|칼라인|재단선|thomson|dieline|crease|fold|perf|score|foil|hot.?stamp|stamp|emboss|deboss|varnish|spot.?uv|uv|epoxy|glitter|white|laser|hologram|칼선|도무송|톰슨|재단|접지|오시|미싱|타공|박|금박|은박|홀로그램|형압|엠보|에폭시|부분.?코팅|코팅|화이트|백색|글리터|투명|레이저|pearl|matt|gloss|silk|holo|metallic|glue|scodix|raised|crease|cutting|cutline|(?:^|[^a-z])(?:gold|silver|bronze|copper)(?!.*pantone)|펄|유광|무광|양각|음각|부식|후가공|에폭|라미|가름|접는|누름|금색|은색|^금$|^은$)/i;
   var REG_NAMES = { All: 1, all: 1 };
   var PROC = { Cyan: 0, Magenta: 1, Yellow: 2, Black: 3 };
 
   // ── 작은 도우미 ──
   function N(x) { return x instanceof PDFNumber ? x.asNumber() : (typeof x === 'number' ? x : 0); }
   function nm(x) { return x instanceof PDFName ? x.decodeText ? x.decodeText() : x.asString().slice(1) : ''; }
-  function nameOf(x) { if (!(x instanceof PDFName)) return ''; var s = x.asString(); return decodeName(s.charAt(0) === '/' ? s.slice(1) : s); }
+  function nameOf(x) { if (!(x instanceof PDFName)) return ''; var s = x.asString(); return utf8(decodeName(s.charAt(0) === '/' ? s.slice(1) : s)); } // 한글 별색 이름(#EC#B9#BC…) → UTF-8
   function decodeName(s) { return s.replace(/#([0-9a-fA-F]{2})/g, function (_, h) { return String.fromCharCode(parseInt(h, 16)); }); }
   function utf8(s) { try { return decodeURIComponent(escape(s)); } catch (e) { return s; } }
   function mul(a, b) { // [a b c d e f] × [a b c d e f]
@@ -38,6 +38,14 @@
   function empty(b) { return !b || b[2] <= b[0] || b[3] <= b[1]; }
   function scaleOf(m) { return Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])); }
 
+  function xmpSrc(u8) { // XMP에서 원본 ID · 파일 이름
+    var t = ''; for (var i = 0; i < u8.length; i++) { var c = u8[i]; t += c < 128 ? String.fromCharCode(c) : ' '; }
+    var a = t.indexOf('<x:xmpmeta'); if (a < 0) a = t.indexOf('xmpMM:'); if (a < 0) return null; t = t.slice(Math.max(0, a - 200), a + 60000);
+    var g = function (re) { var m = t.match(re); return m ? m[1].trim() : ''; };
+    var orig = g(/xmpMM:OriginalDocumentID(?:="|>)([^"<]+)/), doc = g(/xmpMM:DocumentID(?:="|>)([^"<]+)/), path = g(/stRef:filePath(?:="|>)([^"<]+)/) || g(/photoshop:SidecarForExtension(?:="|>)([^"<]+)/), raw = g(/crs:RawFileName(?:="|>)([^"<]+)/);
+    var id = orig || doc; if (!id && !raw) return null;
+    return { id: id, raw: raw, path: path };
+  }
   function hashBytes(u8) { // FNV-1a 32bit ×2 (길이 포함)
     var h1 = 0x811c9dc5, h2 = 0x01000193 ^ u8.length, n = u8.length;
     for (var i = 0; i < n; i++) { h1 ^= u8[i]; h1 = Math.imul(h1, 16777619); }
@@ -46,7 +54,7 @@
   }
 
   // ── PDF 객체 접근 ──
-  function Doc(pdf) { this.pdf = pdf; this.ctx = pdf.context; this.fontCache = new Map(); this.csCache = new Map(); this.imgHash = new Map(); this.ocgName = new Map(); this.fontsSeen = new Map(); }
+  function Doc(pdf) { this.pdf = pdf; this.ctx = pdf.context; this.fontCache = new Map(); this.csCache = new Map(); this.imgHash = new Map(); this.imgSrc = new Map(); this.ocgName = new Map(); this.fontsSeen = new Map(); }
   Doc.prototype.get = function (x) { return x instanceof PDFRef ? this.ctx.lookup(x) : x; };
   Doc.prototype.dget = function (d, k) { d = this.get(d); if (!d || !d.get) return undefined; return this.get(d.get(PDFName.of(k))); };
   Doc.prototype.bytes = function (s) {
@@ -278,6 +286,7 @@
         case 'Q': if (gstack.length) gs = gstack.pop(); st = []; break;
         case 'cm': { var m = nums(6); gs.ctm = mul(m, gs.ctm); st = []; break; }
         case 'w': gs.lw = nums(1)[0]; st = []; break;
+        case 'd': { var da = st.filter(Array.isArray)[0]; gs.dash = !!(da && da.some(function (v) { return typeof v === 'number' && v > 0; })); st = []; break; } // 점선 (접는 선 구분)
         case 'gs': { var gn = st[st.length - 1]; this.extg(gs, gn && gn.n, res); st = []; break; }
         case 'm': { var a = nums(2); cx = sx = a[0]; cy = sy = a[1]; last = addPt(cx, cy); st = []; break; }
         case 'l': { var a2 = nums(2); var p0 = last || tp(gs.ctm, cx, cy); cx = a2[0]; cy = a2[1]; last = addPt(cx, cy); seg(p0, last); st = []; break; }
@@ -360,7 +369,7 @@
     }
     if (stroke) {
       var si = this.patInks(gs, false), w = gs.lw * scaleOf(gs.ctm), hw = Math.max(w / 2, 0.25), sb = [box[0] - hw, box[1] - hw, box[2] + hw, box[3] + hw];
-      this.emit('stroke', { box: sb, vis: gs.clip ? isect(sb, gs.clip) : sb, ink: si, op: gs.OP, w: w, w0: gs.lw, ca: gs.CA, layer: this.layer(mc), segs: segs.slice() });
+      this.emit('stroke', { box: sb, vis: gs.clip ? isect(sb, gs.clip) : sb, ink: si, op: gs.OP, w: w, w0: gs.lw, ca: gs.CA, dash: !!gs.dash, layer: this.layer(mc), segs: segs.slice() });
     }
   };
   Interp.prototype.patInks = function (gs, fill) {
@@ -432,7 +441,10 @@
     var key = ref instanceof PDFRef ? ref.toString() : null, hash = null;
     if (key) { if (this.doc.imgHash.has(key)) hash = this.doc.imgHash.get(key); else { var raw = s.contents || (s.getContents && s.getContents()); hash = raw ? hashBytes(raw) : key; this.doc.imgHash.set(key, hash); } }
     var smask = !!get('SMask') || gs.smask;
-    this.emit('image', { box: box, vis: gs.clip ? isect(box, gs.clip) : box, pw: w, ph: h, ppiX: wIn ? w / wIn : 0, ppiY: hIn ? h / hIn : 0, mask: isMask, cs: cs, ink: cs ? inks(cs, []) : null, filter: fname, ref: key, hash: hash, smask: smask, op: gs.op, ca: gs.ca, layer: this.layer(mc), rot: Math.abs(m[1]) > 1e-3 || Math.abs(m[2]) > 1e-3, ctm: m.slice() });
+    // 원본 사진 ID (포토샵·라이트룸 XMP: OriginalDocumentID / DocumentID · 원본 파일 경로) → 파일명 대신 같은 원본 사진 찾기
+    var src = null;
+    if (key) { if (this.doc.imgSrc.has(key)) src = this.doc.imgSrc.get(key); else { try { var md = d.get(PDFName.of('Metadata')), xb = md ? doc.bytes(md) : null; if (!xb && /DCT/.test(fname)) { var rw = s.contents || (s.getContents && s.getContents()); xb = rw ? rw.subarray(0, Math.min(rw.length, 131072)) : null; } src = xb ? xmpSrc(xb) : null; } catch (e) { src = null; } this.doc.imgSrc.set(key, src); } }
+    this.emit('image', { src: src, box: box, vis: gs.clip ? isect(box, gs.clip) : box, pw: w, ph: h, ppiX: wIn ? w / wIn : 0, ppiY: hIn ? h / hIn : 0, mask: isMask, cs: cs, ink: cs ? inks(cs, []) : null, filter: fname, ref: key, hash: hash, smask: smask, op: gs.op, ca: gs.ca, layer: this.layer(mc), rot: Math.abs(m[1]) > 1e-3 || Math.abs(m[2]) > 1e-3, ctm: m.slice() });
   };
 
   Interp.prototype.inlineImage = function (lx, gs, res, mc) {
@@ -517,7 +529,7 @@
     return P;
   }
 
-  function isFin(name) { return FIN_RE.test(name || ''); }
+  function isFin(name) { name = name || ''; if (/pantone|pms|dic\s*\d|toyo/i.test(name) && !/foil|박|varnish|uv|emboss|형압/i.test(name)) return false; return FIN_RE.test(name); } // 팬톤 인쇄 별색(금·은 메탈릭 포함)은 후가공 아님
 
   function open(pdf) { return new Doc(pdf); }
   function page(doc, i, opt) { return analyzePage(doc, doc.pdf.getPage(i).node, i, opt || {}); }

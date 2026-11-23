@@ -245,7 +245,9 @@ var KINDS = [['id', 'PDF (인디자인 작업)'], ['aiF', 'PDF (일러스트 out
 async function sniff(f) {
   if (/\.(jpe?g|png)$/i.test(f.name) || /^image\/(jpeg|png)$/.test(f.type)) return 'img';
   if (/\.ai$/i.test(f.name)) return 'ai';
-  var t = ''; try { var b = new Uint8Array(await f.slice(0, 65536).arrayBuffer()); for (var i = 0; i < b.length; i++) t += String.fromCharCode(b[i]); } catch (e) {}
+  var t = ''; try { var rd = async function (a, z) { var b = new Uint8Array(await f.slice(a, z).arrayBuffer()), o = ''; for (var i = 0; i < b.length; i++) o += String.fromCharCode(b[i]); return o; }; t = await rd(0, 65536) + (f.size > 65536 ? await rd(Math.max(65536, f.size - 262144), f.size) : ''); } catch (e) {}
+  // 만든 프로그램(Creator/CreatorTool) 기준. 인디자인 PDF 안에 일러스트 로고가 들어 있어도 'Illustrator' 글자가 보이므로 인디자인을 먼저 봄
+  if (/(Creator(?:Tool)?[>\s(]*|<xmp:CreatorTool>)\s*Adobe InDesign/i.test(t) || /InDesign/.test(t) && !/(Creator(?:Tool)?[>\s(]*|<xmp:CreatorTool>)\s*Adobe Illustrator/i.test(t)) return 'id';
   if (/Adobe Illustrator|Illustrator/i.test(t)) return 'aiF';
   return 'id';
 }
@@ -552,7 +554,8 @@ var PRINTISH = function (r) { return r.prod !== 'web'; }, PDFONLY = function (r)
 var CHECK = [
   ['파일 · 크기', [
     ['재단 크기 = 사양서', ['trimsize', 'spine', 'nobox', 'imgratio', 'imgsizeinfo'], PRINTISH],
-    ['도련 3mm', ['bleedbox', 'bleedfill'], PRINTISH],
+    ['도련 3mm (재단선 · 칼선 기준)', ['bleedbox', 'bleedfill', 'diebleed'], PRINTISH],
+    ['가름선(접는 선)과 디자인 경계 맞춤', ['foldalign'], PDFONLY],
     ['안전 여백 3mm (얼굴 · 글자)', ['safe', 'safeface', 'diesafe'], PRINTISH],
     ['칼선 · 후가공 판 (별색 + 오버프린트)', ['dieinfo', 'finop', 'finlayer', 'spotfin'], PDFONLY],
     ['박·형압 선 0.5pt · 글자 7pt · 판 이름 영문', ['finthin', 'fintext', 'finname'], PDFONLY],
@@ -597,7 +600,7 @@ var CHECK = [
     ['중복 사진', ['dup', 'dupnear']],
     ['멤버별 사진 수', ['count'], hasPeople],
     ['멤버 사진과 이름', ['namematch'], function (r) { return hasPeople(r) && isText(r); }],
-    ['얼굴 크기 일관성', ['facesize'], hasPeople],
+    ['얼굴 크기 일관성 (포토카드 · 엽서 등 카드류)', ['facesize'], function (r) { return r.prod === 'photocard' || /엽서|포스트\s*카드|post\s*card|폴라로이드|polaroid|증명\s*사진|id\s*photo|트레카|티켓|ticket|포카/i.test((r.prodName || '') + ' ' + (r.file || '')); }],
     ['밝기 · 피부톤 (같은 멤버·의상)', ['tone', 'cardtone'], hasPeople],
     ['코팅 후 어두워짐', ['coat', 'coatdark'], function (r) { return hasPeople(r) && r.prod !== 'web'; }]
   ]],
@@ -818,7 +821,7 @@ function spotTable(Rs) {
   var M = {};
   Rs.forEach(function (r, i) { (r.spotList || []).forEach(function (s) { var k = s.n; (M[k] = M[k] || { n: s.n, fin: s.fin, it: [] }).it.push(String(i + 1).padStart(2, '0') + ' ' + (r.prodName || r.file)); }); });
   var L = Object.keys(M).map(function (k) { return M[k]; }); if (!L.length) return '';
-  var kind = function (s) { return !s.fin ? '인쇄 별색' : /cut|칼선|die|톰슨/i.test(s.n) ? '칼선' : /fold|접지|오시|crease/i.test(s.n) ? '접지선' : '후가공 판'; };
+  var kind = function (s) { return !s.fin ? '인쇄 별색' : /cut|칼선|die|톰슨/i.test(s.n) ? '칼선' : /fold|접지|오시|crease|score|가름|접는|미싱|perf/i.test(s.n) ? '접지선' : '후가공 판'; };
   L.sort(function (a, b) { return (a.fin - b.fin) || a.n.localeCompare(b.n); });
   var norm = function (s) { return s.toLowerCase().replace(/[^a-z가-힣]/g, '').replace(/(ed|ing|s)$/, ''); }, dif = [];
   L.forEach(function (a, i) { L.slice(i + 1).forEach(function (b) { if (a.n !== b.n && norm(a.n) === norm(b.n)) dif.push(a.n + ' / ' + b.n); }); });
