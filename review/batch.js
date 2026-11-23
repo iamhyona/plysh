@@ -279,6 +279,9 @@ function woOf(q) {
   var dBind = q.prod === 'photobook' ? 'layflat' : q.prod === 'book' ? 'perfect' : 'none';
   var o = SPEC.items[q.item]; if (!o) return { w: 0, h: 0, pages: 0, bind: dBind, cal: 0, coat: q.prod === 'photocard' ? 'gloss' : '', layout: 'auto' };
   var r = { w: o.w || 0, h: o.h || 0, pages: o.pages || 0, bind: o.bind || dBind, cal: o.cal || 0, coat: o.coat || '', layout: 'auto', fin: o.fin || '', raw: o.raw || '', name: o.name || '' };
+  // 같은 품목을 표지 · 내지로 나눠 적은 사양서 (달력 등): 한 상품 합 페이지 (2026-11-23 실장님: 합이 같으면 통과)
+  var sib = SPEC.items.filter(function (x) { return o.big && x.big === o.big && /표지|커버|cover|내지|본문|속지/i.test(x.part || x.name || ''); });
+  if (sib.length > 1) { r.pagesAll = sib.reduce(function (a, x) { return a + (x.pages || 0); }, 0); r.pagesParts = sib.map(function (x) { return (x.part || x.name) + ' ' + (x.pages || 0) + 'p'; }).join(' + '); }
   // 표지: 책등 계산은 같은 품목 내지의 페이지 수 · 종이 두께로 (사양서 크기 = 완성품 앞면)
   if (o.cover || /표지|커버|cover/i.test(q.file.name)) { var inn = SPEC.items.find(function (x) { return x !== o && x.big === o.big && /내지|본문|속지/.test(x.part || x.name || ''); }); if (inn) { r.pages = inn.pages || r.pages; r.cal = inn.cal || r.cal; r.bind = r.bind !== 'none' ? r.bind : inn.bind || r.bind; r.innPaper = inn.paper || ''; } }
   return r;
@@ -561,7 +564,9 @@ var CHECK = [
     ['도련 3mm (재단선 · 칼선 기준)', ['bleedbox', 'bleedfill', 'diebleed'], PRINTISH],
     ['사양서에 있는 후가공 판 (부분 코팅 · 박 · 형압 · 칼선 · 화이트)', ['specplate'], PDFONLY],
     ['로고 · 그림 좌우/상하 반전 (회전은 괜찮음)', ['flipobj'], PDFONLY],
-    ['안전 여백 3mm (얼굴 · 글자)', ['safe', 'safeface', 'diesafe'], PRINTISH],
+    ['안전 여백 3mm (재단선 · 칼선 안쪽 얼굴 · 글자)', ['safe', 'safeface', 'diesafe'], PRINTISH],
+    ['칼선 사이 · 칼선과 재단선 사이 3mm', ['diegap', 'dieedge'], PDFONLY],
+    ['칼선 모서리 뾰족함 (스티커)', ['diesharp'], PDFONLY],
     ['칼선 · 후가공 판 (별색 + 오버프린트)', ['dieinfo', 'finop', 'finlayer', 'spotfin'], PDFONLY],
     ['박·형압 선 0.5pt · 글자 7pt · 판 이름 영문', ['finthin', 'fintext', 'finname'], PDFONLY],
     ['숨겨진 레이어', ['offlayer'], PDFONLY],
@@ -585,16 +590,16 @@ var CHECK = [
     ['순색·별색 면 맞닿는 곳 트랩 (경계 선 오버프린트)', ['trap'], PDFONLY],
     ['흰색 오버프린트 (사라짐)', ['whiteop', 'whiteopt'], PDFONLY],
     ['K100 아닌 색 오버프린트 (색 변화)', ['opcolor'], PDFONLY],
-    ['옅은 농도 (5% · 10% 이하 · 잉크 합 15% 이하)', ['lite5', 'lite10', 'lite15'], PDFONLY],
-    ['회색 톤 색 치우침 (한 판이 높음)', ['graycast'], PDFONLY]
+    ['옅은 농도 (5% · 10% 이하 · 잉크 합 10% 이하 경고)', ['lite5', 'lite10', 'lite15'], PDFONLY],
+    ['회색 톤 · 흑백 사진 색 치우침 (한 판이 높음)', ['graycast', 'grayimgcast'], PDFONLY]
   ]],
   ['글자 · 선', [
-    ['너무 작은 글자 (' + RV.SET.minText + 'pt 이하)', ['tiny'], PDFONLY],
+    ['너무 작은 글자 (흰 바탕 ' + RV.SET.minText + 'pt 미만)', ['tiny'], PDFONLY],
     ['작은 글자 4색', ['small4c'], PDFONLY],
-    ['얇은 선 0.15pt · 4색 얇은 선', ['hair', 'hair0', 'thin4c'], PDFONLY],
-    ['역상(흰) 선 0.3pt', ['whitethin'], PDFONLY],
+    ['얇은 선 (흰 바탕 0.12pt 미만) · 4색 얇은 선', ['hair', 'hair0', 'thin4c'], PDFONLY],
+    ['어두운 바탕 흰 선 (0.12pt 경고 · 0.3pt 미만 주의)', ['whitethin0', 'whitethin'], PDFONLY],
     ['뒤집힌 글자 · 마크 반전', ['mirror', 'upside'], PDFONLY],
-    ['어두운 바탕 흰 글자 (뭉침)', ['whitetext'], PDFONLY],
+    ['어두운 바탕 흰 글자 (3pt 이하 경고 · 뭉침)', ['whitetiny', 'whitetext'], PDFONLY],
     ['아웃라인 · 서체 포함', ['outline', 'fontembed'], PDFONLY]
   ]],
   ['제본 · 접지', [
@@ -633,11 +638,11 @@ var CHECK = [
     ['반복되는 칸의 서체·크기·색 · 표 스타일', ['rulecell', 'ruletext'], PDFONLY],
     ['같은 스타일 글자 색 (제목 · 본문)', ['stylecolor'], PDFONLY],
     ['선 굵기 · 색 통일', ['linerule'], PDFONLY],
-    ['사진 박스 크기 통일 (달력 · 엽서 · 포토카드)', ['photobox'], PDFONLY],
+    ['사진 박스 크기 · 위치 통일 (엽서 · 포토카드)', ['photobox', 'photoboxpos'], PDFONLY],
     ['여백 (애매하게 다름)', ['margin'], PDFONLY]
   ]],
   ['달력', [
-    ['공휴일 · 주말 색', ['calhol', 'caldow', 'holfail'], function (r) { return r.prod === 'calendar'; }],
+    ['공휴일 · 주말 색', ['calhol', 'calholdeco', 'caldow', 'holfail'], function (r) { return r.prod === 'calendar'; }],
     ['생일 · 기념일', ['calbirth', 'calbirth2'], function (r) { return r.prod === 'calendar'; }],
     ['날짜 빠짐 · 중복 · 순서', ['caldup', 'calmdup', 'calmiss', 'calextra', 'calorder', 'calodd', 'calnoym', 'calnone', 'calhidden', 'calpart', 'calminf'], function (r) { return r.prod === 'calendar'; }]
   ]],
@@ -824,7 +829,6 @@ function sheetFile(r, no, tot, pid) {
   h += '</div>';
   var man = (CHECK.find(function (c) { return c[0] === '직접 확인'; }) || [0, []])[1].filter(function (it) { return !it[2] || it[2](r); }).map(function (it) { return it[0]; });
   if (!r.isImg && r.prod !== 'web') man.push('FSC 로고 있으면 높이 14mm 이상 · 흑백 대비');
-  if (/스티커|sticker/i.test((r.prodName || '') + ' ' + r.file)) man.push('칼선 모서리 부드러움 (각진 꺾임 없음)');
   if (man.length) h += '<div class="manual"><label><input type="checkbox" data-k="' + pid + '-m"> <b>직접 확인</b></label><span>' + esc(man.join(' · ')) + '</span></div>';
   return { html: h + '<footer class="foot"><span>' + esc((r.prodName ? r.prodName + ' · ' : '') + r.file) + '</span><span>' + (+no + 1) + '</span></footer></section>', n: n };
 }

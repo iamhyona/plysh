@@ -274,11 +274,17 @@ function textChecks(R, rules) {
         var n = l.items[i + 1]; if (!n) return;
         var gap = n.x - (t.x + t.w), touch = gap < Math.min(t.z, n.z) * 0.12;
         var diffF = t.f !== n.f, dz = Math.abs(t.z - n.z) / Math.max(t.z, n.z);
-        if (touch && /[A-Za-z가-힣]$/.test(t.s) && /^[A-Za-z가-힣]/.test(n.s) && (diffF || dz > 0.02)) mid.push({ P: P, b: [t.b[0], Math.min(t.b[1], n.b[1]), n.b[2], Math.max(t.b[3], n.b[3])], s: cut(t.s.slice(-8) + n.s.slice(0, 8), 20) });
-        else if (dz > 0.02 && dz < 0.15 && gap < Math.max(t.z, n.z) * 1.5 && t.s.trim() && n.s.trim()) sz.push({ P: P, b: [t.b[0], Math.min(t.b[1], n.b[1]), n.b[2], Math.max(t.b[3], n.b[3])], s: cut(t.s.slice(-8) + ' ' + n.s.slice(0, 8), 20), z: [t.z, n.z] });
+        if (touch && /[A-Za-z가-힣]$/.test(t.s) && /^[A-Za-z가-힣]/.test(n.s) && (diffF || dz > 0.02)) mid.push({ sg: t.f + '|' + n.f + '|' + Math.round(t.z * 2) + '|' + Math.round(n.z * 2), a: t.s, P: P, b: [t.b[0], Math.min(t.b[1], n.b[1]), n.b[2], Math.max(t.b[3], n.b[3])], s: cut(t.s.slice(-8) + n.s.slice(0, 8), 20) });
+        else if (dz > 0.02 && dz < 0.15 && gap < Math.max(t.z, n.z) * 1.5 && t.s.trim() && n.s.trim()) sz.push({ sg: t.f + '|' + n.f + '|' + Math.round(t.z * 2) + '|' + Math.round(n.z * 2), a: t.s, P: P, b: [t.b[0], Math.min(t.b[1], n.b[1]), n.b[2], Math.max(t.b[3], n.b[3])], s: cut(t.s.slice(-8) + ' ' + n.s.slice(0, 8), 20), z: [t.z, n.z] });
       });
     });
   });
+  // 크레딧처럼 항목 이름만 볼드 · 크기 다르게 한 건 의도한 스타일 (2026-11-23 실장님): 같은 서체·크기 짝이 3번 넘게 반복되면 뺌.
+  // 크기 차이(sizemix)는 경계가 ':' · '|' 뒤이거나, 크레딧 줄(CREDIT · Photo · Producer · 촬영 · 디자인 …)이면 뺌
+  var CRED = /credit|photo|produc|direct|design|styl|hair|make|art|compos|lyric|arrang|record|mix|master|manag|execut|plan|edit|a&r|크레딧|촬영|사진|디자인|기획|제작|프로듀|스타일|헤어|메이크업|편집|작사|작곡|편곡|녹음|믹싱|마스터링|총괄|매니지먼트/i;
+  var cnt = {};
+  [mid, sz].forEach(function (L) { L.forEach(function (h) { cnt[h.sg] = (cnt[h.sg] || 0) + 1; }); });
+  mid = mid.filter(function (h) { return cnt[h.sg] < 3; }); sz = sz.filter(function (h) { return !(cnt[h.sg] >= 3 || /[:：|·]\s*$/.test(h.a) || CRED.test(h.a)); });
   perPage('midstyle', 'warn', '단어 중간에 서체·크기가 바뀌어요', '스타일이 일부만 적용된 것 같아요. 단락/문자 스타일을 다시 적용해 주세요.', mid, function (L) { return L.length + '곳 · ' + L.slice(0, 3).map(function (h) { return '“' + h.s + '”'; }).join(', '); }, true);
   perPage('sizemix', 'warn', '같은 줄에서 글자 크기가 조금 달라요', '의도한 게 아니면 같은 크기로 맞춰 주세요.', sz, function (L) { return L.slice(0, 3).map(function (h) { return '“' + h.s + '” ' + h.z.map(function (z) { return Math.round(z * 10) / 10; }).join('pt/') + 'pt'; }).join(', '); }, true);
   // 7) 팀 표기 규칙
@@ -395,7 +401,9 @@ function repeatChecks(R) {
   var cr = /(©|℗|Ⓟ|Ⓒ|\(c\)|\(p\)\s*&|copyright|all rights reserved|판권|무단\s*(복제|전재|배포)|unauthorized|manufactured by|distributed by)/i, crP = [];
   R.pages.forEach(function (P) { if (segsOf(P).some(function (s) { return cr.test(s.t); })) crP.push(P.i); });
   var txt = R.pages.some(function (P) { return (P.tc || []).length; });
-  if (txt && !crP.length) issue({ page: null, sev: 'warn', cat: 'text', code: 'nocopy', title: '리걸 문구 없음', detail: '©, Ⓟ&Ⓒ, All rights reserved 없음', fix: '필요 품목인지 확인', boxes: [], sus: true });
+  // 리걸 문구는 표지류(표지 · 커버 · 자켓 · 슬리브 · 케이스 · 박스 · 패키지)에만 검사 (2026-11-23 실장님)
+  var coverish = R.cover || /표지|커버|cover|자켓|재킷|jacket|슬리브|sleeve|케이스|case|박스|box|패키지|package|띠지|겉싸개|아웃\s*박스/i.test((R.prodName || '') + ' ' + R.file);
+  if (txt && !crP.length && coverish) issue({ page: null, sev: 'warn', cat: 'text', code: 'nocopy', title: '리걸 문구 없음', detail: '©, Ⓟ&Ⓒ, All rights reserved 없음', fix: '필요 품목인지 확인', boxes: [], sus: true });
   if (crP.length) {
     var years = {}; R.pages.forEach(function (P) { segsOf(P).forEach(function (s) { if (!/©|\(c\)|copyright/i.test(s.t)) return; var y = s.t.match(/(19|20)\d{2}/); if (y) (years[y[0]] = years[y[0]] || []).push({ P: P, s: s }); }); });
     var ys = Object.keys(years).sort(function (a, b) { return years[b].length - years[a].length; });
@@ -719,7 +727,7 @@ function calendar(R, rules) {
     var pitch = []; rows.forEach(function (r) { r.items.sort(function (a, b) { return cx(a) - cx(b); }); for (var i = 1; i < r.items.length; i++) pitch.push(cx(r.items[i]) - cx(r.items[i - 1])); });
     pitch.sort(function (a, b) { return a - b; }); var pt = pitch[pitch.length >> 1] || zk * 3;
     // 묶음(블록) = x 범위가 겹치는 줄들. 간격이 pt*2.5보다 크면 다른 블록
-    var pieces = []; rows.forEach(function (r, ri) { var cur = null; r.items.forEach(function (t) { if (!cur || cx(t) - cx(cur.items[cur.items.length - 1]) > pt * 2.5) { cur = { y: r.y, ri: ri, items: [] }; pieces.push(cur); } cur.items.push(t); }); });
+    var pieces = []; rows.forEach(function (r, ri) { var cur = null; r.items.forEach(function (t) { var pv = cur && cur.items[cur.items.length - 1], gp = pv ? cx(t) - cx(pv) : 0; if (!cur || gp > pt * 2.5 || (gp > pt * 1.5 && +t.s !== +pv.s + Math.round(gp / pt))) { cur = { y: r.y, ri: ri, items: [] }; pieces.push(cur); } cur.items.push(t); }); });
     var grids = []; pieces.forEach(function (pc) {
       var x0 = cx(pc.items[0]), x1 = cx(pc.items[pc.items.length - 1]);
       var g = grids.find(function (g) { return x0 < g.x1 + pt * 0.6 && x1 > g.x0 - pt * 0.6 && g.lastY - pc.y < zk * 6; });
@@ -737,7 +745,7 @@ function calendar(R, rules) {
       seq.forEach(function (c) { var bd = 1e9; cols.forEach(function (k, i) { var d = Math.abs(k.x - cx(c.t)); if (d < bd) { bd = d; c.c = i; } }); });
       // 순서대로 읽어 1부터 이어지는 달 찾기. 앞쪽 큰 수 = 지난달, 달 끝 뒤 작은 수 = 다음 달
       var runs = [], cur = null;
-      seq.forEach(function (c) { if (!cur || c.d === 1 || c.d < cur.cells[cur.cells.length - 1].d - 1) { cur = { cells: [] }; runs.push(cur); } cur.cells.push(c); });
+      seq.forEach(function (c) { if (!cur || c.d === 1 || c.d < cur.cells[cur.cells.length - 1].d) { cur = { cells: [] }; runs.push(cur); } cur.cells.push(c); });
       runs.forEach(function (rn) {
         var ds = rn.cells.map(function (c) { return c.d; });
         if (ds[0] !== 1 || ds.length < 20) { rn.cells.forEach(function (c) { c.other = true; }); return; }
@@ -749,14 +757,22 @@ function calendar(R, rules) {
     var mine = months.filter(function (M) { return M.P === P; });
     // 연·월: 블록이 하나면 페이지 글자 전체, 여럿이면 블록 위쪽에서 가장 가까운 글자
     var txt = segs.map(function (s) { return s.t; }).join(' '), yr = (txt.match(/20[2-4]\d/) || [])[0];
+    var YS = []; segs.forEach(function (sg) { var m = String(sg.t).match(/\b(20[2-4]\d)\b/); if (m) YS.push({ y: +m[1], b: sg.b }); }); if (uniq(YS.map(function (x) { return x.y; })).length < 2) YS = [];
     var bigM = (P.tc || []).filter(function (t) { return /^\s*(0?[1-9]|1[0-2])\s*(월)?\s*$/.test(t.s) && t.z > zk * 1.6; }).sort(function (a, b) { return b.z - a.z; });
     mine.forEach(function (M) {
       M.multi = mine.length > 1;
       var lab = segs.filter(function (s) { return s.z !== zk && monOf(s.t); }).concat(bigM.map(function (t) { return { t: t.s, b: t.b, big: true }; }));
-      if (M.multi) lab = lab.filter(function (s) { var c = (s.b[0] + s.b[2]) / 2; return c > M.gb[0] - zk * 4 && c < M.gb[2] + zk * 4 && s.b[1] > M.gb[1] - zk * 2; })
-        .sort(function (a, b) { return Math.abs(a.b[1] - M.gb[3]) - Math.abs(b.b[1] - M.gb[3]); });
+      if (M.multi) {
+        // 여러 달 한 면: 묶인 줄(“JAN 02”)보다 낱개 글자(JAN)의 자리로 고름 — 옆 달 이름이 끼어들지 않게 (2026-11-23 온앤오프 연간)
+        var one = (P.tc || []).filter(function (t) { return !t.rot && Math.abs(t.z - zk) > 0.3 && monOf(t.s); }).map(function (t) { return { t: t.s, b: t.b }; });
+        var near = function (L) { return L.filter(function (s) { var c = (s.b[0] + s.b[2]) / 2; return c > M.gb[0] - zk * 4 && c < M.gb[2] + zk * 4 && s.b[1] > M.gb[1] - zk * 2; }); };
+        var sc = function (s) { var c = (s.b[0] + s.b[2]) / 2, out = Math.max(0, M.gb[0] - c, c - M.gb[2]); return Math.abs(s.b[1] - M.gb[3]) + out * 3; };
+        var L1 = near(one); lab = (L1.length ? L1 : near(lab)).sort(function (a, b) { return sc(a) - sc(b); });
+      }
       var L = lab[0]; M.lab = L && String(L.t).slice(0, 30); M.m = L ? (L.big ? +String(L.t).replace(/\D/g, '') : monOf(L.t)) : null;
       var ly = L && String(L.t).match(/20[2-4]\d/); M.y = ly ? +ly[0] : yr ? +yr : null;
+      // 한 면에 두 해(예: 2027 왼쪽 · 2028 오른쪽 다이어리 연간): 블록 위쪽 가장 가까운 연도 글자 (2026-11-23 크래비티 다이어리)
+      if (!ly && M.multi && YS.length > 1) { var yb = YS.filter(function (s) { return s.b[1] > M.gb[1]; }).sort(function (a, b) { var f = function (s) { var c = (s.b[0] + s.b[2]) / 2; return Math.abs(s.b[1] - M.gb[3]) + Math.max(0, M.gb[0] - c, c - M.gb[2]) * 3; }; return f(a) - f(b); })[0]; if (yb) M.y = yb.y; }
     });
   });
   R.calMonths = months;
@@ -802,15 +818,17 @@ function calendar(R, rules) {
     var base = mode(M.cells.filter(function (c) { return c.dow > 0 && c.dow < 6 && !(c.date && holOf(c.date)); }).map(function (c) { return c.mark; }));
     var suns = M.cells.filter(function (c) { return c.dow === 0; }), sunDiff = suns.length && suns.filter(function (c) { return c.mark !== base; }).length >= suns.length * 0.7;
     var sunMark = sunDiff ? mode(suns.map(function (c) { return c.mark; })) : null;
-    var notMarked = [], birthMiss = [], extraRed = [];
+    var notMarked = [], birthMiss = [], holDeco = [];
     M.cells.forEach(function (c) {
       if (!c.date) return;
       var md = mth + '-' + c.d, hol = holOf(c.date), isB = bd[md], marked = c.mark !== base;
-      if (sunDiff && hol && c.dow !== 0 && c.mark !== sunMark) notMarked.push({ c: c, why: hol });
+      if (sunDiff && hol && c.dow !== 0 && c.mark !== sunMark) (decoOf(P, c, M) ? holDeco : notMarked).push({ c: c, why: hol });
       // 표시된 날인데 공휴일 · 생일 목록에 없음 검사는 실장님 요청으로 뺀 상태 (오판 많음)
       if (isB && !marked && !decoOf(P, c, M)) birthMiss.push({ c: c, why: isB });
     });
-    if (notMarked.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calhol', title: nm + ' 공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시. 음력 명절 · 대체공휴일은 자동 계산, 선거일 · 임시공휴일은 PLYSH 달력 목록 기준', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
+    // 공휴일을 숫자 색 대신 동그라미 · 도형으로 표시한 디자인 (2026-11-23 케이윌 달력) → 표시된 것으로 보고 안내만
+    if (holDeco.length) issue({ page: P.i, sev: 'info', cat: 'cal', code: 'calholdeco', title: nm + ' 공휴일은 도형으로 표시됨', detail: holDeco.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', ') + ' · 숫자 색은 평일과 같고 뒤에 도형 있음', fix: '', boxes: holDeco.map(function (n) { return n.c.t.b; }) });
+    if (notMarked.length) issue({ page: P.i, sev: M.multi ? 'warn' : 'err', cat: 'cal', code: 'calhol', title: nm + ' 공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시. 음력 명절 · 대체공휴일은 자동 계산, 선거일 · 임시공휴일은 PLYSH 달력 목록 기준', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
     if (birthMiss.length) issue({ page: P.i, sev: 'warn', cat: 'cal', code: 'calbirth', title: nm + ' 생일 · 기념일 표시가 안 보여요', detail: birthMiss.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', ') + ' · 숫자 색, 뒤 도형, 근처 글자 모두 없음', fix: '다른 생일과 같은 방식으로 표시', boxes: birthMiss.map(function (n) { return n.c.t.b; }), sus: true });
     // 생일 글자가 다른 날짜 칸에 있는지
     rules.days.forEach(function (d) {
