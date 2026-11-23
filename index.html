@@ -1238,7 +1238,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 #nsd .si.tgh.on, #nsd .si.tgh.op { background:none; color:var(--txt); font-weight:600; } #nsd .ss:hover, #nsd .si:hover, #nsd .si.tgh:hover { background:var(--bg); } .s3[hidden] { display:none !important; } .stg[hidden] { display:none !important; } .stg .s3 { padding-left:14px; margin:0 0 4px; } .stg .si3 { font-weight:500; } .stg .si3.on { font-weight:700; color:var(--txt); }
 #nsd .si small { margin-left:auto; font-size:11px; color:var(--faint); }
 #nsd .sg { font-size:12px; font-weight:700; color:var(--faint); padding:8px 12px 3px 40px; letter-spacing:.03em; }
-#nsd .sx { padding-bottom:6px; }
+#nsd .sx { padding-bottom:6px; } #nsd .sx[hidden] { display:none !important; } #nsd .ss .ssv { margin-left:auto; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; } #nsd .ss .ssv:hover { background:var(--line); } #nsd .ss .ssv .cv { margin:0; } #nsd .ss.op .ssv .cv { transform:rotate(-135deg); margin-top:4px; } 
 @media (max-width:1023px) {
   html[data-nav="w"] #nsub.has { display:flex; }
   html[data-nav="w"] #nhm { display:none !important; } /* 모바일: 전체 메뉴는 아래 탭바 "전체" 하나만 (2026-11-20 실장님) */
@@ -1659,7 +1659,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm180';
+var APP_VER = '20261122hm181';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2874,8 +2874,8 @@ function subHide(on) { // PC에서 화면 안 색인 숨기기
 }
 function subPaint(box, cur, cls) {
   if (!box) return; $$('.s3', box).forEach(function (e) { e.remove(); });
-  var L = subItems(), pk = navCur() === 'pack', on = (pk && $('.stg button.on', box)) || (S.view === 'tk' && S.tk === 'wo' && $('.si3.on', box)) || $(cls + '.on', box) || $('.si3.on', box); if (!L.length || !on) return;
-  var w = document.createElement('div'); w.className = 's3' + (/^ref:/.test(navCur()) || pk ? ' bl' : '');
+  var L = subItems(), pk = navCur() === 'pack', on = (pk && $('.stg button.on', box)) || (S.view === 'tk' && S.tk === 'wo' && $('.stg button.on', box)) || $(cls + '.on', box) || $('.si3.on', box); if (!L.length || !on) return;
+  var w = document.createElement('div'); w.className = 's3' + (/^ref:/.test(navCur()) || pk || navCur() === 'wo' ? ' bl' : '');
   w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '" class="' + (x.part === 2 ? 's4 pt2' + (x.open ? ' op' : '') : x.part ? 'pt' + (x.open ? ' op' : '') : x.lv === 2 ? 's5' + (x.on ? ' on' : '') : x.lv ? 's4' + (x.on ? ' on' : '') : (x.on ? 'on' : '')) + '">' + esc(x.t) + (x.part ? '<i class="cv"></i>' : '') + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
   on.parentNode.insertBefore(w, on.nextSibling);
   if (on.classList.contains('tgh')) { if (SUB.shutK !== navCur()) { SUB.shutK = navCur(); SUB.shut = false; } w.hidden = !!SUB.shut; on.classList.toggle('op', !SUB.shut);
@@ -2904,7 +2904,7 @@ function fullMenu() {
 // 2026-11-22 실장님: 도구는 용어사전처럼 대메뉴 > 중메뉴(지류 · MD · 디자인 · 공통) > 소메뉴. 중메뉴를 눌러야 소메뉴가 펼쳐짐
 function tgOpen(sp, g) { var cur = navCur(); NAV.tgo = NAV.tgo || {}; if (NAV.tgo[g.g] != null) return NAV.tgo[g.g]; return g.i.some(function (x) { return x.k === cur; }); }
 function tgHtml(sp, cls) { var cur = navCur(); return sp.g.map(function (g) { var op = tgOpen(sp, g), has = g.i.some(function (x) { return x.k === cur && !inWs(); });
-  return '<button type="button" class="' + cls + ' tgh' + (op ? ' op' : '') + (has && cls === 'si' ? ' on' : '') + '" data-tg="' + esc(g.g) + '">' + esc(g.g) + '<span class="cv"></span></button><div class="stg"' + (op ? '' : ' hidden') + '>' + g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = x.k === 'pack'; return '<button type="button" class="' + (on ? 'on' : '') + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + '" data-ng="' + x.k + '">' + esc(TOOL_SHORT[x.k] || x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join('') + '</div>'; }).join(''); }
+  return '<button type="button" class="' + cls + ' tgh' + (op ? ' op' : '') + (has && cls === 'si' ? ' on' : '') + '" data-tg="' + esc(g.g) + '">' + esc(g.g) + '<span class="cv"></span></button><div class="stg"' + (op ? '' : ' hidden') + '>' + g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = x.k === 'pack' || x.k === 'wo'; return '<button type="button" class="' + (on ? 'on' : '') + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + '" data-ng="' + x.k + '">' + esc(TOOL_SHORT[x.k] || x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join('') + '</div>'; }).join(''); }
 // 용어·견본: 중메뉴(명칭 · 지류 · MD · 음반 · 디자인). 항목이 하나뿐인 중메뉴는 그 자체가 메뉴, 여럿이면 접고 펴는 묶음
 function glHtml(sp, cls) { var cur = navCur(); NAV.tgo = NAV.tgo || {}; return sp.g.map(function (g) {
   if (g.i.length === 1) { var x = g.i[0], on = x.k === cur && !inWs(); return '<button type="button" class="' + cls + ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(g.g) + '<span class="cv"></span></button>'; }
@@ -2915,9 +2915,10 @@ function sideHtml() {
   var cur = navCur(), sk = spOf();
   return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
     SPACES.map(function (sp) {
-      var on = sp.k === sk, h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + '</button>';
+      // 2026-11-23 실장님: 대메뉴 오른쪽에도 접고 펴는 꺾쇠
+      var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj', op = on && !NAV.ssShut, h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
       if (!on) return h;
-      h += '<div class="sx">';
+      h += '<div class="sx"' + (op ? '' : ' hidden') + '>';
       if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
@@ -2988,7 +2989,8 @@ function navSync() {
   hdr.onmouseleave = function (ev) { if (NAV.hv && !(ev.relatedTarget && $('#nmg').contains(ev.relatedTarget))) navClose(); };
   if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
-    sd.innerHTML = sideHtml(); bindGo(sd); tgBind(sd); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
+    sd.innerHTML = sideHtml(); bindGo(sd); tgBind(sd);
+    $$('[data-sst]', sd).forEach(function (c) { c.addEventListener('click', function (e) { var b = c.parentNode, x = b.nextElementSibling; if (!b.classList.contains('on') || !x || !x.classList.contains('sx')) { NAV.ssShut = false; return; } e.stopPropagation(); NAV.ssShut = !NAV.ssShut; x.hidden = NAV.ssShut; b.classList.toggle('op', !NAV.ssShut); }); }); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
     var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
