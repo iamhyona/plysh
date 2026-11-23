@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-nav="w" data-navc>
 <head>
 <meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
@@ -1430,7 +1430,7 @@ html[data-nav] #cvSeg { display:none !important; }
 <div id="imWrap" class="hide"><iframe id="imF" title="터잡기"></iframe></div>
 <!-- TOOLS 메뉴 (2026-11-19): tools/ 폴더 도구들. 도구마다 iframe 하나 -->
 <div id="tkWrap" class="hide"></div>
-<button class="fab" id="fab" aria-label="일정 추가"></button>
+<button class="fab" id="fab" aria-label="일정 추가" style="display:none"></button>
 <div class="dimbg" id="dimbg"></div>
 
 <!-- 가이드 문서 (2026-11-10): 아래에서 올라오는 창으로 보기 -->
@@ -1659,7 +1659,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm183';
+var APP_VER = '20261122hm184';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4652,7 +4652,7 @@ $('#pinBtn').onclick = function () {
   if (!/^\d{4}$/.test(p)) return toast('숫자 4자리로 입력해 주세요');
   var b = $('#pinBtn'); b.classList.add('busy');
   (pinMode === 'set' ? call('appSetPin', p) : call('appCheck', p)).then(function () {
-    S.pin = p; ls.set('d4:pin', p); ls.set('d4:ok', '1'); $('#pinScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">시트에서 불러오는 중…</div>'; load();
+    S.pin = p; ls.set('d4:pin', p); ls.set('d4:ok', '1'); $('#pinScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">불러오는 중…</div>'; shellBoot(); load();
   }).catch(function (e) { toast(errMsg(e)); }).then(function () { b.classList.remove('busy'); });
 };
 $('#pinIn').onkeydown = function (e) { if (e.key === 'Enter') $('#pinBtn').click(); };
@@ -4714,7 +4714,9 @@ function lgCheck(manual) {
   return call('appMe', S.tok).then(function (o) { if (o.st === 'ok') lgEnter(); else if (manual === true) toast('아직 승인 전이에요'); })
     .catch(function (e) { if (/^LOGIN/.test(String(e && e.message))) lgOut(); });
 }
-function lgEnter() { clearInterval(showLogin.t); ls.set('d4:ok', '1'); $('#lgScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">시트에서 불러오는 중…</div>'; load(); dvBadge(); }
+// 2026-11-23 실장님: 첫 접속(캐시 없음) 때도 예전 위 탭 말고 지금 왼쪽 메뉴 틀을 먼저 보여 주기
+function shellBoot() { try { navSync(); } catch (e) {} }
+function lgEnter() { clearInterval(showLogin.t); ls.set('d4:ok', '1'); $('#lgScr').classList.add('hide'); $('#main').innerHTML = '<div class="ld">불러오는 중…</div>'; shellBoot(); load(); dvBadge(); }
 function lgOut() { S.tok = ''; S.pin = ''; ls.set('d4:tok', ''); ls.set('d4:ok', ''); ls.set('d4:who', ''); ls.set('d4:data', ''); showLogin(false); }
 function authErr(e) {
   var m = String(e && e.message || e);
@@ -4827,7 +4829,7 @@ $('#dvBtn').onclick = function () {
 };
 setInterval(function () { if (S.tok && !document.hidden) dvBadge(); }, 300000);
 
-if (S.tok) { var c0 = cached(); if (c0) { setData(c0); render(); } load(); dvBadge(); } else showLogin(false);
+if (S.tok) { var c0 = cached(); if (c0) { setData(c0); render(); } else shellBoot(); load(); dvBadge(); } else showLogin(false);
 
 /* 퀵배차하기 (2026-11-20 실장님): 카카오 T 퀵 주문 화면. 카카오는 다른 사이트 안에 자기 화면(로그인 포함)을 띄우는 걸 막아서
    앱 안에 넣을 수 없음 → 같은 탭 하나(kakaoquick)로만 열리게 하고, 배차에 필요한 연락처를 바로 옆에서 볼 수 있게 안내 */
