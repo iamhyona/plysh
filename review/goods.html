@@ -3,6 +3,7 @@
 <head>
 <meta name="robots" content="noindex, nofollow">
 <script>/* 승인된 팀원만: 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../')}catch(e){location.replace('../')}</script>
+<script src="../plog.js?v=1"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PLYSH 작업지시서 검수기</title>
@@ -222,6 +223,7 @@ function run() {
   $('#res').innerHTML = '<div class="rbar noprint"><button type="button" class="ib" id="pdf">PDF 저장</button></div>' + G.render(R, { title: ttl, file: S.fname });
   $('#res').hidden = false; $('#lay').classList.add('has');
   var c = { t: 0, r: 0, o: 0, p: 0 }; R.items.forEach(function (x) { c[x.lv]++; });
+  try { if (window.plog) plog('검수', { menu: '상품 검수기', file: (ttl ? ttl + ' · ' : '') + (S.fname || '직접 입력'), res: ['t', 'r', 'o', 'p'].map(function (k) { return LV[k][0] + ' ' + c[k]; }).join(' · ') + ' · 품목 ' + R.groups.length }); } catch (e) {}
   var col = { t: '#e0263a', r: '#e0263a', o: '#ff7300', p: '#8b71d0' };
   var side = '<h4>단계</h4><div class="fg">' + ['t', 'r', 'o', 'p'].map(function (k) { return '<label><input type="checkbox" data-lv="' + k + '" checked><i class="dot" style="background:' + col[k] + '"></i>' + LV[k][0] + '<em>' + c[k] + '</em></label>'; }).join('') + '</div>';
   if (R.groups.length > 1) side += '<h4>품목</h4><div class="fg">' + R.groups.map(function (g) { var n = R.items.filter(function (x) { return x.g === g.i; }).length; return '<label><input type="checkbox" data-gf="' + g.i + '" checked>' + esc(g.name) + '<em>' + n + '</em></label>'; }).join('') + '</div>';

@@ -177,6 +177,7 @@ function runSpecChk() {
   var src = pa ? { head: pa.spec.head, rows: pa.spec.rows, info: pa.spec.info, tab: 'PDF ' + pa.spec.pages + 'p', name: pa.name } : { head: sh.raw.head, rows: sh.raw.rows, info: sh.raw.info, tab: sh.tab, name: sh.name };
   var art = specArtist(src.name + ' ' + ((src.info[0] || [])[0] || {}).t), ai = aiFor(art), mem = ai && ai.members ? ai.members.length : 0;
   var R = SC.check(src, { members: mem, artist: art });
+  try { if (window.plog) { var c = {}; (R.items || []).forEach(function (x) { c[x.lv] = (c[x.lv] || 0) + 1; }); plog('검수', { menu: '사양서 검수', file: (art ? '[' + art + '] ' : '') + (src.name || '') + (src.tab ? ' · ' + src.tab : ''), res: Object.keys(c).map(function (k) { return ({ t: '오탈자', r: '경고', a: '주의', o: '주의', p: '조언' }[k] || k) + ' ' + c[k]; }).join(' · ') || '통과' }); } } catch (e) {}
   if (pa && !src.head.some(function (h) { return /기타|비고|전달/.test(h); })) R.notice = 'PDF에 비고(전달 사항) 칸이 없어서 비고와 표 대조는 빠졌어요. 비고까지 보려면 시트로 검수해 주세요.';
   var url = '';
   if (sh) { var tg = (sh.tabs || []).find(function (t) { return t && t.n === sh.tab; }); url = 'https://docs.google.com/spreadsheets/d/' + sh.id + '/edit' + (tg && tg.g != null ? '#gid=' + tg.g : ''); }
@@ -916,8 +917,25 @@ async function histStart(jobs) {
   await hPut(HREC);
   var L = await hAll(); L.slice(20).forEach(function (x) { hDel(x.id); }); // 최근 20개만
 }
+// 사용 기록 (2026-11-24 실장님): 누가 · 언제 · 어떤 파일 · 결과 요약 → 실장님 기록 시트 (plog.js)
+function plogJob(j, r) {
+  try {
+    if (!window.plog || !r) return;
+    var f = (j.img ? j.files : [j.file]).map(function (x) { return x.name; }), res;
+    if (r.fatal) res = '검수 못 함';
+    else {
+      var GS = groupsOf(r), n = { t: 0, r: 0, a: 0, o: 0 }; GS.forEach(function (g) { n[g.lv]++; });
+      res = [['t', '오탈자'], ['r', '경고'], ['a', '주의'], ['o', '조언']].map(function (k) { return k[1] + ' ' + n[k[0]]; }).join(' · ');
+      var top = GS.filter(function (g) { return g.lv !== 'o'; }).slice(0, 3).map(function (g) { return TITLE_FIX[g.x.code] || tStmt(g.x.title); });
+      if (top.length) res += ' (' + top.join(', ') + (GS.length > 3 ? ' 외' : '') + ')';
+    }
+    var info = [r.artist, r.prodName].filter(Boolean).join(' ');
+    plog('검수', { menu: '인쇄파일 검수기', file: (info ? info + ' · ' : '') + f.join(', '), res: res });
+  } catch (e) {}
+}
 function histStep(t) { if (!HREC || Date.now() - HT < 3000) return; HT = Date.now(); HREC.cur = t; hPut(HREC); }
 async function histJob(j, r) {
+  plogJob(j, r);
   if (!HREC) return;
   (j.img ? j.files : [j.file]).forEach(function (f) { HREC.done.push(f.name); });
   if (r.fatal) HREC.fail++; else HREC.ok++;

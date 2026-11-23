@@ -790,7 +790,7 @@ function calendar(R, rules) {
     if (want && fits(want)) pick = want; else { var cs = []; for (var m = 1; m <= 12; m++) if (fits(m)) cs.push(m); if (cs.length === 1) pick = cs[0]; }
     if (pick) { M.m = pick; M.inf = true; issue({ page: M.P.i, sev: 'info', cat: 'cal', code: 'calminf', title: '달 이름을 글자로 못 읽어 ' + pick + '월로 보고 검사했어요', detail: '손글씨 · 그림 글자로 보임 · 앞뒤 달과 날짜 배열(1일 요일 · 마지막 ' + last + '일)로 추정', fix: '', boxes: [M.gb] }); }
   });
-  var noym = [];
+  var noym = [], annHol = {}, annBox = {};
   var bd = {}; rules.days.forEach(function (d) { bd[d.m + '-' + d.d] = d.label; });
   months.forEach(function (M) {
     var P = M.P, y = M.y || yMode, mth = M.m, nm = mth ? mth + '월' : '이 달';
@@ -828,7 +828,8 @@ function calendar(R, rules) {
     });
     // 공휴일을 숫자 색 대신 동그라미 · 도형으로 표시한 디자인 (2026-11-23 케이윌 달력) → 표시된 것으로 보고 안내만
     if (holDeco.length) issue({ page: P.i, sev: 'info', cat: 'cal', code: 'calholdeco', title: nm + ' 공휴일은 도형으로 표시됨', detail: holDeco.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', ') + ' · 숫자 색은 평일과 같고 뒤에 도형 있음', fix: '', boxes: holDeco.map(function (n) { return n.c.t.b; }) });
-    if (notMarked.length) issue({ page: P.i, sev: M.multi ? 'warn' : 'err', cat: 'cal', code: 'calhol', title: nm + ' 공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시. 음력 명절 · 대체공휴일은 자동 계산, 선거일 · 임시공휴일은 PLYSH 달력 목록 기준', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
+    if (notMarked.length && M.multi) { (annHol[P.i] = annHol[P.i] || []).push(nm + ' ' + notMarked.map(function (n) { return n.c.d + '일'; }).join('·')); annBox[P.i] = (annBox[P.i] || []).concat(notMarked.map(function (n) { return n.c.t.b; })); }
+    else if (notMarked.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calhol', title: nm + ' 공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시. 음력 명절 · 대체공휴일은 자동 계산, 선거일 · 임시공휴일은 PLYSH 달력 목록 기준', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
     if (birthMiss.length) issue({ page: P.i, sev: 'warn', cat: 'cal', code: 'calbirth', title: nm + ' 생일 · 기념일 표시가 안 보여요', detail: birthMiss.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', ') + ' · 숫자 색, 뒤 도형, 근처 글자 모두 없음', fix: '다른 생일과 같은 방식으로 표시', boxes: birthMiss.map(function (n) { return n.c.t.b; }), sus: true });
     // 생일 글자가 다른 날짜 칸에 있는지
     rules.days.forEach(function (d) {
@@ -842,6 +843,8 @@ function calendar(R, rules) {
     });
   });
   calSections(months);
+  // 연간(여러 달 한 면): 공휴일 표시 안 된 달을 한 줄로 (2026-11-23)
+  Object.keys(annHol).forEach(function (pi) { issue({ page: +pi, sev: 'warn', cat: 'cal', code: 'calhol', title: '연간 면 공휴일이 일요일처럼 표시되지 않았어요', detail: annHol[pi].length + '개 달 · ' + annHol[pi].join(', '), fix: '연간 면도 공휴일 표시하는지 확인 (월별 면과 같은 방식)', boxes: annBox[pi].slice(0, 40) }); });
   if (noym.length) issue({ page: null, sev: 'info', cat: 'cal', code: 'calnoym', title: '연도 · 월을 읽지 못해 요일 검사를 못 한 달이 있어요', detail: uniq(noym).join(', ') + 'p', fix: '연도(예: 2027)와 월이 글자로 있어야 검사 가능', boxes: [] });
 }
 // 섹션(연간 달력 · 먼슬리 등)마다 달이 1씩 이어지는지. 섹션끼리는 비교하지 않음 (2026-11-23 실장님)
