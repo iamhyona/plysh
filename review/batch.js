@@ -583,6 +583,7 @@ var CHECK = [
     ['리치블랙 C30 M20 Y20 K100', ['richblack', 'richblack2'], PDFONLY],
     ['K100 글자 오버프린트', ['smallk', 'kop'], PDFONLY],
     ['별색·단색 위 선 오버프린트', ['strokeop'], PDFONLY],
+    ['순색·별색 면 맞닿는 곳 트랩 (경계 선 오버프린트)', ['trap'], PDFONLY],
     ['흰색 오버프린트 (사라짐)', ['whiteop', 'whiteopt'], PDFONLY],
     ['K100 아닌 색 오버프린트 (색 변화)', ['opcolor'], PDFONLY],
     ['옅은 농도 (5% · 10% 이하 · 잉크 합 15% 이하)', ['lite5', 'lite10', 'lite15'], PDFONLY],
@@ -604,7 +605,7 @@ var CHECK = [
   ]],
   ['사진 · 인물', [
     ['중복 사진', ['dup', 'dupnear']],
-    ['멤버별 사진 수', ['count'], hasPeople],
+    ['멤버별 컷 수 배분 (2인 이상 그룹)', ['count'], hasPeople],
     ['멤버 사진과 이름', ['namematch'], function (r) { return hasPeople(r) && isText(r); }],
     ['얼굴 크기 일관성 (포토카드 · 엽서 등 카드류)', ['facesize'], function (r) { return r.prod === 'photocard' || /엽서|포스트\s*카드|post\s*card|폴라로이드|polaroid|증명\s*사진|id\s*photo|트레카|티켓|ticket|포카/i.test((r.prodName || '') + ' ' + (r.file || '')); }],
     ['밝기 · 피부톤 (같은 멤버·의상)', ['tone', 'cardtone'], hasPeople],
@@ -617,7 +618,7 @@ var CHECK = [
     ['오타 · 반복 단어', ['typoko', 'typoen', 'repword'], isText],
     ['영어 문장 · 문법 · 같은 문장 반복', ['grammar', 'sentrep'], isText],
     ['글자 중간에 스타일 바뀜', ['midstyle', 'sizemix'], isText],
-    ['팀 표기 규칙 (멤버·소속사·타이틀·품목명)', ['rule', 'rulecase', 'case'], isText],
+    ['팀 표기 규칙 (아티스트·멤버·소속사·타이틀·품목명 · 띄어쓰기·철자)', ['rule', 'rulecase', 'namevar', 'nametypo', 'case'], isText],
     ['한글 · 영문 섞임', ['koen', 'koen2'], isText],
     ['반복 문구 일관성', ['repeat'], isText],
     ['표기법 (CREDIT, PHOTOCARD 등 17개)', ['stdterm'], isText],
@@ -626,7 +627,7 @@ var CHECK = [
     ['페이지 번호 · 목차', ['pagenum', 'toc', 'toc2', 'tocorder'], function (r) { return isText(r) && isBook(r); }],
     ['리걸 표기', ['nocopy', 'copyyear', 'copyok'], isText],
     ['바코드 · ISBN · QR', ['bcfail', 'bcok', 'bcload', 'isbnsum', 'isbnbar', 'bcsize'], PDFONLY],
-    ['바코드 · QR · FSC · 소이잉크 · 분리배출 K100 · 오버프린트', ['bcink', 'markink'], PDFONLY],
+    ['바코드 · QR · FSC · 소이잉크 · 분리배출 K100 · 오버프린트 · FSC 높이 14mm', ['bcink', 'markink', 'fscsize'], PDFONLY],
     ['글자를 읽을 수 없음', ['notext', 'nouni'], PDFONLY]
   ]],
   ['디자인 규칙', [
@@ -639,7 +640,7 @@ var CHECK = [
   ['달력', [
     ['공휴일 · 주말 색', ['calhol', 'caldow', 'holfail'], function (r) { return r.prod === 'calendar'; }],
     ['생일 · 기념일', ['calbirth', 'calbirth2'], function (r) { return r.prod === 'calendar'; }],
-    ['날짜 빠짐 · 중복 · 순서', ['caldup', 'calmdup', 'calmiss', 'calextra', 'calorder', 'calodd', 'calnoym', 'calnone'], function (r) { return r.prod === 'calendar'; }]
+    ['날짜 빠짐 · 중복 · 순서', ['caldup', 'calmdup', 'calmiss', 'calextra', 'calorder', 'calodd', 'calnoym', 'calnone', 'calhidden', 'calpart', 'calminf'], function (r) { return r.prod === 'calendar'; }]
   ]],
   ['직접 확인', [
     ['사양서와 후가공(박·형압·에폭시) 판 대조', [], PDFONLY, 1],

@@ -129,6 +129,9 @@ function untrack(str) {
 function lines(P) {
   if (P._lines) return P._lines;
   var it = (P.tc || []).filter(function (t) { return !t.rot && t.s; }).slice().sort(function (a, b) { return b.y - a.y || a.x - b.x; }), L = [];
+  // 같은 자리에 똑같이 겹친 글자(복사 남음) · 다른 면에 완전히 가려진 글자는 읽지 않음
+  it = it.filter(function (t) { return !tcHidden(P, t); });
+  it = it.filter(function (t, i) { for (var j = i - 1; j >= 0 && j >= i - 40; j--) { var o = it[j]; if (o.s === t.s && Math.abs(o.x - t.x) < 0.5 && Math.abs(o.y - t.y) < 0.5) return false; } return true; });
   it.forEach(function (t) {
     var ln = null;
     for (var i = L.length - 1; i >= 0 && i >= L.length - 6; i--) { var l = L[i]; if (Math.abs(l.y - t.y) < Math.max(1, Math.min(l.z, t.z) * 0.35)) { ln = l; break; } }
@@ -196,7 +199,7 @@ function textChecks(R, rules) {
     Object.keys(byP).forEach(function (pi) { var L = byP[pi]; issue({ page: +pi, sev: sev, cat: 'text', code: code, title: title, detail: detailFn(L), fix: fix, boxes: L.map(function (h) { return h.b; }).slice(0, 40), sus: sus }); });
   }
   // 1) 이중 띄어쓰기
-  var dbl = []; all.forEach(function (s) { var re = / {2,}|　/g, m; while ((m = re.exec(s.t))) { if (m.index === 0 || m.index + m[0].length >= s.t.length) continue; dbl.push({ P: s.P, b: subBox(s, Math.max(0, m.index - 2), m[0].length + 4), s: s.t.slice(Math.max(0, m.index - 8), m.index + m[0].length + 8) }); } });
+  var dbl = []; all.forEach(function (s) { if (/^[\d\s.·\/]+$/.test(s.t)) return; /* 달력 날짜 줄 · 숫자 표처럼 칸 맞춤 공백 */ var re = / {2,}|　/g, m; while ((m = re.exec(s.t))) { if (m.index === 0 || m.index + m[0].length >= s.t.length) continue; dbl.push({ P: s.P, b: subBox(s, Math.max(0, m.index - 2), m[0].length + 4), s: s.t.slice(Math.max(0, m.index - 8), m.index + m[0].length + 8) }); } });
   perPage('dblspace', 'warn', '띄어쓰기가 두 번 들어갔어요', '한 칸으로 줄여 주세요. (인디자인 찾기/바꾸기: 공백 두 개 → 한 개)', dbl, function (L) { return L.length + '곳 · ' + L.slice(0, 3).map(function (h) { return '“' + h.s.replace(/ {2,}/g, '␣␣') + '”'; }).join(', '); });
   // 2) 따옴표·프라임·문장부호 혼용 (문서 전체에서 다수와 다른 것)
   var groups = [
@@ -227,7 +230,7 @@ function textChecks(R, rules) {
     perPage('oddchar', 'warn', '헷갈리는 글자가 있어요: ' + o[1], '보기엔 비슷해도 다른 글자예요. 다시 입력해 주세요.', hits, function (L) { return L.length + '곳 · ' + L.slice(0, 2).map(function (h) { return '“' + cut(h.s, 24) + '”'; }).join(', '); });
   });
   // 인디자인 단축키(v · z · w 등)가 실수로 찍혀 혼자 떨어져 있는 영문 한 글자
-  var stray = []; all.forEach(function (s) { if (s.trk) return; var re = /(^|[^A-Za-z0-9'’&.-])([vzwVZWtTpP])(?=$|[^A-Za-z0-9'’&.])/g, m; while ((m = re.exec(s.t))) {
+  var stray = []; all.forEach(function (s) { if (s.trk || /^\s*([A-Za-z]\s+){2,}[A-Za-z]\s*$/.test(s.t)) return; /* S M T W T F S · W E D 처럼 낱글자를 띄워 쓴 머리글 · 자간 디자인 */ var re = /(^|[^A-Za-z0-9'’&.-])([vzwVZWtTpP])(?=$|[^A-Za-z0-9'’&.])/g, m; while ((m = re.exec(s.t))) {
     var at = m.index + m[1].length, ch = m[2];
     if (/[tTpP]/.test(ch) && !/^\s*$/.test(s.t.replace(ch, ''))) continue; // t · p는 그 글자만 따로 있는 덩어리일 때만
     stray.push({ P: s.P, b: subBox(s, Math.max(0, at - 2), 5), s: s.t.slice(Math.max(0, at - 10), at + 10), ch: ch }); } });
@@ -292,6 +295,49 @@ function textChecks(R, rules) {
       perPage('rulecase', 'err', '대소문자가 팀 표기와 달라요: ' + f, '“' + f + '”(으)로 맞춰 주세요.', hits, function (L) { return uniq(L.map(function (h) { return '“' + h.s + '”'; })).join(', ') + ' ' + L.length + '곳'; });
     });
   });
+  // 7-1) 아티스트 · 멤버 · 팀 이름 표기 흔들림: 띄어쓰기 · 하이픈 · 가운뎃점 다름, 영문 한두 글자 오타 (2026-11-23 실장님)
+  (function () {
+    var ENW = window.PLYSH_ENW, SEP = /[\s\-·.'’_]/;
+    var lev = function (a, b) { if (Math.abs(a.length - b.length) > 2) return 9; var d = []; for (var i = 0; i <= a.length; i++) { d[i] = [i]; } for (var j = 1; j <= b.length; j++) d[0][j] = j; for (i = 1; i <= a.length; i++) for (j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
+    var keyOf = function (x) { return x.toLowerCase().replace(/[\s\-·.'’_]/g, ''); };
+    var var1 = [], typo = [], seen = {};
+    rules.members.concat(rules.terms).forEach(function (r) {
+      var ok = r.forms.concat(r.wrong);
+      r.forms.forEach(function (f) {
+        var k = keyOf(f), lat = /[A-Za-z]/.test(f) && !HANGUL.test(f); if (k.length < (lat ? 4 : 2)) return;
+        all.forEach(function (sg) {
+          var t = sg.t, map = [], nk = '';
+          for (var i = 0; i < t.length; i++) { if (SEP.test(t.charAt(i))) continue; nk += t.charAt(i).toLowerCase(); map.push(i); }
+          var at = nk.indexOf(k);
+          while (at > -1) {
+            var a = map[at], b = map[at + k.length - 1] + 1, raw = t.slice(a, b);
+            var pre = t.charAt(a - 1) || '', post = t.charAt(b) || '';
+            var wordOK = lat ? !/[A-Za-z]/.test(pre) && !/[A-Za-z]/.test(post) : true;
+            if (wordOK && ok.indexOf(raw) < 0) {
+              var sepRaw = raw.replace(/[^\s\-·.'’_]/g, ''), sepF = r.forms.map(function (x) { return x.replace(/[^\s\-·.'’_]/g, ''); });
+              if (sepF.indexOf(sepRaw) < 0 && !seen[sg.P.i + raw]) { seen[sg.P.i + raw] = 1; var1.push({ P: sg.P, b: subBox(sg, a, b - a), s: raw, f: r.forms[0] }); }
+            }
+            at = nk.indexOf(k, at + 1);
+          }
+          // 영문 한두 글자 오타 (사전에 없는 단어만)
+          if (!lat) return;
+          var words = t.split(/\s+/).filter(Boolean), nW = f.split(/\s+/).length;
+          for (var w = 0; w + nW <= words.length; w++) {
+            var raw2 = words.slice(w, w + nW).join(' ').replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, ''), k2 = keyOf(raw2);
+            if (k2.length < 5 || k2 === k || ok.indexOf(raw2) > -1) continue;
+            var dist = lev(k2, k); if (dist < 1 || dist > (k.length >= 9 ? 2 : 1)) continue;
+            if (ENW && raw2.split(/\s+/).every(function (x) { return ENW.has(x.toLowerCase()); })) continue;
+            if (rules.members.concat(rules.terms).some(function (o) { return o.forms.some(function (g) { return keyOf(g) === k2; }); })) continue; // 다른 정식 이름
+            if (!seen['t' + sg.P.i + raw2]) { seen['t' + sg.P.i + raw2] = 1; var ix = t.indexOf(raw2); typo.push({ P: sg.P, b: subBox(sg, Math.max(0, ix), raw2.length), s: raw2, f: f }); }
+          }
+        });
+      });
+    });
+    var byF = {}; var1.forEach(function (h) { (byF[h.f] = byF[h.f] || []).push(h); });
+    Object.keys(byF).forEach(function (f) { perPage('namevar', 'err', '이름 표기가 달라요 (띄어쓰기 · 하이픈): ' + f, '정식 표기 “' + f + '”(으)로 맞추기', byF[f], function (L) { return uniq(L.map(function (h) { return '“' + h.s + '”'; })).join(', ') + ' ' + L.length + '곳'; }); });
+    var byT = {}; typo.forEach(function (h) { (byT[h.f] = byT[h.f] || []).push(h); });
+    Object.keys(byT).forEach(function (f) { perPage('nametypo', 'err', '이름 철자가 달라 보여요: ' + f, '정식 표기 “' + f + '” 확인 (다른 이름이면 팀 규칙에 추가하면 통과)', byT[f], function (L) { return uniq(L.map(function (h) { return '“' + h.s + '”'; })).join(', ') + ' ' + L.length + '곳'; }); });
+  })();
   // 7-2) 팀 기본 표기법 (자가점검리스트 › 표기법체크, 2026-11-20)
   var STD = [
     ['CREDITS', /\bCREDIT\b/gi], ['1st · 2nd · 3rd', /\b(?:1(?:th|nd|rd)|2(?:th|st|rd)|3(?:th|st|nd))\b/gi], ['TRACK LIST', /\bTRACKLIST\b/gi],
@@ -417,11 +463,26 @@ function members(R, rules) {
   R.people.forEach(function (p) { p.solo = 0; p.group = 0; var seen = {}; p.items.forEach(function (f) { var k = f.img || ('p' + f.page); if (seen[k]) return; seen[k] = 1; var n = imgFaces[k].filter(function (x) { return x.score > 0.6; }).length; if (n <= 1) p.solo++; else p.group++; }); });
   var main = R.people.filter(function (p) { return p.items.length >= 2; });
   R.photoTable = main;
-  if (main.length >= 2) {
+  var nMem = +((rules.info || {})['인원'] || 0) || (rules.members.length || 0);
+  if (nMem === 1) return; // 솔로 아티스트는 배분 검사 없음
+  var setProd = R.prod === 'photobook' || R.prod === 'photocard' || R.prod === 'calendar' || R.prod === 'book' || /엽서|포스트\s*카드|post\s*card|폴라로이드|polaroid|증명\s*사진|포카|티켓|ticket|미니\s*포스터|스티커|cut/i.test((R.prodName || '') + ' ' + (R.file || ''));
+  // 1) 이름 캡션이 있으면 이름별로 단독 컷 수 (사진 1장에 얼굴 1개 + 이름)
+  var byName = {}, seenI = {};
+  R.faces.forEach(function (F) { if (!F.cap) return; var k = F.img || ('p' + F.page); if (seenI[k]) return; var n = (imgFaces[k] || []).filter(function (x) { return x.score > 0.6; }).length; if (n !== 1) return; seenI[k] = 1; byName[F.cap.name] = (byName[F.cap.name] || 0) + 1; });
+  var named = Object.keys(byName);
+  if (named.length >= 2 && setProd) {
+    rules.members.forEach(function (r) { if (byName[r.name] == null && named.length >= Math.max(2, rules.members.length - 1)) byName[r.name] = 0; });
+    var cv = {}; Object.keys(byName).forEach(function (k) { cv[byName[k]] = (cv[byName[k]] || 0) + 1; });
+    var md = +Object.keys(cv).sort(function (a, b) { return cv[b] - cv[a] || b - a; })[0], offN = Object.keys(byName).filter(function (k) { return byName[k] !== md; });
+    if (offN.length) { issue({ page: null, sev: 'warn', cat: 'face', code: 'count', title: '멤버별 컷 수가 달라요 (이름 기준)', detail: Object.keys(byName).map(function (k) { return k + ' ' + byName[k] + '컷'; }).join(' · ') + ' · 보통 ' + md + '컷', fix: '그룹 품목은 멤버별 같은 수로 배분. 의도한 배분이면 확인 후 통과', boxes: [], top: true }); return; }
+  }
+  // 2) 이름이 없으면 얼굴 묶음 기준
+  if (main.length >= 2 && setProd) {
     var cnt = {}; main.forEach(function (p) { cnt[p.solo] = (cnt[p.solo] || 0) + 1; });
     var mode = +Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a] || b - a; })[0];
     var off = main.filter(function (p) { return p.solo !== mode; });
-    if (off.length && (R.prod === 'photobook' || R.prod === 'photocard' || R.prod === 'calendar' || R.prod === 'book')) issue({ page: null, sev: 'warn', cat: 'face', code: 'count', title: '멤버별 단독 사진 수가 달라요', detail: off.map(function (p) { return p.name + ' ' + p.solo + '장'; }).join(', ') + ' · 대부분 ' + mode + '장', fix: '멤버별 사진 수를 맞춰야 하는 품목이면 확인해 주세요. (얼굴 자동 인식이라 표에서 묶음이 맞는지도 봐 주세요)', boxes: [], sus: true, top: true });
+    var many = nMem >= 2 && main.length > nMem + 1;
+    if (off.length) issue({ page: null, sev: 'warn', cat: 'face', code: 'count', title: '멤버별 단독 컷 수가 달라요', detail: main.map(function (p) { return p.name + ' ' + p.solo + '컷'; }).join(' · ') + ' · 보통 ' + mode + '컷' + (many ? ' · 얼굴 묶음 ' + main.length + '개가 멤버 수(' + nMem + '명)보다 많아 표에서 묶음 확인 필요' : ''), fix: '그룹 품목은 멤버별 같은 수로 배분. 얼굴 자동 인식이라 표에서 묶음이 맞는지도 확인', boxes: [], sus: true, top: true });
   }
 }
 
@@ -641,7 +702,12 @@ function monOf(str) { // 글자 → 월 번호
 function calendar(R, rules) {
   var issue = X.issue, MM = X.MM, months = [];
   R.pages.forEach(function (P) {
-    var items = (P.tc || []).filter(function (t) { return !t.rot && /^\s*\d{1,2}\s*$/.test(t.s) && +t.s >= 1 && +t.s <= 31; });
+    var items0 = (P.tc || []).filter(function (t) { return !t.rot && /^\s*\d{1,2}\s*$/.test(t.s) && +t.s >= 1 && +t.s <= 31; });
+    if (items0.length < 20) return;
+    // 위에 덮인(안 보이는) 날짜 글자는 빼고 읽음 — 예전 연도 날짜가 카드 밑에 남은 경우 (2026-11-23 예나 탁상 2028 연간)
+    var hid = items0.filter(function (t) { return tcHidden(P, t); });
+    var items = items0.filter(function (t) { return hid.indexOf(t) < 0; });
+    if (hid.length >= 7) issue({ page: P.i, sev: 'warn', cat: 'cal', code: 'calhidden', title: '다른 면 밑에 가려진 날짜 글자가 남아 있어요', detail: hid.length + '개 · 화면엔 안 보이지만 파일 안에 있음 (예전 연도 · 다른 달 날짜일 수 있음)', fix: '안 쓰는 날짜 글자 삭제 (가린 면이 빠지면 그대로 인쇄됨)', boxes: hid.slice(0, 12).map(function (t) { return t.b; }) });
     if (items.length < 20) return;
     var zs = {}; items.forEach(function (t) { var k = Math.round(t.z); zs[k] = (zs[k] || 0) + 1; }); var zk = +Object.keys(zs).sort(function (a, b) { return zs[b] - zs[a]; })[0];
     var D = items.filter(function (t) { return Math.abs(t.z - zk) <= Math.max(1, zk * 0.12); });
@@ -689,19 +755,31 @@ function calendar(R, rules) {
       var lab = segs.filter(function (s) { return s.z !== zk && monOf(s.t); }).concat(bigM.map(function (t) { return { t: t.s, b: t.b, big: true }; }));
       if (M.multi) lab = lab.filter(function (s) { var c = (s.b[0] + s.b[2]) / 2; return c > M.gb[0] - zk * 4 && c < M.gb[2] + zk * 4 && s.b[1] > M.gb[1] - zk * 2; })
         .sort(function (a, b) { return Math.abs(a.b[1] - M.gb[3]) - Math.abs(b.b[1] - M.gb[3]); });
-      var L = lab[0]; M.m = L ? (L.big ? +String(L.t).replace(/\D/g, '') : monOf(L.t)) : null;
+      var L = lab[0]; M.lab = L && String(L.t).slice(0, 30); M.m = L ? (L.big ? +String(L.t).replace(/\D/g, '') : monOf(L.t)) : null;
       var ly = L && String(L.t).match(/20[2-4]\d/); M.y = ly ? +ly[0] : yr ? +yr : null;
     });
   });
   R.calMonths = months;
   if (!months.length) { if (R.prod === 'calendar') issue({ page: null, sev: 'info', cat: 'cal', code: 'calnone', title: '달력 날짜 칸을 찾지 못했어요', detail: '날짜 숫자가 글자로 살아 있는 파일(아웃라인 전)이어야 검사할 수 있어요.', fix: '', boxes: [] }); return; }
   var yGuess = months.map(function (m) { return m.y; }).filter(Boolean); var yMode = yGuess.length ? +mode(yGuess) : null;
+  // 달 이름을 못 읽은 달(손글씨 · 그림 글자): 앞뒤 달과 날짜 배열(1일 요일 · 마지막 날)로 몇 월인지 추정
+  months.forEach(function (M, i) {
+    if (M.m || !M.col7) return; var y = M.y || yMode; if (!y) return;
+    var same = function (o) { return o.m && !o.inf && o.multi === M.multi; }, prev = null, next = null;
+    for (var a = i - 1; a >= 0; a--) if (same(months[a])) { prev = months[a]; break; }
+    for (var b = i + 1; b < months.length; b++) if (same(months[b])) { next = months[b]; break; }
+    var c1 = M.cells[0].c, last = M.cells[M.cells.length - 1].d;
+    var fits = function (m) { var d1 = new Date(y, m - 1, 1).getDay(); return new Date(y, m, 0).getDate() === last && (d1 === c1 || (d1 + 6) % 7 === c1); };
+    var want = prev ? prev.m % 12 + 1 : next ? (next.m + 10) % 12 + 1 : null, pick = null;
+    if (want && fits(want)) pick = want; else { var cs = []; for (var m = 1; m <= 12; m++) if (fits(m)) cs.push(m); if (cs.length === 1) pick = cs[0]; }
+    if (pick) { M.m = pick; M.inf = true; issue({ page: M.P.i, sev: 'info', cat: 'cal', code: 'calminf', title: '달 이름을 글자로 못 읽어 ' + pick + '월로 보고 검사했어요', detail: '손글씨 · 그림 글자로 보임 · 앞뒤 달과 날짜 배열(1일 요일 · 마지막 ' + last + '일)로 추정', fix: '', boxes: [M.gb] }); }
+  });
   var noym = [];
   var bd = {}; rules.days.forEach(function (d) { bd[d.m + '-' + d.d] = d.label; });
   months.forEach(function (M) {
     var P = M.P, y = M.y || yMode, mth = M.m, nm = mth ? mth + '월' : '이 달';
     var ds = M.cells.map(function (c) { return c.d; }), dup = [], skip = [];
-    for (var i = 1; i < ds.length; i++) { if (ds[i] === ds[i - 1]) dup.push(M.cells[i]); else if (ds[i] > ds[i - 1] + 1) for (var k = ds[i - 1] + 1; k < ds[i]; k++) skip.push(k); }
+    for (var i = 1; i < ds.length; i++) { if (ds[i] === ds[i - 1]) dup.push(M.cells[i]); else if (ds[i] > ds[i - 1] + 1) for (var k = ds[i - 1] + 1; k < ds[i]; k++) if (!slotDeco(P, M, k)) skip.push(k); }
     var last = ds[ds.length - 1], dim = y && mth ? new Date(y, mth, 0).getDate() : null;
     if (dup.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'caldup', title: nm + '에 같은 날짜가 두 번 있어요', detail: uniq(dup.map(function (c) { return c.d; })).join(', ') + '일', fix: '날짜 확인', boxes: dup.map(function (c) { return c.t.b; }) });
     if (skip.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calmiss', title: nm + '에 빠진 날짜가 있어요', detail: skip.join(', ') + '일', fix: '날짜 확인', boxes: [] });
@@ -716,16 +794,20 @@ function calendar(R, rules) {
       var wrong = M.cells.filter(function (c) { return dup.indexOf(c) < 0 && new Date(y, mth - 1, c.d).getDay() !== M.head[c.c]; });
       if (wrong.length) issue({ page: P.i, sev: M.headGuess ? 'warn' : 'err', cat: 'cal', code: 'caldow', title: nm + ' 날짜와 요일이 안 맞아요', detail: y + '년 ' + mth + '월 1일은 ' + '일월화수목금토'.charAt(new Date(y, mth - 1, 1).getDay()) + '요일 · 어긋난 날짜 ' + wrong.length + '개' + (M.headGuess ? ' (요일 머리글을 못 읽어 일요일 시작으로 봄)' : ''), fix: '달력 시작 요일 확인', boxes: wrong.slice(0, 10).map(function (c) { return c.t.b; }), sus: M.headGuess });
     } else if (!(y && mth)) noym.push(P.i + 1);
-    M.cells.forEach(function (c) { c.mark = markOf(P, c); c.date = y && mth ? y + '-' + mth + '-' + c.d : null; c.dow = M.head[c.c]; c.own = true; });
+    M.cells.forEach(function (c) { c.mark = markOf(P, c); c.date = y && mth ? y + '-' + mth + '-' + c.d : null; c.dow = y && mth ? new Date(y, mth - 1, c.d).getDay() : M.col7 ? M.head[c.c] : -1; c.own = true; });
+    // 글자색이 칸마다 다르면 글자색만으로 구분 (사진 위 띠처럼 바탕 샘플이 흔들리는 경우)
+    var inkK = {}; M.cells.forEach(function (c) { inkK[c.mark.split('|')[0]] = 1; });
+    var inkOnly = Object.keys(inkK).length > 1; if (inkOnly) M.cells.forEach(function (c) { c.mark = c.mark.split('|')[0]; });
     // 이 달 안에서: 평일 기본 표시 = 가장 흔한 표시
     var base = mode(M.cells.filter(function (c) { return c.dow > 0 && c.dow < 6 && !(c.date && holOf(c.date)); }).map(function (c) { return c.mark; }));
     var suns = M.cells.filter(function (c) { return c.dow === 0; }), sunDiff = suns.length && suns.filter(function (c) { return c.mark !== base; }).length >= suns.length * 0.7;
     var sunMark = sunDiff ? mode(suns.map(function (c) { return c.mark; })) : null;
-    var notMarked = [], birthMiss = [];
+    var notMarked = [], birthMiss = [], extraRed = [];
     M.cells.forEach(function (c) {
       if (!c.date) return;
       var md = mth + '-' + c.d, hol = holOf(c.date), isB = bd[md], marked = c.mark !== base;
       if (sunDiff && hol && c.dow !== 0 && c.mark !== sunMark) notMarked.push({ c: c, why: hol });
+      // 표시된 날인데 공휴일 · 생일 목록에 없음 검사는 실장님 요청으로 뺀 상태 (오판 많음)
       if (isB && !marked && !decoOf(P, c, M)) birthMiss.push({ c: c, why: isB });
     });
     if (notMarked.length) issue({ page: P.i, sev: 'err', cat: 'cal', code: 'calhol', title: nm + ' 공휴일이 일요일처럼 표시되지 않았어요', detail: notMarked.map(function (n) { return n.c.d + '일 ' + n.why; }).join(', '), fix: '일요일과 같은 색으로 표시. 음력 명절 · 대체공휴일은 자동 계산, 선거일 · 임시공휴일은 PLYSH 달력 목록 기준', boxes: notMarked.map(function (n) { return n.c.t.b; }) });
@@ -748,27 +830,62 @@ function calendar(R, rules) {
 function calSections(months) {
   var issue = X.issue, list = [];
   var pages = []; months.forEach(function (M) { if (pages.indexOf(M.P) < 0) pages.push(M.P); });
+  var part = {}; // 연간 면에서 달 이름은 더 많은데 날짜 묶음을 다 못 읽은 페이지 (기울인 카드 · 아웃라인 등)
   pages.forEach(function (P) { // 한 페이지 안: 위 → 아래, 왼 → 오른 (읽는 순서)
     var mine = months.filter(function (M) { return M.P === P; }), z = mine.length ? mine[0].zk : 10;
     mine.sort(function (a, b) { var dy = b.gb[3] - a.gb[3]; return Math.abs(dy) > z * 3 ? dy : a.gb[0] - b.gb[0]; });
+    if (mine.length > 1) {
+      var names = {}; segsOf(P).forEach(function (sg) { var m = monOf(sg.t); if (m && sg.t.length < 30) names[m] = 1; });
+      (P.tc || []).forEach(function (t) { if (t.rot) { var m = monOf(t.s); if (m) names[m] = 1; } });
+      var got = mine.filter(function (M) { return M.m; }).length, nn = Object.keys(names).length;
+      if (nn > got) { part[P.i] = true; issue({ page: P.i, sev: 'info', cat: 'cal', code: 'calpart', title: '이 면의 달력 일부만 읽었어요', detail: nn + '개 달 중 ' + got + '개 · 기울인 카드 · 아웃라인 글자는 눈으로 확인', fix: '', boxes: [] }); }
+    }
     list = list.concat(mine);
   });
-  var secs = [], cur = null;
+  // 모양(연간 여러 달 · 한 달 한 면 · 한 줄 띠)마다 따로 이어 봄. 탁상 달력처럼 앞면 달력 + 뒷면 띠가 번갈아 와도 섞이지 않게
+  var secs = [], cur = {};
   list.forEach(function (M) {
     if (!M.m) return;
-    var type = M.multi ? 'multi' : 'single';
-    if (!cur || cur.type !== type || (M.m === 1 && cur.last.m !== 12 && cur.items.length > 1)) { cur = { type: type, items: [], last: null }; secs.push(cur); }
-    cur.items.push(M); cur.last = M;
+    var type = M.multi ? 'multi' : (M.gb[3] - M.gb[1]) < M.zk * 3 ? 'strip' : 'single', c = cur[type];
+    if (!c || (M.m === 1 && c.last.m !== 12) || (M.y && c.last.y && M.y !== c.last.y && !(c.last.m === 12 && M.m === 1))) { c = cur[type] = { type: type, items: [], last: null }; secs.push(c); }
+    c.items.push(M); c.last = M;
   });
-  secs.forEach(function (S, si) {
-    var name = (secs.length > 1 ? (si + 1) + '번째 ' : '') + (S.type === 'multi' ? '연간(여러 달 한 면)' : '월별') + ' 섹션';
+  var TN = { multi: '연간(여러 달 한 면)', single: '월별', strip: '한 줄 날짜 띠' }, cnt = {};
+  secs.forEach(function (S) { cnt[S.type] = (cnt[S.type] || 0) + 1; S.no = cnt[S.type]; });
+  secs.forEach(function (S) {
+    var name = (cnt[S.type] > 1 ? S.no + '번째 ' : '') + TN[S.type] + ' 섹션';
     for (var i = 1; i < S.items.length; i++) {
       var a = S.items[i - 1], b = S.items[i], want = a.m % 12 + 1;
       if (b.m === a.m) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calmdup', title: name + '에서 ' + b.m + '월이 두 번 있어요', detail: (a.P.i + 1) + 'p · ' + (b.P.i + 1) + 'p', fix: '달 표기 확인', boxes: [b.gb] });
-      else if (b.m !== want) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calorder', title: name + ' 달 순서가 이어지지 않아요', detail: a.m + '월 다음에 ' + b.m + '월 (' + want + '월이어야 함) · ' + (b.P.i + 1) + 'p', fix: '달 순서 · 빠진 달 확인', boxes: [b.gb] });
-      if (a.y && b.y && (a.m === 12 && b.m === 1 ? b.y !== a.y + 1 : b.m === want && b.y !== a.y)) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calorder', title: '연도 표기가 이어지지 않아요', detail: a.y + '년 ' + a.m + '월 다음 ' + b.y + '년 ' + b.m + '월', fix: '연도 확인', boxes: [b.gb] });
+      else if (b.m !== want && !(part[b.P.i] && a.P === b.P && b.m > a.m)) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calorder', title: name + ' 달 순서가 이어지지 않아요', detail: a.m + '월 다음에 ' + b.m + '월 (' + want + '월이어야 함) · ' + (b.P.i + 1) + 'p', fix: '달 순서 · 빠진 달 확인', boxes: [b.gb] });
     }
   });
+}
+function slotDeco(P, M, k) { // 빠진 날짜 칸에 그림 · 도형 · 다른 글자(생일 표시 등)가 있으면 빠진 게 아님
+  var pv = M.cells.find(function (c) { return c.d === k - 1; }), nx = M.cells.find(function (c) { return c.d === k + 1; }), x, y;
+  var cy = function (c) { return (c.t.b[1] + c.t.b[3]) / 2; };
+  if (pv && pv.c < M.cols.length - 1) { x = M.cols[pv.c + 1].x; y = cy(pv); } else if (nx && nx.c > 0) { x = M.cols[nx.c - 1].x; y = cy(nx); } else return false;
+  var pitch = M.cols.length > 1 ? (M.cols[M.cols.length - 1].x - M.cols[0].x) / (M.cols.length - 1) : M.zk * 3, r = pitch * 0.45;
+  var near = function (b) { return b && b[0] < x + r && b[2] > x - r && b[1] < y + r && b[3] > y - r && (b[2] - b[0]) < pitch * 2.5 && (b[3] - b[1]) < pitch * 2.5; };
+  return (P.images || []).some(function (im) { return near(im.vis); }) || (P.fills || []).some(function (f) { return !f.ink.white && near(f.vis); }) || (P.tc || []).some(function (t) { return M.cells.every(function (c) { return c.t !== t; }) && near(t.b); });
+}
+function tcHidden(P, t) { // pdf.js 글자(t) ↔ 엔진 글자를 그린 순서대로 짝지어, 나중에 그린 불투명 면 · 사진에 완전히 덮였는지
+  if (!P._tcMap) {
+    P._tcMap = new Map(); var used = new Set(), ets = P.texts || [], from = 0;
+    (P.tc || []).forEach(function (q) {
+      var cx = (q.b[0] + q.b[2]) / 2, cy = (q.b[1] + q.b[3]) / 2, tol = Math.max(1, q.z * 0.3);
+      for (var i = from; i < ets.length; i++) { if (used.has(i)) continue; var b = ets[i].box; if (Math.abs((b[0] + b[2]) / 2 - cx) < tol + 1 && Math.abs((b[1] + b[3]) / 2 - cy) < tol) { used.add(i); P._tcMap.set(q, ets[i]); while (used.has(from)) from++; return; } }
+    });
+  }
+  var e = P._tcMap.get(t); if (!e) return false;
+  var b = e.vis || e.box;
+  var lap = (P.tc || []).some(function (o) { if (o === t || !o.s.trim()) return false; var w = Math.min(o.b[2], t.b[2]) - Math.max(o.b[0], t.b[0]), h = Math.min(o.b[3], t.b[3]) - Math.max(o.b[1], t.b[1]); return w > (t.b[2] - t.b[0]) * 0.4 && h > (t.b[3] - t.b[1]) * 0.4; });
+  if (P.px && X.pix && !lap) { // 그려진 화면에서 글자 자리가 고른 색이면 가려진 것, 글자 모양이 보이면 보이는 것
+    var q = X.toPx(P, t.b), lo = 999, hi = -1;
+    for (var px = Math.floor(q[0]); px <= Math.ceil(q[2]); px++) for (var py = Math.floor(q[1]); py <= Math.ceil(q[3]); py++) { var c = X.pix(P, px, py), l = c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11; if (l < lo) lo = l; if (l > hi) hi = l; }
+    if (hi - lo > 35) return false;
+  }
+  return (P.fills || []).some(function (f) { var v = f.vis; if (!v || f.seq <= e.seq || (f.ca != null && f.ca < 0.99) || f.sm || f.op || !f.ink || f.ink.none || f.ink.pattern) return false; return v[0] <= b[0] + 0.3 && v[2] >= b[2] - 0.3 && v[1] <= b[1] + 0.3 && v[3] >= b[3] - 0.3; });
 }
 function decoOf(P, c, M) { // 숫자 뒤 도형(별 · 하트 · 원) 또는 칸 안 작은 글자(이름 · Birthday · Debut …)
   var b = c.t.b, z = M.zk, cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
@@ -778,7 +895,7 @@ function decoOf(P, c, M) { // 숫자 뒤 도형(별 · 하트 · 원) 또는 칸
   return (P.tc || []).some(function (t) { if (t === c.t || /^\s*\d{1,2}\s*$/.test(t.s) || !/[A-Za-z가-힣]/.test(t.s) || t.z > z * 0.9) return false; var tx = (t.b[0] + t.b[2]) / 2, ty = (t.b[1] + t.b[3]) / 2; return Math.abs(tx - cx) < pitch * 0.5 && Math.abs(ty - cy) < pitch * 0.9; });
 }
 function markOf(P, c) { // 숫자 글자색 + 칸 바탕색을 거칠게 묶은 키
-  var t = c.t, b = t.b, et = (P.texts || []).find(function (x) { return X.overlaps(x.vis, b); }), ink = et && et.ink ? [Math.round(et.ink.c * 4), Math.round(et.ink.m * 4), Math.round(et.ink.y * 4), Math.round(et.ink.k * 4), et.ink.spots ? Object.keys(et.ink.spots)[0] : ''].join('') : '';
+  var t = c.t, b = t.b, et = (P.texts || []).find(function (x) { return X.overlaps(x.vis, b); }), ink = et && et.ink ? [Math.round(et.ink.c * 4), Math.round(et.ink.m * 4), Math.round(et.ink.y * 4), Math.round(et.ink.k * 4), et.ink.spots ? Object.keys(et.ink.spots)[0] : '', et.ink.rgbv ? et.ink.rgbv.map(function (v) { return Math.round(v * 4); }).join('') : ''].join('') : '';
   var z = c.t.z, bg = X.avgPx(P, [b[0] - z * 0.9, b[1] - z * 0.9, b[0] - z * 0.3, b[3]]);
   var bk = bg ? bg.map(function (v) { return Math.round(v / 40); }).join('') : '';
   return ink + '|' + bk;
@@ -880,8 +997,15 @@ function orient(R) { // 전개도(칼선 · 접는 선) 기준으로 면마다 �
       if (it.mir) issue({ page: P.i, sev: 'err', cat: 'print', code: 'mirror', title: it.nm + ' 좌우 반전', detail: (where ? where + ' · ' : '') + '찾은 방법: ' + it.src, fix: '반전(뒤집기) 풀기. 투명 소재 안쪽 인쇄가 아니면 반전 금지', boxes: [it.b] });
       else if (/마크/.test(it.nm)) issue({ page: P.i, sev: 'info', cat: 'print', code: 'markok', title: it.nm + ' 있음 · 반전 없음' + (d ? ' (' + d + '° 회전 · 전개도 방향이면 괜찮음)' : ''), detail: (where ? where + ' · ' : '') + '찾은 방법: ' + it.src, fix: '', boxes: [it.b] });
       if (/마크/.test(it.nm)) markInk(P, it);
+      if (it.nm === 'FSC 마크' && !seen['fsz' + P.i]) { seen['fsz' + P.i] = 1; var lb = logoBox(P, it.b), h = Math.min(lb[2] - lb[0], lb[3] - lb[1]) / MM, H = Math.max(lb[2] - lb[0], lb[3] - lb[1]) / MM; // 팀 기준: FSC 로고 높이 14mm 이상 (2026-11-19 실장님)
+        if (H < 14) issue({ page: P.i, sev: 'warn', cat: 'print', code: 'fscsize', title: 'FSC 로고가 작아요', detail: '로고 묶음 약 ' + (Math.round((lb[2] - lb[0]) / MM * 10) / 10) + '×' + (Math.round((lb[3] - lb[1]) / MM * 10) / 10) + 'mm · 팀 기준 높이 14mm 이상 (FSC 최소 6mm)', fix: '권장 높이 14mm 이상. 바코드처럼 대비 선명하게 (검정 · 흰색 권장)', boxes: [lb], sus: true }); }
     });
   });
+}
+function logoBox(P, b) { // 마크 글자 둘레로 붙어 있는 작은 면 · 선 · 글자를 모아 로고 크기 추정
+  var MM = X.MM, box = b.slice(), gap = 1.5 * MM, objs = (P.fills || []).concat(P.strokes || [], P.texts || []).map(function (o) { return o.vis || o.box; }).filter(function (v) { return v && v[2] - v[0] < 40 * MM && v[3] - v[1] < 40 * MM; });
+  for (var it = 0; it < 4; it++) { var grew = false; objs.forEach(function (v) { if (v[0] < box[2] + gap && v[2] > box[0] - gap && v[1] < box[3] + gap && v[3] > box[1] - gap) { var nb = [Math.min(box[0], v[0]), Math.min(box[1], v[1]), Math.max(box[2], v[2]), Math.max(box[3], v[3])]; if (nb[2] - nb[0] < 45 * MM && nb[3] - nb[1] < 45 * MM && (nb[0] !== box[0] || nb[1] !== box[1] || nb[2] !== box[2] || nb[3] !== box[3])) { box = nb; grew = true; } } }); if (!grew) break; }
+  return box;
 }
 // ── 영어 문장 판독 (Harper: 브라우저 안에서만 도는 무료 문법 검사기, 글자가 밖으로 나가지 않음) ──
 var hpP = null;
