@@ -35,8 +35,11 @@ function spot(name, c, m, y, k) {
   if (!s) for (var i = 0; i < doc.spots.length; i++) { try { if (doc.spots[i].name == name) { s = doc.spots[i]; break; } } catch (e0) {} }
   var cc = new CMYKColor(); cc.cyan = c; cc.magenta = m; cc.yellow = y; cc.black = k;
   if (!s) {
-    try { s = doc.spots.add(); } catch (eB) { app.activeDocument = doc; s = doc.spots.add(); }
-    try { s.name = name; } catch (eN) { NOTE.push('별색 이름 실패 ' + name + ': ' + eN); }
+    for (var tr = 0; tr < 4 && !s; tr++) {
+      try { var s1 = doc.spots.add(); s1.name = name; s = s1; }
+      catch (eB) { try { s1.remove(); } catch (eR2) {} $.sleep(300); try { app.redraw(); } catch (eR3) {} }
+    }
+    if (!s) { NOTE.push('별색 만들기 실패 ' + name); s = doc.spots.add(); }
   }
   try { s.color = cc; s.colorType = ColorModel.SPOT; } catch (eC) { NOTE.push('별색 색 실패 ' + name + ': ' + eC); }
   var sc = new SpotColor(); sc.spot = s; sc.tint = 100; return sc;
@@ -59,7 +62,9 @@ function cstyle(name, f, size, color) {
 }
 // 기준 = 실장님 수정본 (아크릴 스탠드, 본문 25pt). 다른 단계는 본문 크기 비율로 전부 같이 커지고 작아짐.
 var TIERS = {}, TB = { XS: 18, S: 25, M: 32, L: 42, XL: 60 };
-function tierOf(D) { return D <= 60 ? 'XS' : D <= 150 ? 'S' : D <= 300 ? 'M' : D <= 700 ? 'L' : 'XL'; }
+function tierOf(D) { // ExtendScript는 겹친 ? : 를 잘못 계산함 → if 로
+  if (D <= 60) return 'XS'; if (D <= 150) return 'S'; if (D <= 300) return 'M'; if (D <= 700) return 'L'; return 'XL';
+}
 function st2(name, f, size, color, ld, trk) { var s = cstyle(name, f, size, color); var a = s.characterAttributes; a.leading = ld; a.tracking = trk; return s; }
 function styles(t) {
   if (TIERS[t]) return TIERS[t];
@@ -172,6 +177,7 @@ function item(d, ox, oy) {
   // 머리: [아티스트] 프로젝트 이름 / 작성자 이름 · 연락처 (글자 하나, 두 단락)
   var hd = CTI.textFrames.pointText([px(M), py(M)]); hd.contents = '[아티스트] 프로젝트 이름\r작성자 이름 · 연락처'; hd.name = '머리';
   setSt(hd.paragraphs[0], S.title); setSt(hd.paragraphs[1], S.writer);
+  try { NOTE.push('[크기] ' + d.n + ' D=' + D + ' ' + t + ' k=' + k + ' 제목=' + hd.paragraphs[0].characterAttributes.size + 'pt'); } catch (eZ) {}
   hd.top = py(M); hd.left = px(M);
   var boxTop = M + hd.height / MM + 43 * k;
 
