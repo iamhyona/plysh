@@ -235,11 +235,12 @@ function item(d, ox, oy) {
     var h = placeSvg(V.f, vx, vy + VL * 1.5, vw, S);
     if (vy + VL * 1.5 + h > viewBottom) viewBottom = vy + VL * 1.5 + h;
     var cw = Math.max(vw, c1.width / MM, c2.width / MM);
-    right = Math.max(right, vx + cw); vx += cw + Math.max(20, 60 * k);
+    right = Math.max(right, vx + cw); vx += cw + Math.max(60 * k, D * 0.4); // 디자인 사이 = 품목 크기의 40%
   }
   var c3 = ptext(dx, viewBottom + VL * 1.2, '디자인이 여러 개면 오른쪽 · 아래로 이어서 배치하고, 이 대지를 늘려 쓰기', S.vhint);
   right = Math.max(right, dx + c3.width / MM);
-  var W = right + M, H = Math.max(infoBottom, viewBottom + VL * 2 + M);
+  var ROOM = Math.max(M, D * 0.4); // 품목 크기 기준 여유
+  var W = right + ROOM, H = Math.max(infoBottom, viewBottom + VL * 2 + ROOM);
   var ab = doc.artboards.add([px(0), py(0), px(W), py(H)]); ab.name = d.k;
   return [W, H, [CT, CTB, LINFO.groupItems.getByName(d.k)]];
 }
