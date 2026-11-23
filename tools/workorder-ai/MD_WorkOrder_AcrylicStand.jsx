@@ -7,28 +7,41 @@
 var DATA = [{"D":150,"k":"acrStand","n":"아크릴 스탠드","g":"아크릴","src":"아크릴 굿즈 디자인","views":[{"t":"전개도","note":"본체 + 받침 한 판","f":"acrStand_0.svg"},{"t":"조립도","note":"","f":"acrStand_1.svg"}],"vs":[["본체","____T · 인쇄면 ____"],["받침","____T · 인쇄 유무"],["탭 · 홈","업체 템플릿 값"]],"mat":["투명","유백 (반투명)","글리터","홀로그램","미러"],"det":[["본체 두께",["3T","5T","____T"]],["받침 두께",["3T","5T"]],["인쇄면",["앞","뒤","양면"]],["화이트",["전체","부분","없음"]]],"proc":["UV 인쇄","레이저 커팅","받침 인쇄","보호 필름"],"col":["CMYK","화이트 판"],"dims":["본체 가로 · 세로","받침 가로 · 세로","탭 폭 (본체 1/3↑)","탭 높이","홈 폭 (두께 + 0.1~0.2)","홈 길이 (탭 + 0.2~0.5)","전체 높이"],"acc":[["받침",["일체형 (끼움)","별도 받침 판","받침 없음"]]],"pack":["OPP 개별","본체 · 받침 분리 포장","조립 안내 카드"],"warn":["본체 긴 변 50mm 이상 (작으면 흔들림)","탭 · 홈은 업체 템플릿 그대로","받침에 묻히는 높이는 디자인 비움","디오라마는 판 사이 5mm 이상"],"chk":["종류 · 크기 · 두께 · 수량","인쇄면 · 화이트 범위","탭 · 홈 = 업체 템플릿","조립도로 앞뒤 · 겹침 확인"],"R":{"소재":"r","소재 세부":"r","인쇄 · 가공":"o","컬러 안내":"o","치수":"r","부자재":"r","주의사항":"o"}}];
 var MM = 2.834645669;
 var HERE = Folder(File($.fileName).parent + "/MD_WorkOrder_Format"); if (!HERE.exists) HERE.create();
-var OUTNAME = '[PLYSH]MDWorkOrder_AcrylicStand(261123)_v2';
+var OUTNAME = '[PLYSH]MDWorkOrder_AcrylicStand(261123)_v3';
 var NOTE = [];
+var ONLY = null;
 app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
-var doc = app.documents.add(DocumentColorSpace.CMYK, 420 * MM, 297 * MM);
-var LBOX = doc.layers[0]; LBOX.name = 'info box'; var LINFO = doc.layers.add(); LINFO.name = 'info'; var LDES = doc.layers.add(); LDES.name = 'design'; var CT = LDES, CTI = LINFO, CTB = LBOX;
+var doc, LBOX, LINFO, LDES, CT, CTI, CTB, C_LEN, C_FOLD, C_MAR, C_CUT, C_TXT, C_CHIP, C_REQ, C_MUTE;
+function newDoc() {
+  app.documents.add(DocumentColorSpace.CMYK, 420 * MM, 297 * MM);
+  try { app.redraw(); } catch (eR) {} $.sleep(400);
+  doc = app.activeDocument;
+  LBOX = doc.layers[0]; LBOX.name = 'info box'; LINFO = doc.layers.add(); LINFO.name = 'info'; LDES = doc.layers.add(); LDES.name = 'design'; CT = LDES; CTI = LINFO; CTB = LBOX;
+  C_LEN = spot('HYONA_Length', 0, 100, 0, 0);
+  C_FOLD = spot('HYONA_Fold', 100, 0, 0, 0);
+  C_MAR = spot('HYONA_Margin', 100, 0, 100, 0);
+  C_CUT = spot('HYONA_Cut', 0, 100, 100, 0);
+  C_TXT = spot('HYONA_Text', 0, 0, 0, 100);
+  C_CHIP = spot('HYONA_ChipLine', 0, 0, 0, 40);
+  C_REQ = spot('HYONA_Required', 0, 90, 80, 0);
+  C_MUTE = tint(C_TXT, 55);
+  TIERS = {};
+}
 
 /* ── 별색 ── */
 function spot(name, c, m, y, k) {
-  var s; try { s = doc.spots.getByName(name); } catch (e) { s = doc.spots.add(); s.name = name; }
+  var s = null;
+  try { var sw = doc.swatches.getByName(name); if (sw.color.typename == 'SpotColor') s = sw.color.spot; } catch (eA) {}
+  if (!s) for (var i = 0; i < doc.spots.length; i++) { try { if (doc.spots[i].name == name) { s = doc.spots[i]; break; } } catch (e0) {} }
   var cc = new CMYKColor(); cc.cyan = c; cc.magenta = m; cc.yellow = y; cc.black = k;
-  s.color = cc; s.colorType = ColorModel.SPOT;
+  if (!s) {
+    try { s = doc.spots.add(); } catch (eB) { app.activeDocument = doc; s = doc.spots.add(); }
+    try { s.name = name; } catch (eN) { NOTE.push('별색 이름 실패 ' + name + ': ' + eN); }
+  }
+  try { s.color = cc; s.colorType = ColorModel.SPOT; } catch (eC) { NOTE.push('별색 색 실패 ' + name + ': ' + eC); }
   var sc = new SpotColor(); sc.spot = s; sc.tint = 100; return sc;
 }
-var C_LEN = spot('HYONA_Length', 0, 100, 0, 0);
-var C_FOLD = spot('HYONA_Fold', 100, 0, 0, 0);
-var C_MAR = spot('HYONA_Margin', 100, 0, 100, 0);
-var C_CUT = spot('HYONA_Cut', 0, 100, 100, 0);
-var C_TXT = spot('HYONA_Text', 0, 0, 0, 100);
-var C_CHIP = spot('HYONA_ChipLine', 0, 0, 0, 40);
-var C_REQ = spot('HYONA_Required', 0, 90, 80, 0);
 function tint(sc, t) { var n = new SpotColor(); n.spot = sc.spot; n.tint = t; return n; }
-var C_MUTE = tint(C_TXT, 55);
 
 /* ── 문자 스타일 (단계별) ── */
 function font(names) { for (var i = 0; i < names.length; i++) { try { return app.textFonts.getByName(names[i]); } catch (e) {} } NOTE.push('폰트 없음: ' + names[0]); return null; }
@@ -37,7 +50,8 @@ var F_B = font(['Pretendard-Bold', 'PretendardVariable-Bold', 'AppleSDGothicNeo-
 var F_XB = font(['Pretendard-ExtraBold', 'Pretendard-Bold', 'AppleSDGothicNeo-ExtraBold']) || F_B;
 var F_S = font(['Pretendard-SemiBold', 'Pretendard-Bold', 'AppleSDGothicNeo-SemiBold']) || F_B;
 function cstyle(name, f, size, color) {
-  var st; try { st = doc.characterStyles.getByName(name); } catch (e) { st = doc.characterStyles.add(name); }
+  var st = null; for (var i = 0; i < doc.characterStyles.length; i++) { try { if (doc.characterStyles[i].name == name) { st = doc.characterStyles[i]; break; } } catch (e0) {} }
+  if (!st) st = doc.characterStyles.add(name);
   var a = st.characterAttributes;
   if (f) a.textFont = f; a.size = size; a.tracking = -15;
   try { a.kerningMethod = AutoKernType.OPTICAL; } catch (e1) {}
@@ -102,6 +116,7 @@ function wrapText(s, maxEm) {
   for (var i = 0; i < words.length; i++) { var nx = cur ? cur + ' ' + words[i] : words[i]; if (cur && emw(nx) > maxEm) { lines.push(cur); cur = words[i]; } else cur = nx; }
   if (cur) lines.push(cur); return lines;
 }
+function fill1(s) { return String(s).replace('\u25A1', '\u25A0'); } // 첫 칸 = 선택 예시 ■
 function blanks(s) { return String(s).replace(/____/g, '________'); }
 
 function setSt(rng, st) { st.applyTo(rng, true); try { var ca = st.characterAttributes, ta = rng.characterAttributes; if (ca.textFont) ta.textFont = ca.textFont; ta.size = ca.size; ta.autoLeading = false; ta.leading = ca.leading; ta.fillColor = ca.fillColor; ta.tracking = ca.tracking; } catch (e) {} }
@@ -166,13 +181,13 @@ function item(d, ox, oy) {
   function sec(name, tag, tagSt) { para(RULE, S.rule, { noInd: true }); para(name + (tag ? '    ' + tag : ''), S.sec, { tag: tag, tagSt: tagSt, isSec: true, noInd: true }); }
   function lv(x) { return x == 'r' ? ['필수', S.req] : ['권장', S.opt]; }
   function secR(name, x) { var a = lv(x); sec(name, a[0], a[1]); }
-  function opts(arr) { var ls = wrapOpts(arr, maxEm, true); for (var i = 0; i < ls.length; i++) para(blanks(ls[i]), S.body); }
+  function opts(arr) { var ls = wrapOpts(arr, maxEm, true); for (var i = 0; i < ls.length; i++) para(blanks(i ? ls[i] : fill1(ls[i])), S.body); }
   function sub(rows) {
     var names = []; for (var n = 0; n < rows.length; n++) names.push(rows[n][0]);
     var tw = tabsFor(63.9, names) * MM;
     for (var i = 0; i < rows.length; i++) {
       var ls = wrapOpts(rows[i][1], maxEm - 7, true);
-      for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(ls[j]), S.body, { tabs: [[tw, 'L']], label: !j });
+      for (var j = 0; j < ls.length; j++) para((j ? '' : rows[i][0]) + '\t' + blanks(j ? ls[j] : fill1(ls[j])), S.body, { tabs: [[tw, 'L']], label: !j });
     }
   }
   para('품목', S.eye, { noInd: true });
@@ -216,7 +231,7 @@ function item(d, ox, oy) {
       if (o.tag) { var tl = o.tag.length; for (var c3 = tx.length - tl; c3 < tx.length; c3++) o.tagSt.applyTo(pr.characters[c3], true); }
       if (o.chip) S.chip.applyTo(pr.characters[0], true);
       if (o.lineCol) for (var c4 = 0; c4 < tab; c4++) { var ch4 = pr.characters[c4]; S.label.applyTo(ch4, true); ch4.characterAttributes.fillColor = o.lineCol; ch4.characterAttributes.overprintFill = true; }
-      for (var c5 = 0; c5 < tx.length; c5++) if (tx.charAt(c5) == '□') S.box.applyTo(pr.characters[c5], true);
+      for (var c5 = 0; c5 < tx.length; c5++) if (tx.charAt(c5) == '□' || tx.charAt(c5) == '■') S.box.applyTo(pr.characters[c5], true);
     } catch (eS) { NOTE.push(d.n + ' 글자 스타일: ' + eS); }
   }
   tf.top = py(boxTop + PAD); tf.left = px(M + PAD);
@@ -229,8 +244,10 @@ function item(d, ox, oy) {
   CTI = CT; // 도면 캡션은 design 레이어
   var dx = M + boxW + 150 * k, vy = boxTop + 23 * k, vw = D * 1.35, right = dx, viewBottom = 0, VL = S.view.characterAttributes.leading * 0.3528;
   var vx = dx;
+  var MAXW = 4900; // PDF 대지 한계 (약 5080mm) 안에서 줄바꿈
   for (var v = 0; v < d.views.length; v++) {
     var V = d.views[v];
+    if (v > 0 && vx + vw + Math.max(M * 1.5, D * 0.6) > MAXW) { vx = dx; vy = viewBottom + VL * 2 + Math.max(80 * k, D * 0.3); }
     var c1 = ptext(vx, vy, '디자인 ' + (v + 1) + ' · ' + V.t + (V.note ? '  (' + V.note + ')' : ''), S.view);
     var c2 = ptext(vx, vy + VL * 0.75, '실제 크기 1:1로 배치', S.vhint);
     var h = placeSvg(V.f, vx, vy + VL * 1.5, vw, S);
@@ -243,31 +260,28 @@ function item(d, ox, oy) {
   var ROOM = Math.max(M * 1.5, D * 0.6); // 품목 크기 기준 여유
   var W = right + ROOM, H = Math.max(infoBottom, viewBottom + VL * 2 + ROOM);
   var ab = doc.artboards.add([px(0), py(0), px(W), py(H)]); ab.name = d.k;
-  return [W, H, [CT, CTB, LINFO.groupItems.getByName(d.k)]];
+  return [W, H];
 }
 
-// 배치: 한 줄에 5,000mm까지, 넘으면 다음 줄
-var first = doc.artboards[0].artboardRect, cx = (first[0] + first[2]) / 2, cy = (first[1] + first[3]) / 2;
-var X0 = cx - 2800 * MM, Y0 = cy + 2800 * MM, curX = 0, curY = 0, rowH = 0, GAPB = 60;
-for (var i = 0; i < DATA.length; i++) {
-  // 크기를 먼저 모르니 그려 보고, 줄을 넘치면 다음 줄로 옮김
-  var sz = item(DATA[i], X0 + curX * MM, Y0 - curY * MM);
-  if (curX > 0 && curX + sz[0] > 5000) {
-    var abN = doc.artboards[doc.artboards.length - 1], rr = abN.artboardRect;
-    var mdx = -curX * MM, mdy = -(rowH + GAPB) * MM;
-    abN.artboardRect = [rr[0] + mdx, rr[1] + mdy, rr[2] + mdx, rr[3] + mdy];
-    for (var gi = 0; gi < sz[2].length; gi++) sz[2][gi].translate(mdx, mdy);
-    curY += rowH + GAPB; curX = 0; rowH = 0;
-  }
-  curX += sz[0] + GAPB; if (sz[1] > rowH) rowH = sz[1];
-}
-doc.artboards[0].remove();
-
+// 품목마다 파일 하나 (대지 하나)
 var ai = new IllustratorSaveOptions(); ai.pdfCompatible = true; ai.compressed = true;
-doc.saveAs(File(HERE + '/' + OUTNAME + '.ai'), ai);
 var pdf = new PDFSaveOptions(); pdf.preserveEditability = false; pdf.viewAfterSaving = false;
-doc.saveAs(File(HERE + '/' + OUTNAME + '.pdf'), pdf);
-doc.saveAs(File(HERE + '/' + OUTNAME + '.ai'), ai);
-
-var log = File(HERE + '/build_log.txt'); log.encoding = 'UTF-8'; log.open('w'); log.write('v2 done ' + DATA.length + '\n' + NOTE.join('\n')); log.close();
+var DIR = HERE; if (DATA.length > 1) { DIR = Folder(HERE + '/' + OUTNAME); if (!DIR.exists) DIR.create(); }
+function two(n) { return n < 10 ? '0' + n : '' + n; }
+function logW(t) { var f = File(HERE + '/build_log.txt'); f.encoding = 'UTF-8'; f.open('w'); f.write(t); f.close(); }
+for (var i = 0; i < DATA.length; i++) {
+  if (ONLY && DATA[i].k != ONLY) continue;
+  try { newDoc(); } catch (eD) { NOTE.push(DATA[i].n + ' 새 문서 실패: ' + eD + ' (줄 ' + eD.line + ')'); logW('v3 stop ' + i + '\n' + NOTE.join('\n')); break; }
+  var r0 = doc.artboards[0].artboardRect, cx = (r0[0] + r0[2]) / 2, cy = (r0[1] + r0[3]) / 2;
+  try {
+    item(DATA[i], cx - 2800 * MM, cy + 2800 * MM);
+    doc.artboards[0].remove();
+    var nm = DATA.length > 1 ? '[PLYSH]MDWorkOrder_' + two(i + 1) + '_' + String(DATA[i].n).replace(/[\/\\:*?"<>|]/g, '·') + '(261123)' : OUTNAME;
+    doc.saveAs(File(DIR + '/' + nm + '.pdf'), pdf);
+    doc.saveAs(File(DIR + '/' + nm + '.ai'), ai);
+  } catch (eI) { NOTE.push(DATA[i].n + ' 실패: ' + eI + ' (줄 ' + eI.line + ')'); }
+  if (DATA.length > 1) doc.close(SaveOptions.DONOTSAVECHANGES);
+  logW('v3 progress ' + (i + 1) + '/' + DATA.length + '\n' + NOTE.join('\n'));
+}
+var log = File(HERE + '/build_log.txt'); log.encoding = 'UTF-8'; log.open('w'); log.write('v3 done ' + DATA.length + '\n' + NOTE.join('\n')); log.close();
 })();
