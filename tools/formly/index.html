@@ -646,6 +646,22 @@ html.emb .field-card.hidden-card{opacity:1 !important}
 .pv-row{align-items:flex-start}
 .pv-cp{flex:none;width:32px;height:32px;margin:-6px 0 -6px auto;border:0;border-radius:8px;background:transparent;color:#8b95a1;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .pv-cp:hover{background:#f2f4f6;color:#191f28}
+
+/* 2026-11-23 실장님: 창이 좁으면 상품 목록 · 미리보기는 버튼으로 → 누르면 가운데 팝업 */
+.fxnb{display:none}
+.fxx{display:none}
+@media (max-width:1099px){
+ html.emb .fxio{grid-template-columns:minmax(0,1fr)}
+ html.emb .fxnb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 16px}
+ html.emb .fxnb button{height:46px;border:0;border-radius:14px;background:#fff;font:inherit;font-size:15px;font-weight:700;color:#191f28;cursor:pointer}
+ html.emb .fxnb button small{margin-left:6px;font-size:14px;font-weight:600;color:#8b95a1}
+ html.emb .fxio-r{display:none}
+ html.emb.fxp-list .fxio-r, html.emb.fxp-pv .fxio-r{display:block;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.45);padding:40px 16px;overflow:auto}
+ html.emb.fxp-list .fxio-r #fxLive, html.emb.fxp-list .fxio-r #tgLive, html.emb.fxp-pv .fxio-r .fpl{display:none}
+ html.emb .fxio-r .lbcard{position:relative;max-width:560px;margin:0 auto !important;max-height:none !important;overflow:visible}
+ html.emb.fxp-list .fxio-r .fxx, html.emb.fxp-pv .fxio-r .fxx{display:flex;position:sticky;top:0;margin:0 auto 8px;max-width:560px;justify-content:flex-end}
+ .fxx button{width:40px;height:40px;border:0;border-radius:12px;background:#fff;font-size:22px;line-height:1;color:#4e5968;cursor:pointer}
+}
 </style>
 </head>
 <body>
@@ -2800,7 +2816,6 @@ function tabFields(p){
 }
 function tabFieldsIO(p){
   if(!document.documentElement.classList.contains('emb')) return tabFields(p);
-  if(window.innerWidth<760) return fxFold(p,tabFields(p),'');
   return fxFold(p,tabFields(p),'<div class="lbcard" id="fxLive">'+fxLiveBody(p)+'</div>');
 }
 // 2026-11-23 실장님: 상품 칩 대신 지류 사양서처럼 폴더 색인(번호) + 오른쪽 상품 목록(이름 · 순서 옮기기)
@@ -2811,8 +2826,12 @@ function fxFold(p,left,right){
   var name='<div class="fname"><div class="fnr"><span class="fno">'+(i0+1)+'</span><input class="ftitle" id="fName" value="'+eh(p.name==='새 상품'?'':p.name)+'" placeholder="상품 이름 (예: 아크릴 키링)" aria-label="상품 이름" oninput="fxRename(this.value)"></div>'+fxPresetSel(p)+'</div>';
   var list=fxPlist(p);
   if(!right) return tabs+'<div class="ffold">'+name+left+list+'</div>';
-  return tabs+'<div class="ffold"><div class="fxio"><div class="fxio-l">'+name+left+'</div><div class="fxio-r">'+list+right+'</div></div></div>';
+  var nb='<div class="fxnb"><button type="button" onclick="fxPop(\'list\')">상품 목록<small>'+S.products.length+'개</small></button><button type="button" onclick="fxPop(\'pv\')">미리보기</button></div>';
+  return tabs+'<div class="ffold"><div class="fxio"><div class="fxio-l">'+name+nb+left+'</div><div class="fxio-r" onclick="if(event.target===this)fxPop(\'\')"><div class="fxx"><button type="button" aria-label="닫기" onclick="fxPop(\'\')">×</button></div>'+list+right+'</div></div></div>';
 }
+function fxPop(k){var h=document.documentElement;h.classList.remove('fxp-list','fxp-pv');if(k)h.classList.add('fxp-'+k);}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fxPop('');});
+document.addEventListener('click',function(e){var t=e.target;if(t.closest&&t.closest('.fxio-r .fpv')&&!t.closest('button'))setTimeout(function(){fxPop('');},0);});
 function fxPlist(p){
   var n=S.products.length,I=function(d){return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>';};
   return '<div class="lbcard fpl"><h3>상품 목록<small>'+n+'개 · 번호 = 색인 순서</small></h3>'+S.products.map(function(q,i){
@@ -3823,7 +3842,6 @@ function renderCauRow(p){
 }
 function tagsIO(p){
   if(!document.documentElement.classList.contains('emb')) return tabTags(p);
-  if(window.innerWidth<760) return fxFold(p,tabTags(p),'');
   return fxFold(p,tabTags(p,1),'<div class="lbcard" id="tgLive">'+tagLiveBody(p)+'</div>');
 }
 function tagLiveBody(p){

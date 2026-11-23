@@ -1659,7 +1659,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm178';
+var APP_VER = '20261122hm180';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2874,7 +2874,7 @@ function subHide(on) { // PC에서 화면 안 색인 숨기기
 }
 function subPaint(box, cur, cls) {
   if (!box) return; $$('.s3', box).forEach(function (e) { e.remove(); });
-  var L = subItems(), pk = navCur() === 'pack', on = (pk && $('.stg button.on', box)) || $(cls + '.on', box) || $('.si3.on', box); if (!L.length || !on) return;
+  var L = subItems(), pk = navCur() === 'pack', on = (pk && $('.stg button.on', box)) || (S.view === 'tk' && S.tk === 'wo' && $('.si3.on', box)) || $(cls + '.on', box) || $('.si3.on', box); if (!L.length || !on) return;
   var w = document.createElement('div'); w.className = 's3' + (/^ref:/.test(navCur()) || pk ? ' bl' : '');
   w.innerHTML = L.map(function (x, i) { return x.h ? '<b class="s3h">' + esc(x.h) + '</b>' : '<button type="button" data-s3="' + i + '" class="' + (x.part === 2 ? 's4 pt2' + (x.open ? ' op' : '') : x.part ? 'pt' + (x.open ? ' op' : '') : x.lv === 2 ? 's5' + (x.on ? ' on' : '') : x.lv ? 's4' + (x.on ? ' on' : '') : (x.on ? 'on' : '')) + '">' + esc(x.t) + (x.part ? '<i class="cv"></i>' : '') + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; }).join('');
   on.parentNode.insertBefore(w, on.nextSibling);
