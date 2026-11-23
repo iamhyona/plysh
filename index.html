@@ -1659,7 +1659,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm177';
+var APP_VER = '20261122hm178';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2164,7 +2164,7 @@ function openGd(g, anchor) {
 var TOOLS = [
   { g: '작성', i: [
     { k: 'doc', t: '지류 사양서', s: '품목을 모아 MASTER 양식 순서로 사양서 만들기', f: 'tools/proof/', pv: 'doc' },
-    { k: 'wo', t: '작업지시서 양식', s: 'MD 품목별 일러스트 작업지시서 양식 · .ai · PDF 내려받기 · 미리보기', f: 'tools/workorder/', nw: 1 },
+    { k: 'wo', t: '작업지시서 양식', s: 'MD 품목별 일러스트 작업지시서 양식 · AI · PDF 내려받기 · 미리보기', f: 'tools/workorder/', nw: 1 },
     { k: 'formly', t: '상품 정보 라벨 생성기', s: '상품 후면 표시사항 문구와 케어 · 주의 · 원산지 같은 부착 라벨 정리', f: 'tools/formly/', nw: 1 },
     { k: 'filename', t: '폴더·파일명 생성기', s: '규칙에 맞는 파일명·작업폴더명·하위폴더명 복사', f: 'tools/filename/' }] },
   { g: '계산', i: [
@@ -2529,7 +2529,7 @@ var SPACES = [
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
   { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
     { g: '지류', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] },
-    { g: 'MD', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 .ai · PDF 양식', tool: 1 }, { k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] },
+    { g: 'MD', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '상품 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] },
     { g: '디자인', i: [{ k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }, // 2026-11-23 실장님: 로고 · 폰트 찾기 · 단위 환산 · 팬톤 순
     { g: '공통', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
   // 2026-11-22 실장님: 명칭(상품별 부위 명칭)을 용어·견본에서 빼서 따로 대메뉴로, 하위 카테고리로 나눔
@@ -2811,6 +2811,10 @@ function subItems() {
         if (dd.c2 && !gq[dd.c + '|' + dd.c2]) return;
         L.push({ t: dd.t, on: isCur, lv: dd.c2 ? 2 : dd.c ? 1 : 0, go: function () { navGo('gd:' + dd.f); try { navClose(); } catch (e) {} } });
       });
+    } else if (S.view === 'tk' && S.tk === 'wo') {
+      // 2026-11-23 실장님: 작업지시서 양식 분류(아크릴 · 금속 …)를 왼쪽 메뉴에서 고르기
+      var wf = subFrame('wo'), wd = wf && wf.contentDocument; if (!wd) return L;
+      $$('#chips button', wd).forEach(function (e) { var m = e.textContent.trim().match(/^(.*?)\s+(\d+)$/); L.push({ t: m ? m[1] : e.textContent.trim(), n: m ? m[2] : '', on: e.classList.contains('on'), go: function () { e.click(); try { wf.contentWindow.scrollTo(0, 0); } catch (x) {} } }); });
     } else if (S.view === 'gdoc') {
       // 소메뉴는 문서 원본에서 미리 읽은 목차로 바로 그린다 (화면 로딩을 기다리면 이전 문서 목차가 잠깐 보였음)
       L = []; // 문서 목차는 오른쪽 패널 색인으로 (2026-11-22 실장님)
@@ -2862,7 +2866,7 @@ function gdSecLoad(f) {
 }
 setTimeout(function () { GUIDE_GROUPS.forEach(function (g) { g.i.forEach(function (d) { gdSecLoad(d.f); }); }); SPACES.forEach(function (sp) { (sp.g || []).forEach(function (g) { (g.i || []).forEach(function (x) { if (/^gd:/.test(x.k)) gdSecLoad(x.k.slice(3)); }); }); }); }, 800);
 function subHide(on) { // PC에서 화면 안 색인 숨기기
-  [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }' + (S.refP === '디자인' ? ' .rix .ixs:has(> .ixv) { display:none !important; }' : '')], ['fonts', 'nav.tabs { display:none !important; } header { border-bottom:0 !important; }']].forEach(function (x) {
+  [['ref', '.rnav { display:none !important; } .rfx { grid-template-columns:minmax(0, 1fr) !important; }' + (S.refP === '디자인' ? ' .rix .ixs:has(> .ixv) { display:none !important; }' : '')], ['fonts', 'nav.tabs { display:none !important; } header { border-bottom:0 !important; }'], ['wo', '.chips { display:none !important; }']].forEach(function (x) {
     var f = subFrame(x[0]), d; try { d = f && f.contentDocument; } catch (e) { d = null; } if (!d || !d.head) return;
     var st = d.getElementById('s3hide'), tx = '@media (min-width:900px) { ' + x[1] + ' }'; if (on && !st) { st = d.createElement('style'); st.id = 's3hide'; d.head.appendChild(st); } else if (!on && st) { st.remove(); return; } if (on && st.textContent !== tx) st.textContent = tx;
   });
@@ -2881,7 +2885,7 @@ function subPaint(box, cur, cls) {
 function subTick() {
   var sd = document.getElementById('nsd'), pc = !!(sd && sd.offsetWidth);
   var L = subItems(), sig = S.view + '|' + (S.tk || '') + '|' + L.map(function (x) { return (x.h || x.t) + (x.n || '') + (x.on ? '*' : '') + (x.open ? '+' : ''); }).join(',');
-  subHide(pc && S.view === 'tk' && S.tk === 'ref' && (L.length > 0 || /^명칭 /.test(S.refP)));
+  subHide(pc && S.view === 'tk' && ((S.tk === 'ref' && (L.length > 0 || /^명칭 /.test(S.refP))) || (S.tk === 'wo' && L.length > 0)));
   if (sig === SUB.sig && (!sd || !L.length || $('.s3', sd))) return; SUB.sig = sig;
   if (sd) subPaint(sd, null, '.si');
   var fm = document.getElementById('nfm'); if (fm && fm.classList.contains('open')) subPaint(fm, null, '.lk');
