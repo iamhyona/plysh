@@ -421,12 +421,16 @@
     var g2 = gs.clone(), m = doc.get(d.get(PDFName.of('Matrix')));
     if (m instanceof PDFArray) g2.ctm = mul([0, 1, 2, 3, 4, 5].map(function (i) { return N(doc.get(m.get(i))); }), g2.ctm);
     var bb = doc.get(d.get(PDFName.of('BBox')));
-    if (bb instanceof PDFArray) { var b = [0, 1, 2, 3].map(function (i) { return N(doc.get(bb.get(i))); }); g2.clip = isect(g2.clip, bboxPts(g2.ctm, [b[0], b[1], b[2], b[1], b[2], b[3], b[0], b[3]])); }
+    if (bb instanceof PDFArray) { var b = [0, 1, 2, 3].map(function (i) { return N(doc.get(bb.get(i))); }); var fb = bboxPts(g2.ctm, [b[0], b[1], b[2], b[1], b[2], b[3], b[0], b[3]]); g2.clip = isect(g2.clip, fb);
+      // 반전 배치된 그림(로고 등): 부모는 바로인데 이 그림만 좌우·상하 뒤집힘 (회전은 해당 없음)
+      var dt = function (q) { return q[0] * q[3] - q[1] * q[2]; }; if (!this.negForm && dt(g2.ctm) < 0) this.emit('flip', { box: fb, vis: g2.clip, layer: this.layer(mc) }); }
     var r2 = doc.get(d.get(PDFName.of('Resources'))) || res, bytes = doc.bytes(s);
     var oc = doc.get(d.get(PDFName.of('OC'))), keepBase = this.baseLayer;
     if (oc) { var ln = doc.ocg(oc, r2); if (ln) this.baseLayer = ln; }
     var keepRes = this.res; this.res = r2;
+    var keepNeg = this.negForm; this.negForm = keepNeg || (g2.ctm[0] * g2.ctm[3] - g2.ctm[1] * g2.ctm[2] < 0);
     if (bytes) this.run(bytes, r2, g2, depth + 1);
+    this.negForm = keepNeg;
     this.res = keepRes; this.baseLayer = keepBase;
   };
 
@@ -506,6 +510,7 @@
       else if (kind === 'text') { if (P.texts.length < 6000) P.texts.push(o); }
       else if (kind === 'stroke') { if (P.strokes.length < 30000) P.strokes.push(o); }
       else if (kind === 'fill') { if (P.fills.length < 30000) P.fills.push(o); }
+      else if (kind === 'flip') { (P.flips = P.flips || []).push({ b: o.vis && !empty(o.vis) ? o.vis : o.box, kind: 'form' }); return; }
       var ink = o.ink;
       [ink, o.sink].forEach(function (k) {
         if (!k) return;

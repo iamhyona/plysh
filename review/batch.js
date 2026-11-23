@@ -276,8 +276,12 @@ function autoItem(q) { // 파일 이름과 가장 잘 맞는 사양서 품목
   q.item = bs >= 2 ? best : -1;
 }
 function woOf(q) {
-  var o = SPEC.items[q.item]; if (!o) return { w: 0, h: 0, pages: 0, bind: q.prod === 'photobook' ? 'layflat' : 'none', cal: 0, coat: q.prod === 'photocard' ? 'gloss' : '', layout: 'auto' };
-  return { w: o.w || 0, h: o.h || 0, pages: o.pages || 0, bind: o.bind || (q.prod === 'photobook' ? 'layflat' : 'none'), cal: o.cal || 0, coat: o.coat || '', layout: 'auto' };
+  var dBind = q.prod === 'photobook' ? 'layflat' : q.prod === 'book' ? 'perfect' : 'none';
+  var o = SPEC.items[q.item]; if (!o) return { w: 0, h: 0, pages: 0, bind: dBind, cal: 0, coat: q.prod === 'photocard' ? 'gloss' : '', layout: 'auto' };
+  var r = { w: o.w || 0, h: o.h || 0, pages: o.pages || 0, bind: o.bind || dBind, cal: o.cal || 0, coat: o.coat || '', layout: 'auto', fin: o.fin || '', raw: o.raw || '', name: o.name || '' };
+  // 표지: 책등 계산은 같은 품목 내지의 페이지 수 · 종이 두께로 (사양서 크기 = 완성품 앞면)
+  if (o.cover || /표지|커버|cover/i.test(q.file.name)) { var inn = SPEC.items.find(function (x) { return x !== o && x.big === o.big && /내지|본문|속지/.test(x.part || x.name || ''); }); if (inn) { r.pages = inn.pages || r.pages; r.cal = inn.cal || r.cal; r.bind = r.bind !== 'none' ? r.bind : inn.bind || r.bind; r.innPaper = inn.paper || ''; } }
+  return r;
 }
 function drawQ() {
   var h = '';
@@ -555,7 +559,8 @@ var CHECK = [
   ['파일 · 크기', [
     ['재단 크기 = 사양서', ['trimsize', 'spine', 'nobox', 'imgratio', 'imgsizeinfo'], PRINTISH],
     ['도련 3mm (재단선 · 칼선 기준)', ['bleedbox', 'bleedfill', 'diebleed'], PRINTISH],
-    ['가름선(접는 선)과 디자인 경계 맞춤', ['foldalign'], PDFONLY],
+    ['사양서에 있는 후가공 판 (부분 코팅 · 박 · 형압 · 칼선 · 화이트)', ['specplate'], PDFONLY],
+    ['로고 · 그림 좌우/상하 반전 (회전은 괜찮음)', ['flipobj'], PDFONLY],
     ['안전 여백 3mm (얼굴 · 글자)', ['safe', 'safeface', 'diesafe'], PRINTISH],
     ['칼선 · 후가공 판 (별색 + 오버프린트)', ['dieinfo', 'finop', 'finlayer', 'spotfin'], PDFONLY],
     ['박·형압 선 0.5pt · 글자 7pt · 판 이름 영문', ['finthin', 'fintext', 'finname'], PDFONLY],
@@ -580,14 +585,15 @@ var CHECK = [
     ['별색·단색 위 선 오버프린트', ['strokeop'], PDFONLY],
     ['흰색 오버프린트 (사라짐)', ['whiteop', 'whiteopt'], PDFONLY],
     ['K100 아닌 색 오버프린트 (색 변화)', ['opcolor'], PDFONLY],
-    ['옅은 농도 (5% · 10% 이하)', ['lite5', 'lite10'], PDFONLY]
+    ['옅은 농도 (5% · 10% 이하 · 잉크 합 15% 이하)', ['lite5', 'lite10', 'lite15'], PDFONLY],
+    ['회색 톤 색 치우침 (한 판이 높음)', ['graycast'], PDFONLY]
   ]],
   ['글자 · 선', [
     ['너무 작은 글자 (' + RV.SET.minText + 'pt 이하)', ['tiny'], PDFONLY],
     ['작은 글자 4색', ['small4c'], PDFONLY],
     ['얇은 선 0.15pt · 4색 얇은 선', ['hair', 'hair0', 'thin4c'], PDFONLY],
     ['역상(흰) 선 0.3pt', ['whitethin'], PDFONLY],
-    ['뒤집힌 글자', ['mirror'], PDFONLY],
+    ['뒤집힌 글자 · 마크 반전', ['mirror', 'upside'], PDFONLY],
     ['어두운 바탕 흰 글자 (뭉침)', ['whitetext'], PDFONLY],
     ['아웃라인 · 서체 포함', ['outline', 'fontembed'], PDFONLY]
   ]],
@@ -619,11 +625,16 @@ var CHECK = [
     ['치수 소수점 자릿수 통일', ['decmix'], isText],
     ['페이지 번호 · 목차', ['pagenum', 'toc', 'toc2', 'tocorder'], function (r) { return isText(r) && isBook(r); }],
     ['리걸 표기', ['nocopy', 'copyyear', 'copyok'], isText],
-    ['바코드 · ISBN · QR', ['bcfail', 'bcok', 'bcload', 'isbnsum', 'isbnbar'], PDFONLY],
+    ['바코드 · ISBN · QR', ['bcfail', 'bcok', 'bcload', 'isbnsum', 'isbnbar', 'bcsize'], PDFONLY],
+    ['바코드 · QR · FSC · 소이잉크 · 분리배출 K100 · 오버프린트', ['bcink', 'markink'], PDFONLY],
     ['글자를 읽을 수 없음', ['notext', 'nouni'], PDFONLY]
   ]],
   ['디자인 규칙', [
-    ['반복되는 칸의 서체·크기·색', ['rulecell', 'ruletext'], PDFONLY]
+    ['반복되는 칸의 서체·크기·색 · 표 스타일', ['rulecell', 'ruletext'], PDFONLY],
+    ['같은 스타일 글자 색 (제목 · 본문)', ['stylecolor'], PDFONLY],
+    ['선 굵기 · 색 통일', ['linerule'], PDFONLY],
+    ['사진 박스 크기 통일 (달력 · 엽서 · 포토카드)', ['photobox'], PDFONLY],
+    ['여백 (애매하게 다름)', ['margin'], PDFONLY]
   ]],
   ['달력', [
     ['공휴일 · 주말 색', ['calhol', 'caldow', 'holfail'], function (r) { return r.prod === 'calendar'; }],

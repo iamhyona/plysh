@@ -544,6 +544,7 @@ return { text: res.getText(), fmt: ZXing.BarcodeFormat[res.getBarcodeFormat()] }
       if (hr < 0.5) issue({ page: c.P.i, sev: 'warn', cat: 'print', code: 'bctrunc', title: '바코드 높이를 많이 줄였어요 (약 ' + Math.round(hr * 100) + '%)', detail: xs, fix: '권장 원래 높이의 50% 이상. 대형마트 평판(전방향) 스캐너는 짧으면 못 읽음. 손 스캐너 납품처면 출력 테스트로 확인', boxes: [c.b] });
       else if (hr < 0.9) issue({ page: c.P.i, sev: 'adv', cat: 'print', code: 'bctrunc', title: '바코드 높이 줄임 (약 ' + Math.round(hr * 100) + '%)', detail: xs, fix: 'GS1 소매 기준은 높이 줄이기 불가. 평판 스캐너 납품처면 높이 유지', boxes: [c.b] });
     }
+    try { inkOK(c.P, c.b, c.kind === 'qr' ? 'QR코드' : '바코드', 'bcink', 'warn'); } catch (e) {}
     issue({ page: c.P.i, sev: bad ? 'err' : 'info', cat: 'print', code: 'bcok', title: bad || ((c.kind === 'qr' ? 'QR코드' : '바코드') + ' 읽힘'), detail: msg, fix: bad ? '바코드와 번호를 다시 확인해 주세요.' : (c.kind === 'qr' ? '주소가 맞는지 열어 봐 주세요.' : ''), boxes: [c.b], bc: { fmt: res.fmt, text: res.text, w: bw, h: bh, chk: chk, kind: c.kind } });
   }
   var pageHit = {};
@@ -740,7 +741,34 @@ function calendar(R, rules) {
       });
     });
   });
+  calSections(months);
   if (noym.length) issue({ page: null, sev: 'info', cat: 'cal', code: 'calnoym', title: '연도 · 월을 읽지 못해 요일 검사를 못 한 달이 있어요', detail: uniq(noym).join(', ') + 'p', fix: '연도(예: 2027)와 월이 글자로 있어야 검사 가능', boxes: [] });
+}
+// 섹션(연간 달력 · 먼슬리 등)마다 달이 1씩 이어지는지. 섹션끼리는 비교하지 않음 (2026-11-23 실장님)
+function calSections(months) {
+  var issue = X.issue, list = [];
+  var pages = []; months.forEach(function (M) { if (pages.indexOf(M.P) < 0) pages.push(M.P); });
+  pages.forEach(function (P) { // 한 페이지 안: 위 → 아래, 왼 → 오른 (읽는 순서)
+    var mine = months.filter(function (M) { return M.P === P; }), z = mine.length ? mine[0].zk : 10;
+    mine.sort(function (a, b) { var dy = b.gb[3] - a.gb[3]; return Math.abs(dy) > z * 3 ? dy : a.gb[0] - b.gb[0]; });
+    list = list.concat(mine);
+  });
+  var secs = [], cur = null;
+  list.forEach(function (M) {
+    if (!M.m) return;
+    var type = M.multi ? 'multi' : 'single';
+    if (!cur || cur.type !== type || (M.m === 1 && cur.last.m !== 12 && cur.items.length > 1)) { cur = { type: type, items: [], last: null }; secs.push(cur); }
+    cur.items.push(M); cur.last = M;
+  });
+  secs.forEach(function (S, si) {
+    var name = (secs.length > 1 ? (si + 1) + '번째 ' : '') + (S.type === 'multi' ? '연간(여러 달 한 면)' : '월별') + ' 섹션';
+    for (var i = 1; i < S.items.length; i++) {
+      var a = S.items[i - 1], b = S.items[i], want = a.m % 12 + 1;
+      if (b.m === a.m) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calmdup', title: name + '에서 ' + b.m + '월이 두 번 있어요', detail: (a.P.i + 1) + 'p · ' + (b.P.i + 1) + 'p', fix: '달 표기 확인', boxes: [b.gb] });
+      else if (b.m !== want) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calorder', title: name + ' 달 순서가 이어지지 않아요', detail: a.m + '월 다음에 ' + b.m + '월 (' + want + '월이어야 함) · ' + (b.P.i + 1) + 'p', fix: '달 순서 · 빠진 달 확인', boxes: [b.gb] });
+      if (a.y && b.y && (a.m === 12 && b.m === 1 ? b.y !== a.y + 1 : b.m === want && b.y !== a.y)) issue({ page: b.P.i, sev: 'err', cat: 'cal', code: 'calorder', title: '연도 표기가 이어지지 않아요', detail: a.y + '년 ' + a.m + '월 다음 ' + b.y + '년 ' + b.m + '월', fix: '연도 확인', boxes: [b.gb] });
+    }
+  });
 }
 function decoOf(P, c, M) { // 숫자 뒤 도형(별 · 하트 · 원) 또는 칸 안 작은 글자(이름 · Birthday · Debut …)
   var b = c.t.b, z = M.zk, cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
@@ -771,17 +799,17 @@ function cards(t) {
 }
 
 // ── 인증 마크 (FSC · 소이잉크 · KOMCA) 찾기 + 전개도 기준 방향 · 반전 판정 ──
-var MARKS = [['FSC', /\bFSC\b|FSC\s*[®Ⓡ]|\bC\d{6}\b|^MIX$|RECYCLED|FSC\s*MIX/i], ['소이잉크', /SOY\s*INK|SOYINK|PRINTED\s*WITH\s*SOY|소이\s*잉크|^SOY$/i], ['KOMCA', /KOMCA/i]];
+var MARKS = [['분리배출', /분리\s*배출|재활용\s*(가능|어려움)|^(종이|종이팩|플라스틱|비닐류|캔류|유리|PET|HDPE|LDPE|PP|PS|OTHER)$/i], ['FSC', /\bFSC\b|FSC\s*[®Ⓡ]|\bC\d{6}\b|^MIX$|RECYCLED|FSC\s*MIX/i], ['소이잉크', /SOY\s*INK|SOYINK|PRINTED\s*WITH\s*SOY|소이\s*잉크|^SOY$/i], ['KOMCA', /KOMCA/i]];
 var BOXRE2 = /박스|아웃\s*박스|outbox|box|패키지|package|상자/i;
 var tsP = null;
 function tess() { if (!tsP) tsP = (window.Tesseract ? Promise.resolve(true) : new Promise(function (ok) { var s = document.createElement('script'); s.src = LIBS.tess; s.onload = function () { ok(true); }; s.onerror = function () { ok(false); }; document.head.appendChild(s); })); return tsP; }
 function tcAng(t) { return t.a == null ? 0 : t.a; }
 async function marks(R, pdfjs, step) {
-  var isBox = BOXRE2.test((R.prodName || '') + ' ' + R.file); if (!isBox) return;
+  var isBox = BOXRE2.test((R.prodName || '') + ' ' + R.file); // 글자 마크는 모든 품목, 그림 OCR은 아웃박스만 (느림)
   var issue = X.issue, MM = X.MM, mm = X.mm, found = {};
   R.pages.forEach(function (P) { P._marks = []; (P.tc || []).forEach(function (t) { MARKS.forEach(function (k) { if (k[1].test(t.s.trim())) { P._marks.push({ k: k[0], rot: t.a || 0, mir: !!t.m, b: t.b, src: t.a ? '글자 (' + t.a + '° 돌아감)' : '글자' }); found[k[0]] = 1; } }); }); });
   var need = function () { return !found.FSC || !found['소이잉크']; };
-  if (need() && await tess() && window.Tesseract) {
+  if (isBox && need() && await tess() && window.Tesseract) {
     var W = null;
     try { W = await Tesseract.createWorker('eng', 1, { workerPath: LIBS.tessWorker, corePath: LIBS.tessCore, langPath: LIBS.tessLang }); await W.setParameters({ tessedit_pageseg_mode: '11' }); } catch (e) { console.warn(e); W = null; }
     if (W) for (var pi = 0; pi < Math.min(R.pages.length, 4) && need(); pi++) {
@@ -815,6 +843,17 @@ async function marks(R, pdfjs, step) {
   R._marks = found;
   orient(R);
 }
+// 마크(FSC · 소이잉크 · 분리배출 · KOMCA) · 바코드 색: K100 권장, 바탕이 흰색이 아니면 오버프린트
+function inkOK(P, b, label, code, sev) {
+  var MM = X.MM, issue = X.issue, objs = (P.fills || []).concat(P.texts || []).filter(function (o) { var v = o.vis || o.box; return v && o.ink && !o.ink.white && !o.ink.none && v[0] >= b[0] - 0.5 && v[1] >= b[1] - 0.5 && v[2] <= b[2] + 0.5 && v[3] <= b[3] + 0.5; });
+  if (!objs.length) return;
+  var notK = objs.filter(function (o) { return !o.ink.k100; }), noOP = objs.filter(function (o) { return o.ink.k100 && !o.op; });
+  var g = 1.5 * MM, rs = [[b[0] - g - 2, b[1], b[0] - g, b[3]], [b[2] + g, b[1], b[2] + g + 2, b[3]], [b[0], b[1] - g - 2, b[2], b[1] - g], [b[0], b[3] + g, b[2], b[3] + g + 2]].map(function (r) { var c = X.avgPx(P, r); return c ? (c[0] + c[1] + c[2]) / 3 : 255; });
+  var dark = P.px && Math.max.apply(null, rs) < 245; // 네 방향 모두 흰색이 아닐 때만 '바탕 있음'
+  if (notK.length > objs.length * 0.3) issue({ page: P.i, sev: sev || 'warn', cat: 'print', code: code, title: label + ' 색이 K100이 아니에요', detail: uniq(notK.map(function (o) { return o.ink.rgb ? 'RGB' : o.ink.spots ? Object.keys(o.ink.spots).join('+') : ['c', 'm', 'y', 'k'].filter(function (q) { return o.ink[q] > 0.004; }).map(function (q) { return q.toUpperCase() + Math.round(o.ink[q] * 100); }).join(' '); })).slice(0, 3).join(', '), fix: '권장 K100 단색 (여러 색 겹치면 판 어긋남으로 흐려짐)', boxes: [b] });
+  else if (dark && noOP.length > objs.length * 0.3) issue({ page: P.i, sev: 'warn', cat: 'print', code: code, title: label + ' 바탕이 흰색이 아닌데 오버프린트가 꺼져 있어요', detail: 'K100 ' + noOP.length + '개', fix: '권장 K100 + 오버프린트 (흰 테두리 생김 방지)', boxes: [b] });
+}
+function markInk(P, it) { if (/^(글자|그림)/.test(it.src) || it.src) inkOK(P, it.b, it.nm, 'markink', 'warn'); }
 function orient(R) { // 전개도(칼선 · 접는 선) 기준으로 면마다 방향 · 반전
   var issue = X.issue, MM = X.MM, mm = X.mm;
   R.pages.forEach(function (P) {
@@ -839,9 +878,8 @@ function orient(R) { // 전개도(칼선 · 접는 선) 기준으로 면마다 �
       var key = it.nm + Math.round(it.b[0]) + ',' + Math.round(it.b[1]); if (seen[key]) return; seen[key] = 1;
       var bi = bandOf(it.b), d = ((it.rot - ref) % 360 + 360) % 360, where = bands ? (bi === main ? '몸통 면' : bi >= 0 ? (bi < main ? '아래쪽 날개 면' : '위쪽 날개 면') : '면 밖') : '';
       if (it.mir) issue({ page: P.i, sev: 'err', cat: 'print', code: 'mirror', title: it.nm + ' 좌우 반전', detail: (where ? where + ' · ' : '') + '찾은 방법: ' + it.src, fix: '반전(뒤집기) 풀기. 투명 소재 안쪽 인쇄가 아니면 반전 금지', boxes: [it.b] });
-      else if (d === 180) issue({ page: P.i, sev: bands && bi !== main ? 'adv' : 'warn', cat: 'print', code: 'upside', title: it.nm + ' 방향이 다른 글자와 반대 (180°)', detail: (where ? where + ' · ' : '') + '기준 = ' + (bands ? '몸통 면' : '페이지') + ' 글자 방향 · 찾은 방법: ' + it.src, fix: bands && bi !== main ? '날개(덮개) 면이면 접었을 때 읽는 방향 확인' : '조립했을 때 거꾸로 보이지 않는지 전개도로 확인. 몸통 면이면 180° 돌리기', boxes: [it.b] });
-      else if (d === 90 || d === 270) issue({ page: P.i, sev: 'adv', cat: 'print', code: 'upside', title: it.nm + ' 90° 돌아감', detail: (where ? where + ' · ' : '') + '찾은 방법: ' + it.src, fix: '세로로 넣은 것이 맞는지 확인', boxes: [it.b] });
-      else if (it.src !== '글자' && /마크/.test(it.nm)) issue({ page: P.i, sev: 'info', cat: 'print', code: 'markok', title: it.nm + ' 있음 · 방향 맞음', detail: (where ? where + ' · ' : '') + '찾은 방법: ' + it.src, fix: '', boxes: [it.b] });
+      else if (/마크/.test(it.nm)) issue({ page: P.i, sev: 'info', cat: 'print', code: 'markok', title: it.nm + ' 있음 · 반전 없음' + (d ? ' (' + d + '° 회전 · 전개도 방향이면 괜찮음)' : ''), detail: (where ? where + ' · ' : '') + '찾은 방법: ' + it.src, fix: '', boxes: [it.b] });
+      if (/마크/.test(it.nm)) markInk(P, it);
     });
   });
 }
