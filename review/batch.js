@@ -606,6 +606,7 @@ var CHECK = [
     ['문장부호 통일 · ′″ 따옴표', ['punct', 'prime'], isText],
     ['헷갈리는 글자 · 혼자 떨어진 v / z / w', ['oddchar', 'vzw'], isText],
     ['오타 · 반복 단어', ['typoko', 'typoen', 'repword'], isText],
+    ['영어 문장 · 문법 · 같은 문장 반복', ['grammar', 'sentrep'], isText],
     ['글자 중간에 스타일 바뀜', ['midstyle', 'sizemix'], isText],
     ['팀 표기 규칙 (멤버·소속사·타이틀·품목명)', ['rule', 'rulecase', 'case'], isText],
     ['한글 · 영문 섞임', ['koen', 'koen2'], isText],
@@ -749,7 +750,7 @@ function extraIssues(r) { // 결과지 전용 리마인드 (품목 성격에 따
 var SHEET_CHECK_EXTRA = [['아웃박스', [['FSC · 소이잉크 표기', ['boxfsc']], ['증지 위치 가이드', ['boxsticker']], ['증지 크기', ['boxsize']]], function (r) { return BOXRE.test((r.prodName || '') + ' ' + r.file); }],
   ['멤버 · 구성', [['멤버 배치 순서 (정합 순서)', ['memorder']]], function (r) { return SETRE.test((r.prodName || '') + ' ' + r.file); }]];
 // 오탈자·표기 항목은 단계와 상관없이 '오탈자'로 맨 위에 (2026-11-20 실장님: 오탈자 / 경고 / 주의 / 조언)
-var TYPO_CODES = ['typoko', 'typoen', 'repword', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix']; // app.js와 같은 목록
+var TYPO_CODES = ['typoko', 'typoen', 'repword', 'sentrep', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix']; // app.js와 같은 목록
 function lvOf(x) { return LV[x.sev] ? (TYPO_CODES.indexOf(x.code) > -1 ? 't' : LV[x.sev]) : ''; }
 function groupsOf(r) {
   var G = {}, order = [];

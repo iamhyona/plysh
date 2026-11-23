@@ -950,7 +950,7 @@ function median(a) { a = a.slice().sort(function (x, y) { return x - y; }); retu
 // ── 보고서 화면 ──
 var CATS = [['all', '전체'], ['top', '가장 중요'], ['print', '인쇄'], ['img', '이미지 파일'], ['bind', '제본'], ['photo', '중복 사진'], ['rule', '디자인 규칙'], ['text', '글자·표기'], ['cal', '달력'], ['face', '인물 사진']];
 // 단계 이름: 오탈자 / 경고 / 주의 / 조언 (+ 안내) — 결과지와 같은 말 (2026-11-20 실장님)
-var TYPO_CODES = ['typoko', 'typoen', 'repword', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix'];
+var TYPO_CODES = ['typoko', 'typoen', 'repword', 'sentrep', 'dblspace', 'oddchar', 'vzw', 'prime', 'rule', 'rulecase', 'stdterm', 'case', 'koen', 'koen2', 'qtyunit', 'decmix'];
 function isTypo(x) { return x.sev !== 'info' && TYPO_CODES.indexOf(x.code) > -1; }
 var SEVN = { err: '경고', warn: '주의', info: '안내', adv: '조언' };
 function sevName(x) { return isTypo(x) ? '오탈자' : SEVN[x.sev]; }

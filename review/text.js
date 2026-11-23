@@ -845,6 +845,63 @@ function orient(R) { // 전개도(칼선 · 접는 선) 기준으로 면마다 �
     });
   });
 }
+// ── 영어 문장 판독 (Harper: 브라우저 안에서만 도는 무료 문법 검사기, 글자가 밖으로 나가지 않음) ──
+var hpP = null;
+function harper() {
+  if (!hpP) hpP = Promise.all([import(new URL('vendor/harper/index.js', location.href).href), import(new URL('vendor/harper/slimBinary.js', location.href).href)])
+    .then(function (m) { var L = new m[0].LocalLinter({ binary: m[1].slimBinary || m[1].binary }); return L.setup().then(function () { return L; }); })
+    .catch(function (e) { console.warn(e); return null; });
+  return hpP;
+}
+function paras(P) { // 같은 단 · 같은 크기 · 줄 간격이 가까운 줄들을 문단으로
+  var out = [], cur = null;
+  segsOf(P).forEach(function (s) {
+    var t = s.t.trim(); if (!t) return;
+    var ok = cur && Math.abs(s.b[0] - cur.x0) < s.z * 1.5 + 20 && Math.abs(s.z - cur.z) < cur.z * 0.12 && cur.y - s.b[3] < s.z * 1.2 && cur.y - s.b[3] > -s.z * 0.3;
+    if (!ok) { cur = { x0: s.b[0], z: s.z, y: s.b[1], txt: '', map: [] }; out.push(cur); }
+    else { var hy = /[A-Za-z]-$/.test(cur.txt); if (hy) { cur.txt = cur.txt.slice(0, -1); cur.map.pop(); } else { cur.txt += ' '; cur.map.push(null); } }
+    var off = s.t.indexOf(t); for (var i = 0; i < t.length; i++) cur.map.push({ s: s, i: off + i }); cur.txt += t; cur.y = s.b[1];
+  });
+  return out.filter(function (p) { var en = (p.txt.match(/[A-Za-z]/g) || []).length, all = (p.txt.match(/[A-Za-z가-힣]/g) || []).length; return en >= 20 && en >= all * 0.8 && (p.txt.match(/[A-Za-z]{2,}/g) || []).length >= 4; });
+}
+function pBox(p, a, b) { var bb = null; for (var i = a; i < b; i++) { var q = p.map[i]; if (!q) continue; var x = subBox(q.s, q.i, 1); bb = bb ? [Math.min(bb[0], x[0]), Math.min(bb[1], x[1]), Math.max(bb[2], x[2]), Math.max(bb[3], x[3])] : x; } return bb; }
+var HP_KEEP = /^(Agreement|Grammar|Malapropism|Eggcorn|Repetition|Typo|BoundaryError|Usage|WordChoice|Spelling)$/;
+async function sentences(R, step) {
+  var issue = X.issue, ps = []; R.pages.forEach(function (P) { paras(P).forEach(function (p) { p.P = P; ps.push(p); }); });
+  if (!ps.length) return;
+  // 같은 페이지 안에서 같은 문장이 두 번
+  var rep = [];
+  R.pages.forEach(function (P) {
+    var seen = {}; ps.filter(function (p) { return p.P === P; }).forEach(function (p) {
+      var re = /[^.!?]+[.!?]+/g, m; while ((m = re.exec(p.txt))) { var k = m[0].toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); if (k.length < 24) continue; if (seen[k]) rep.push({ P: P, b: pBox(p, m.index, m.index + m[0].length), s: m[0].trim() }); else seen[k] = 1; }
+    });
+  });
+  var byP = {}; rep.forEach(function (h) { (byP[h.P.i] = byP[h.P.i] || []).push(h); });
+  Object.keys(byP).forEach(function (pi) { var L = byP[pi]; issue({ page: +pi, sev: 'warn', cat: 'text', code: 'sentrep', title: '같은 문장이 한 페이지에 두 번 있어요', detail: L.slice(0, 2).map(function (h) { return '“' + cut(h.s, 40) + '”'; }).join(', '), fix: '하나 지우기', boxes: L.map(function (h) { return h.b; }).filter(Boolean) }); });
+  if (step) step('영어 문장 읽는 중…');
+  var L = await Promise.race([harper(), new Promise(function (ok) { setTimeout(function () { ok(null); }, 60000); })]);
+  if (!L) { issue({ page: null, sev: 'info', cat: 'text', code: 'grammar', title: '영어 문법 검사기를 불러오지 못했어요', detail: '철자 검사(사전)만 했어요.', fix: '', boxes: [] }); return; }
+  var ENW = window.PLYSH_ENW, sp = [], gr = [];
+  for (var i = 0; i < ps.length; i++) {
+    var p = ps[i], lints = []; try { lints = await L.lint(p.txt); } catch (e) { console.warn(e); continue; }
+    lints.forEach(function (x) {
+      var kind = x.lint_kind(), sp0 = x.span(), w = p.txt.slice(sp0.start, sp0.end); if (!HP_KEEP.test(kind) || !w.trim()) return;
+      if (w === w.toUpperCase() && /[A-Z]{2}/.test(w)) return; // 제목 · 이름 (전부 대문자)
+      var sug = x.suggestions().map(function (g) { try { return g.get_replacement_text(); } catch (e) { return ''; } }).filter(Boolean).slice(0, 3);
+      var b = pBox(p, sp0.start, sp0.end) || p.map.find(Boolean).s.b;
+      if (kind === 'Spelling') {
+        // 사전에 있는 단어 · 대문자로 시작하는 이름 · 팀 규칙 표기는 맞는 것으로
+        if ((/^[A-Z]/.test(w) && !/(^|[.!?]\s+)$/.test(p.txt.slice(0, sp0.start))) || /^[A-Z]{2}/.test(w) || WSEG[w.toUpperCase()] || (ENW && ENW.has(w.toLowerCase())) || w.length < 3 || !sug.length) return;
+        sp.push({ P: p.P, b: b, w: w, to: sug.join(' 또는 ') }); return;
+      }
+      if (kind === 'WordChoice' && /^Insert `to`/.test(x.message())) return; // 단어 반복은 따로 잡음
+      gr.push({ P: p.P, b: b, w: w, msg: x.message().replace(/`/g, ''), to: sug[0], ctx: cut(p.txt.slice(Math.max(0, sp0.start - 20), sp0.end + 20), 50) });
+    });
+  }
+  var grp = function (arr) { var o = {}; arr.forEach(function (h) { (o[h.P.i] = o[h.P.i] || []).push(h); }); return o; };
+  var a = grp(sp); Object.keys(a).forEach(function (pi) { var L2 = a[pi]; issue({ page: +pi, sev: 'warn', cat: 'text', code: 'typoen', title: '영문 철자 틀림', detail: uniq(L2.map(function (h) { return h.w + ' → ' + h.to; })).slice(0, 4).join(', '), fix: '철자 고치기', boxes: L2.map(function (h) { return h.b; }) }); });
+  var g = grp(gr); Object.keys(g).forEach(function (pi) { var L3 = g[pi]; issue({ page: +pi, sev: 'adv', cat: 'text', code: 'grammar', title: '영어 문장 확인', detail: L3.slice(0, 3).map(function (h) { return '“' + h.ctx + '” ' + h.w + (h.to ? ' → ' + h.to : ''); }).join(' / '), fix: '문법 확인 (자동 판독이라 의도한 표현이면 그대로 두기)', boxes: L3.map(function (h) { return h.b; }), sus: true }); });
+}
 var enwP = null;
 function enWords() { // 영어 단어 목록 (an-array-of-english-words, 처음 한 번만 받음)
   if (window.PLYSH_ENW) return Promise.resolve();
@@ -859,6 +916,7 @@ window.RV2 = {
     WSEG = {}; rules.members.concat(rules.terms).forEach(function (r) { r.forms.concat(r.wrong).forEach(function (f) { f.toUpperCase().split(/[\s\-·]+/).forEach(function (w) { if (/^[A-Z0-9']{2,}$/.test(w)) WSEG[w] = 1; }); }); }); R.pages.forEach(function (P) { P._lines = null; });
     step('글자 검사 중…'); await X.tick(); await enWords(); textChecks(R, rules);
     repeatChecks(R); pageNumbers(R);
+    try { await sentences(R, step); } catch (e) { console.warn(e); }
     step('달력·멤버 사진 확인 중…'); await X.tick(); calendar(R, rules); var hf = Object.keys(HOL_FAIL); if (hf.length) X.issue({ page: null, sev: 'info', cat: 'cal', code: 'holfail', title: hf.join(', ') + '년 음력 명절은 계산하지 못했어요', detail: '음력 변환표가 2050년까지라서 그 뒤의 설날·추석·부처님오신날은 빠져 있어요.', fix: '해당 연도 공휴일은 직접 확인해 주세요.', boxes: [] }); members(R, rules);
     step('바코드·QR 읽는 중…'); await X.tick(); try { await barcodes(R, pdfjs); } catch (e) { console.warn(e); }
     step('인증 마크 · 방향 확인 중…'); await X.tick(); try { await marks(R, pdfjs, step); } catch (e) { console.warn(e); }
