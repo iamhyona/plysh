@@ -115,7 +115,11 @@ async function renderPage(pdfjs, P, faceOK) {
   P.vt = vp.transform.slice(); P.cw = cv.width; P.ch = cv.height; P.scale = scale;
   P.px = cx.getImageData(0, 0, cv.width, cv.height);
   // 글자 내용 (스니펫용)
-  try { var tc = await pg.getTextContent(); P.tc = tc.items.filter(function (t) { return t.str; }).map(function (t) { var m = t.transform, z = Math.hypot(m[2], m[3]) || Math.abs(t.height) || 1; return { s: t.str, b: [m[4], m[5] - z * 0.2, m[4] + t.width, m[5] + z * 0.85], x: m[4], y: m[5], w: t.width, z: z, f: t.fontName, rot: Math.abs(m[1]) > 0.01 || m[0] < 0 }; }); } catch (e) { P.tc = []; }
+  try { var tc = await pg.getTextContent(); P.tc = tc.items.filter(function (t) { return t.str; }).map(function (t) { var m = t.transform, z = Math.hypot(m[2], m[3]) || Math.abs(t.height) || 1; var rot = Math.abs(m[1]) > 0.01 || m[0] < 0, b = [m[4], m[5] - z * 0.2, m[4] + t.width, m[5] + z * 0.85], a = 0, mir = false;
+      if (rot || m[3] < 0) { var L = Math.hypot(m[0], m[1]) || 1, dx = m[0] / L, dy = m[1] / L, U = Math.hypot(m[2], m[3]) || 1, ux = m[2] / U, uy = m[3] / U; a = ((Math.round(Math.atan2(dy, dx) * 180 / Math.PI / 90) * 90) % 360 + 360) % 360; mir = dx * uy - dy * ux < 0;
+        var pts = [[0, -0.2], [1, -0.2], [0, 0.85], [1, 0.85]].map(function (q) { return [m[4] + dx * t.width * q[0] + ux * z * q[1], m[5] + dy * t.width * q[0] + uy * z * q[1]]; });
+        b = [Math.min.apply(null, pts.map(function (q) { return q[0]; })), Math.min.apply(null, pts.map(function (q) { return q[1]; })), Math.max.apply(null, pts.map(function (q) { return q[0]; })), Math.max.apply(null, pts.map(function (q) { return q[1]; }))]; }
+      return { s: t.str, b: b, x: m[4], y: m[5], w: t.width, z: z, f: t.fontName, rot: rot, a: a, m: mir }; }); } catch (e) { P.tc = []; }
   // 썸네일
   var tw = Math.min(1100, cv.width), th = Math.round(cv.height * tw / cv.width), tcv = document.createElement('canvas'); tcv.width = tw; tcv.height = th;
   tcv.getContext('2d').drawImage(cv, 0, 0, tw, th);
@@ -389,6 +393,15 @@ function pageChecks(P) {
   // 재단 사이즈
   if (WO.w && WO.h) {
     var tw = mm(T[2] - T[0]), th = mm(T[3] - T[1]), ew = P.spread ? WO.w * 2 : WO.w;
+    // 표지 펼침면: 사양서 크기 = 표1(앞표지 한 면). 파일 = 표4 + 책등 + 표1 (+ 날개)
+    if (R.cover && tw > WO.w * 1.6 && Math.abs(th - WO.h) <= 0.6) {
+      var spEst = WO.pages && WO.cal ? Math.ceil(WO.pages / 2) * WO.cal : 0, rest = tw - WO.w * 2, gl = spineLines(P), spM = gl ? mm(gl[1] - gl[0]) : null;
+      var wing = rest > 40 ? (rest - (spM || spEst || 0)) / 2 : 0, sp0 = wing ? rest - wing * 2 : rest;
+      var msg = '파일 ' + f1(tw) + '×' + f1(th) + 'mm = 표4 ' + f1(WO.w) + ' + 책등 ' + f1(sp0) + ' + 표1 ' + f1(WO.w) + (wing ? ' + 날개 ' + f1(wing) + '×2' : '') + 'mm';
+      if (gl && Math.abs(spM - sp0) > 0.6) add('warn', 'bind', 'spine', '책등 가이드 폭이 표지 크기와 안 맞아요', msg + ' · 파일 안 책등 선 사이 ' + f1(spM) + 'mm', '책등 선 위치 · 문서 폭 확인', [[gl[0], T[1], gl[1], T[3]]]);
+      else if (spEst && Math.abs(sp0 - spEst) > Math.max(1, spEst * 0.15)) add('warn', 'bind', 'spine', '책등 폭이 사양서로 계산한 값과 달라요', msg + ' · 사양서 ' + WO.pages + 'p · 종이 두께로 계산한 책등 약 ' + f1(spEst) + 'mm', '인쇄소 책등 값 확인 (종이 · 제본마다 다름)', [T], { sus: true });
+      else add('info', 'bind', 'spine', '표지 펼침 크기 확인', msg + (gl ? ' · 책등 선 사이 ' + f1(spM) + 'mm' : ''), '');
+    } else
     if (Math.abs(tw - ew) > 0.6 || Math.abs(th - WO.h) > 0.6) { if (!(Math.abs(tw - WO.h) < 0.6 && Math.abs(th - ew) < 0.6)) add('err', 'print', 'trimsize', '재단 사이즈가 사양서와 달라요', '파일 ' + f1(tw) + '×' + f1(th) + 'mm · 사양서 ' + f1(ew) + '×' + WO.h + 'mm', '문서 크기를 사양서에 맞춰 주세요.', [T]); }
   }
   // 도련 상자
@@ -619,6 +632,12 @@ function whiteText(P, wt, add) {
 }
 
 // 포토북 표지: 안쪽면(마지막 페이지, 2p 이상일 때)의 책등 쪽 — 책등과 그 양옆 풀칠 영역이 비어 있어야 함
+function spineLines(P) { // 표지 가운데 근처, 위아래로 긴 세로선 두 개 (책등 가이드 · 접는 선)
+  var T = P.trim, cx = (T[0] + T[2]) / 2, H = T[3] - T[1];
+  var xs = P.strokes.concat(P.fills).filter(function (o) { var b = o.box; return b && b[2] - b[0] < 1.5 && b[3] - b[1] > H * 0.3 && Math.abs((b[0] + b[2]) / 2 - cx) < 40 * MM; }).map(function (o) { return (o.box[0] + o.box[2]) / 2; });
+  var best = null; xs.forEach(function (a) { xs.forEach(function (b) { if (b - a > 1.5 * MM && b - a < 80 * MM && Math.abs((a + b) / 2 - cx) < 1 * MM && (!best || Math.abs((a + b) / 2 - cx) < Math.abs((best[0] + best[1]) / 2 - cx))) best = [a, b]; }); });
+  return best;
+}
 function coverGlue(P, add) {
   if (R.bookPages < 2 || P.lp.indexOf(R.bookPages) < 0) return; // 1p짜리 표지(바깥면만)·바깥면 페이지는 보지 않음
   var T = P.trim, g = SET.glue * MM, cx = (T[0] + T[2]) / 2, W = R.WO || {};

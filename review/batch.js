@@ -551,7 +551,7 @@ function hasPeople(r) { return /photobook|photocard|calendar|book/.test(r.prod) 
 var PRINTISH = function (r) { return r.prod !== 'web'; }, PDFONLY = function (r) { return !r.isImg; }, IMGONLY = function (r) { return !!r.isImg; };
 var CHECK = [
   ['파일 · 크기', [
-    ['재단 크기 = 사양서', ['trimsize', 'nobox', 'imgratio', 'imgsizeinfo'], PRINTISH],
+    ['재단 크기 = 사양서', ['trimsize', 'spine', 'nobox', 'imgratio', 'imgsizeinfo'], PRINTISH],
     ['도련 3mm', ['bleedbox', 'bleedfill'], PRINTISH],
     ['안전 여백 3mm (얼굴 · 글자)', ['safe', 'safeface', 'diesafe'], PRINTISH],
     ['칼선 · 후가공 판 (별색 + 오버프린트)', ['dieinfo', 'finop', 'finlayer', 'spotfin'], PDFONLY],
@@ -739,7 +739,7 @@ function extraIssues(r) { // 결과지 전용 리마인드 (품목 성격에 따
   if (r._extra) return; r._extra = true;
   var nm = (r.prodName || '') + ' ' + r.file, id = 900000 + Math.floor(Math.random() * 90000), add = function (o) { o.id = id++; o.page = null; o.boxes = []; o.cat = 'extra'; r.issues.push(o); };
   if (BOXRE.test(nm)) {
-    if (!/\bFSC\b|SOY|소이\s*잉크/i.test(allText(r))) add({ sev: 'adv', code: 'boxfsc', title: 'FSC · 소이잉크 표기 없음', detail: 'FSC 로고 · 소이잉크 마크 찾지 못함 (글자 기준)', fix: '필수 아님. 사용 지류 · 잉크가 해당되면 표기 추가' });
+    var mk = r._marks || {}; if (!mk.FSC && !mk['소이잉크'] && !/\bFSC\b|SOY|소이\s*잉크/i.test(allText(r))) add({ sev: 'adv', code: 'boxfsc', title: 'FSC · 소이잉크 표기 없음', detail: 'FSC 로고 · 소이잉크 마크 찾지 못함 (글자 · 돌아간 글자 · 그림 글자 판독까지 확인)', fix: '필수 아님. 사용 지류 · 잉크가 해당되면 표기 추가' });
     add({ sev: 'adv', code: 'boxsticker', title: '증지 부착 위치 가이드 확인', detail: '소속사마다 점선 요청 여부 다름', fix: '소속사 요청 여부 리마인드. 넣는 소속사면 점선 추가' });
     add({ sev: 'adv', code: 'boxsize', title: '증지 부착 크기 리마인드', detail: '증지 크기는 소속사마다 다름', fix: '소속사 증지 크기 확인. 부착 자리 크기 맞는지 확인' });
   }
