@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>/* 승인된 팀원만: 승인 안 된 기기에서 주소로 바로 열면 PLYSH 로그인으로 보냄 */try{if(localStorage.getItem('d4:ok')!=='1')location.replace('../../')}catch(e){location.replace('../../')}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>작업지시서 양식</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script>try { if (window.self !== window.top) document.documentElement.classList.add('emb'); } catch (e) { document.documentElement.classList.add('emb'); }</script>
+<style>
+/* 2026-11-23 실장님: 도구 > MD > 작업지시서 양식 — 분류별 품목, 품목마다 .ai · .pdf 내려받기 + 미리보기 */
+:root { --bg:#f2f4f6; --card:#fff; --line:#e5e8eb; --txt:#191f28; --sub:#4e5968; --mute:#8b95a1; --chip:#f2f4f6; --on:#191f28; --acc:#e5007e; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { background:var(--bg); color:var(--txt); font-family:'Pretendard Variable', Pretendard, -apple-system, sans-serif; letter-spacing:-0.01em; }
+main { max-width:1040px; margin:0 auto; padding:20px 16px 80px; }
+html.emb main { padding-top:6px; }
+.phd { margin:0 0 20px; } .phd b { display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; } .phd small { display:block; margin-top:6px; font-size:14px; color:#6b7684; line-height:1.5; }
+html.emb .phd { display:none; }
+.intro { background:var(--card); border-radius:20px; padding:20px; font-size:14px; line-height:1.7; color:var(--sub); }
+.intro b { color:var(--txt); font-weight:700; }
+.intro ul { margin-top:8px; padding-left:18px; } .intro li + li { margin-top:2px; }
+/* 검색 + 분류 칩 한 줄 (PC) */
+.bar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:20px 0 0; }
+.bar input { flex:0 1 260px; min-width:0; height:42px; border:0; background:var(--card); border-radius:12px; padding:0 14px; font:inherit; font-size:15px; font-weight:500; color:var(--txt); }
+.bar input:focus { outline:2px solid var(--txt); }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chips button { height:36px; padding:0 14px; border:0; border-radius:999px; background:var(--card); color:var(--sub); font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.chips button.on { background:var(--on); color:#fff; }
+.chips button:focus-visible, .it button:focus-visible, .it a:focus-visible { outline:2px solid var(--acc); outline-offset:2px; }
+@media (max-width:640px) { .bar input { flex:1 1 100%; } }
+/* 분류 */
+.grp { margin-top:32px; }
+.grp h3 { font-size:18px; font-weight:800; display:flex; align-items:baseline; gap:8px; margin:0 0 14px; }
+.grp h3 small { font-size:13px; font-weight:600; color:var(--mute); }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:14px; }
+@media (max-width:520px) { .grid { grid-template-columns:1fr 1fr; gap:10px; } }
+.it { background:var(--card); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+.th { display:block; width:100%; aspect-ratio:4 / 3; border:1px solid var(--line); border-radius:12px; background:#fff; overflow:hidden; cursor:zoom-in; padding:0; }
+.th img { width:100%; height:100%; object-fit:cover; object-position:left top; display:block; }
+.nm { font-size:15.5px; font-weight:700; line-height:1.35; }
+.mt { font-size:12.5px; color:var(--mute); line-height:1.5; margin-top:2px; }
+.dl { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:auto; }
+.dl a, .dl button { display:flex; align-items:center; justify-content:center; height:36px; border-radius:10px; font:inherit; font-size:13px; font-weight:700; text-decoration:none; cursor:pointer; border:0; }
+.dl .pv { background:var(--chip); color:var(--sub); }
+.dl .ai { background:var(--on); color:#fff; }
+.dl .pdf { background:var(--chip); color:var(--txt); }
+@media (max-width:520px) { .it { padding:10px; } .nm { font-size:14.5px; } .dl { grid-template-columns:1fr 1fr; } .dl .pv { grid-column:1 / -1; } }
+.none { margin-top:32px; text-align:center; color:var(--mute); font-size:14px; }
+/* 미리보기 팝업: 화면 전체 어둡게, 가운데 */
+.pop { position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; padding:24px 16px; z-index:50; }
+.pop[hidden] { display:none; }
+.pbox { background:var(--card); border-radius:20px; width:min(960px, 100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden; }
+.phead { display:flex; align-items:center; gap:10px; padding:16px 18px; border-bottom:1px solid var(--line); }
+.phead b { font-size:17px; font-weight:800; flex:1; min-width:0; }
+.phead small { display:block; font-size:12.5px; font-weight:500; color:var(--mute); margin-top:2px; }
+.phead a { height:36px; padding:0 14px; border-radius:10px; display:flex; align-items:center; font-size:13px; font-weight:700; text-decoration:none; }
+.phead .ai { background:var(--on); color:#fff; } .phead .pdf { background:var(--chip); color:var(--txt); }
+.phead .x { width:36px; height:36px; border:0; border-radius:10px; background:var(--chip); font-size:20px; line-height:1; cursor:pointer; color:var(--sub); }
+.pimg { overflow:auto; background:#fff; }
+.pimg img { display:block; width:100%; height:auto; }
+@media (max-width:520px) { .phead { flex-wrap:wrap; } .phead b { flex:1 1 100%; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="phd"><b>작업지시서 양식</b><small>MD 품목별 일러스트 작업지시서 양식</small></div>
+  <div class="intro">
+    품목마다 <b>일러스트 파일(.ai)</b>을 받아 바로 열어 쓰면 됩니다. PDF는 보기용입니다.
+    <ul>
+      <li>왼쪽 정보는 글상자 하나라서 그대로 입력하면 됩니다. 빈칸은 밑줄 없이 비워 두었습니다.</li>
+      <li>선택지는 첫 칸이 ■로 채워져 있으니, 맞는 칸으로 바꿔 쓰세요.</li>
+      <li>오른쪽 디자인 자리에 디자인을 1:1로 넣습니다. 여러 개면 오른쪽 · 아래로 이어 놓고 대지를 늘려 쓰세요.</li>
+      <li>글자 크기는 품목 크기에 맞춰 5단계(본문 XS 18 · S 25 · M 32 · L 42 · XL 60pt)로 잡혀 있고, HYONA_ 문자 스타일로 한 번에 바꿀 수 있습니다.</li>
+    </ul>
+  </div>
+  <div class="bar">
+    <input id="q" type="search" placeholder="품목 이름으로 찾기" aria-label="품목 이름으로 찾기">
+    <div class="chips" id="chips" role="group" aria-label="분류"></div>
+  </div>
+  <div id="list"></div>
+</main>
+<div class="pop" id="pop" hidden role="dialog" aria-modal="true" aria-labelledby="pt">
+  <div class="pbox">
+    <div class="phead"><b id="pt"></b><a class="ai" id="pai" download>.ai 받기</a><a class="pdf" id="ppdf" download>PDF</a><button class="x" id="px" type="button" aria-label="닫기">×</button></div>
+    <div class="pimg"><img id="pim" alt=""></div>
+  </div>
+</div>
+<script>
+var V = '20261123a';
+var ITEMS = [{"no": "01", "k": "acrKey", "n": "아크릴 키링", "g": "아크릴", "t": "XS", "v": ["앞면", "인쇄 층"]}, {"no": "02", "k": "acrStand", "n": "아크릴 스탠드", "g": "아크릴", "t": "S", "v": ["전개도 (본체 + 받침 한 판)", "조립도"]}, {"no": "03", "k": "acrShaker", "n": "아크릴 셰이커", "g": "아크릴", "t": "S", "v": ["층 구성", "조립도"]}, {"no": "04", "k": "metalBadge", "n": "메탈 뱃지", "g": "금속", "t": "XS", "v": ["앞면", "뒷면"]}, {"no": "05", "k": "metalKey", "n": "메탈 키링", "g": "금속", "t": "XS", "v": ["앞면", "뒷면"]}, {"no": "06", "k": "canBadge", "n": "캔뱃지", "g": "금속", "t": "XS", "v": ["앞면 (재단 · 완성 · 안전)", "단면"]}, {"no": "07", "k": "tin", "n": "틴케이스", "g": "금속", "t": "S", "v": ["전개도 (업체 다이 라인)", "조립도"]}, {"no": "08", "k": "pvcKey", "n": "PVC · 실리콘 키링", "g": "PVC · 실리콘", "t": "XS", "v": ["앞면", "단면 (층 높이)"]}, {"no": "09", "k": "doll", "n": "봉제 인형", "g": "봉제", "t": "M", "v": ["전개도 (패턴 조각)", "조립도"]}, {"no": "10", "k": "dollKey", "n": "인형 키링", "g": "봉제", "t": "S", "v": ["전개도", "조립도"]}, {"no": "11", "k": "wappen", "n": "와펜", "g": "봉제", "t": "S", "v": ["앞면", "뒷면"]}, {"no": "12", "k": "pouch", "n": "파우치", "g": "봉제", "t": "M", "v": ["앞면", "옆면 (마치)"]}, {"no": "13", "k": "bag", "n": "에코백 · 가방", "g": "봉제", "t": "L", "v": ["앞면", "옆면 (마치)"]}, {"no": "14", "k": "blanket", "n": "담요 · 쿠션 · 타월", "g": "봉제", "t": "XL", "v": ["앞면", "옆면 · 두께"]}, {"no": "15", "k": "tee", "n": "의류 (티 · 맨투맨 · 후디)", "g": "의류 · 잡화", "t": "L", "v": ["앞면", "뒷면"]}, {"no": "16", "k": "pajama", "n": "파자마 (긴바지 · 반바지)", "g": "의류 · 잡화", "t": "L", "v": ["상의", "하의"]}, {"no": "17", "k": "cap", "n": "모자", "g": "의류 · 잡화", "t": "M", "v": ["앞면", "뒷면"]}, {"no": "18", "k": "socks", "n": "양말", "g": "의류 · 잡화", "t": "M", "v": ["옆면 (부위)"]}, {"no": "19", "k": "slipper", "n": "슬리퍼", "g": "의류 · 잡화", "t": "M", "v": ["위 · 바닥"]}, {"no": "20", "k": "leather", "n": "인조가죽 소품", "g": "의류 · 잡화", "t": "M", "v": ["전개도", "조립도"]}, {"no": "21", "k": "magsafe", "n": "맥세이프 카드지갑", "g": "의류 · 잡화", "t": "S", "v": ["앞 (밖)", "뒤 (폰 쪽)"]}, {"no": "22", "k": "mug", "n": "머그 · 텀블러", "g": "식기 · 소품", "t": "M", "v": ["인쇄 펼침", "옆면"]}, {"no": "23", "k": "lanyard", "n": "랜야드 · 스트랩", "g": "식기 · 소품", "t": "L", "v": ["펼침"]}, {"no": "24", "k": "grip", "n": "스마트톡 · 그립톡", "g": "식기 · 소품", "t": "XS", "v": ["윗면 · 옆면"]}, {"no": "25", "k": "sewlabel", "n": "봉제 라벨", "g": "식기 · 소품", "t": "XS", "v": ["전개도", "조립도"]}];
+var GROUPS = []; ITEMS.forEach(function (x) { if (GROUPS.indexOf(x.g) < 0) GROUPS.push(x.g); });
+var TIER = { XS: 18, S: 25, M: 32, L: 42, XL: 60 };
+var cur = '', q = '';
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function fname(x, ext) { return '[PLYSH]MDWorkOrder_' + x.n.replace(/[\/\\:*?"<>|]/g, '·') + '(261123).' + ext; }
+function src(x, ext) { return 'files/' + x.no + '_' + x.k + '.' + ext + '?v=' + V; }
+function chips() {
+  var a = [''].concat(GROUPS);
+  document.getElementById('chips').innerHTML = a.map(function (g) {
+    var n = g ? ITEMS.filter(function (x) { return x.g === g; }).length : ITEMS.length;
+    return '<button type="button" data-g="' + esc(g) + '"' + (g === cur ? ' class="on"' : '') + '>' + (g ? esc(g) : '전체') + ' ' + n + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('#chips button'), function (b) { b.onclick = function () { cur = b.dataset.g; chips(); draw(); }; });
+}
+function card(x) {
+  return '<div class="it">' +
+    '<button class="th" type="button" data-pv="' + x.no + '" aria-label="' + esc(x.n) + ' 미리보기"><img loading="lazy" src="img/' + x.no + '.webp?v=' + V + '" alt=""></button>' +
+    '<div><div class="nm">' + esc(x.n) + '</div><div class="mt">디자인 ' + esc(x.v.join(' · ')) + '<br>본문 ' + TIER[x.t] + 'pt (' + x.t + ')</div></div>' +
+    '<div class="dl"><button class="pv" type="button" data-pv="' + x.no + '">미리보기</button><a class="ai" href="' + src(x, 'ai') + '" download="' + esc(fname(x, 'ai')) + '">.ai</a><a class="pdf" href="' + src(x, 'pdf') + '" download="' + esc(fname(x, 'pdf')) + '">PDF</a></div>' +
+    '</div>';
+}
+function draw() {
+  var h = '', any = 0;
+  GROUPS.forEach(function (g) {
+    if (cur && g !== cur) return;
+    var a = ITEMS.filter(function (x) { return x.g === g && (!q || x.n.toLowerCase().indexOf(q) >= 0); });
+    if (!a.length) return; any = 1;
+    h += '<section class="grp"><h3>' + esc(g) + '<small>' + a.length + '개</small></h3><div class="grid">' + a.map(card).join('') + '</div></section>';
+  });
+  document.getElementById('list').innerHTML = any ? h : '<p class="none">맞는 품목이 없습니다.</p>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pv]'), function (b) { b.onclick = function () { pvOpen(b.dataset.pv); }; });
+}
+var last = null;
+function pvOpen(no) {
+  var x = ITEMS.filter(function (i) { return i.no === no; })[0]; if (!x) return;
+  last = document.activeElement;
+  document.getElementById('pt').innerHTML = esc(x.n) + '<small>' + esc(x.g) + ' · 본문 ' + TIER[x.t] + 'pt (' + x.t + ')</small>';
+  var ai = document.getElementById('pai'), pdf = document.getElementById('ppdf');
+  ai.href = src(x, 'ai'); ai.setAttribute('download', fname(x, 'ai'));
+  pdf.href = src(x, 'pdf'); pdf.setAttribute('download', fname(x, 'pdf'));
+  var im = document.getElementById('pim'); im.src = 'img/' + x.no + '.webp?v=' + V; im.alt = x.n + ' 작업지시서 미리보기';
+  document.getElementById('pop').hidden = false; document.getElementById('px').focus();
+}
+function pvClose() { document.getElementById('pop').hidden = true; if (last) try { last.focus(); } catch (e) {} }
+document.getElementById("px").onclick = pvClose;
+document.getElementById('pop').onclick = function (e) { if (e.target === this) pvClose(); };
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !document.getElementById("pop").hidden) pvClose(); });
+document.getElementById('q').oninput = function () { q = this.value.trim().toLowerCase(); draw(); };
+chips(); draw();
+</script>
+</body>
+</html>
