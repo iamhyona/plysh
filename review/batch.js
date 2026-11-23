@@ -920,6 +920,42 @@ async function histJob(j, r) {
   HREC.cur = '';
   try { var ok = RS.filter(function (x) { return x && !x.fatal; }); if (ok.length) HREC.sheet = await sheetDoc(ok); } catch (e) { console.warn('hist sheet', e); }
   await hPut(HREC);
+  rlSend(r);
+}
+// ── 팀 검수 기록 (2026-11-23 실장님: 어떤 파일을 돌렸고 무엇이 검수됐는지 남기기) → 업무보고 시트 '검수 기록' 탭, 파일 하나에 한 줄 ──
+function rlRow(r) {
+  var o = { file: r.file || '', prod: r.prodName || '', title: titleOf(), artist: r.artist || '', info: '', res: '', found: '', ran: '' };
+  if (r.fatal) { o.res = '검수 못 함'; o.found = r.fatal + (r.fatalSub ? ' · ' + r.fatalSub : ''); return o; }
+  o.info = r.isImg ? '이미지 ' + r.n + '개' : 'PDF ' + (r.bookPages || r.n) + 'p';
+  var P0 = r.pages && r.pages[0]; if (P0 && P0.trim && !r.isImg) o.info += ' · ' + Math.round((P0.trim[2] - P0.trim[0]) / (72 / 25.4)) + '×' + Math.round((P0.trim[3] - P0.trim[1]) / (72 / 25.4)) + 'mm';
+  extraIssues(r);
+  var GS = groupsOf(r), n = { t: 0, r: 0, a: 0, o: 0 };
+  GS.forEach(function (g) { n[g.lv]++; });
+  o.res = GS.length ? [n.t ? '오탈자 ' + n.t : '', n.r ? '경고 ' + n.r : '', n.a ? '주의 ' + n.a : '', n.o ? '조언 ' + n.o : ''].filter(Boolean).join(' · ') : '통과';
+  o.found = GS.map(function (g, i) { return (i + 1) + '. [' + LVN[g.lv][0] + '] ' + (TITLE_FIX[g.x.code] || tStmt(g.x.title)) + ' (' + pgList(r, g.L) + ')'; }).join('\n');
+  var ran = [];
+  CHECK.forEach(function (cat) { var L = []; cat[1].forEach(function (it) { if (evalItem(r, it).st !== 'na') L.push(it[0]); }); if (L.length) ran.push(cat[0] + ': ' + L.join(', ')); });
+  o.ran = ran.join('\n');
+  return o;
+}
+function rlSend(r) {
+  if (!A || A.preview || !r) return;
+  var o; try { o = rlRow(r); } catch (e) { console.warn('rl', e); return; }
+  A.call('appRvLogAdd', A.pin, [o]).then(function () { RL = null; if (H_VIEW === 'team') drawHist(); }).catch(function (e) { console.warn('rl send', e); });
+}
+var RL = null, H_VIEW = 'me';
+function rlLoad() {
+  if (RL) return Promise.resolve(RL);
+  return A.call('appRvLog', A.pin, 100).then(function (o) { RL = o.rows || []; return RL; });
+}
+function rlHtml(L) {
+  if (!L.length) return '<p class="note" style="margin-top:14px">아직 팀 기록이 없어요. 검수를 돌리면 파일마다 한 줄씩 쌓여요.</p>';
+  return '<div class="hl">' + L.map(function (x) {
+    var res = x[7] || '', st = /못 함/.test(res) ? ['검수 못 함', 'cr'] : res === '통과' ? ['통과', 'ok'] : [res, 'st'];
+    var sub = [x[0], x[1], x[5], x[6]].filter(Boolean).join(' · ');
+    return '<div class="hi"><div class="hm"><b>' + esc(x[4] || '') + '</b><small>' + esc([x[3], x[2]].filter(Boolean).join(' · ')) + '</small><small>' + esc(sub) + '</small></div><span class="hs ' + st[1] + '">' + esc(st[0]) + '</span>' +
+      ((x[8] || x[9]) ? '<details class="hd"><summary>무엇을 검수했나</summary>' + (x[8] ? '<h4>잡힌 항목</h4><pre>' + esc(x[8]) + '</pre>' : '') + (x[9] ? '<h4>검사한 항목</h4><pre>' + esc(x[9]) + '</pre>' : '') + '</details>' : '') + '</div>';
+  }).join('') + '</div>';
 }
 async function histEnd(stopped) { if (!HREC) return; HREC.status = stopped ? 'stop' : 'done'; HREC.cur = ''; if (!stopped) HREC.q = null; await hPut(HREC); HREC = null; drawHist(); }
 function hDate(id) { var d = new Date(id); return (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + (d.getHours() < 12 ? '오전 ' : '오후 ') + ((d.getHours() + 11) % 12 + 1) + ':' + ('0' + d.getMinutes()).slice(-2); }
@@ -927,9 +963,21 @@ async function drawHist() {
   var el = $('#hist'); if (!el) return;
   var L = await hAll();
   L.forEach(function (x) { if (x.status === 'run' && (!HREC || HREC.id !== x.id)) { x.status = 'crash'; hPut(x); } });
-  if (!L.length) { el.hidden = true; return; }
+  var team = !!(A && !A.preview);
+  if (!L.length && !team) { el.hidden = true; return; }
+  if (!team) H_VIEW = 'me';
+  var head = '<div class="row" style="justify-content:space-between;align-items:center"><h3 class="sh" style="margin:0">검수 기록</h3>' + (team ? '<div class="seg" id="hView"><button type="button" data-v="me" class="' + (H_VIEW === 'me' ? 'on' : '') + '">이 기기</button><button type="button" data-v="team" class="' + (H_VIEW === 'team' ? 'on' : '') + '">팀 전체</button></div>' : '<span class="small mute">이 기기에 최근 20개</span>') + '</div>';
+  var bindV = function () { $$('#hView button', el).forEach(function (b) { b.onclick = function () { H_VIEW = b.dataset.v; if (H_VIEW === 'team') RL = null; drawHist(); }; }); };
+  el.hidden = false;
+  if (H_VIEW === 'team') {
+    el.innerHTML = head + '<p class="note" style="margin-top:14px">팀 기록 불러오는 중…</p>'; bindV();
+    rlLoad().then(function (R) { if (H_VIEW !== 'team') return; el.innerHTML = head + '<p class="note" style="margin:10px 0 0">팀원 누구든 검수한 파일이 최근 100개까지 보여요 · 전체는 업무보고 시트 \'검수 기록\' 탭</p>' + rlHtml(R); bindV(); })
+      .catch(function (e) { if (H_VIEW !== 'team') return; var m = String(e && e.message || e); el.innerHTML = head + '<p class="note" style="margin-top:14px">' + (/알 수 없는 요청|appRvLog/.test(m) ? '팀 기록 서버가 아직 준비되지 않았어요. 서버 코드를 붙여 넣고 새 버전으로 배포하면 보여요.' : '팀 기록을 불러오지 못했어요 · ' + esc(m)) + '</p>'; bindV(); });
+    return;
+  }
+  if (!L.length) { el.innerHTML = head + '<p class="note" style="margin-top:14px">이 기기에서 돌린 검수가 아직 없어요.</p>'; bindV(); return; }
   var ST = { done: ['완료', 'ok'], stop: ['중지됨', 'st'], crash: ['중단됨', 'cr'], run: ['검수 중', 'rn'] };
-  el.innerHTML = '<div class="row" style="justify-content:space-between"><h3 class="sh" style="margin:0">검수 기록</h3><span class="small mute">이 기기에 최근 20개</span></div><div class="hl">' + L.map(function (x) {
+  el.innerHTML = head + (team ? '<p class="note" style="margin:10px 0 0">이 기기에 최근 20개 · 결과지 다시 보기 · 이어 하기</p>' : '') + '<div class="hl">' + L.map(function (x) {
     var nm = x.names[0] + (x.names.length > 1 ? ' 외 ' + (x.names.length - 1) + '개' : ''), st = ST[x.status] || ST.done, left = x.names.length - x.done.length;
     var sub = hDate(x.id) + ' · 파일 ' + x.done.length + ' / ' + x.names.length + '개 끝남' + (x.cur && x.status !== 'done' ? ' · ' + (x.status === 'run' ? x.cur : x.cur.replace(/\s*·\s*페이지 (\d+) \/ (\d+).*$/, ' $1 / $2p에서 멈춤')) : '');
     return '<div class="hi"><div class="hm"><b>' + esc(x.title ? x.title + ' · ' + nm : nm) + '</b><small>' + esc(sub) + '</small></div><span class="hs ' + st[1] + '">' + st[0] + '</span><div class="hb">' +
@@ -937,7 +985,7 @@ async function drawHist() {
       (x.status !== 'done' && x.status !== 'run' && left > 0 ? '<button type="button" class="ib" data-hr="' + x.id + '">이어 하기</button>' : '') +
       (x.status !== 'run' ? '<button type="button" class="ib ghost" data-hd="' + x.id + '">삭제</button>' : '') + '</div></div>';
   }).join('') + '</div>';
-  el.hidden = false;
+  bindV();
   $$('[data-hs]', el).forEach(function (b) { b.onclick = function () { var x = L.filter(function (y) { return y.id === +b.dataset.hs; })[0]; if (x) openDoc(x.sheet); }; });
   $$('[data-hd]', el).forEach(function (b) { b.onclick = function () { if (!confirm('이 기록을 지울까요?')) return; hDel(+b.dataset.hd).then(drawHist); }; });
   $$('[data-hr]', el).forEach(function (b) { b.onclick = function () { var x = L.filter(function (y) { return y.id === +b.dataset.hr; })[0]; if (x) histResume(x); }; });

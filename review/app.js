@@ -2,6 +2,33 @@
 (function () {
 'use strict';
 var $ = function (s, r) { return (r || document).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+// 기울인 카드 글자 (2026-11-23 실장님: 돌아간 각도를 되돌려서 읽기). 같은 각도로 붙어 있는 글자를 한 묶음(카드)으로 보고,
+// 묶음 가운데를 기준으로 각도만큼 되돌려 똑바른 글자처럼 둠. 원래 위치 상자는 ob에 남겨 가림·위치 확인에 씀.
+function untilt(L) {
+  var T = L.filter(function (t) { return t.rot && !t.m && Math.abs(t.th) >= 0.5 && Math.abs(t.th) <= 30; });
+  if (!T.length) return;
+  var G = [], used = [];
+  T.forEach(function (t, i) {
+    if (used[i]) return; var g = [t]; used[i] = 1;
+    for (var k = 0; k < g.length; k++) T.forEach(function (u, j) {
+      if (used[j] || Math.abs(u.th - g[k].th) > 0.4) return;
+      var q = g[k], gap = Math.max(q.z, u.z) * 4;
+      if (u.b[0] < q.b[2] + gap && u.b[2] > q.b[0] - gap && u.b[1] < q.b[3] + gap && u.b[3] > q.b[1] - gap) { used[j] = 1; g.push(u); }
+    });
+    G.push(g);
+  });
+  G.forEach(function (g) {
+    if (g.length < 3) return;
+    var cx = 0, cy = 0, th = 0; g.forEach(function (t) { cx += t.x; cy += t.y; th += t.th; }); cx /= g.length; cy /= g.length; th /= g.length;
+    var r = -th * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
+    g.forEach(function (t) {
+      var dx = t.x - cx, dy = t.y - cy, x = cx + dx * co - dy * si, y = cy + dx * si + dy * co;
+      t.ob = t.b; t.tilt = Math.round(th * 10) / 10; t.x = x; t.y = y; t.rot = false; t.a = 0;
+      t.b = [x, y - t.z * 0.2, x + t.w, y + t.z * 0.85];
+    });
+  });
+}
+
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 var MM = 72 / 25.4; function mm(pt) { return pt / MM; } function f1(x) { return (Math.round(x * 10) / 10).toString(); }
 var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -122,7 +149,7 @@ async function renderPage(pdfjs, P, faceOK) {
       if (rot || m[3] < 0) { var L = Math.hypot(m[0], m[1]) || 1, dx = m[0] / L, dy = m[1] / L, U = Math.hypot(m[2], m[3]) || 1, ux = m[2] / U, uy = m[3] / U; a = ((Math.round(Math.atan2(dy, dx) * 180 / Math.PI / 90) * 90) % 360 + 360) % 360; mir = dx * uy - dy * ux < 0;
         var pts = [[0, -0.2], [1, -0.2], [0, 0.85], [1, 0.85]].map(function (q) { return [m[4] + dx * t.width * q[0] + ux * z * q[1], m[5] + dy * t.width * q[0] + uy * z * q[1]]; });
         b = [Math.min.apply(null, pts.map(function (q) { return q[0]; })), Math.min.apply(null, pts.map(function (q) { return q[1]; })), Math.max.apply(null, pts.map(function (q) { return q[0]; })), Math.max.apply(null, pts.map(function (q) { return q[1]; }))]; }
-      return { s: t.str, b: b, x: m[4], y: m[5], w: t.width, z: z, f: t.fontName, rot: rot, a: a, m: mir }; }); } catch (e) { P.tc = []; }
+      return { s: t.str, b: b, x: m[4], y: m[5], w: t.width, z: z, f: t.fontName, rot: rot, a: a, m: mir, th: Math.atan2(m[1], m[0]) * 180 / Math.PI }; }); untilt(P.tc); } catch (e) { P.tc = []; }
   // 썸네일
   var tw = Math.min(1100, cv.width), th = Math.round(cv.height * tw / cv.width), tcv = document.createElement('canvas'); tcv.width = tw; tcv.height = th;
   tcv.getContext('2d').drawImage(cv, 0, 0, tw, th);

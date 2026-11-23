@@ -93,7 +93,7 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 .vh { display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff; border-bottom:1px solid var(--line); }
 .vh b { flex:1; font-size:15px; }
 /* 검수 기록 (2026-11-20) */
-#hist .hl { display:grid; gap:8px; margin-top:14px; }
+#hist .hl { display:grid; gap:8px; margin-top:14px; animation:none; }
 #hist .hi { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:6px 12px; align-items:center; padding:12px 14px; border:1px solid #e5e8eb; border-radius:14px; background:#fff; }
 #hist .hm b { display:block; font-size:14px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #hist .hm small { display:block; font-size:12.5px; color:#8b95a1; margin-top:3px; line-height:1.45; }
@@ -101,6 +101,8 @@ details.set summary { cursor:pointer; font-size:13.5px; font-weight:700; color:v
 #hist .hs.ok { background:#e8f8ee; color:#12a150; } #hist .hs.cr { background:#fdecee; color:#e5303e; } #hist .hs.st { background:#fff3e6; color:#e06a00; }
 #hist .hb { grid-column:1 / -1; display:flex; gap:6px; flex-wrap:wrap; }
 #hist .hb .ib { height:34px; font-size:13px; font-weight:700; } #hist .hb .ib.ghost { background:none; color:#8b95a1; }
+#hist .hd { grid-column:1 / -1; } #hist .hd summary { font-size:13px; font-weight:700; color:#4e5968; cursor:pointer; }
+#hist .hd h4 { font-size:12.5px; color:#8b95a1; margin:10px 0 4px; font-weight:700; } #hist .hd pre { font:inherit; font-size:13px; line-height:1.6; white-space:pre-wrap; margin:0; color:#333d4b; }
 @media (min-width:900px) { #hist .hl { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
 .ib { border:0; background:var(--chip); border-radius:10px; min-width:36px; height:36px; font-weight:800; padding:0 10px; }
 .vb { flex:1; display:flex; min-height:0; }
@@ -356,9 +358,9 @@ var LIBS = {
 };
 </script>
 <script src="korean-lunar-calendar.min.js"></script>
-<script src="text.js?v=20261123d3"></script>
-<script src="app.js?v=20261123d3"></script>
+<script src="text.js?v=20261123d4"></script>
+<script src="app.js?v=20261123d4"></script>
 <script src="spec.js?v=20261121p"></script>
-<script src="batch.js?v=20261123d3"></script>
+<script src="batch.js?v=20261123d4"></script>
 </body>
 </html>

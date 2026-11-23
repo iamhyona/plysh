@@ -873,15 +873,15 @@ function tcHidden(P, t) { // pdf.js 글자(t) ↔ 엔진 글자를 그린 순서
   if (!P._tcMap) {
     P._tcMap = new Map(); var used = new Set(), ets = P.texts || [], from = 0;
     (P.tc || []).forEach(function (q) {
-      var cx = (q.b[0] + q.b[2]) / 2, cy = (q.b[1] + q.b[3]) / 2, tol = Math.max(1, q.z * 0.3);
+      var qb = q.ob || q.b, cx = (qb[0] + qb[2]) / 2, cy = (qb[1] + qb[3]) / 2, tol = Math.max(1, q.z * 0.3);
       for (var i = from; i < ets.length; i++) { if (used.has(i)) continue; var b = ets[i].box; if (Math.abs((b[0] + b[2]) / 2 - cx) < tol + 1 && Math.abs((b[1] + b[3]) / 2 - cy) < tol) { used.add(i); P._tcMap.set(q, ets[i]); while (used.has(from)) from++; return; } }
     });
   }
   var e = P._tcMap.get(t); if (!e) return false;
   var b = e.vis || e.box;
-  var lap = (P.tc || []).some(function (o) { if (o === t || !o.s.trim()) return false; var w = Math.min(o.b[2], t.b[2]) - Math.max(o.b[0], t.b[0]), h = Math.min(o.b[3], t.b[3]) - Math.max(o.b[1], t.b[1]); return w > (t.b[2] - t.b[0]) * 0.4 && h > (t.b[3] - t.b[1]) * 0.4; });
+  var tb = t.ob || t.b, lap = (P.tc || []).some(function (o) { if (o === t || !o.s.trim()) return false; var ob = o.ob || o.b, w = Math.min(ob[2], tb[2]) - Math.max(ob[0], tb[0]), h = Math.min(ob[3], tb[3]) - Math.max(ob[1], tb[1]); return w > (tb[2] - tb[0]) * 0.4 && h > (tb[3] - tb[1]) * 0.4; });
   if (P.px && X.pix && !lap) { // 그려진 화면에서 글자 자리가 고른 색이면 가려진 것, 글자 모양이 보이면 보이는 것
-    var q = X.toPx(P, t.b), lo = 999, hi = -1;
+    var q = X.toPx(P, tb), lo = 999, hi = -1;
     for (var px = Math.floor(q[0]); px <= Math.ceil(q[2]); px++) for (var py = Math.floor(q[1]); py <= Math.ceil(q[3]); py++) { var c = X.pix(P, px, py), l = c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11; if (l < lo) lo = l; if (l > hi) hi = l; }
     if (hi - lo > 35) return false;
   }
