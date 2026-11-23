@@ -1198,6 +1198,14 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 @media (max-width:1023px) { #npg:not(.hide):not(.subon) + main { padding-top:0; } #npg.subon ~ #rvWrap, #npg.subon ~ #imWrap, #npg.subon ~ #tkWrap { padding-top:14px; } }
 @media (min-width:1024px) { #npg:not(.hide) + main { padding-top:0; } }
 #npg.hide { display:none; }
+#npg .pgw { display:none; }
+@media (min-width:1024px) {
+  html[data-fabtop] button.fab { display:none !important; }
+  #npg .pgw { display:inline-flex; align-items:center; gap:6px; position:absolute; right:40px; bottom:22px; height:40px; padding:0 18px 0 14px; border:0; border-radius:20px; background:var(--txt); color:#fff; font:inherit; font-size:14px; font-weight:700; letter-spacing:-0.01em; cursor:pointer; }
+  #npg .pgw.wa { right:86px; }
+  #npg .pgw svg { width:16px; height:16px; }
+  #npg .pgw:hover { opacity:.88; }
+}
 @media (max-width:1023px) { html[data-navc] #npg.subon { display:none; } }
 #npg h1 { margin:0; font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1.3; color:var(--txt); }
 #npg p { margin:6px 0 0; font-size:14px; font-weight:500; line-height:1.5; color:var(--mute); letter-spacing:-0.01em; }
@@ -2483,7 +2491,7 @@ function renderView() {
   toolBar(); navSync(); pgSync(); $('#main').setAttribute('data-v', S.view); $('#main').classList.toggle('io', S.view === 'spine' || S.view === 'calc');
   $$('#nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === (S.view === 'spec' || S.view === 'month' ? 'pj' : isToolView(S.view) ? 'tools' : S.view)); });
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
-  $('#fab').style.display = S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj' ? 'none' : '';
+  $('#fab').style.display = fabOn() ? '' : 'none';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
   ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, kq: renderQk, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, ws: renderWs, refs: renderRefs, space: function () { renderSpace(S.spk || 'tool'); }, gdoc: renderGdoc, glist: renderGlist })[S.view]();
 }
@@ -2960,7 +2968,10 @@ function pgSync() {
   e.classList.toggle('hide', !i); e.classList.toggle('subon', !!subHtml());
   var a = null; try { var f = S.view === 'tk' && $('#tkWrap iframe:not(.hide)'), l = f && f.contentDocument && f.contentDocument.getElementById('lnk'); if (l && l.getAttribute('href')) a = l; } catch (x) {}
   if (!a && S.view === 'qk' && S.qk && S.qk.url) a = { href: S.qk.url, title: '연락처 시트 열기' }; // 퀵: 시트 열기는 머리 오른쪽 아이콘 (2026-11-20)
-  e.innerHTML = i ? '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' + (a ? '<a class="pga" href="' + esc(a.href) + '" target="_blank" rel="noopener" title="' + esc(a.title || '시트 · 폴더 열기') + '" aria-label="시트 · 폴더 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>' : '') : '';
+  // 2026-11-23 실장님: PC에선 오른쪽 아래 + 대신 머리 오른쪽에 글자 있는 '작성하기' 단추
+  var wb = i && fabOn() ? '<button type="button" class="pgw' + (a ? ' wa' : '') + '" id="pgW"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>' + (S.view === 'qk' ? '연락처 추가' : S.view === 'month' || S.view === 'week' ? '일정 추가' : '작성하기') + '</button>' : '';
+  document.documentElement.toggleAttribute('data-fabtop', !!wb);
+  e.innerHTML = i ? wb + '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' + (a ? '<a class="pga" href="' + esc(a.href) + '" target="_blank" rel="noopener" title="' + esc(a.title || '시트 · 폴더 열기') + '" aria-label="시트 · 폴더 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>' : '') : '';
 }
 function navSync() {
   document.documentElement.setAttribute('data-nav', NAV.s === 'c' ? 'w' : NAV.s);
@@ -3488,6 +3499,8 @@ sure($('#edDel'), function () {
   call('appEdit', S.pin, { id: e.id, old: e.t, t: '' }).then(function () { closeBs(); toast('삭제했어요'); return load(); })
     .catch(function (er) { toast(errMsg(er)); }).then(function () { btn.classList.remove('busy'); });
 });
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#pgW'); if (b) $('#fab').onclick(); });
+function fabOn() { return !(S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj'); }
 $('#fab').onclick = function () {
   if (S.view === 'todo') return openCompose();
   if (S.view === 'wl') return openWl(TODAY);
