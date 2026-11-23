@@ -566,8 +566,7 @@ var CHECK = [
     ['박·형압 선 0.5pt · 글자 7pt · 판 이름 영문', ['finthin', 'fintext', 'finname'], PDFONLY],
     ['숨겨진 레이어', ['offlayer'], PDFONLY],
     ['펼침면 가운데 기준선 남김', ['centerguide'], PDFONLY],
-    ['주석 · 메모 · 파일 구조', ['annot', 'parse', 'trunc', 'p2err'], PDFONLY],
-    ['이미지 포함(링크 아님)', ['embed'], PDFONLY]
+    ['주석 · 메모 · 파일 구조', ['annot', 'parse', 'trunc', 'p2err'], PDFONLY]
   ]],
   ['이미지', [
     ['이미지 해상도 ' + RV.SET.ppi + 'ppi 이상', ['lowppi']],

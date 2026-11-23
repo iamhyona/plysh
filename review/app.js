@@ -834,8 +834,6 @@ function docChecks() {
     var outside = bb[0] < T[0] - tol || bb[2] > T[2] + tol || bb[1] < T[1] - tol || bb[3] > T[3] + tol;
     issue({ page: P.i, sev: outside ? 'warn' : 'info', cat: 'print', code: 'dieinfo', title: outside ? '칼선이 재단 영역 밖으로 나가요' : '칼선 위치', detail: '칼선 크기 ' + f1(mm(bb[2] - bb[0])) + '×' + f1(mm(bb[3] - bb[1])) + 'mm · 가운데에서 가로 ' + f1(dx) + 'mm, 세로 ' + f1(dy) + 'mm', fix: outside ? '칼선이 재단선 안에 있는지, 칼선 기준 도련 3mm가 있는지 확인해 주세요.' : '', boxes: [bb], sus: true });
   });
-  // 이미지 임베드 안내
-  add('info', 'print', 'embed', '이미지 임베드 여부는 PDF로 알 수 없어요', '원본 .ai/.indd의 링크 상태는 파일 안에서만 보여요.', '일러스트·인디자인 링크 패널 또는 데스크탑 스크립트로 확인해 주세요.');
   R.notes.forEach(function (n) { add('info', 'print', 'note', n, '', ''); });
 }
 
