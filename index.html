@@ -1659,7 +1659,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261122hm187';
+var APP_VER = '20261122hm188';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3538,7 +3538,8 @@ var TEAM0 = ['이혜선', '유이시', '허희원', '박주영', '변경연', '�
 var RCOL = '#8b95a1';
 // 프로젝트 이름 비교용: 연도·공백·기호 제거, SG/시그/시즌그리팅 통일
 function pnorm(x) {
-  return String(x || '').toLowerCase().replace(/[\[\]()]/g, ' ').replace(/(^|\s)20\d\d(?=\s|$)/g, ' ')
+  // 2026-11-23 실장님: 같은 프로젝트를 다르게 적어도 하나로 (쉽/십, 컨텐츠/콘텐츠, 띄어쓰기·대소문자). 시트 원본은 그대로, 표시만 합침
+  return String(x || '').normalize('NFC').toLowerCase().replace(/쉽/g, '십').replace(/컨텐츠/g, '콘텐츠').replace(/엠디/g, 'md').replace(/[\[\]()]/g, ' ').replace(/(^|\s)20\d\d(?=\s|$)/g, ' ')
     .replace(/시즌\s*그리팅|시그(?!니)|(^|\s)s\.?g(?=\s|$)/g, ' sg ').replace(/제작\s*일정/g, '').replace(/[\s\-_.·,]/g, '');
 }
 // 처음 보는 프로젝트의 보기 좋은 이름
@@ -4165,7 +4166,7 @@ function openTd(id) {
   $('#teT').textContent = memo ? '메모 고치기' : '할 일 고치기';
   $('#teD').value = x.d; $('#teX').value = x.t;
   $('#teP').innerHTML = team().map(function (n) { return '<option' + (n === x.p ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
-  $('#teJ').innerHTML = tdProjOpts(); $('#teJ').value = x.j || '';
+  $('#teJ').innerHTML = tdProjOpts(); $('#teJ').value = x.j || ''; if (x.j && $('#teJ').value !== x.j) { var jo = [].filter.call($('#teJ').options, function (o) { return o.value && pnorm(o.value) === pnorm(sgFix(x.j)); })[0]; if (jo) $('#teJ').value = jo.value; }
   if ($('#teJ').value !== (x.j || '')) { $('#teJ').insertAdjacentHTML('beforeend', '<option>' + esc(x.j) + '</option>'); $('#teJ').value = x.j; }
   $('#teM').value = String(x.m || '').replace(/\s*(대기|중요)\s*/g, ' ').trim();
   $$('#te .tdonly').forEach(function (el) { el.style.display = memo ? 'none' : ''; });
