@@ -94,6 +94,17 @@ function setupRulesUI() {
 
 // ── 줄 만들기 (pdf.js 글자 조각 → 같은 기준선끼리) ──
 // 자간을 넓힌 글자(S E A S O N ' S)는 낱자 사이에 가짜 공백이 들어옴 → 단어로 다시 묶기. o[i] = 묶은 글자 i의 원래 위치
+// 사전 단어 중 한 글자 차이(빠짐 · 더함 · 바뀜 · 자리 바뀜)
+function enNear(w, ENW) {
+  var A = 'abcdefghijklmnopqrstuvwxyz', out = {}, n = w.length, add = function (x) { if (x !== w && x.length >= 4 && ENW.has(x)) out[x] = 1; };
+  for (var i = 0; i <= n; i++) {
+    if (i < n) add(w.slice(0, i) + w.slice(i + 1));
+    if (i < n - 1) add(w.slice(0, i) + w[i + 1] + w[i] + w.slice(i + 2));
+    for (var k = 0; k < 26; k++) { if (i < n) add(w.slice(0, i) + A[k] + w.slice(i + 1)); add(w.slice(0, i) + A[k] + w.slice(i)); }
+  }
+  var tri = w.replace(/(.)\1\1/, '$1$1'), sc = function (x) { return x === tri ? -1 : Math.abs(x.length - n); };
+  return Object.keys(out).sort(function (a, b) { return sc(a) - sc(b); });
+}
 function wordSeg(w) { // 띄어쓰기 없이 붙은 대문자 덩어리를 사전·팀 규칙 단어로 나누기
   var U = w.toUpperCase(), n = U.length, best = [0]; if (n < 6) return null;
   var ok = function (x) { return DICTS[x] || (x.length >= 2 && WSEG[x]) || /^\d+$/.test(x) || (/'S$/.test(x) && DICTS[x.slice(0, -2)]); };
@@ -191,7 +202,7 @@ var DICT = ('JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER
   'CALENDAR PHOTOBOOK PHOTOCARD POSTCARD POSTER STICKER DIARY ALBUM OFFICIAL ENTERTAINMENT MANUFACTURED DISTRIBUTED WARNING RESERVED RIGHTS UNAUTHORIZED DUPLICATION PROHIBITED COPYING KOREA COPYRIGHT ' +
   'SEASON SEASONS GREETINGS GREETING HAPPY BIRTHDAY ANNIVERSARY CHRISTMAS SPECIAL EDITION LIMITED MEMBER MEMBERS CONCERT TOUR WORLD FANMEETING FANCLUB GOODS MERCHANDISE PACKAGE ' +
   'BEHIND SCENES MAKING STORY MEMORIES MOMENT MOMENTS SUMMER WINTER SPRING AUTUMN FALL HOLIDAY WEEKEND WEEKLY MONTHLY SCHEDULE PLANNER NOTE NOTES PHOTO PHOTOS PICTURE IMAGE COVER CONTENTS INDEX ' +
-  'THANK THANKS LOVE FOREVER TOGETHER FRIENDS FAMILY DREAM DREAMS SPECIAL ORIGINAL VERSION PREMIUM COLLECTION SERIES VOLUME CHAPTER EPISODE MARKET FESTIVAL').split(' ');
+  'PANTONE PANTONES THANK THANKS LOVE FOREVER TOGETHER FRIENDS FAMILY DREAM DREAMS SPECIAL ORIGINAL VERSION PREMIUM COLLECTION SERIES VOLUME CHAPTER EPISODE MARKET FESTIVAL').split(' ');
 var DICTS = {}; DICT.forEach(function (w) { DICTS[w] = 1; });
 var ODD = [[/[！-～]/, '전각(넓은) 영문·기호'], [/[Ѐ-ӿ]/, '키릴 문자(러시아 글자)'], [/[Ͱ-Ͽ]/, '그리스 문자'], [/[​-‍⁠﻿]/, '보이지 않는 글자(폭 없는 공백)'], [/[-]/, '서체 전용 글자(PUA)'], [/\ufffd/, '깨진 글자(\ufffd)'], [/[ㄱ-ㆎ](?=[가-힣])|[가-힣][ㄱ-ㆎ]/, '낱자모(ㄱ,ㅏ 등)가 글자 사이에']];
 
@@ -250,6 +261,7 @@ function textChecks(R, rules) {
   perPage('repword', 'warn', '같은 단어가 연달아 나와요', '하나를 지워야 하는지 확인해 주세요.', rep, function (L) { return L.slice(0, 4).map(function (h) { return '“' + h.w + ' ' + h.w + '”'; }).join(', '); }, true);
   var words = {}; all.forEach(function (s) { (s.t.match(/[A-Za-z][A-Za-z']{3,}/g) || []).forEach(function (w) { var u = w.toUpperCase(); (words[u] = words[u] || { n: 0, forms: {}, hits: [] }); words[u].n++; words[u].forms[w] = (words[u].forms[w] || 0) + 1; if (words[u].hits.length < 30) words[u].hits.push({ P: s.P, b: subBox(s, s.t.indexOf(w), w.length), s: s.t, trk: s.trk }); }); });
   var wk = Object.keys(words), sp = [];
+  var NAMEW = ' ' + [R.artist, R.title, R.file, R.spec, R.rulesText].join(' ').toUpperCase().replace(/[^A-Z]+/g, ' ') + ' '; // 아티스트 · 프로젝트 · 파일 이름 · 팀 규칙에 있는 단어는 이름
   var ENW = window.PLYSH_ENW, isEn = function (u) { if (!ENW) return true; var l = u.toLowerCase().replace(/['’]s$/, '').replace(/['’]/g, ''); return ENW.has(l) || ENW.has(u.toLowerCase()); };
   // 영어 사전(27만 단어, 어형 변화 포함)에 있으면 정상 단어. 사전에 없는 단어만 팀 표기 · 업계 단어와 한두 글자 차이인지 봄
   if (ENW) wk.forEach(function (u) {
@@ -259,6 +271,9 @@ function textChecks(R, rules) {
     cand.forEach(function (d) { if (d.length >= 4 && Math.abs(d.length - u.length) <= 2) { var e = lev(u, d); if (e > 0 && e <= (u.length >= 8 ? 2 : 1) && (!best || e < best.e)) best = { d: d, e: e }; } });
     if (!best) wk.forEach(function (v) { if (v !== u && !isEn(v) && words[v].n >= 3 * words[u].n && words[v].n >= 3 && Math.abs(v.length - u.length) <= 1 && lev(u, v) === 1) best = { d: v, e: 1, doc: true }; });
     if (best && u.length >= 10 && words[u].hits.every(function (h) { return h.trk; })) best = null;
+    // 여러 번 나오는 대문자 단어 · 첫 글자 다른 것(CRAVITY → GRAVITY) · 짧은 단어에 글자 더하기(WOOBIN → WOODBIN)는 이름일 때가 많아 뺌
+    // 일반 영어 사전(27만 단어)과 한 글자 차이 (INTERTATIONAL → INTERNATIONAL). 대문자 제목 · 자간 넓힌 글자도 (2026-11-24 실장님)
+    if (!best && NAMEW.indexOf(' ' + u + ' ') < 0 && (u.length >= 6 || /(.)\1\1/.test(u)) && /^[A-Z]+$/.test(u) && words[u].n === 1 && Object.keys(words[u].forms).every(function (x) { return x === x.toUpperCase(); })) { var near = enNear(u.toLowerCase(), ENW).filter(function (x) { var l = u.toLowerCase(); return x[0] === l[0] && (x.length <= l.length || l.length >= 7); }); if (near.length) best = { d: near.slice(0, 2).map(function (x) { return x.toUpperCase(); }).join(' 또는 '), e: 1 }; }
     if (best) words[u].hits.forEach(function (h) { sp.push({ P: h.P, b: h.b, w: Object.keys(words[u].forms)[0], to: best.d, doc: best.doc }); });
   });
   perPage('typoen', 'warn', '영문 철자 의심', '철자를 확인해 주세요.', sp, function (L) { return uniq(L.map(function (h) { return h.w + ' → ' + (h.doc ? h.to + '(문서에 더 많은 표기)' : h.to); })).slice(0, 4).join(', '); }, true);
