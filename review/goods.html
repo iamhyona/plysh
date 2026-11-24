@@ -76,6 +76,8 @@ h2 { font-size:20px; font-weight:800; margin:4px 4px 12px; }
 .gdk-g { border:1px solid #e5e8eb; border-radius:14px; padding:14px 16px; break-inside:avoid; }
 .gdk-gh { display:flex; align-items:baseline; gap:8px; margin-bottom:8px; } .gdk-gh b { font-size:14.5px; } .gdk-gh span { font-size:12px; color:#8b95a1; }
 .gdk-g table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.gdk-man { display:grid; grid-template-columns:1fr; gap:8px; } .gdk-man .spk-cb { white-space:normal; font-size:13px; color:#333d4b; align-items:flex-start; line-height:1.5; } .gdk-man .spk-cb input { flex:none; margin-top:2px; }
+@media (min-width:700px) { .gdk-man { grid-template-columns:1fr 1fr; column-gap:24px; } }
 .gdk-g th { text-align:left; font-weight:600; color:#4e5968; width:96px; padding:5px 8px 5px 0; vertical-align:top; border-top:1px solid #f2f4f6; }
 .gdk-g td { padding:5px 0; border-top:1px solid #f2f4f6; word-break:keep-all; overflow-wrap:anywhere; }
 .gdk-g tr:first-child th, .gdk-g tr:first-child td { border-top:0; }
@@ -94,7 +96,7 @@ h2 { font-size:20px; font-weight:800; margin:4px 4px 12px; }
 
   <div class="card noprint" id="inCard">
     <h3 class="sh">작업지시서<button type="button" class="lk" id="demo">예시 넣어 보기</button></h3>
-    <p class="desc">품목마다 꼭 들어가야 할 사양(소재 · 두께 · 부자재 · 인쇄 방식 · 수량 …)이 빠졌는지, 도수 · 핀 · 수량처럼 서로 안 맞는 값과 오탈자를 찾아요.</p>
+    <p class="desc">품목마다 꼭 들어가야 할 사양(소재 · 두께 · 부자재 · 인쇄 방식 · 수량 …)이 빠졌는지, 도수 · 핀 · 수량처럼 서로 안 맞는 값, 칼선 여백 · 글자 크기 · 색 기준, 오탈자를 찾아요. PLYSH 작업지시서 양식은 칸 그대로 읽어요.</p>
     <div class="drop" id="drop">
       <b>작업지시서 파일을 여기에 끌어다 놓기</b>
       <div class="sub">PDF · AI · 엑셀 · CSV · TXT · 여러 개를 한 번에 넣어도 돼요<br>AI는 PDF 호환으로 저장한 파일, 글자를 깨기 전 파일이어야 글자를 읽어요</div>
@@ -122,7 +124,7 @@ h2 { font-size:20px; font-weight:800; margin:4px 4px 12px; }
 </div>
 
 <script src="spec.js?v=20261122g1"></script>
-<script src="goods.js?v=20261122g1"></script>
+<script src="goods.js?v=20261124g2"></script>
 <script>
 (function () {
 var $ = function (s) { return document.querySelector(s); }, $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
@@ -143,14 +145,20 @@ async function pdfText(buf) {
     var tc = await (await doc.getPage(p)).getTextContent(), rows = [];
     tc.items.forEach(function (it) { if (!it.str || !it.str.trim()) return; var y = it.transform[5], x = it.transform[4], fs = Math.abs(it.transform[3]) || 10, r = rows.filter(function (r) { return Math.abs(r.y - y) < fs * 0.45; })[0]; if (!r) { r = { y: y, fs: fs, it: [] }; rows.push(r); } r.it.push({ x: x, w: it.width, s: it.str, fs: fs }); });
     rows.sort(function (a, b) { return b.y - a.y; });
+    /* PLYSH 작업지시서 양식: 왼쪽 사양 칸 (———— 선 너비) 만 읽고, 오른쪽 도면 메모는 따로 */
+    var rule = 0, memo = [];
+    rows.forEach(function (r) { r.it.forEach(function (c) { if (/—{6,}/.test(c.s)) rule = Math.max(rule, c.x + c.w); }); });
+    if (rule) rows.forEach(function (r) { var keep = []; r.it.forEach(function (c) { if (c.x > rule + 4) memo.push(c.s.trim()); else keep.push(c); }); r.it = keep; });
+    rows = rows.filter(function (r) { return r.it.length; });
     rows.forEach(function (r) {
       r.it.sort(function (a, b) { return a.x - b.x; });
       var chunks = [], cur = '', end = null;
       r.it.forEach(function (c) { var gap = end == null ? 0 : c.x - end; if (end != null && gap > c.fs * 1.6) { chunks.push(cur.trim()); cur = ''; } else if (end != null && gap > c.fs * 0.18 && !/\s$/.test(cur) && !/^\s/.test(c.s)) cur += ' '; cur += c.s; end = c.x + c.w; });
       chunks.push(cur.trim()); chunks = chunks.filter(Boolean);
-      if (chunks.length === 2 && chunks[0].length <= 10 && !/[:：]/.test(chunks[0])) out.push(chunks[0] + ': ' + chunks[1]);
+      if (chunks.length === 2 && chunks[0].length <= 22 && !/[:：]/.test(chunks[0])) out.push(chunks[0] + ': ' + chunks[1]);
       else out.push(chunks.join(' · ').replace(/\s{2,}/g, ' '));
     });
+    if (memo.length) out.push('도면 메모: ' + memo.filter(Boolean).join(' · '));
     if (p < doc.numPages) out.push('');
   }
   return out.join('\n');
@@ -172,6 +180,7 @@ async function sheetText(buf, name) {
   return out.join('\n');
 }
 async function addFiles(fs) {
+  fs = Array.prototype.slice.call(fs); // 고른 뒤 input 값을 비우면 FileList 도 비워짐
   var parts = [], chips = [];
   S.pdf = false;
   for (var i = 0; i < fs.length; i++) {
@@ -219,7 +228,9 @@ $('#demo').onclick = function () {
 /* ── 검수 ── */
 function run() {
   var R = G.check($('#ta').value, { types: S.types, noDbl: S.pdf }); S.R = R; S.off = { lv: {}, g: {} };
-  var ttl = $('#ttl').value.trim() || (S.fname ? S.fname.replace(/\.[a-z0-9]+(, |$)/gi, '$1') : '상품 작업지시서');
+  var hd = ($('#ta').value.match(/^\s*(\[[^\]\n]+\][^\n]*)/) || [])[1];
+  if (hd && /\[\s*아티스트\s*\]|프로젝트 이름/.test(hd)) hd = '';
+  var ttl = $('#ttl').value.trim() || (hd ? hd.trim() : '') || (S.fname ? S.fname.replace(/\.[a-z0-9]+(, |$)/gi, '$1') : '상품 작업지시서');
   $('#res').innerHTML = '<div class="rbar noprint"><button type="button" class="ib" id="pdf">PDF 저장</button></div>' + G.render(R, { title: ttl, file: S.fname });
   $('#res').hidden = false; $('#lay').classList.add('has');
   var c = { t: 0, r: 0, o: 0, p: 0 }; R.items.forEach(function (x) { c[x.lv]++; });

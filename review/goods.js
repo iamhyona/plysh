@@ -55,6 +55,18 @@ var F = {
   smat:   { n: '소재', re: /EVA|PVC|극세사|퍼|고무|TPR|PU|면|폴리|밍크/i, ex: 'EVA 바닥 + 극세사 갑피' },
   hem:    { n: '마감', re: /오버록|바이어스|휘갑|마감|시접|프린지|술/, ex: '테두리 오버록 (화이트)' },
   grip:   { n: '부착 방식', re: /양면|테이프|3M|접착|부착|자석/, ex: '3M 양면 테이프' },
+  wfab:   { n: '소재 (방식)', re: /평자수|자수|입체\s*자수|직조|인쇄\s*와펜|PVC\s*와펜|쉐닐|chenille/i, ex: '평자수 · 트윌 바탕' },
+  wback:  { n: '뒷면', re: /열\s*접착|아이롱|벨크로|찍찍이|핀|스티커|접착|봉제|박음|안전핀/, ex: '열접착' },
+  border: { n: '테두리', re: /메로우|새틴|레이저|컷\s*테두리|테두리/, ex: '메로우 3mm' },
+  tinMat: { n: '소재', re: /양철|틴|알루미늄|tin/i, ex: '양철 (틴 플레이트)' },
+  tinPr:  { n: '인쇄 방식', re: /옵셋|오프셋|UV|인쇄|각인|형압/, ex: '평판 옵셋 (성형 전)' },
+  knit:   { n: '편직 · 가공', re: /자카드|편직|자수|인쇄|승화|프린트/, ex: '자카드 편직' },
+  footSz: { n: '사이즈 (발 길이)', re: /\d{3}\s*(?:mm|~)|발\s*길이|사이즈\s*\d|FREE|프리/, ex: '230~250mm' },
+  ltMat:  { n: '소재', re: /PU|PVC|사피아노|가죽|레더|leather/i, ex: 'PU (사피아노)' },
+  ltPr:   { n: '가공', re: /박|형압|디보싱|엠보|각인|인쇄|UV|실크/, ex: '금박 + 형압' },
+  magnet: { n: '자석', re: /자석|맥세이프|마그넷|magsafe/i, ex: '맥세이프 링 (N52)' },
+  lbKind: { n: '라벨 종류', re: /목\s*라벨|케어|직조|인쇄\s*라벨|다마스크|새틴|면\s*라벨|고밀도/, ex: '다마스크 직조 목 라벨' },
+  attach: { n: '다는 법', re: /사면|양면|박음|루프|맨하탄|접기|폴드|센터\s*폴드|엔드\s*폴드/, ex: '루프폴드 · 사면박이' },
   mat:    { n: '소재', re: /아크릴|PVC|실리콘|아연|황동|스테인|스텐|알루미늄|철|면|폴리|캔버스|나일론|가죽|PU|세라믹|유리|도자기|PET|PP|ABS|우드|나무|원목|종이|레진|에폭시|자석|EVA/i, ex: '소재 이름' }
 };
 
@@ -70,6 +82,12 @@ var TYPES = [
   { k: 'acrKey', n: '아크릴 키링', g: '아크릴', kw: /아크릴\s*키\s*링|아크릴\s*키홀더|아크릴\s*참|acrylic\s*key/i, need: [['matAcr', 'r'], ['thick', 'r'], ['ring', 'r'], ['size', 'r'], ['print', 'o'], ['side', 'o'], ['white', 'o'], ['hole', 'p'], ['ringCol', 'p'], ['qty', 'o'], ['pack', 'p']] },
   { k: 'acr', n: '아크릴 (그 밖)', g: '아크릴', kw: /아크릴|포카\s*홀더|아크릴\s*블록|아크릴\s*집게|코스터/i, need: [['matAcr', 'r'], ['thick', 'r'], ['size', 'r'], ['print', 'o'], ['white', 'o'], ['qty', 'o'], ['pack', 'p']] },
   { k: 'key', n: '키링 (소재 미상)', g: '키링', kw: /키\s*링|키홀더|keyring|key\s*ring/i, need: [['mat', 'r'], ['thick', 'r'], ['ring', 'r'], ['size', 'r'], ['print', 'o'], ['ringCol', 'p'], ['qty', 'o'], ['pack', 'p']] },
+  { k: 'sewlabel', n: '봉제 라벨', g: '봉제', kw: /봉제\s*라벨|직조\s*라벨|우븐\s*라벨|목\s*라벨|woven\s*label/i, need: [['lbKind', 'r'], ['size', 'r'], ['attach', 'o'], ['color', 'o'], ['qty', 'o']] },
+  { k: 'wappen', n: '와펜', g: '봉제', kw: /와펜|자수\s*패치|패치|wappen|patch/i, need: [['wfab', 'r'], ['size', 'r'], ['wback', 'r'], ['border', 'o'], ['colors', 'o'], ['qty', 'o'], ['pack', 'p']] },
+  { k: 'tin', n: '틴케이스', g: '금속', kw: /틴\s*케이스|틴케이스|틴\s*박스|tin\s*case/i, need: [['tinMat', 'r'], ['size', 'r'], ['tinPr', 'r'], ['finish', 'o'], ['qty', 'o'], ['pack', 'p']] },
+  { k: 'socks', n: '양말', g: '의류', kw: /양말|socks/i, need: [['fabric', 'r'], ['footSz', 'r'], ['knit', 'r'], ['color', 'o'], ['kc', 'p'], ['qty', 'o'], ['pack', 'p']] },
+  { k: 'leather', n: '인조가죽 소품', g: '가죽', kw: /인조\s*가죽|가죽\s*소품|카드\s*지갑|카드\s*케이스|여권\s*케이스|leather/i, need: [['ltMat', 'r'], ['size', 'r'], ['ltPr', 'r'], ['color', 'o'], ['qty', 'o'], ['pack', 'p']] },
+  { k: 'magsafe', n: '맥세이프 카드 지갑', g: '가죽', kw: /맥세이프|magsafe/i, need: [['ltMat', 'r'], ['size', 'r'], ['magnet', 'r'], ['ltPr', 'o'], ['qty', 'o'], ['pack', 'p']] },
   { k: 'doll', n: '인형', g: '봉제', kw: /인형|누이|plush|doll|봉제/i, need: [['fabric', 'r'], ['size', 'r'], ['method', 'o'], ['stuff', 'o'], ['color', 'o'], ['kc', 'o'], ['care', 'o'], ['qty', 'o'], ['pack', 'p']] },
   { k: 'cloth', n: '의류', g: '의류', kw: /티셔츠|반팔|긴팔|맨투맨|후디|후드\s*티|후드\s*집업|집업|파자마|잠옷|반바지|긴바지|트레이닝|져지|저지\s*상의|t-?shirt|hoodie|sweatshirt/i, need: [['fabric', 'r'], ['color', 'r'], ['method', 'r'], ['sizes', 'r'], ['pos', 'o'], ['mix', 'o'], ['care', 'o'], ['qty', 'o'], ['pack', 'p']] },
   { k: 'cap', n: '모자', g: '의류', kw: /모자|볼캡|버킷햇|비니|스냅백|cap|beanie/i, need: [['fabric', 'r'], ['color', 'r'], ['method', 'r'], ['adjust', 'o'], ['pos', 'o'], ['care', 'p'], ['qty', 'o'], ['pack', 'p']] },
@@ -124,7 +142,7 @@ var TYPO = [
   [/쉐이커/g, '셰이커', 't'], [/스텐드|스탠더/g, '스탠드', 't'], [/렌야드|랜야트/g, '랜야드', 't'], [/짚퍼|지펴|쟈크|자크(?![가-힣])/g, '지퍼', 't'], [/싸이즈|사이스/g, '사이즈', 't'],
   [/두깨|두꼐/g, '두께', 't'], [/수랑/g, '수량', 't'], [/부자제/g, '부자재', 't'], [/재잴|재짙/g, '재질', 't'], [/도굼|도긍/g, '도금', 't'], [/패톤|펜톤|팬턴/g, '팬톤', 't'],
   [/폴리에스테르/g, '폴리에스터', 'p'], [/후드티/g, '후디', 'p'], [/오링/g, 'O링', 'p'], [/디링/g, 'D링', 'p'], [/스텐(?![드실])/g, '스테인리스', 'p'], [/맨투멘/g, '맨투맨', 't'], [/티샤츠|티셔쯔/g, '티셔츠', 't'],
-  [/뱃찌|벳지|빼지/g, '뱃지', 't'], [/코팅지/g, '코팅지', ''], [/옵셋/g, '오프셋', 'p'], [/미싱/g, '미싱', ''], [/칼라(?![비])/g, '컬러', 'p'], [/쿳션/g, '쿠션', 't'], [/파우취/g, '파우치', 't']
+  [/뱃찌|벳지|빼지/g, '뱃지', 't'], [/key\s?ling|keyirng|kyering/gi, 'keyring', 't'], [/acrylik|acryllic|arcylic/gi, 'acrylic', 't'], [/badeg|bagde/gi, 'badge', 't'], [/stiker|stickre/gi, 'sticker', 't'], [/pouc(?!h)|poutch/gi, 'pouch', 't'], [/hologram{2}|holgram/gi, 'hologram', 't'], [/lanyrad|laynard/gi, 'lanyard', 't'], [/코팅지/g, '코팅지', ''], [/미싱/g, '미싱', ''], [/칼라(?![비])/g, '컬러', 'p'], [/쿳션/g, '쿠션', 't'], [/파우취/g, '파우치', 't']
 ];
 
 /* ── 줄 → 라벨/값 ── */
@@ -183,23 +201,172 @@ function findF(fk, P) {
   return null;
 }
 
+/* ── PLYSH 작업지시서 양식 (도구 > 작업지시서 양식) 읽기 ── */
+var TSEC = /^(가이드별색|소재 세부|소재|인쇄 · 가공|컬러|치수(?:\s*\([^)]*\))?|부자재|포장|발주 전 확인|작성 주의사항)\s*(필수|권장|필독.*)?$/;
+var TPL_K = [[/아크릴\s*키링/, 'acrKey'], [/아크릴\s*스탠드/, 'acrStand'], [/셰이커/, 'acrShaker'], [/메탈\s*뱃지/, 'metalBadge'], [/메탈\s*키링/, 'metalKey'], [/캔\s*뱃지/, 'canBadge'], [/틴/, 'tin'], [/PVC|실리콘/i, 'pvcKey'],
+  [/인형\s*키링/, 'dollKey'], [/인형/, 'doll'], [/와펜/, 'wappen'], [/파우치/, 'pouch'], [/가방|에코백/, 'bag'], [/담요|쿠션|타월/, 'fabricEtc'], [/의류|티셔츠|맨투맨|후디|파자마/, 'cloth'], [/모자/, 'cap'],
+  [/양말/, 'socks'], [/슬리퍼/, 'slipper'], [/인조\s*가죽/, 'leather'], [/맥세이프/, 'magsafe'], [/머그|텀블러/, 'mug'], [/랜야드|스트랩/, 'lanyard'], [/스마트\s*톡|그립/, 'grip'], [/봉제\s*라벨|라벨/, 'sewlabel']];
+function isTpl(t) { var n = 0; String(t || '').split('\n').forEach(function (l) { if (TSEC.test(l.trim())) n++; }); return n >= 4 && /^\s*품목\s*$/m.test(t); }
+function blank(t) { t = String(t || '').replace(/PANTONE\s*C\s*\(\s*\)/gi, '').replace(/원단\s*스와치\s*번호/g, '').replace(/mm|cm|ml|gsm|oz/gi, ''); for (var i = 0; i < 3; i++) t = t.replace(/(^|[\s·(\/])(?:g|T|개|수|색|호)(?=$|[\s·)\/])/g, '$1'); return !t.replace(/[\s·()\/×x~:：\-↑]/g, ''); }
+function opts(v) { if (!/[■□]/.test(v)) return null; var sel = [], uns = []; v.split(/(?=[■□])/).forEach(function (p) { p = p.trim(); if (!p || !/^[■□]/.test(p)) return; var t = p.slice(1).trim(); (p[0] === '■' ? sel : uns).push(t); }); return { sel: sel, uns: uns }; }
+function nums(v) { return (String(v).match(/\d+(?:\.\d+)?/g) || []).map(parseFloat); }
+function tsplit(text) {
+  var L = String(text || '').replace(/\r/g, '').split('\n'), docs = [], d = null, sec = null, hdr = [];
+  for (var i = 0; i < L.length; i++) {
+    var l = L[i].trim(); if (!l || /^[—\-]{4,}$/.test(l)) continue;
+    if (/^\[[^\]]*\]/.test(l) && d) { d = null; sec = null; hdr = []; }
+    if (l === '품목' && i + 1 < L.length) { d = { name: L[i + 1].trim(), start: i + 1, hdr: hdr, secs: [], memo: '' }; hdr = []; docs.push(d); sec = null; i++; continue; }
+    if (!d) { hdr.push({ t: l, n: i + 1 }); continue; }
+    var mm = l.match(/^도면 메모\s*[:：]\s*(.*)$/); if (mm) { d.memo += (d.memo ? ' · ' : '') + mm[1]; continue; }
+    var m = l.match(TSEC);
+    if (m) { sec = { k: m[1].replace(/\s*\(.*$/, ''), full: m[1], req: m[2] && /필수/.test(m[2]) ? 'r' : m[2] && /권장/.test(m[2]) ? 'p' : '', n: i + 1, lines: [] }; d.secs.push(sec); continue; }
+    if (!sec) continue;
+    var last = sec.lines[sec.lines.length - 1];
+    if (/^[□■]/.test(l) && last && (last.lab || /[■□]/.test(last.v)) && sec.k !== '발주 전 확인') { last.v += ' ' + l; continue; }
+    var lm = l.match(/^([^■□●�:：]{1,30}?)\s*[:：]\s*(.*)$/) || (sec.k === '치수' ? l.match(/^(.*?\S)\s+((?:[\d.,×x~·\s]*)mm)$/) : null);
+    sec.lines.push(lm ? { lab: lm[1].trim(), v: lm[2].trim(), n: i + 1 } : { lab: '', v: l.replace(/^[●�]\s*/, ''), n: i + 1, raw: l });
+  }
+  return docs;
+}
+/* 칸 하나 → 값 · 빈 칸 */
+function cell(sec, x) {
+  var o = opts(x.v), val, empty;
+  if (o) { var real = o.sel.filter(function (t) { return !blank(t); }); val = real.join(' · '); empty = !real.length; }
+  else { val = x.v; empty = blank(x.v) || (sec.k === '치수' && !/\d/.test(x.v)); }
+  if (sec.k === '컬러') { empty = /^PANTONE\s*C\s*\(\s*\)$/i.test(x.v) || blank(x.v); }
+  return { lab: x.lab || sec.k, v: val, empty: empty, o: o, n: x.n };
+}
+/* 숫자 기준 (작업지시서 양식 '작성 주의사항' + 인쇄파일 검수기 기준을 상품에 맞춤) */
+function numRules(C, tk, sel, add) {
+  var get = function (re) { for (var i = 0; i < C.length; i++) if (re.test(C[i].lab) && !C[i].empty) { var ns = nums(C[i].v); if (ns.length) return { ns: ns, c: C[i] }; } return null; };
+  C.forEach(function (c) {
+    if (c.empty) return; var ns = nums(c.v); if (!ns.length) return;
+    var th = c.lab.match(/\((?:[^)]*?\s)?(\d+(?:\.\d+)?)\s*mm\s*↑/), rg = c.lab.match(/\((?:[^)\d]*)(\d+(?:\.\d+)?)\s*~\s*(\d+(?:\.\d+)?)\s*mm\)/);
+    if (th && ns[0] < +th[1]) add('r', c.lab.replace(/\s*\(.*$/, '') + ' 기준보다 작음', c.lab + ' · ' + ns[0] + 'mm', '권장 ' + th[1] + 'mm 이상', c.n);
+    else if (rg && (ns[0] < +rg[1] || ns[0] > +rg[2])) add('o', c.lab.replace(/\s*\(.*$/, '') + ' 범위 밖', c.lab + ' · ' + ns[0] + 'mm', '권장 ' + rg[1] + '~' + rg[2] + 'mm', c.n);
+  });
+  var W = get(/^(?:완성\s*)?가로|^본체 가로|^가로 · 세로|^완성 가로|^지름/), H = get(/^세로/), long = W ? Math.max.apply(null, W.ns.concat(H ? H.ns : [])) : 0;
+  var hp = get(/구멍 위치|구멍.*끝에서/), cm = get(/칼선 여백/), hole = get(/고리 구멍(?: 지름)?/);
+  if (/^acr/.test(tk)) {
+    if (cm && cm.ns[0] < 2) add('r', '칼선 여백 좁음', '칼선 여백 ' + cm.ns[0] + 'mm', ['인쇄는 칼선 2mm 안쪽까지 (UV 까짐)', '권장 2mm 이상'], cm.c.n);
+    if (hp && hp.ns[0] < 2) add('r', '고리 구멍이 끝에 붙음', '구멍 위치 끝에서 ' + hp.ns[0] + 'mm', '권장 칼선 끝에서 2mm 이상 안쪽', hp.c.n);
+    if (hole && hole.ns[0] < 2) add('o', '고리 구멍이 작음', '구멍 지름 ' + hole.ns[0] + 'mm', '권장 지름 2.5~3mm 이상 (고리 · 볼체인 통과)', hole.c.n);
+  }
+  if (tk === 'acrKey' && long && long < 25) add('o', '키링이 작음', '긴 변 ' + long + 'mm', '권장 긴 변 25~30mm 이상', W.c.n);
+  if (tk === 'acrStand' && W && Math.max.apply(null, W.ns) < 50) add('o', '스탠드 본체가 작음', '본체 긴 변 ' + Math.max.apply(null, W.ns) + 'mm', '권장 50mm 이상 (작으면 흔들림)', W.c.n);
+  var tab = get(/^탭 폭/); if (tk === 'acrStand' && tab && W && tab.ns[0] < W.ns[0] / 3) add('o', '탭 폭 좁음', '탭 폭 ' + tab.ns[0] + 'mm · 본체 가로 ' + W.ns[0] + 'mm', '권장 본체 가로의 1/3 이상', tab.c.n);
+  var ly = get(/층별 두께/); if (tk === 'acrShaker' && ly && ly.ns.some(function (v) { return v < 1 || v > 3; })) add('o', '층 두께 범위 밖', '층별 두께 ' + ly.ns.join(' · ') + 'mm', '권장 층마다 1~3mm', ly.c.n);
+  if (tk === 'metalBadge' && long) {
+    if (long <= 20) add('p', '작은 메탈 뱃지', '긴 변 ' + long + 'mm', '20mm 이하는 글자 · 색 칸이 거의 못 들어감 · 디자인 단순하게', W.c.n);
+    if (long >= 25 && /(?:^|·\s*)1\s*개/.test(sel.pins || '')) add('p', '큰 뱃지에 침 1개', '긴 변 ' + long + 'mm · 침 1개', '권장 침 2개 (25mm 이상 · 가로 긴 뱃지 · 돌아감 방지)');
+  }
+  var cd = get(/완성 지름/), sa = get(/안전 영역/);
+  if (tk === 'canBadge' && cd) { if ([25, 32, 38, 44, 50, 56, 58, 75].indexOf(cd.ns[0]) < 0) add('p', '캔뱃지 규격 아님', '완성 지름 ' + cd.ns[0] + 'mm', ['권장 규격 32 · 38 · 44 · 58 · 75mm', '업체 몰드 규격 확인'], cd.c.n); if (sa && sa.ns[0] > cd.ns[0] - 6) add('o', '캔뱃지 안전 영역 넓음', '안전 영역 ' + sa.ns[0] + 'mm · 완성 ' + cd.ns[0] + 'mm', '권장 완성 지름 − 약 6mm', sa.c.n); }
+  if (tk === 'wappen' && long && long < 25 && /메로우/.test(sel.all || '')) add('o', '메로우 와펜이 작음', '크기 ' + long + 'mm · 메로우 테두리', '권장 메로우는 25~30mm 이상 · 단순한 모양만', W.c.n);
+  var vis = get(/보이는 크기/), full = get(/전체 크기/);
+  if (tk === 'sewlabel' && vis && full && Math.max.apply(null, full.ns) < Math.max.apply(null, vis.ns)) add('r', '라벨 전체 크기가 더 작음', '보이는 크기 ' + vis.c.v + ' · 전체 크기 ' + full.c.v, '전체 크기 = 보이는 크기 + 접는 여유 · 시접', full.c.n);
+  var ex = get(/^전개/), fin = get(/^완성 가로/);
+  if (tk === 'leather' && ex && fin && Math.max.apply(null, fin.ns) > Math.max.apply(null, ex.ns)) add('r', '완성 크기가 전개 크기보다 큼', '전개 ' + ex.c.v + ' · 완성 ' + fin.c.v, '전개 · 완성 크기 바꿔 적었는지 확인', fin.c.n);
+  var ms = get(/^전체/); if (tk === 'magsafe' && ms && ms.ns.length >= 2) { var a = Math.min(ms.ns[0], ms.ns[1]), b = Math.max(ms.ns[0], ms.ns[1]); if (a < 63 || a > 65 || b < 95 || b > 97) add('o', '맥세이프 지갑 크기 확인', '전체 ' + ms.c.v, '권장 약 63~65 × 95~97mm (휴대폰 뒷면)', ms.c.n); }
+  // 정수 mm
+  C.forEach(function (c) { if (c.sec !== '치수' || c.empty || /0\.\d\s*mm\s*↑|0\.\d\s*~/.test(c.lab)) return; if (/\d\.\d/.test(c.v) && !/\d\.5(?!\d)/.test(c.v)) add('p', '치수 소수점', c.lab + ' · ' + c.v, '권장 정수 mm (0.5는 올림)', c.n); });
+}
+/* 양식 한 장 → 품목 구역 (검사용 P 는 고른 값만) */
+function tplSec(d) {
+  var tk = ''; for (var i = 0; i < TPL_K.length; i++) if (TPL_K[i][0].test(d.name)) { tk = TPL_K[i][1]; break; }
+  var labs = [], vals = [], C = [], skip = { '가이드별색': 1, '발주 전 확인': 1, '작성 주의사항': 1 };
+  d.secs.forEach(function (sec) {
+    if (skip[sec.k]) return;
+    sec.cells = sec.lines.map(function (x) { var c = cell(sec, x); c.sec = sec.k; c.req = sec.req; C.push(c); return c; });
+    sec.cells.forEach(function (c) { var lb = { l: c.lab, v: c.empty ? '' : c.v, n: c.n, f: labFields(c.lab) }; labs.push(lb); if (!c.empty) vals.push({ t: (c.lab !== sec.k ? c.lab + ': ' : sec.k === '소재' ? '소재: ' : '') + c.v, n: c.n, lab: lb }); });
+  });
+  var P = { labs: labs, vals: vals, text: vals.map(function (v) { return v.t; }).join('\n') };
+  P.raw = d.name + '\n' + P.text;
+  return { name: d.name, head: d.name, start: d.start, lines: [], tpl: d, tk: tk || typeOf(d.name), P: P, C: C };
+}
+function tplChecks(s, g, tk, add) {
+  var d = s.tpl, C = s.C, sel = { all: s.P.text, pins: (C.filter(function (c) { return /침 개수/.test(c.lab); })[0] || {}).v };
+  // 머리글
+  var hd = d.hdr.map(function (x) { return x.t; }).join(' ');
+  if (/\[\s*아티스트\s*\]|프로젝트 이름/.test(hd)) add('r', '머리글 그대로', '"[아티스트] 프로젝트 이름" 안 바꿈', '아티스트 · 프로젝트 이름 넣기', '머리글');
+  if (/작성자 이름|연락처/.test(hd) && /작성자 이름 · 연락처|작성자 이름\s*$/.test(hd)) add('o', '작성자 · 연락처 없음', '"작성자 이름 · 연락처" 그대로', '작성자 이름 · 연락처 넣기 (업체 문의용)', '머리글');
+  if (!d.hdr.length) add('o', '머리글 없음', '아티스트 · 프로젝트 · 작성자 줄이 없음', '양식 맨 위 머리글 채우기', '머리글');
+  // 칸마다
+  d.secs.forEach(function (sec) {
+    if (sec.k === '가이드별색') return;
+    if (sec.k === '작성 주의사항') { add('o', '작성 주의사항 안 지움', '"작성 주의사항 · 읽고 삭제" 칸이 남아 있음', '읽고 지운 뒤 업체에 보내기', sec.k); return; }
+    if (sec.k === '발주 전 확인') {
+      var un = sec.lines.filter(function (x) { return /^□/.test((x.raw || x.v).trim()) || /^□/.test(x.v); }).map(function (x) { return x.v.replace(/^[□■]\s*/, ''); });
+      if (un.length) add('p', '발주 전 확인 ' + un.length + '개 체크 안 함', un, '확인한 항목은 ■ 로 바꾸기', sec.k);
+      return;
+    }
+    var cells = sec.cells || [], fill = cells.filter(function (c) { return !c.empty; });
+    var ph = sec.k === '컬러' ? cells.filter(function (c) { return !/^PANTONE\s*C\s*\(\s*\)$/i.test(c.v); }) : cells;
+    if (sec.k === '컬러') {
+      var exa = cells.filter(function (c) { return /PANTONE\s*231\s*C\s*\(\s*백그라운드 판\s*\)/i.test(c.v); });
+      if (exa.length) add('o', '양식 예시 색 그대로', '"PANTONE 231C (백그라운드 판)" 안 바꿈', '실제 색 번호 · 쓰는 곳으로 바꾸기 · 안 쓰면 지우기', exa[0].n);
+      var real = cells.filter(function (c) { return !c.empty && !/백그라운드 판/.test(c.v); });
+      g.fields.push(real.length ? { k: 'col', n: '컬러', v: show(real.map(function (c) { return c.v.replace(/\s*\(\s*\)$/, ''); }).join(' · ')) } : { k: 'col', n: '컬러', miss: 1, lv: sec.req || 'p' });
+      if (!real.length && sec.req) add(sec.req, '컬러 칸 비어 있음', '별색 번호 없음', ['PANTONE 번호 · C/U · 쓰는 곳 넣기', '예: PANTONE 186 C (글자)'], sec.k);
+      return;
+    }
+    var empt = cells.filter(function (c) { return c.empty; });
+    var nm = sec.k === '소재 세부' ? '소재 세부' : sec.k;
+    var sum = fill.map(function (c) { return (c.lab !== sec.k ? c.lab.replace(/\s*\(.*$/, '') + ' ' : '') + c.v; }).join(' · ');
+    if (!fill.length) g.fields.push({ k: sec.k, n: nm, miss: 1, lv: sec.req || 'p' });
+    else g.fields.push({ k: sec.k, n: nm, v: show(sum) + (empt.length ? ' (빈 칸 ' + empt.length + ')' : ''), lv: empt.length ? (sec.req === 'r' ? 'o' : '') : '' });
+    if (empt.length && sec.req) {
+      var opt = empt.some(function (c) { return c.o; });
+      add(sec.req, nm + ' 빈 칸 ' + empt.length + '개', empt.map(function (c) { return c.lab + (c.o && c.o.sel.length ? ' (■ 뒤 값 없음)' : ''); }).join(' · '), sec.k === '치수' ? ['정수 mm로 채우기 (0.5 올림)', '안 쓰는 칸이면 지우기'] : opt ? ['쓰는 것을 ■ 로 고르고 값 넣기', '안 쓰는 줄이면 지우기'] : ['값 넣기'], empt[0].n);
+    }
+    // 하나만 골라야 하는 칸에 여러 개
+    cells.forEach(function (c) {
+      if (!c.o || c.o.sel.filter(function (t) { return !blank(t); }).length < 2) return;
+      if (/두께|인쇄면|화이트|도금|침 개수|핏|방식|^고리$|고리 색|종류|모양|클러치$|^소재$/.test(c.lab)) add('o', c.lab + ' 여러 개 고름', c.lab + ': ' + c.v, '하나만 ■ · 부위가 다르면 부위 이름 같이', c.n);
+    });
+  });
+  // 화이트 없음 + 투명 소재
+  var wh = C.filter(function (c) { return /^화이트/.test(c.lab) && !c.empty; })[0], mt = C.filter(function (c) { return c.sec === '소재' && !c.empty; })[0];
+  if (/^acr/.test(tk) && wh && /없음/.test(wh.v) && mt && /투명|글리터|홀로|미러|오로라/.test(mt.v)) add('p', '화이트 판 없음', '소재 ' + mt.v + ' · 화이트 없음', '투명 · 글리터 위 컬러는 비침 · 의도한 거면 통과', wh.n);
+  // 도면 치수 그대로
+  if (/(?:^|·\s)(?:가로|세로|높이|지름|폭)\s*mm(?:\s|·|$)|아크릴\s*T(?:\s|·|$)/.test(d.memo)) add('p', '도면 치수 표기 비어 있음', '도면에 "가로 mm" · "세로 mm" 같은 빈 치수', '도면 치수선에 숫자 넣기', '도면');
+  numRules(C, tk, sel, add);
+}
+
+/* 글자 · 선 최소 (방식별) — 글로 쓴 작업지시서에도 */
+function minRules(tx, tk, add) {
+  var emb = /자수/.test(tx), fur = /밍크|보아|장모/.test(tx);
+  var re = /(글자|텍스트|문구|레터링|선|획|금속선|박\s*글자|형압\s*글자)\s*(?:높이|크기|굵기|두께|폭)?\s*[:：]?\s*(?:최소\s*)?(\d+(?:\.\d+)?)\s*mm/g, m;
+  while ((m = re.exec(tx))) {
+    var w = m[1].replace(/\s/g, ''), v = parseFloat(m[2]), min = 0, why = '';
+    if (/선|획/.test(w)) { if (/^metal/.test(tk) || w === '금속선') { min = 0.3; why = '금속선 0.3mm 이상 (얇으면 끊김)'; } else if (tk === 'pvcKey') { min = 1; why = 'PVC 획 1mm 이상'; } }
+    else if (/박/.test(w)) { min = 2; why = '박 글자 2mm 이상'; }
+    else if (/형압/.test(w)) { min = 3; why = '형압 글자 3mm 이상'; }
+    else if (emb || tk === 'wappen') { min = fur ? 10 : tk === 'wappen' ? 5 : 6; why = fur ? '밍크 · 보아 위 자수 글자 10mm 이상' : tk === 'wappen' ? '평자수 글자 5mm 이상' : '자수 글자 6mm 이상 (뭉개짐)'; }
+    else if (tk === 'pvcKey') { min = 3; why = 'PVC 글자 3mm 이상'; }
+    else if (tk === 'sewlabel') { min = 2; why = '라벨 글자 2mm 이상'; }
+    if (min && v < min) add('r', /선|획/.test(w) ? '선이 너무 가늘음' : '글자가 너무 작음', m[0].trim(), '권장 ' + why);
+  }
+}
+
 var LV = { t: ['오탈자', '#e0263a', '수정함'], r: ['경고', '#e0263a', '수정함'], o: ['주의', '#ff7300', '확인함'], p: ['조언', '#6546b9', '확인'] };
 
 function check(text, opt) {
   opt = opt || {};
-  var secs = split(text), common = null, groups = [], items = [], pass = [];
+  var TPL = isTpl(text), secs = TPL ? tsplit(text).map(tplSec) : split(text), common = null, groups = [], items = [], pass = [], manual = [];
   /* 품목 이름 없는 앞부분 = 공통 정보 (포장 · 납기 · 아티스트 등) */
   if (secs.length > 1 && secs[0].common) common = secs.shift();
   if (secs.length === 1 && secs[0].common) { var s0 = secs[0], k0 = typeOf(s0.lines.map(function (x) { return x.t; }).join(' ')); s0.name = s0.name || (k0 ? TMAP[k0].n : '상품'); }
   var CP = common ? parse(common) : null;
   secs.forEach(function (s, gi) {
-    var P = parse(s), ov = (opt.types || {})[gi], tk = ov || typeOf(s.name) || typeOf(P.raw) || 'etc', T = TMAP[tk] || TMAP.etc;
+    var P = s.P || parse(s), ov = (opt.types || {})[gi], tk = ov || s.tk || typeOf(s.name) || typeOf(P.raw) || 'etc', T = TMAP[tk] || TMAP.etc;
     var g = { i: gi, name: s.name || T.n, type: tk, tn: T.n, line: s.start, fields: [], n: { t: 0, r: 0, o: 0, p: 0 } };
     var where = function (ln) { return g.name + (ln ? ' · ' + ln + '줄' : ''); };
-    var add = function (lv, title, prob, fix, ln) { var it = { g: gi, lv: lv, where: where(ln), title: title, prob: [].concat(prob), fix: [].concat(fix) }; items.push(it); g.n[lv]++; };
+    var add = function (lv, title, prob, fix, ln) { var it = { g: gi, lv: lv, where: typeof ln === 'string' ? g.name + ' · ' + ln : where(ln), title: title, prob: [].concat(prob), fix: [].concat(fix) }; items.push(it); g.n[lv]++; };
 
-    /* 1) 꼭 들어가야 할 칸 */
-    T.need.forEach(function (nd) {
+    /* 1) 꼭 들어가야 할 칸 — 양식이면 양식 칸 그대로, 아니면 품목별 필수 칸 */
+    if (s.tpl) tplChecks(s, g, tk, add);
+    else T.need.forEach(function (nd) {
       var fk = nd[0], lv = nd[1], f = F[fk], hit = findF(fk, P), lab = P.labs.filter(function (l) { return l.f.indexOf(fk) >= 0; })[0];
       if (!hit && fk === 'pack' && CP) hit = findF('pack', CP);
       if (!hit && fk === 'qty' && CP) hit = findF('qty', CP);
@@ -237,7 +404,7 @@ function check(text, opt) {
     var thv = uniq(th.map(function (x) { return x.v; }));
     if (thv.length > 1 && T.g !== '봉제' && T.g !== '의류') add('r', '두께 값이 여러 개', '두께 ' + thv.map(function (v) { return v + 'T'; }).join(' · ') + ' (' + uniq(th.map(function (x) { return x.n + '줄'; })).join(', ') + ')', ['한 가지로 통일', '부위가 다르면 부위 이름을 같이 표기 (예: 본체 3T · 받침 5T)'], th[1].n);
     // 두께 표기 섞임 (3T 와 3mm)
-    if (/\d\s*[Tt](?![a-zA-Z가-힣])/.test(tx) && /두께\s*[:：]?\s*\d+(?:\.\d+)?\s*mm|\d+(?:\.\d+)?\s*mm\s*두께/.test(tx)) add('p', '두께 표기 섞임', 'T 표기와 mm 표기가 같이 있음', '한 가지로 통일 · 권장 "3T (3mm)"');
+    if (!s.tpl && /\d\s*[Tt](?![a-zA-Z가-힣])/.test(tx) && /두께\s*[:：]?\s*\d+(?:\.\d+)?\s*mm|\d+(?:\.\d+)?\s*mm\s*두께/.test(tx)) add('p', '두께 표기 섞임', 'T 표기와 mm 표기가 같이 있음', '한 가지로 통일 · 권장 "3T (3mm)"');
     // 단면 · 양면 같이
     if (/단면/.test(tx) && /양면/.test(tx) && !/(단면|양면)[^\n]{0,12}(또는|or|\/|중)/.test(tx)) { var ln = P.vals.filter(function (v) { return /단면|양면/.test(v.t); }).map(function (v) { return v.n; }); add('r', '단면 · 양면 같이 표기', '단면과 양면이 둘 다 있음 (' + ln.map(function (n) { return n + '줄'; }).join(', ') + ')', '인쇄 면 하나로 정리', ln[0]); }
     // 도수 vs 별색 수 (판 수)
@@ -257,12 +424,13 @@ function check(text, opt) {
       if (tk === 'canBadge' && /나비|버터플라이|클러치/.test(tx)) add('o', '캔뱃지에 클러치 핀', '캔뱃지인데 나비 · 고무 클러치 표기', ['캔뱃지 뒷면은 보통 안전핀 · 자석 · 미러', '클러치 핀이면 메탈 뱃지인지 확인']);
       var sz = tx.match(/(\d+(?:\.\d+)?)\s*[x×X*]\s*(\d+(?:\.\d+)?)/) || tx.match(/(?:지름|직경|Ø|ø|φ)\s*(\d+(?:\.\d+)?)/);
       var big = sz ? Math.max(parseFloat(sz[1]), parseFloat(sz[2] || 0)) : 0;
-      if (tk === 'metalBadge' && big >= 40 && pinN[0] === 1) add('p', '큰 뱃지에 1핀', '긴 변 ' + big + 'mm · 핀 1개', '권장 2핀 (돌아감 방지)');
-      if (tk === 'canBadge' && big && [25, 32, 38, 44, 50, 56, 58, 75].indexOf(big) < 0) add('p', '캔뱃지 규격 아님', '지름 ' + big + 'mm', ['권장 규격 지름 32 · 38 · 44 · 58 · 75mm 중 하나', '업체 몰드 규격 확인']);
+      if (!s.tpl && tk === 'metalBadge' && big && big <= 20) add('p', '작은 메탈 뱃지', '긴 변 ' + big + 'mm', '20mm 이하는 글자 · 색 칸이 거의 못 들어감 · 디자인 단순하게');
+      if (!s.tpl && tk === 'metalBadge' && big >= 25 && pinN[0] === 1) add('p', '큰 뱃지에 1핀', '긴 변 ' + big + 'mm · 핀 1개', '권장 2핀 (25mm 이상 · 돌아감 방지)');
+      if (!s.tpl && tk === 'canBadge' && big && [25, 32, 38, 44, 50, 56, 58, 75].indexOf(big) < 0) add('p', '캔뱃지 규격 아님', '지름 ' + big + 'mm', ['권장 규격 지름 32 · 38 · 44 · 58 · 75mm 중 하나', '업체 몰드 규격 확인']);
     }
     // 키링 구멍 지름 vs 고리
     var hd = tx.match(/(?:구멍|타공|홀)[^\n\d]{0,8}(\d+(?:\.\d+)?)\s*mm/);
-    if (hd && /키\s*링|키홀더/.test(s.name + tx) && parseFloat(hd[1]) < 2) add('o', '고리 구멍이 작음', '구멍 지름 ' + hd[1] + 'mm', '권장 지름 2.5~3mm 이상 (고리 · 볼체인 통과)', 0);
+    if (!s.tpl && hd && /키\s*링|키홀더/.test(s.name + tx) && parseFloat(hd[1]) < 2) add('o', '고리 구멍이 작음', '구멍 지름 ' + hd[1] + 'mm', '권장 지름 2.5~3mm 이상 (고리 · 볼체인 통과)', 0);
     // 수량 합계
     var tot = tx.match(/(?:총|합계|전체|Total|TOTAL)\s*[:：]?\s*(\d[\d,]*)\s*(?:개|ea|EA|pcs|PCS|세트|set|벌|족)?/), parts = [];
     P.vals.forEach(function (v) { v = { t: v.t.replace(/(?:총|합계|전체|Total|TOTAL)\s*[:：]?\s*\d[\d,]*\s*(?:개|ea|EA|pcs|PCS|세트|set|벌|족)?/g, ''), n: v.n }; var re = /(\d[\d,]*)\s*(?:개|ea|EA|pcs|PCS|세트|벌|족)(?![별월])/g, m; while ((m = re.exec(v.t))) parts.push(+m[1].replace(/,/g, '')); if (T.g === '의류' || tk === 'slipper') { var re2 = /(?:^|[\s/,(])(?:XS|S|M|L|XL|XXL|2XL|3XL|FREE|\d{3})\s*[:：]?\s*(\d{1,5})(?![\dmx×])/g; while ((m = re2.exec(v.t))) parts.push(+m[1]); } });
@@ -272,7 +440,7 @@ function check(text, opt) {
     var svals = uniq(sl.map(function (l) { return (l.v.match(/\d+(?:\.\d+)?\s*[x×X*]\s*\d+(?:\.\d+)?/) || [''])[0].replace(/\s/g, '').replace(/[xX*]/g, '×'); }).filter(Boolean));
     if (svals.length > 1) add('r', '사이즈 값이 여러 개', '사이즈 ' + svals.join(' · ') + ' (' + sl.map(function (l) { return l.n + '줄'; }).join(', ') + ')', ['한 가지로 통일', '부위가 다르면 부위 이름 표기'], sl[1].n);
     // 단위 없는 크기
-    P.vals.forEach(function (v) { var m = v.t.match(/(\d+(?:\.\d+)?)\s*[x×X*]\s*(\d+(?:\.\d+)?)(?!\s*(?:[x×X*]\s*\d)|\s*(?:mm|cm|㎜|㎝|m|inch|in|px|"))/); if (m && !/mm|cm|㎜|㎝/.test(v.t)) add('o', '크기 단위 없음', '"' + m[0] + '" 단위 표기 없음', '단위 추가 · 권장 mm (예: 50×50mm)', v.n); });
+    if (!s.tpl) P.vals.forEach(function (v) { var m = v.t.match(/(\d+(?:\.\d+)?)\s*[x×X*]\s*(\d+(?:\.\d+)?)(?!\s*(?:[x×X*]\s*\d)|\s*(?:mm|cm|㎜|㎝|m|inch|in|px|"))/); if (m && !/mm|cm|㎜|㎝/.test(v.t)) add('o', '크기 단위 없음', '"' + m[0] + '" 단위 표기 없음', '단위 추가 · 권장 mm (예: 50×50mm)', v.n); });
     // mm · cm 섞임
     if (/\d\s*mm/.test(tx) && /\d\s*cm/.test(tx)) add('p', 'mm · cm 섞임', '한 품목에 mm와 cm가 같이 있음', '권장 mm로 통일');
     // 미정
@@ -282,8 +450,48 @@ function check(text, opt) {
     if (/투명/.test(tx) && /아크릴/.test(tx) && !/보호\s*필름|필름/.test(tx) && T.g === '아크릴') add('p', '보호 필름 표기 없음', '투명 아크릴 · 보호 필름 언급 없음', '보호 필름 제거 여부 · 개별 포장 전 제거 표기 권장');
     if (/(반지|목걸이|귀걸이|팔찌|이어링|피어싱)/.test(s.name + tx) && /메탈|금속|도금|아연|황동/.test(tx) && !/니켈\s*프리|nickel\s*free/i.test(tx)) add('p', '니켈 프리 표기 없음', '피부에 닿는 금속 · 니켈 프리 언급 없음', '권장 니켈 프리 도금 표기');
     if (T.g === '의류' && F.sizes.re.test(tx) === false && /S\s*\/\s*M|S,\s*M/.test(tx)) add('o', '사이즈별 수량 없음', '사이즈 이름만 있고 수량 없음', '사이즈마다 수량 표기 (예: S 50 / M 100)');
+    /* 3) 인쇄파일 검수 기준을 상품에 맞춘 것 */
+    // 색 · 잉크
+    var pn = tx.match(/(?:PANTONE|팬톤|PMS)\s*(?:\d{2,4}|[A-Za-z]+(?:\s[A-Za-z]+)?)(?:\s*(?:C|U|CP|UP|TCX|TPX|TPG|XGC|M)(?![A-Za-z]))?/gi) || [];
+    var noCU = uniq(pn.filter(function (x) { return !/\d/.test(x) ? false : !/(?:C|U|CP|UP|TCX|TPX|TPG|XGC|M)$/i.test(x.trim()); }).map(function (x) { return x.trim(); }));
+    if (noCU.length) add('o', 'PANTONE C · U 표기 없음', noCU.join(', '), ['코팅 (C) · 비코팅 (U) 표기 · 원단은 TCX · TPX', '예: PANTONE 186 C']);
+    var cre = /C\s*(\d{1,3})\s*M\s*(\d{1,3})\s*Y\s*(\d{1,3})\s*K\s*(\d{1,3})/g, cmk;
+    while ((cmk = cre.exec(tx))) { var su = +cmk[1] + +cmk[2] + +cmk[3] + +cmk[4]; if (su > 300) add('r', '잉크 총량 많음', cmk[0] + ' · 합 ' + su + '%', '권장 300% 이하 (번짐 · 안 마름)'); else if (su > 0 && su <= 10) add('r', '잉크가 거의 없음', cmk[0] + ' · 합 ' + su + '%', '10% 이하는 인쇄가 거의 안 보임 · 진하게 또는 빼기'); }
+    if (/블랙|검정|네이비|차콜|다크|진한|딥\s*그린|버건디|와인/.test(tx) && (T.g === '의류' || T.g === '봉제' || /원단/.test(tx)) && /실크|나염|DTF|DTG|인쇄|프린트/.test(tx) && !/화이트\s*(?:하판|베이스|언더|판)|백판|하지/.test(tx)) add('o', '진한 원단에 화이트 하판 없음', '진한 원단 + 인쇄 · 화이트 하판 표기 없음', '권장 화이트 하판 (언더베이스) 추가 · 없으면 색이 어둡게 나옴');
+    if ((T.g === '의류' || T.g === '봉제') && /자수/.test(tx) && /원단\s*색|원단\s*컬러/.test(tx) && !/실\s*색|실\s*컬러|자수\s*(?:색|컬러)|사\s*번호/.test(tx)) add('p', '자수 실 색 따로 없음', '원단 색만 있고 자수 실 색 표기 없음', '원단 컬러와 자수 실 컬러는 범례 따로');
+    // 글자 · 선 최소
+    minRules(tx, tk, add);
+    // 뒷면 인쇄 반전
+    if (/^acr/.test(tk) && (/뒷면\s*인쇄|뒤\s*인쇄|역\s*인쇄|이면\s*인쇄|인쇄면\s*[:：]\s*뒤/.test(tx))) add('p', '뒷면 인쇄 · 그림 방향', '인쇄가 뒷면 (보이는 쪽 앞)', '그림 좌우 반전을 누가 할지 업체와 정하기 · 글자 거꾸로 보임 방지');
+    // 수량 · 종
+    var jm = tx.match(/(\d+)\s*종\s*[×xX*]\s*(\d[\d,]*)\s*(?:개|ea|EA|pcs)?\s*=\s*(\d[\d,]*)/);
+    if (jm && +jm[1] * +jm[2].replace(/,/g, '') !== +jm[3].replace(/,/g, '')) add('r', '종 × 수량 계산 틀림', jm[0], jm[1] + '종 × ' + jm[2] + ' = ' + (+jm[1] * +jm[2].replace(/,/g, '')).toLocaleString());
+    // 표시사항 · 바코드 · FSC
+    if (/바코드|barcode/i.test(tx) && !/K\s*100|먹\s*1도|블랙\s*단색/i.test(tx)) add('p', '바코드 색 표기 없음', '바코드 언급 · 색 표기 없음', '권장 K100 단색 · 흰 바탕 · 오버프린트 · 읽힘 테스트');
+    if (/FSC/i.test(tx)) add('p', 'FSC 로고 크기', 'FSC 로고 사용', '권장 높이 14mm 이상 · 흑백처럼 대비 뚜렷하게');
+    g.spec = {}; g.fields.forEach(function (f) { if (!f.miss && !f.skip && f.v) g.spec[f.n] = f.v; });
     groups.push(g);
   });
+  /* 같은 품목끼리 사양 다름 (디자인 규칙 통일) */
+  var byT = {}; groups.forEach(function (g) { (byT[g.type] = byT[g.type] || []).push(g); });
+  Object.keys(byT).forEach(function (k) {
+    var gs = byT[k]; if (gs.length < 2) return;
+    ['소재', '두께', '고리 · 부자재', '고리', '도금', '잠금 · 핀', '인쇄 방식', '포장'].forEach(function (fn) {
+      var vs = uniq(gs.map(function (g) { return g.spec[fn]; }).filter(Boolean)); if (vs.length < 2) return;
+      items.push({ g: -1, lv: 'o', where: gs.map(function (g) { return g.name; }).join(' · '), title: '같은 품목 ' + fn + ' 다름', prob: gs.filter(function (g) { return g.spec[fn]; }).map(function (g) { return g.name + ': ' + g.spec[fn]; }), fix: ['의도한 차이면 통과', '아니면 한 가지로 통일'] });
+    });
+  });
+  /* 직접 확인 (검수기는 안내만) */
+  manual.push('아트워크 파일은 인쇄파일 검수기로 (해상도 · RGB · 도련 · 칼선 여백 · 후가공 별색 오버프린트)');
+  manual.push('PANTONE 칩과 실물 색 대조');
+  var gt = groups.map(function (g) { return g.type; }).join(' ');
+  if (/acr/.test(gt)) manual.push('아크릴 인쇄면 · 화이트 범위 · 칼선을 도면과 대조');
+  if (/doll|wappen|cloth|cap|socks|slipper|pouch|bag|fabricEtc|sewlabel/.test(gt)) manual.push('원단 스와치 · 자수 실 색 실물 대조');
+  if (/cloth|slipper|socks/.test(gt)) manual.push('사이즈별 치수표 · 사이즈별 수량 첨부');
+  if (/doll|socks/.test(gt) || /어린이|아동|키즈|유아|아기/.test(text)) manual.push('KC · 사용 연령 · 작은 부품 표시');
+  if (/mug/.test(gt)) manual.push('식품 접촉 · 식품 안전 검사 서류');
+  manual.push('부자재 (고리 · 체인 · 지퍼 · 라벨) 색 · 종류 실물 확인');
+  manual.push('양산 전 샘플 · 실물 사진 확인 (멤버별 · 디자인별)');
 
   /* 3) 오탈자 · 표기 (글 전체) */
   var lines = String(text || '').replace(/\r/g, '').split('\n');
@@ -301,6 +509,13 @@ function check(text, opt) {
     var lone = l.match(/(?:^|[\s가-힣])([vzwVZW])(?=[\s가-힣]|$)/);
     if (lone && !/[vV]\s*\d|w\s*\d/.test(l)) { var it3 = { g: gi, lv: 't', where: nm + ' · ' + n + '줄', title: '혼자 떨어진 글자 "' + lone[1] + '"', prob: ['"' + l.trim().slice(0, 50) + '"'], fix: ['단축키로 잘못 들어간 글자인지 확인 후 삭제'] }; items.push(it3); if (gi >= 0) groups[gi].n.t++; }
   });
+  // 반복 단어
+  lines.forEach(function (l, i) { var m = l.match(/(^|\s)([가-힣A-Za-z]{2,})\s+\2(?=\s|$|[.,])/); if (m && !/^[■□]/.test(l.trim())) { var gi = gOfLine(i + 1); items.push({ g: gi, lv: 't', where: (gi >= 0 ? groups[gi].name : '공통') + ' · ' + (i + 1) + '줄', title: '같은 단어 두 번 "' + m[2] + '"', prob: ['"' + l.trim().slice(0, 50) + '"'], fix: ['하나 지우기'] }); if (gi >= 0) groups[gi].n.t++; } });
+  // 단위 · 숫자 표기 섞임
+  var AT = String(text || '');
+  if (/\d\s*mm/.test(AT) && /㎜/.test(AT)) items.push({ g: -1, lv: 'p', where: '전체', title: 'mm · ㎜ 섞임', prob: ['"mm"와 "㎜"가 같이 있음'], fix: ['권장 "mm"로 통일'] });
+  if (/(?:^|[^\d,.])\d{1,3}(?:,\d{3})+(?![\d])/.test(AT) && /(?:^|[^\d,.])\d{4,}(?![\d.,]|\s*(?:mm|년|C|U|TCX|TPX|-))/.test(AT.replace(/PANTONE\s*\d+|\d{4}[.\-]\d{1,2}/gi, ''))) items.push({ g: -1, lv: 'p', where: '전체', title: '수량 쉼표 표기 섞임', prob: ['"1,000"과 "1000" 같은 표기가 같이 있음'], fix: ['권장 쉼표 넣어 통일 (1,000)'] });
+  if (/\d\s*(?:"|″|inch|인치)/i.test(AT)) items.push({ g: -1, lv: 'p', where: '전체', title: '인치 표기', prob: ['인치 (") 표기 있음'], fix: ['권장 mm로 바꿔 표기'] });
   // × 표기
   var xs = String(text || '').match(/\d+(?:\.\d+)?\s*[xX*]\s*\d+(?:\.\d+)?/g);
   if (xs) items.push({ g: -1, lv: 'p', where: '전체', title: '크기 곱하기 표기', prob: ['"x" 표기 ' + xs.length + '곳 (' + uniq(xs).slice(0, 3).join(', ') + ')'], fix: ['권장 "×" (예: 50×50mm)'] });
@@ -314,7 +529,7 @@ function check(text, opt) {
   items.sort(function (a, b) { return ord[a.lv] - ord[b.lv] || a.g - b.g; });
   groups.forEach(function (g) { var ok = g.fields.filter(function (f) { return !f.miss && !f.skip && !f.lv; }).length; if (ok) pass.push(g.name + ' 필수 사양 ' + ok + '개'); });
   if (!items.some(function (x) { return x.lv === 't'; })) pass.push('오탈자 없음');
-  return { items: items, groups: groups, pass: pass, common: common ? common.lines.map(function (x) { return x.t; }) : [] };
+  return { items: items, groups: groups, pass: pass, manual: manual, tpl: TPL, common: common ? common.lines.map(function (x) { return x.t; }) : [] };
 }
 
 /* 결과지 (지류 사양서 검수 결과지와 같은 모양) */
@@ -344,6 +559,7 @@ function render(R, opt) {
         '<dt>해결</dt><dd class="fx"><ul>' + x.fix.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></dd></dl></div></div>';
     }).join('');
   } else h += '<p class="spk-ok">고칠 곳이 없어요.</p>';
+  if (R.manual && R.manual.length) h += '<h2>직접 확인</h2><div class="gdk-man">' + R.manual.map(function (p) { return '<label class="spk-cb"><input type="checkbox"><span>' + esc(p) + '</span></label>'; }).join('') + '</div>';
   if (R.pass.length) h += '<h2>통과</h2><div class="spk-pass">' + R.pass.map(function (p) { return '<span>' + esc(p) + '</span>'; }).join('') + '</div>';
   h += '<div class="spk-foot"><span>PLYSH 검수 · 상품 작업지시서</span><span>' + stamp + '</span></div></div>';
   return h;
