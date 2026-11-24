@@ -101,11 +101,12 @@ function wordSeg(w) { // 띄어쓰기 없이 붙은 대문자 덩어리를 사�
   return dp[n] && dp[n].length > 1 ? dp[n].slice(0, -1) : null;
 }
 var WSEG = {};
-function untrack(str) {
+function untrack(str, force) {
   var toks = str.split(/( +)/), words = toks.filter(function (t, i) { return i % 2 === 0 && t; });
   var single = words.filter(function (t) { return t.length === 1; }).length;
   var id = { s: str, o: str.split('').map(function (c, i) { return i; }), trk: false };
-  if (words.length < 4 || single < words.length * 0.75) return id;
+  if (!force && (words.length < 4 || single < words.length * 0.75)) return id;
+  if (force && !single) return id;
   var out = '', o = [], pos = 0, prevSingle = false;
   toks.forEach(function (t, i) {
     if (i % 2) { if (t.length >= 2 || !prevSingle || (toks[i + 1] || '').length > 1) { out += ' '; o.push(pos); } pos += t.length; return; }
@@ -144,13 +145,20 @@ function lines(P) {
     var segs = [[]]; l.items.forEach(function (t, i) { var pv = l.items[i - 1]; if (pv && t.x - (pv.x + pv.w) > Math.max(pv.z, t.z) * 2.2) segs.push([]); segs[segs.length - 1].push(t); });
     l.segs = segs.map(function (s) {
       // 낱자 조각이 대부분이면(자간 넓힘) 조각을 먼저 이어 붙인 뒤 한 번에 다시 묶기
-      var oneCh = s.filter(function (t) { return t.s.trim().length === 1; }).length, trkItems = s.length >= 4 && oneCh >= s.length * 0.75;
+      // 글자마다 따로 찍힌 경우 pdf.js가 사이에 공백 조각을 끼움 → 공백 조각은 빼고 판단 (간격은 위치로 다시 계산)
+      var sNS = s.filter(function (t) { return t.s.trim(); });
+      var oneCh0 = s.filter(function (t) { return t.s.trim().length === 1; }).length, trkItems = s.length >= 4 && oneCh0 >= s.length * 0.75;
+      var oneCh = sNS.filter(function (t) { return t.s.trim().length === 1; }).length;
+      // 낱자마다 사이에 공백 조각이 끼었을 때만 (단어 사이에만 공백 조각이 있으면 원래 띄어쓰기라 그대로 둠)
+      if (!trkItems && sNS.length >= 4 && oneCh >= sNS.length * 0.75 && s.length - sNS.length >= (sNS.length - 1) * 0.6) { trkItems = true; s = sNS; }
+      // 자간을 넓힌 단어가 '금 새' · '다 시'처럼 짧은 조각으로 나뉜 경우: 줄 전체로 보면 낱자가 대부분 → 조각마다 낱자 띄움 풀기
+      var segW = sNS.map(function (t) { return t.s.trim(); }).join(' ').split(/ +/).filter(Boolean), segTrk = !trkItems && segW.length >= 4 && segW.filter(function (w) { return w.length === 1; }).length >= segW.length * 0.75 && sNS.filter(function (t) { return /^[^\s\d]( [^\s\d])+$/.test(t.s.trim()); }).length >= 2;
       var gaps = []; s.forEach(function (t, i) { if (i) gaps.push(t.x - (s[i - 1].x + s[i - 1].w)); });
       var med = gaps.slice().sort(function (a, b) { return a - b; })[gaps.length >> 1] || 0;
       var txt = '', prev = null, offs = [], src = [];
       s.forEach(function (t) {
         if (prev) { var gap = t.x - (prev.x + prev.w), z = Math.min(prev.z, t.z), th = trkItems ? Math.max(z * 0.18, med + z * 0.15) : z * 0.18; if (gap > th && !/\s$/.test(txt) && !/^\s/.test(t.s)) { txt += ' '; src.push(null); } }
-        var u = untrack(t.s); if (u.trk) t.trk = true;
+        var u = untrack(t.s, segTrk && /^[^\s\d]( [^\s\d])+$/.test(t.s.trim())); if (u.trk) t.trk = true;
         offs.push(txt.length); for (var k = 0; k < u.s.length; k++) src.push({ t: t, i: u.o[k] }); txt += u.s; prev = t;
       });
       if (trkItems) { // 조각 단위로 낱자가 흩어진 경우: 공백 없는 덩어리를 사전으로 다시 나누기
@@ -178,7 +186,7 @@ function subBox(seg, idx, len) {
 }
 
 // ── 글자 검사 ──
-var TYPO_KO = [[/되요/g, '돼요'], [/됬/g, '됐'], [/몇일/g, '며칠'], [/어의없/g, '어이없'], [/왠만/g, '웬만'], [/할께/g, '할게'], [/금새/g, '금세'], [/역활/g, '역할'], [/일일히/g, '일일이'], [/깨끗히/g, '깨끗이'], [/오랫만/g, '오랜만'], [/희안/g, '희한'], [/어떻해/g, '어떡해'], [/않되/g, '안 되'], [/안되요/g, '안 돼요'], [/설겆이/g, '설거지'], [/가르키/g, '가리키'], [/바램/g, '바람'], [/뵈요/g, '봬요'], [/웬지/g, '왠지'], [/곰곰히/g, '곰곰이'], [/틈틈히/g, '틈틈이'], [/생각컨대/g, '생각건대'], [/내노라/g, '내로라'], [/어짜피/g, '어차피'], [/돌맹이/g, '돌멩이'], [/구지/g, '굳이'], [/있슴/g, '있음'], [/없슴/g, '없음'], [/했슴/g, '했음']];
+var TYPO_KO = [[/되요/g, '돼요'], [/됬/g, '됐'], [/몇일/g, '며칠'], [/어의없/g, '어이없'], [/왠만/g, '웬만'], [/할께/g, '할게'], [/(갈|볼|줄|올|날|릴|될|쓸|살|놀|올릴|드릴)께/g, 'ㄹ게 (께 → 게)'], [/금새/g, '금세'], [/역활/g, '역할'], [/일일히/g, '일일이'], [/깨끗히/g, '깨끗이'], [/오랫만/g, '오랜만'], [/희안/g, '희한'], [/어떻해/g, '어떡해'], [/않되/g, '안 되'], [/안되요/g, '안 돼요'], [/설겆이/g, '설거지'], [/가르키/g, '가리키'], [/바램/g, '바람'], [/뵈요/g, '봬요'], [/웬지/g, '왠지'], [/곰곰히/g, '곰곰이'], [/틈틈히/g, '틈틈이'], [/생각컨대/g, '생각건대'], [/내노라/g, '내로라'], [/어짜피/g, '어차피'], [/돌맹이/g, '돌멩이'], [/구지/g, '굳이'], [/있슴/g, '있음'], [/없슴/g, '없음'], [/했슴/g, '했음']];
 var DICT = ('JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER SUNDAY MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY ' +
   'CALENDAR PHOTOBOOK PHOTOCARD POSTCARD POSTER STICKER DIARY ALBUM OFFICIAL ENTERTAINMENT MANUFACTURED DISTRIBUTED WARNING RESERVED RIGHTS UNAUTHORIZED DUPLICATION PROHIBITED COPYING KOREA COPYRIGHT ' +
   'SEASON SEASONS GREETINGS GREETING HAPPY BIRTHDAY ANNIVERSARY CHRISTMAS SPECIAL EDITION LIMITED MEMBER MEMBERS CONCERT TOUR WORLD FANMEETING FANCLUB GOODS MERCHANDISE PACKAGE ' +
@@ -1040,8 +1048,9 @@ function paras(P) { // 같은 단 · 같은 크기 · 줄 간격이 가까운 �
   var out = [], cur = null;
   segsOf(P).forEach(function (s) {
     var t = s.t.trim(); if (!t) return;
-    var ok = cur && Math.abs(s.b[0] - cur.x0) < s.z * 1.5 + 20 && Math.abs(s.z - cur.z) < cur.z * 0.12 && cur.y - s.b[3] < s.z * 1.2 && cur.y - s.b[3] > -s.z * 0.3;
-    if (!ok) { cur = { x0: s.b[0], z: s.z, y: s.b[1], txt: '', map: [] }; out.push(cur); }
+    var enL = (t.match(/[A-Za-z]/g) || []).length, koL = (t.match(/[가-힣]/g) || []).length, en = enL >= (enL + koL) * 0.8;
+    var ok = cur && cur.en === en && Math.abs(s.b[0] - cur.x0) < s.z * 1.5 + 20 && Math.abs(s.z - cur.z) < cur.z * 0.12 && cur.y - s.b[3] < s.z * 1.2 && cur.y - s.b[3] > -s.z * 0.3;
+    if (!ok) { cur = { x0: s.b[0], z: s.z, y: s.b[1], txt: '', map: [], en: en }; out.push(cur); }
     else { var hy = /[A-Za-z]-$/.test(cur.txt); if (hy) { cur.txt = cur.txt.slice(0, -1); cur.map.pop(); } else { cur.txt += ' '; cur.map.push(null); } }
     var off = s.t.indexOf(t); for (var i = 0; i < t.length; i++) cur.map.push({ s: s, i: off + i }); cur.txt += t; cur.y = s.b[1];
   });
@@ -1070,6 +1079,8 @@ async function sentences(R, step) {
     lints.forEach(function (x) {
       var kind = x.lint_kind(), sp0 = x.span(), w = p.txt.slice(sp0.start, sp0.end); if (!HP_KEEP.test(kind) || !w.trim()) return;
       if (w === w.toUpperCase() && /[A-Z]{2}/.test(w)) return; // 제목 · 이름 (전부 대문자)
+      var tok = (p.txt.slice(0, sp0.start).match(/\S*$/) || [''])[0] + w + (p.txt.slice(sp0.end).match(/^\S*/) || [''])[0];
+      if (/^(pdf|ai|indd|idml|psd|jpe?g|png|tiff?|eps|svg|zip|hwp|xlsx?|docx?|pptx?)$/i.test(w) || /[A-Za-z0-9)\]]\.[A-Za-z]{2,4}\b|https?:|www\.|@|_|…/.test(tok)) return; // 파일 이름 · 주소 · 확장자 · 말줄임으로 잘린 단어
       var sug = x.suggestions().map(function (g) { try { return g.get_replacement_text(); } catch (e) { return ''; } }).filter(Boolean).slice(0, 3);
       var b = pBox(p, sp0.start, sp0.end) || p.map.find(Boolean).s.b;
       if (kind === 'Spelling') {
