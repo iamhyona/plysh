@@ -1130,6 +1130,17 @@ html[data-nav="t"] #nsub.has { display:flex; }
 @media (max-width:1023px) { .wsg { grid-template-columns:1fr; } }
 /* 홈 위 줄: 팀 공지 | 자주 쓰는 도구 반반 (2026-11-20) */
 .wsg.wtop { margin-bottom:12px; align-items:stretch; }
+/* 2026-11-27 실장님: 홈 출퇴근 버튼 (출근·퇴근·외근·복귀) */
+.wlbt h3 { justify-content:flex-start; } .wlbt h3 small { font-size:12px; font-weight:600; color:var(--mute); margin-left:6px; }
+.wlbg { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; margin-top:6px; }
+.wlbg button { border:0; background:var(--bg); border-radius:12px; padding:12px 10px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; font:inherit; color:var(--txt); cursor:pointer; min-width:0; }
+.wlbg button span { font-size:13px; font-weight:700; }
+.wlbg button b { font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--faint); }
+.wlbg button.got b { color:var(--txt); }
+.wlbg button.nx { background:var(--txt); color:#fff; } .wlbg button.nx b { color:rgba(255,255,255,.55); }
+.wlbg button.arm { box-shadow:inset 0 0 0 2px var(--red); } .wlbg button.arm span { color:var(--red); }
+.wlbg button.busy { opacity:.5; pointer-events:none; }
+@media (max-width:520px) { .wlbg { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
 .wsg.wtop > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
 .wsg.wtop .nth { margin:-6px 0 4px; } .wsg.wtop .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
 @media (max-width:1023px) { .wsg.wtop { grid-template-columns:1fr; } }
@@ -1705,7 +1716,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261126hm201';
+var APP_VER = '20261127hm202';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2731,6 +2742,7 @@ function calCard(E) {
 var CLK_T = 0;
 function clkTick() { clearTimeout(CLK_T); var hH = document.getElementById('chH'); if (!hH) return; var n = new Date(), hh = n.getHours(), ac = document.getElementById('aClk'); if (ac) ac.classList.toggle('night', hh >= 18 || hh < 6); var sec = n.getSeconds(), mi = n.getMinutes() + sec / 60, hr = n.getHours() % 12 + mi / 60; hH.setAttribute('transform', 'rotate(' + hr * 30 + ' 50 50)'); document.getElementById('chM').setAttribute('transform', 'rotate(' + mi * 6 + ' 50 50)'); document.getElementById('chS').setAttribute('transform', 'rotate(' + sec * 6 + ' 50 50)'); CLK_T = setTimeout(clkTick, 1000 - n.getMilliseconds()); }
 function renderStart() {
+  wlMeInit();
   var d = P(TODAY), wk = '일월화수목금토'.charAt(d.getDay()), end = addD(TODAY, 7);
   var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && e.d >= TODAY && e.d <= end; }).slice(0, 10);
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort).slice(0, 7);
@@ -2743,7 +2755,7 @@ function renderStart() {
     wtCard() + '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
   var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['review', 'chk', '인쇄파일 검수기'], ['gcheck', 'chk', '작업지시서 검수기'], ['wo', 'doc', '작업지시서 양식'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
-  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
+  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + wlBtnCard() + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick(); wlBtnBind();
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
@@ -2769,6 +2781,44 @@ function wtCard() {
       '<span class="bar"><i class="' + c + '" style="width:' + Math.min(100, t / (52 * 60) * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span></div>';
   }).join('') + '</div><p class="wtn">이번 주 · 근무표 기준 · 선은 40시간, 끝은 52시간</p>';
   return '<div class="wsc wfull wgo" data-ng="wl"><h3>근무시간 통계<button type="button" data-ng="wl">근태</button></h3>' + body + '</div>';
+}
+// 2026-11-27 실장님: 홈 출퇴근 버튼 — 누른 시각 그대로 근태 저장 (근무표 시트 · WORK LOG · 근태기록 캘린더)
+// 출근 · 퇴근 · 외근(외근 체크 + 외근 내용에 '14:10~') · 복귀('14:10~16:30'). 새벽 6시 전은 전날 근무로 '25:30'
+// 이미 적힌 시각을 바꿀 땐 한 번 더 눌러야 바뀜 (근무표 기본값 9:00·18:00 은 빈 칸으로 봄). 지금은 실장님만 (WL_BTN)
+var WL_BTN = ['박현아'];
+function wlBtnNow() { var n = new Date(), h = n.getHours(), e = h < 6; return { d: e ? addD(F(n), -1) : F(n), hm: pad(e ? h + 24 : h) + ':' + pad(n.getMinutes()) }; }
+function wlBtnRow(me, d) { return wlRows(function (r) { return r.d === d && r.p === me; })[0] || {}; }
+function wlBtnReal(x) { return { i: x.i && !/^0?9:00$/.test(x.i) ? x.i : '', o: x.o && x.o !== '18:00' ? x.o : '' }; }
+function wlBtnEx(x) { var s = String(x.exn || ''), m = s.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})?\s*$/); return m ? { a: m[1], b: m[2] || '' } : null; }
+function wlBtnCard() {
+  var me = wlMe(); if (WL_BTN.indexOf(me) < 0) return '';
+  var t = wlBtnNow(), x = wlBtnRow(me, t.d), R = wlBtnReal(x), E = wlBtnEx(x), out = E && !E.b;
+  var nx = !R.i ? 'i' : out ? 'b' : !R.o ? 'o' : '';
+  var B = [['i', '출근', R.i], ['o', '퇴근', R.o], ['x', '외근', E ? E.a : ''], ['b', '복귀', E ? E.b : '']];
+  return '<div class="wsc wlbt"><h3>출퇴근<small>' + (+t.d.slice(5, 7)) + '월 ' + (+t.d.slice(8)) + '일' + (t.d !== F(new Date()) ? ' 근무' : '') + '</small></h3><div class="wlbg">' +
+    B.map(function (b) { return '<button type="button" data-wb="' + b[0] + '" class="' + (b[2] ? 'got ' : '') + (nx === b[0] ? 'nx' : '') + '"><span>' + b[1] + '</span><b>' + (b[2] || '—') + '</b></button>'; }).join('') + '</div></div>';
+}
+function wlBtnBind() {
+  $$('#main [data-wb]').forEach(function (b) { b.onclick = function () { wlBtnGo(b.dataset.wb, b); }; });
+}
+function wlBtnGo(k, btn) {
+  var me = wlMe(); if (!me) return;
+  var t = wlBtnNow(), x = wlBtnRow(me, t.d), R = wlBtnReal(x), E = wlBtnEx(x), exn = String(x.exn || '').trim(), msg;
+  var o = { d: t.d, p: me, i: x.i || '', o: x.o || '', ot: !!x.ot, fd: !!x.fd, ex: !!x.ex, exn: exn, tx: !!x.tx, fare: +x.fare || 0, m: String(x.m || '') };
+  if (k === 'b' && !E) return toast('외근을 먼저 눌러 주세요');
+  var redo = (k === 'i' && R.i) || (k === 'o' && R.o) || (k === 'x' && E && !E.b) || (k === 'b' && E && E.b);
+  if (redo && !btn.classList.contains('arm')) {
+    btn.classList.add('arm'); btn.querySelector('span').textContent = '한 번 더'; clearTimeout(btn._t);
+    btn._t = setTimeout(function () { btn.classList.remove('arm'); btn.querySelector('span').textContent = { i: '출근', o: '퇴근', x: '외근', b: '복귀' }[k]; }, 3000);
+    return;
+  }
+  if (k === 'i') { o.i = t.hm; msg = '출근 ' + t.hm; }
+  else if (k === 'o') { o.o = t.hm; msg = '퇴근 ' + t.hm; }
+  else if (k === 'x') { o.ex = true; o.exn = E && !E.b ? exn.replace(/\d{1,2}:\d{2}~\s*$/, t.hm + '~') : (exn ? exn + ', ' : '') + t.hm + '~'; msg = '외근 ' + t.hm; }
+  else { o.exn = E.b ? exn.replace(/~\d{1,2}:\d{2}\s*$/, '~' + t.hm) : exn + t.hm; msg = '복귀 ' + t.hm; }
+  btn.classList.remove('arm'); btn.classList.add('busy');
+  call('appWlSet', S.pin, o).then(function (res) { S.D.wl = res.wl || S.D.wl; saveCache(); toast(msg + ' 기록했어요'); render(); })
+    .catch(function (e) { toast(errMsg(e)); btn.classList.remove('busy'); });
 }
 /* ── 도구 · 자료 공간 첫 화면 ── */
 function renderSpace(k) {
@@ -4699,7 +4749,7 @@ function wlMeInit() {
   if (!e || e === S.wlMeE || !window.crypto || !crypto.subtle || !window.TextEncoder) return; S.wlMeE = e;
   crypto.subtle.digest('SHA-256', new TextEncoder().encode(e)).then(function (b) {
     var h = Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('').slice(0, 12);
-    S.wlMe = WL_ME[h] || ''; if (S.view === 'wl' && S.wlMe) { try { render(); } catch (x) {} } if ($('#wlShG')) wlShSync();
+    S.wlMe = WL_ME[h] || ''; if ((S.view === 'wl' || S.view === 'start') && S.wlMe) { try { render(); } catch (x) {} } if ($('#wlShG')) wlShSync();
   }).catch(function () {});
 }
 function wlShSync() { var u = wlShUrl(wlMe()), a = $('#wlShG'); if (!a) return; a.style.display = u ? '' : 'none'; if (u) a.href = u; }
