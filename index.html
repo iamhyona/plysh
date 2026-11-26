@@ -619,6 +619,8 @@ textarea.dx { width:100%; border:0; background:var(--chip); border-radius:14px; 
 .aseg.sw button.on { background:#fff; color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.08); }
 .hm2 .arw { gap:4px; }
 .hm2 .arw button { width:30px; height:30px; font-size:16px; }
+.wlshm { display:none; } /* 모바일: 머리(#npg)가 안 보여서 달력 줄에 내 근무표 시트 바로가기 (2026-11-26) */
+@media (max-width:1023px) { .hm2 .arw .wlshm { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:#fff; color:var(--sub); flex:none; } .wlshm svg { width:15px; height:15px; } }
 .hm2 .arw .tod { width:auto; height:30px; padding:0 9px; font-size:12px; }
 .mfold { display:flex; justify-content:flex-end; margin:-4px 0 8px; }
 .mfold .tod { border:0; background:#fff; border-radius:999px; padding:6px 11px; font-size:12px; font-weight:700; color:var(--sub); }
@@ -1589,7 +1591,7 @@ html[data-nav] #cvSeg { display:none !important; }
 </div>
 <!-- WORK LOG: 출퇴근·야근·야근식사·외근·야근택시 -->
 <div class="bs" id="wl">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><h3 style="flex:1;margin:0">근태 작성</h3></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><h3 style="flex:1;margin:0">근태 작성</h3><a class="spgo2" id="wlShG" href="#" target="_blank" rel="noopener" title="내 근무표 시트 열기" aria-label="내 근무표 시트 열기" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></a></div>
   <div class="fl" style="margin-top:0">디자이너</div><div class="chips" id="wlP2"></div>
   <div id="wlDay"></div>
   <div class="wlform0" id="wlForm0">위에서 디자이너를 고르면 이 날 기록을 쓰거나 고칠 수 있어요.</div>
@@ -1703,7 +1705,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261126hm200';
+var APP_VER = '20261126hm201';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3027,10 +3029,11 @@ function pgSync() {
   e.classList.toggle('hide', !i); e.classList.toggle('subon', !!subHtml());
   var a = null; try { var f = S.view === 'tk' && $('#tkWrap iframe:not(.hide)'), l = f && f.contentDocument && f.contentDocument.getElementById('lnk'); if (l && l.getAttribute('href')) a = l; } catch (x) {}
   if (!a && S.view === 'qk' && S.qk && S.qk.url) a = { href: S.qk.url, title: '연락처 시트 열기' }; // 퀵: 시트 열기는 머리 오른쪽 아이콘 (2026-11-20)
+  if (!a && S.view === 'wl') { var wu = wlShUrl(wlMe()); if (wu) a = { href: wu, title: '내 근무표 시트 열기', ic: SHIC }; } // 2026-11-26 실장님: 근태 작성에서 로그인한 사람의 근무표 시트 바로가기
   // 2026-11-23 실장님: PC에선 오른쪽 아래 + 대신 머리 오른쪽에 글자 있는 '작성하기' 단추
   var wb = i && fabOn() ? '<button type="button" class="pgw' + (a ? ' wa' : '') + '" id="pgW"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>' + (S.view === 'qk' ? '연락처 추가' : S.view === 'month' || S.view === 'week' ? '일정 추가' : '작성하기') + '</button>' : '';
   document.documentElement.toggleAttribute('data-fabtop', !!wb);
-  e.innerHTML = i ? wb + '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' + (a ? '<a class="pga" href="' + esc(a.href) + '" target="_blank" rel="noopener" title="' + esc(a.title || '시트 · 폴더 열기') + '" aria-label="시트 · 폴더 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>' : '') : '';
+  e.innerHTML = i ? wb + '<h1>' + esc(i.t) + '</h1><p>' + esc(i.d || '') + '</p>' + (a ? '<a class="pga" href="' + esc(a.href) + '" target="_blank" rel="noopener" title="' + esc(a.title || '시트 · 폴더 열기') + '" aria-label="' + esc(a.title || '시트 · 폴더 열기') + '">' + (a.ic || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>') + '</a>' : '') : '';
 }
 function navSync() {
   document.documentElement.setAttribute('data-nav', NAV.s === 'c' ? 'w' : NAV.s);
@@ -4685,13 +4688,29 @@ function hmOut(i, o) { if (!i || !o) return o; if (o < i && +o.slice(0, 2) < 12)
 function wlRows(fn) { return (S.D.wl || []).filter(fn); }
 function wlTags(r) { return WLT.filter(function (k) { return r[k[0]]; }).map(function (k) { return k[1]; }); }
 function won(n) { return (+n || 0).toLocaleString('ko-KR'); }
+// 2026-11-26 실장님: 근태 작성에서 로그인한 사람 → 자기 근무표 시트(디자인본부근무현황_4팀_이름) 바로가기
+// 공개 저장소라 메일 주소는 그대로 안 적고 SHA-256 앞 12자리로만 맞춤
+var WL_SH = { '박현아': '1c6EIw6wx__8ZTpGog_ZGO_liD8IyBw2mI89bq_1l38Q', '박주영': '1jY8syRDCI5Kk2r9NYfksFp-g0WlQ6LsKjHj3eTDmIIQ', '이혜선': '1tHhd3KzlbOYrDCn3U54NSRUN-0zWgQDYoD-sUUA8bPs', '유이시': '1fmBKUgBq8FrKiIZ9JIcHhdp7FusPnDetspVpKK8VQXI', '허희원': '1WAJZHBEeZz9NmHvp0iC9XaTNH0C-r4FNnvZkD9PiOLk' };
+var WL_ME = { '64a474bb4f37': '박현아', '1411207bae7c': '박주영', '5ed6ade3753d': '이혜선', '78a5ca0bc3f9': '유이시' };
+function wlShUrl(n) { return n && WL_SH[n] ? 'https://docs.google.com/spreadsheets/d/' + WL_SH[n] + '/edit' : ''; }
+function wlMe() { return S.wlMe || ''; }
+function wlMeInit() {
+  var e = String(ls.get('d4:who') || '').split(' · ').pop().trim().toLowerCase();
+  if (!e || e === S.wlMeE || !window.crypto || !crypto.subtle || !window.TextEncoder) return; S.wlMeE = e;
+  crypto.subtle.digest('SHA-256', new TextEncoder().encode(e)).then(function (b) {
+    var h = Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('').slice(0, 12);
+    S.wlMe = WL_ME[h] || ''; if (S.view === 'wl' && S.wlMe) { try { render(); } catch (x) {} } if ($('#wlShG')) wlShSync();
+  }).catch(function () {});
+}
+function wlShSync() { var u = wlShUrl(wlMe()), a = $('#wlShG'); if (!a) return; a.style.display = u ? '' : 'none'; if (u) a.href = u; }
 function renderWl() {
+  wlMeInit();
   S.wy = S.wy || +TODAY.slice(0, 4); S.wm = S.wm || +TODAY.slice(5, 7);
   var y = S.wy, m = S.wm, first = y + '-' + pad(m) + '-01', last = F(new Date(y, m, 0)), start = sunOf(first), end = addD(sunOf(last), 6), T = team();
   var wp = ls.get('d4:wlp') || ''; if (wp && T.indexOf(wp) < 0) wp = '';
   var isCur = TODAY.slice(0, 7) === first.slice(0, 7);
   var h = '<div class="hm2"><label class="hmt">' + y + '.' + pad(m) + '<input type="month" class="dpk" id="wlMo" value="' + y + '-' + pad(m) + '"></label>' +
-    '<div class="arw"><button class="tod" id="wlQ">빠른 입력</button>' + (isCur ? '' : '<button class="tod" id="wlT">이번 달</button>') + '<button id="wlPv">' + IC_L + '</button><button id="wlNx">' + IC_R + '</button></div></div>';
+    '<div class="arw">' + (wlShUrl(wlMe()) ? '<a class="wlshm" href="' + esc(wlShUrl(wlMe())) + '" target="_blank" rel="noopener" title="내 근무표 시트 열기" aria-label="내 근무표 시트 열기">' + SHIC + '</a>' : '') + '<button class="tod" id="wlQ">빠른 입력</button>' + (isCur ? '' : '<button class="tod" id="wlT">이번 달</button>') + '<button id="wlPv">' + IC_L + '</button><button id="wlNx">' + IC_R + '</button></div></div>';
   h += '<div class="tabs2" id="wlP"><button data-n="" class="' + (wp ? '' : 'on') + '">전체</button>' + T.map(function (n) { return '<button data-n="' + esc(n) + '" class="' + (wp === n ? 'on' : '') + '">' + esc(n) + '</button>'; }).join('') + '</div>';
   h += '<div class="mcal wlcal"><div class="wd">' + WEN.map(function (w) { return '<div>' + w + '</div>'; }).join('') + '</div><div class="grid">';
   for (var d = start; d <= end; d = addD(d, 1)) {
@@ -4751,6 +4770,7 @@ function openWl(d, p) {
   var was = !!$('.bs.open'); closeBs(); setTimeout(function () { openBs('#wl'); }, was ? 230 : 0);
 }
 function wlLoad() {
+  wlMeInit(); wlShSync();
   var r = WLS.p ? wlRows(function (x) { return x.d === WLS.d && x.p === WLS.p; })[0] : null;
   WLS.r = r || null; WLS.k = {}; WLK.forEach(function (k) { WLS.k[k[0]] = !!(r && r[k[0]]); });
   $('#wlD').value = WLS.d; $('#wlI').value = r ? r.i : ''; $('#wlO').value = r ? r.o : ''; $('#wlEx').value = r ? r.exn : ''; $('#wlFare').value = r && r.fare ? r.fare : ''; $('#wlM').value = r ? r.m : ''; WLS.dn = r ? +r.dn || 0 : 0; $('#wlRs').value = r ? r.rs || '' : '';
