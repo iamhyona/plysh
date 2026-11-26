@@ -1008,13 +1008,12 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .exi[data-exi]:active { opacity:.6; }
 .tdea { display:flex; align-items:center; gap:6px; margin-top:6px; } .tdea input { flex:1; min-width:0; height:38px; border:1.5px dashed var(--line); background:none; border-radius:10px; padding:0 11px; font-size:15px; outline:0; color:var(--txt); box-sizing:border-box; } .tdea input:focus { border-style:solid; border-color:var(--sub); } .tdea.busy { opacity:.5; } .tdea::after { content:''; flex:none; width:34px; }
 .exxl { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:10px; border-radius:14px; background:var(--txt); color:#fff; padding:14px; font-size:14px; font-weight:700; text-decoration:none; box-sizing:border-box; } .exxl svg { width:16px; height:16px; }
-.exbat { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:12px; }
-.exbi { display:flex; gap:12px; background:#fff; border-radius:18px; padding:16px; }
-.exbi > img, .exbph { width:84px; height:112px; object-fit:cover; border-radius:10px; flex:none; background:var(--chip); }
-.exbf { flex:1; min-width:0; } .exbf .frow { margin-bottom:10px !important; }
-.exbt { display:flex; align-items:center; gap:8px; margin-bottom:10px; } .exbt em { font-style:normal; width:22px; height:22px; border-radius:50%; background:var(--chip); font-size:12px; font-weight:700; color:var(--sub); display:flex; align-items:center; justify-content:center; flex:none; }
-.exbt small { flex:1; color:var(--mute); font-size:12px; } .exbx { border:0; background:var(--chip); color:var(--sub); border-radius:10px; padding:6px 10px; font-size:13px; font-weight:600; }
-@media (max-width:520px) { .exbi { flex-direction:column; } .exbi > img, .exbph { width:100%; height:160px; } }
+.exbat { display:flex; flex-direction:column; gap:12px; }
+.exbi .exbt { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.exbt em { font-style:normal; width:22px; height:22px; border-radius:50%; background:var(--chip); font-size:12px; font-weight:700; color:var(--sub); display:flex; align-items:center; justify-content:center; flex:none; }
+.exbt small { flex:1; color:var(--mute); font-size:12px; } .exbx { border:0; background:var(--chip); color:var(--sub); border-radius:10px; padding:6px 12px; font-size:13px; font-weight:600; }
+.exbi textarea { min-height:84px; }
+.exbi .expic { cursor:default; }
 .extidy { width:100%; margin-top:10px; border:0; border-radius:14px; background:var(--chip); color:var(--sub); padding:14px; font-size:14px; font-weight:600; }
 .wlform { margin-top:16px; border:1px solid var(--line); border-radius:18px; padding:16px 14px 14px; background:#fff; }
 .wlform .acts { margin-top:18px; }
@@ -1704,7 +1703,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261126hm198';
+var APP_VER = '20261126hm199';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4527,11 +4526,12 @@ function exBatchDraw() {
   var busy = X.B.some(function (i) { return /중…$/.test(i.st); });
   var h = '<div class="exhd"><b>여러 장 올리기</b><span>' + X.B.length + '건 · 확인 후 올려 주세요</span></div><div class="exbat">';
   h += X.B.map(function (i, k) {
-    return '<div class="exbi" data-bi="' + i.id + '">' + (i.img ? '<img src="data:image/jpeg;base64,' + i.img + '" alt="">' : '<div class="exbph"></div>') +
-      '<div class="exbf"><div class="exbt"><em>' + (k + 1) + '</em><small>' + esc(i.st || '') + '</small><button class="exbx" data-bx="' + i.id + '">빼기</button></div>' +
-      '<div class="frow"><div class="f"><label>지출일자</label><input type="date" class="dpk" data-k="d" value="' + esc(i.d) + '"></div><div class="f"><label>사용금액</label><input inputmode="numeric" autocomplete="off" data-k="a" value="' + esc(i.a) + '"></div></div>' +
-      '<div class="frow"><div class="f"><label>지출처</label><input maxlength="40" data-k="v" value="' + esc(i.v) + '"></div></div>' +
-      '<div class="frow"><div class="f"><label>사용목적</label><textarea rows="3" maxlength="160" data-k="u" style="min-height:84px">' + esc(i.u) + '</textarea></div></div></div></div>';
+    return '<div class="exbox exbi" data-bi="' + i.id + '">' +
+      '<div class="exbt"><em>' + (k + 1) + '</em><small>' + esc(i.st || '') + '</small><button class="exbx" data-bx="' + i.id + '">빼기</button></div>' +
+      '<div class="frow"><div class="f"><label>지출일자</label><input type="date" class="dpk" data-k="d" value="' + esc(i.d) + '"></div></div>' +
+      '<div class="frow"><div class="f"><label>사용금액</label><input inputmode="numeric" autocomplete="off" placeholder="예) 12,500" data-k="a" value="' + esc(i.a) + '"></div><div class="f"><label>지출처</label><input maxlength="40" placeholder="예) 우버 · 쿠팡이츠" data-k="v" value="' + esc(i.v) + '"></div></div>' +
+      '<div class="frow"><div class="f"><label>사용목적</label><textarea rows="3" maxlength="160" data-k="u" placeholder="[아티스트명] 프로젝트명+야근사유 야근택시비/야근식대&#10;(출발지>도착지 HH:MM~HH:MM/명단)">' + esc(i.u) + '</textarea></div></div>' +
+      '<div class="expic' + (i.img ? ' on' : '') + '">' + (i.img ? '<img src="data:image/jpeg;base64,' + i.img + '" alt="">' : '<span>사진 줄이는 중…</span>') + '</div></div>';
   }).join('') + '</div>';
   h += '<div class="acts" style="margin-top:12px"><button class="save" id="exBS"' + (busy || X.busy ? ' disabled' : '') + '>' + (busy ? '읽는 중…' : X.B.length + '건 모두 올리기') + '</button></div>';
   el.innerHTML = h;
