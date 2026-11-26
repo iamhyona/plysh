@@ -1008,6 +1008,13 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .exi[data-exi]:active { opacity:.6; }
 .tdea { display:flex; align-items:center; gap:6px; margin-top:6px; } .tdea input { flex:1; min-width:0; height:38px; border:1.5px dashed var(--line); background:none; border-radius:10px; padding:0 11px; font-size:15px; outline:0; color:var(--txt); box-sizing:border-box; } .tdea input:focus { border-style:solid; border-color:var(--sub); } .tdea.busy { opacity:.5; } .tdea::after { content:''; flex:none; width:34px; }
 .exxl { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:10px; border-radius:14px; background:var(--txt); color:#fff; padding:14px; font-size:14px; font-weight:700; text-decoration:none; box-sizing:border-box; } .exxl svg { width:16px; height:16px; }
+.exbat { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:12px; }
+.exbi { display:flex; gap:12px; background:#fff; border-radius:18px; padding:16px; }
+.exbi > img, .exbph { width:84px; height:112px; object-fit:cover; border-radius:10px; flex:none; background:var(--chip); }
+.exbf { flex:1; min-width:0; } .exbf .frow { margin-bottom:10px !important; }
+.exbt { display:flex; align-items:center; gap:8px; margin-bottom:10px; } .exbt em { font-style:normal; width:22px; height:22px; border-radius:50%; background:var(--chip); font-size:12px; font-weight:700; color:var(--sub); display:flex; align-items:center; justify-content:center; flex:none; }
+.exbt small { flex:1; color:var(--mute); font-size:12px; } .exbx { border:0; background:var(--chip); color:var(--sub); border-radius:10px; padding:6px 10px; font-size:13px; font-weight:600; }
+@media (max-width:520px) { .exbi { flex-direction:column; } .exbi > img, .exbph { width:100%; height:160px; } }
 .extidy { width:100%; margin-top:10px; border:0; border-radius:14px; background:var(--chip); color:var(--sub); padding:14px; font-size:14px; font-weight:600; }
 .wlform { margin-top:16px; border:1px solid var(--line); border-radius:18px; padding:16px 14px 14px; background:#fff; }
 .wlform .acts { margin-top:18px; }
@@ -1697,7 +1704,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261126hm197';
+var APP_VER = '20261126hm198';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4441,15 +4448,16 @@ function renderExp() {
   h += '<div class="frow" style="margin-top:0"><div class="f"><label>작성 연월</label><select id="exY" class="exsel">' + exYms().map(function (y) { return '<option value="' + y + '"' + (y === X.ym ? ' selected' : '') + '>' + (+y.slice(0, 4)) + '년 ' + (+y.slice(5, 7)) + '월</option>'; }).join('') + '</select></div><div class="f"><label>지출일자</label><input id="exD" type="date" class="dpk" value="' + (TODAY.slice(0, 7) === X.ym ? TODAY : X.ym + '-01') + '"></div></div>';
   h += '<div class="frow"><div class="f"><label>사용금액</label><input id="exA" inputmode="numeric" autocomplete="off" placeholder="예) 12,500"></div><div class="f"><label>지출처</label><input id="exV" maxlength="40" placeholder="예) 우버 · 쿠팡이츠"></div></div>';
   h += '<div class="frow"><div class="f"><label>사용목적</label><textarea id="exU" rows="2" maxlength="160" placeholder="[아티스트명] 프로젝트명+야근사유 야근택시비/야근식대&#10;(출발지>도착지 HH:MM~HH:MM/명단)"></textarea></div></div>';
-  h += '<label class="expic" id="exPic"><input id="exF" type="file" accept="image/*" hidden><span id="exPicT">' + IC_PS + '영수증 사진 첨부</span><img id="exImg" alt=""></label>';
+  h += '<label class="expic" id="exPic"><input id="exF" type="file" accept="image/*" multiple hidden><span id="exPicT">' + IC_PS + '영수증 사진 첨부 · 여러 장 한 번에 가능</span><img id="exImg" alt=""></label>';
   h += '<div class="acts" style="margin-top:14px"><button class="save" id="exS">올리기</button></div></div>';
-  h += '<div id="exL"></div>';
+  h += '<div id="exB"></div><div id="exL"></div>';
   $('#main').innerHTML = h;
   $$('#exP button').forEach(function (b) { b.onclick = function () { X.p = b.dataset.n; ls.set('d4:exp', X.p); $$('#exP button').forEach(function (z) { z.classList.toggle('on', z === b); }); exList(); exLoad(); }; });
   $('#exY').onchange = function () { X.ym = this.value; var d = $('#exD'); if (d.value.slice(0, 7) !== X.ym) d.value = TODAY.slice(0, 7) === X.ym ? TODAY : X.ym + '-01'; exList(); exLoad(); };
   $('#exA').oninput = function () { var v = this.value.replace(/[^\d]/g, ''); this.value = v ? (+v).toLocaleString('ko-KR') : ''; };
   $('#exF').onchange = function () {
-    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    var fl = Array.prototype.slice.call(this.files || []), f = fl[0]; this.value = ''; if (!f) return;
+    if (fl.length > 1) return exBatchAdd(fl);
     $('#exPicT').textContent = '사진 줄이는 중…';
     exShrink(f).then(function (b64) { X.img = b64; exDraftSave(); setTimeout(function () { exOcr(b64); }, 0); $('#exImg').src = 'data:image/jpeg;base64,' + b64; $('#exPic').classList.add('on'); $('#exPicT').textContent = '사진 바꾸기'; })
       .catch(function (e) { toast(errMsg(e)); $('#exPicT').innerHTML = IC_PS + '영수증 사진 첨부'; });
@@ -4459,7 +4467,7 @@ function renderExp() {
   exTaxiHook('#exV', '#exU');
   if (X.dr) { if (X.dr.d && X.dr.d.slice(0, 7) === X.ym) $('#exD').value = X.dr.d; $('#exA').value = X.dr.a || ''; $('#exV').value = X.dr.v || ''; $('#exU').value = X.dr.u || ''; }
   if (X.img) { $('#exImg').src = 'data:image/jpeg;base64,' + X.img; $('#exPic').classList.add('on'); $('#exPicT').textContent = '사진 바꾸기'; }
-  exList(); exLoad();
+  exBatchDraw(); exList(); exLoad();
 }
 // 작성 중 내용 임시 저장 (새로고침·앱 업데이트로 화면이 다시 열려도 그대로)
 function exDraftSave() {
@@ -4487,6 +4495,77 @@ function exOcr(b64, edit) {
     if (!edit) exDraftSave();
     toast(n ? '영수증에서 읽어 채웠어요 · 맞는지 확인해 주세요' : '영수증 글자를 못 읽었어요. 직접 적어 주세요');
   }).catch(function (e) { toast('자동 인식 실패 · ' + errMsg(e)); }).then(function () { lab.innerHTML = keep; });
+}
+// 영수증 여러 장 한 번에 (2026-11-26 실장님): 사진마다 자동 인식 → 카드로 확인·고치기 → 모두 올리기 (한 건씩 차례로)
+S.ex.B = [];
+function exBatchAdd(files) {
+  var X = S.ex; if (!X.p) return toast('디자이너를 먼저 골라 주세요');
+  var q = [];
+  files.forEach(function (f) {
+    var it = { id: Math.random().toString(36).slice(2), img: '', d: '', a: '', v: '', u: '', st: '사진 줄이는 중…' };
+    X.B.push(it); q.push([f, it]);
+  });
+  exBatchDraw();
+  toast(files.length + '장을 읽고 있어요. 아래에서 확인 후 모두 올려 주세요');
+  // 서버가 한꺼번에 몰리지 않게 2장씩 차례로 읽음
+  function run() {
+    var job = q.shift(); if (!job) return;
+    var f = job[0], it = job[1];
+    exShrink(f).then(function (b64) {
+      it.img = b64; it.st = '영수증 읽는 중…'; exBatchDraw();
+      return call('appExpOcr', S.pin, { img: b64, p: X.p, d: TODAY }).then(function (r) {
+        it.d = r.d || ''; it.a = r.a ? (+r.a).toLocaleString('ko-KR') : ''; it.v = r.v || ''; it.u = r.u || (exIsTaxi(r.v) ? exTaxiU(X.p) : '');
+        it.st = r.d || r.a ? '' : '글자를 못 읽었어요. 직접 적어 주세요';
+      }).catch(function () { it.st = '자동 인식 실패 · 직접 적어 주세요'; });
+    }).catch(function () { it.st = '사진을 열지 못했어요'; }).then(function () { exBatchDraw(); run(); });
+  }
+  run(); run();
+}
+function exBatchDraw() {
+  var X = S.ex, el = $('#exB'); if (!el) return;
+  if (!X.B.length) { el.innerHTML = ''; return; }
+  var busy = X.B.some(function (i) { return /중…$/.test(i.st); });
+  var h = '<div class="exhd"><b>여러 장 올리기</b><span>' + X.B.length + '건 · 확인 후 올려 주세요</span></div><div class="exbat">';
+  h += X.B.map(function (i, k) {
+    return '<div class="exbi" data-bi="' + i.id + '">' + (i.img ? '<img src="data:image/jpeg;base64,' + i.img + '" alt="">' : '<div class="exbph"></div>') +
+      '<div class="exbf"><div class="exbt"><em>' + (k + 1) + '</em><small>' + esc(i.st || '') + '</small><button class="exbx" data-bx="' + i.id + '">빼기</button></div>' +
+      '<div class="frow"><div class="f"><label>지출일자</label><input type="date" class="dpk" data-k="d" value="' + esc(i.d) + '"></div><div class="f"><label>사용금액</label><input inputmode="numeric" autocomplete="off" data-k="a" value="' + esc(i.a) + '"></div></div>' +
+      '<div class="frow"><div class="f"><label>지출처</label><input maxlength="40" data-k="v" value="' + esc(i.v) + '"></div></div>' +
+      '<div class="frow"><div class="f"><label>사용목적</label><textarea rows="3" maxlength="160" data-k="u" style="min-height:84px">' + esc(i.u) + '</textarea></div></div></div></div>';
+  }).join('') + '</div>';
+  h += '<div class="acts" style="margin-top:12px"><button class="save" id="exBS"' + (busy || X.busy ? ' disabled' : '') + '>' + (busy ? '읽는 중…' : X.B.length + '건 모두 올리기') + '</button></div>';
+  el.innerHTML = h;
+  Array.prototype.forEach.call(el.querySelectorAll('[data-bi]'), function (c) {
+    var it = X.B.filter(function (i) { return i.id === c.dataset.bi; })[0];
+    Array.prototype.forEach.call(c.querySelectorAll('[data-k]'), function (inp) {
+      inp.addEventListener('input', function () {
+        var k = inp.dataset.k;
+        if (k === 'a') { var v = inp.value.replace(/[^\d]/g, ''); inp.value = v ? (+v).toLocaleString('ko-KR') : ''; }
+        it[k] = inp.value;
+        if (k === 'v') { var t = exTaxiU(X.p), ta = c.querySelector('[data-k="u"]'); if (t && exIsTaxi(inp.value) && !ta.value.trim()) { ta.value = t; it.u = t; } }
+      });
+    });
+  });
+  Array.prototype.forEach.call(el.querySelectorAll('[data-bx]'), function (b) { b.onclick = function () { if (X.busy) return; X.B = X.B.filter(function (i) { return i.id !== b.dataset.bx; }); exBatchDraw(); }; });
+  if ($('#exBS')) $('#exBS').onclick = exBatchSave;
+}
+function exBatchSave() {
+  var X = S.ex, b = $('#exBS'); if (X.busy || !X.B.length) return;
+  for (var k = 0; k < X.B.length; k++) {
+    var i = X.B[k];
+    if (!i.d) return toast((k + 1) + '번 지출일자를 골라 주세요');
+    if (!+String(i.a).replace(/[^\d]/g, '')) return toast((k + 1) + '번 사용금액을 적어 주세요');
+    if (!String(i.u).trim()) return toast((k + 1) + '번 사용목적을 적어 주세요');
+  }
+  X.busy = true; b.disabled = true; var all = X.B.length, ok = 0;
+  (function next() {
+    var i = X.B[0];
+    if (!i) { X.busy = false; exBatchDraw(); return toast(ok + '건 올렸어요'); }
+    b.textContent = '올리는 중… ' + (ok + 1) + ' / ' + all;
+    call('appExpAdd', S.pin, { p: X.p, ym: X.ym, d: i.d, a: String(i.a).replace(/[^\d]/g, ''), u: String(i.u).trim(), v: String(i.v).trim(), img: i.img }).then(function (res) {
+      X.D[X.p + '|' + X.ym] = res; ok++; X.B.shift(); exList(); next();
+    }).catch(function (e) { X.busy = false; exBatchDraw(); toast((ok + 1) + '번째에서 멈췄어요 · ' + errMsg(e)); });
+  })();
 }
 // 택시 사용목적 기본값 (2026-11-26 실장님): 지출처에 우버·카카오T 등 택시가 들어가고 사용목적이 비어 있으면 작성자별 경로로 채움
 var EX_HOME = { '박현아': '공덕', '유이시': '신촌', '이혜선': '영등포', '박주영': '남성', '허희원': '안양' };
