@@ -1697,7 +1697,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261124hm196';
+var APP_VER = '20261126hm197';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4456,6 +4456,7 @@ function renderExp() {
   };
   $('#exS').onclick = exSave;
   ['#exD', '#exA', '#exV', '#exU'].forEach(function (k) { $(k).addEventListener('input', exDraftSave); $(k).addEventListener('change', exDraftSave); });
+  exTaxiHook('#exV', '#exU');
   if (X.dr) { if (X.dr.d && X.dr.d.slice(0, 7) === X.ym) $('#exD').value = X.dr.d; $('#exA').value = X.dr.a || ''; $('#exV').value = X.dr.v || ''; $('#exU').value = X.dr.u || ''; }
   if (X.img) { $('#exImg').src = 'data:image/jpeg;base64,' + X.img; $('#exPic').classList.add('on'); $('#exPicT').textContent = '사진 바꾸기'; }
   exList(); exLoad();
@@ -4487,6 +4488,13 @@ function exOcr(b64, edit) {
     toast(n ? '영수증에서 읽어 채웠어요 · 맞는지 확인해 주세요' : '영수증 글자를 못 읽었어요. 직접 적어 주세요');
   }).catch(function (e) { toast('자동 인식 실패 · ' + errMsg(e)); }).then(function () { lab.innerHTML = keep; });
 }
+// 택시 사용목적 기본값 (2026-11-26 실장님): 지출처에 우버·카카오T 등 택시가 들어가고 사용목적이 비어 있으면 작성자별 경로로 채움
+var EX_HOME = { '박현아': '공덕', '유이시': '신촌', '이혜선': '영등포', '박주영': '남성', '허희원': '안양' };
+function exTaxiU(p) { return EX_HOME[p] ? '[아티스트]프로젝트명 야근사유 야근택시비\n(합정>' + EX_HOME[p] + ') HH:MM-HH:MM' : ''; }
+function exIsTaxi(v) { v = String(v || ''); return /우버|카카오\s*T|카카오\s*택시|택시|티머니|타다|uber|kakao\s*t/i.test(v) || /\bUT\b/.test(v); }
+function exTaxiHook(kv, ku) {
+  $(kv).addEventListener('input', function () { var u = $(ku), t = exTaxiU(S.ex.p); if (t && exIsTaxi(this.value) && !u.value.trim()) { u.value = t; if (kv === '#exV') exDraftSave(); } });
+}
 function exDraftClear() { S.ex.dr = null; try { localStorage.removeItem('d4:exdr'); } catch (e) {} }
 // 올린 영수증 고치기 (2026-10-28): 목록을 누르면 내용 수정 · 사진 교체/빼기 · 삭제
 var EXE = null;
@@ -4505,6 +4513,7 @@ function exEditSend(o, b, msg) {
   call('appExpEdit', S.pin, o).then(function (res) { X.D[X.p + '|' + X.ym] = res; closeBs(); exList(); toast(msg); })
     .catch(function (e) { toast(errMsg(e)); }).then(function () { b.classList.remove('busy'); });
 }
+exTaxiHook('#exEV', '#exEU');
 $('#exEA').oninput = function () { var v = this.value.replace(/[^\d]/g, ''); this.value = v ? (+v).toLocaleString('ko-KR') : ''; };
 $('#exED').addEventListener('click', function () { try { if (this.showPicker) this.showPicker(); } catch (e) {} });
 $('#exEF').onchange = function () {
