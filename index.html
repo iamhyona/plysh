@@ -1354,6 +1354,15 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+.tdqb { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; height:40px; margin:10px 0 4px; border:0; border-radius:10px; background:var(--chip); color:var(--sub); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.tdqb svg { width:16px; height:16px; }
+.tdadd .tdjx { flex:0 1 38%; min-width:0; height:38px; border:0; background:var(--chip); border-radius:10px; padding:0 10px; font-size:13px; outline:0; }
+.tqj { display:flex; flex-direction:column; gap:6px; margin-bottom:8px; } .tqj select, .tqj input { height:44px; border:0; background:var(--bg); border-radius:12px; padding:0 12px; font:inherit; font-size:14px; color:var(--txt); }
+#tqX { width:100%; border:0; background:var(--bg); border-radius:12px; padding:12px; font:inherit; font-size:15px; line-height:1.6; resize:vertical; color:var(--txt); }
+.tqg { margin-top:12px; } .tqh { font-size:14px; font-weight:800; color:var(--txt); padding-bottom:4px; display:flex; gap:6px; align-items:baseline; } .tqh small { font-size:11.5px; font-weight:600; color:var(--mute); }
+.tqi { display:flex; gap:8px; align-items:center; font-size:14px; color:var(--txt); padding:6px 0; border-top:1px solid var(--line); }
+.tqi .ck { width:16px; height:16px; border-radius:5px; box-shadow:inset 0 0 0 1.5px var(--faint); flex:none; }
+
 #bgSv { position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px); z-index:400; background:#191f28; color:#fff; font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; white-space:nowrap; max-width:calc(100vw - 32px); }
 /* 출퇴근 단추 확인 문구는 잘리지 않게 줄바꿈 */
 /* 2026-11-27 실장님: 출퇴근 단추는 세로형 4칸 유지(한 번 누르면 바로 기록이라 확인 문구 없음) · 찍힌 단추는 흐리지 않게 */
@@ -1887,6 +1896,16 @@ html[data-nav] #cvSeg { display:none !important; }
   <div class="acts"><button class="save" id="bkS" disabled>시트에 저장</button></div>
 </div>
 
+<!-- 2026-11-27 실장님: 할 일 줄글 추가 -->
+<div class="bs" id="tq">
+  <h3 id="tqH">할 일 추가</h3>
+  <div class="tqj" id="tqJw"></div>
+  <textarea id="tqX" rows="7" placeholder="줄마다 할 일 하나씩 적거나 그대로 붙여 넣으세요&#10;&#10;프로젝트를 안 골랐다면 이렇게 써도 알아서 나눠요&#10;크래비티 2027 시즌그리팅&#10;박 샘플 확인&#10;내지 2차 수정&#10;예나 팩샷 정리"></textarea>
+  <p class="srcinfo">줄바꿈마다 할 일 하나로 나눠요. 프로젝트를 고르지 않으면 프로젝트 이름만 있는 줄이나 글 속 아티스트 이름으로 찾아요. 앞의 '-', '1.' 같은 표시는 빼고 저장해요.</p>
+  <div id="tqPv"></div>
+  <div class="acts"><button class="save" id="tqS" disabled>추가</button></div>
+</div>
+
 <!-- 새 프로젝트 -->
 <div class="bs" id="np">
   <h3>새 프로젝트</h3>
@@ -2098,7 +2117,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm224';
+var APP_VER = '20261127hm225';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4656,11 +4675,11 @@ function tdItem(x, opt) {
 // 완료 시각 표시: 2026-10-28 14:05 → 26.10.28(수) 14:05 (2026-10-28)
 function tdCt(s) { var m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}:\d{2})/); if (!m) return esc(s); var w = '일월화수목금토'.charAt(new Date(+m[1], +m[2] - 1, +m[3]).getDay()); return m[1].slice(2) + '.' + m[2] + '.' + m[3] + '(' + w + ') ' + m[4]; }
 function tdProjOpts() {
-  var names = projList().map(function (p) { return p.name; });
-  tdRows(function (x) { return x.j; }).forEach(function (x) { if (names.indexOf(x.j) < 0) names.push(x.j); });
+  // 2026-11-27 실장님: 예전 할 일에 적힌 이름(기안작성·나스 정리 등)은 빼고 제작일정 시트가 있는 프로젝트만, 맨 아래 '직접 입력'
+  var names = S.D.files.filter(function (f) { return f.type === 'proj'; }).map(function (f) { return f.name; });
   var last = ls.get('d4:tdj') || '';
   var seen = {}; names = names.map(sgFix).filter(function (n) { var k = pnorm(n); if (!n || seen[k]) return false; seen[k] = 1; return true; }).sort(function (a, b) { return a.localeCompare(b, 'ko'); });
-  return '<option value="">프로젝트 선택</option>' + names.map(function (n) { return '<option' + (pnorm(n) === pnorm(last) ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
+  return '<option value="">프로젝트 선택</option>' + names.map(function (n) { return '<option' + (pnorm(n) === pnorm(last) ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '<option value="__own">직접 입력</option>';
 }
 function tdAddRow(k, d, p, memo) {
   return '<div class="tdadd" data-k="' + k + '" data-d="' + d + '" data-p="' + esc(p || '') + '">' +
@@ -4715,7 +4734,7 @@ function renderTodo() {
     h += '<div class="bd tdd tdcard"><div class="bdh"><div>' + '<div class="tdnm">' + (tp ? '<b>' + esc(n) + '</b>' : '<button class="tdwho" data-go="' + esc(n) + '"><b>' + esc(n) + '</b></button>') +
       (tdCount(L) ? '<span class="tdcn">' + tdCount(L) + ' 완료</span>' : '') + '</div></div>' +
       (L.length ? (S.tdEdit === n ? '<button class="tded on" data-ted="' + esc(n) + '">저장</button>' : '<button class="tded" data-ted="' + esc(n) + '" aria-label="편집"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>') : '') + '</div>' +
-      (S.tdEdit === n ? tdEditList(L) + '<div class="tdnewp">새 프로젝트 · 할 일 추가</div>' + tdAddRow('데일리', one ? S.tdd : TODAY, n) : '<div class="tdl">' + (one ? list(L) : byDate(L)) + '</div>' + (one ? tdAddRow('데일리', S.tdd, n) : '')) + '</div>';
+      (S.tdEdit === n ? tdEditList(L) + '<div class="tdnewp">새 프로젝트 · 할 일 추가</div>' + tdAddRow('데일리', one ? S.tdd : TODAY, n) : '<div class="tdl">' + (one ? list(L) : byDate(L)) + '</div>' + '<button type="button" class="tdqb" data-tdq="' + esc(n) + '|' + (one ? S.tdd : TODAY) + '">' + IC_PS + '할 일 추가</button>') + '</div>';
   });
   var y0 = window.scrollY;
   var ntOn = tdRows(function (x) { return x.k === '공지' && !x.c; }).length;
@@ -4729,6 +4748,7 @@ function renderTodo() {
   $$('[data-go]').forEach(function (b) { b.onclick = function () { ls.set('d4:tp', b.dataset.go); window.scrollTo(0, 0); render(); }; });
   $$('[data-ted]').forEach(function (b) { b.onmousedown = function (e) { e.preventDefault(); }; b.onclick = function () { var a = document.activeElement; if (a && a.closest && a.closest('.tdei')) a.blur(); S.tdEdit = S.tdEdit === b.dataset.ted ? '' : b.dataset.ted; render(); }; });
   bindTdEdit();
+  $$('[data-tdq]').forEach(function (b) { b.onclick = function () { var a = b.dataset.tdq.split('|'); openTdq(a[0], a[1]); }; });
   $$('[data-pst]').forEach(function (b) { b.onclick = function () { var a = b.dataset.pst.split('|'); openPaste({ d: a[0], p: a[1] }); }; });
   if ($('#tdPaste')) $('#tdPaste').onclick = function () { openPaste(); };
 }
@@ -4738,7 +4758,8 @@ function bindTd(root) {
   root.querySelectorAll('[data-tdck]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); tdToggle(b.dataset.tdck); }; });
   root.querySelectorAll('[data-tdx]').forEach(function (b) { b.onclick = function () { openTd(b.dataset.tdx); }; });
   root.querySelectorAll('.tdadd').forEach(function (w) {
-    var inp = w.querySelector('.tdi'), st = w.querySelector('.tdstar');
+    var inp = w.querySelector('.tdi'), st = w.querySelector('.tdstar'), sj = w.querySelector('select.tdj');
+    if (sj) sj.onchange = function () { if (sj.value !== '__own') return; var x = document.createElement('input'); x.className = 'tdj tdjx'; x.placeholder = '프로젝트 이름'; x.maxLength = 40; sj.replaceWith(x); x.focus(); };
     if (st) st.onclick = function () { var on = st.getAttribute('aria-pressed') !== 'true'; st.setAttribute('aria-pressed', on ? 'true' : 'false'); inp.focus(); };
     function go() {
       var t = inp.value.trim(); if (!t) return inp.focus();
@@ -6234,6 +6255,51 @@ function bgBar() {
   el.innerHTML = '<i></i>구글 시트에 저장 중이에요 · 30초쯤 걸리니 PLYSH 창을 닫지 마세요'; el.classList.toggle('on', BG.n > 0);
 }
 window.addEventListener('beforeunload', function (ev) { if (BG.n > 0) { ev.preventDefault(); ev.returnValue = ''; } });
+// ───── 할 일 줄글로 추가 (2026-11-27 실장님) ─────
+// 맨 윗줄 = 프로젝트, 그 아래 줄들 = 그 프로젝트 할 일. 빈 줄 다음 줄이나 프로젝트 이름과 같은 줄은 새 프로젝트로 읽음
+var TQ = { p: '', d: '' };
+function openTdq(p, d) {
+  TQ = { p: p, d: d || TODAY }; $('#tqH').textContent = p + ' · ' + dw(TQ.d) + ' 할 일 추가'; $('#tqX').value = '';
+  $('#tqJw').innerHTML = '<select id="tqJ">' + tdProjOpts().replace('>프로젝트 선택<', '>프로젝트 고르지 않기 (글에서 찾기)<').replace(/ selected/g, '') + '</select>';
+  $('#tqJ').onchange = function () { if (this.value === '__own') { $('#tqJw').insertAdjacentHTML('beforeend', '<input id="tqJx" placeholder="프로젝트 이름" maxlength="40">'); $('#tqJx').oninput = tqDraw; $('#tqJx').focus(); } else if ($('#tqJx')) $('#tqJx').remove(); tqDraw(); };
+  tqDraw();
+  var was = !!$('.bs.open'); closeBs(); setTimeout(function () { openBs('#tq'); setTimeout(function () { $('#tqX').focus(); }, 250); }, was ? 230 : 0);
+}
+function tqProj(line) {
+  var k = pnorm(line.replace(/[:：]$/, '')); if (!k) return '';
+  var f = S.D.files.filter(function (f) { return f.type === 'proj' && pnorm(f.name) === k; })[0]; if (f) return f.name;
+  var al = S.D.alias || {}; for (var a in al) if (pnorm(a) === k) return al[a];
+  return '';
+}
+function tqParse(txt) {
+  // 위에서 프로젝트를 고르면 모든 줄이 그 프로젝트, 안 고르면 줄마다 프로젝트 이름(아티스트)을 찾아 맞춤
+  var sel = $('#tqJ') ? $('#tqJ').value : '', pick = sel && sel !== '__own' ? sel : sel === '__own' ? ($('#tqJx') ? $('#tqJx').value.trim() : '') : '';
+  var out = [], cur = pick, head = !pick;
+  String(txt || '').split(/\r?\n/).forEach(function (ln) {
+    var raw = ln.trim(); if (!raw) { if (!pick) head = true; return; }
+    var t = raw.replace(/^([-–•·*▪︎◦]|\d+[.)]|\[\s?\]|☐)\s*/, '').trim(); if (!t) return;
+    var pj = tqProj(t), f = !pj && !pick ? bkFind(t) : null;
+    // 프로젝트 이름만 있는 줄 → 아래 줄들의 프로젝트
+    if (pj || (head && f && pnorm(t).length <= pnorm(f.name).length + 2)) { cur = pj || f.name; head = false; return; }
+    head = false;
+    out.push({ j: sgFix(pick || (f ? f.name : cur)), t: t });
+  });
+  return out;
+}
+function tqDraw() {
+  var R = tqParse($('#tqX').value), g = {}, o = [];
+  R.forEach(function (r) { if (!g[r.j]) { g[r.j] = []; o.push(r.j); } g[r.j].push(r.t); });
+  $('#tqPv').innerHTML = R.length ? o.map(function (j) { var known = S.D.files.some(function (f) { return f.type === 'proj' && pnorm(f.name) === pnorm(j); }); return '<div class="tqg"><div class="tqh">' + esc(j || '프로젝트 없음') + (known ? '' : '<small>새 이름</small>') + '</div>' + g[j].map(function (t) { return '<div class="tqi"><span class="ck"></span>' + esc(t) + '</div>'; }).join('') + '</div>'; }).join('') : '';
+  $('#tqS').disabled = !R.length; $('#tqS').textContent = R.length ? R.length + '개 추가' : '추가';
+}
+$('#tqX').oninput = tqDraw;
+$('#tqS').onclick = function () {
+  var R = tqParse($('#tqX').value); if (!R.length) return;
+  var arr = R.map(function (r) { return { d: TQ.d, k: '데일리', p: TQ.p, j: r.j, t: r.t, c: false, m: '' }; }), tmps = arr.map(function (o, i) { return Object.assign({ id: 'tmp|' + Date.now() + i, tmp: 1 }, o); });
+  S.D.todo = S.D.todo.concat(tmps); closeBs(); render();
+  bgSave(call('appTodoAdd', S.pin, arr).then(function (res) { if (!tdMerge(res)) return load(); })
+    .catch(function (e) { S.D.todo = S.D.todo.filter(function (x) { return tmps.indexOf(x) < 0; }); render(); throw e; }), '할 일 ' + arr.length + '개');
+};
 function wlShrink(file) {
   return new Promise(function (ok, no) {
     var img = new Image(), u = URL.createObjectURL(file);
