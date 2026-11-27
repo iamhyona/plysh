@@ -2367,7 +2367,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm246';
+var APP_VER = '20261127hm247';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3273,6 +3273,8 @@ var SPACES = [
     // 2026-11-27 실장님: 행정 업무는 한 페이지 목차가 아니라 하위 메뉴별 페이지로
     { g: '행정 업무', i: [{ k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }, { k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 제작 방법', s: '신청 정보 · 제작 순서 · 데이터' }] }] }
 ];
+// 2026-11-27 실장님: 안내는 '안내 · 행정 업무' 구분 없이 한 목록
+SPACES.forEach(function (sp) { if (sp.k === 'admin' && sp.g.length > 1) sp.g = [{ g: sp.t, i: [].concat.apply([], sp.g.map(function (g) { return g.i; })) }]; });
 // 2026-11-20: 메뉴 이름은 SPACES(실장님 확정)가 유일한 기준. 칩 · 카드 · 찾기 · 자주 쓰는 도구 모두 이 이름
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i.forEach(function (x) { if (typeof x === 'string') return; var t = tl(x.k); if (t.k) t.t = x.t; TOOL_SHORT[x.k] = x.t; }); }); });
 SPACES.forEach(function (sp) { sp.g.forEach(function (g) { g.i = g.i.map(function (x) { if (typeof x !== 'string') { if (x.tool && !x.s) x.s = tl(x.k).s; return x; } var t = tl(x); return { k: x, t: t.t, s: t.s, tool: 1 }; }); }); });
