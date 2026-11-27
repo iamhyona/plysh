@@ -751,7 +751,7 @@ setPending();
 load();
 
 /* ---------- 이미지로 폰트 찾기 (2026-11-20) ---------- */
-const FIND_API='https://script.google.com/macros/s/AKfycbwFtL_qIuUMOxdD5wzj6Eltc67OTIScR4yJjMZWxLyPzn8K7Y5JhOBTDlf4wp9Av6lqSQ/exec';
+const FIND_API='https://script.google.com/macros/s/AKfycbzpvNlxuCa95ZxGvg8N4SiPqmsPzyYx_n9ikhmdRlIng7VzWzks_WS6DDyviPXsfoaO/exec'; // 2026-11-27 루틴 앱 서버(PIN) → PLYSH 서버(로그인 토큰)
 const FIND={b64:'',blob:null};
 function openFind(){
   $('#sheet').className='sheet';
@@ -787,12 +787,11 @@ function takeFindImg(file){
 function showFindImg(){ const i=$('#fImg'); if(!i) return; i.src='data:image/jpeg;base64,'+FIND.b64; $('#fdrop').classList.add('has'); $('#fAI').disabled=false; $('#fCopy').disabled=false; $('#fRes').innerHTML=''; }
 function toPng(b){ return Promise.resolve(b); }
 async function findAI(){
-  let pin=localStorage.getItem('pr:pin'); if(!pin){ pin=prompt('루틴 앱 PIN 4자리'); if(!pin) return; }
+  let pin=''; try{ pin=localStorage.getItem('d4:tok')||''; }catch(e){} if(!pin){ $('#fRes').innerHTML='<div class="fwait">PLYSH에 다시 로그인한 뒤 써 주세요</div>'; return; }
   const box=$('#fRes'); box.innerHTML='<div class="fwait">이미지 보는 중…</div>';
   try{
     const r=await fetch(FIND_API,{method:'POST',body:JSON.stringify({api:'appFontFind',args:[pin,FIND.b64,'image/jpeg']})}); const o=await r.json();
     if(!o||!o.ok) throw new Error((o&&o.error)||'서버 오류');
-    localStorage.setItem('pr:pin',pin);
     const L=(o.data&&o.data.fonts)||[];
     if(!L.length){ box.innerHTML='<div class="fwait">비슷한 폰트를 못 찾았어요 · 글자 부분만 크게 잘라 다시 올려 주세요</div>'; return; }
     box.innerHTML='<div class="flab">비슷한 폰트</div>'+L.map(x=>{
@@ -802,7 +801,7 @@ async function findAI(){
     box.querySelectorAll('[data-fid]').forEach(b=>b.onclick=()=>openDetail(b.dataset.fid));
     box.querySelectorAll('[data-fq]').forEach(b=>b.onclick=()=>{ closeOv(); const q=$('#q'); q.value=b.dataset.fq; q.dispatchEvent(new Event('input')); });
   }catch(e){
-    if(/PIN/.test(e.message)) localStorage.removeItem('pr:pin');
+    
     box.innerHTML='<div class="fwait">'+(/appFontFind|unknown|없는|not/i.test(e.message)?'AI 찾기는 서버에 폰트 찾기 코드를 붙여 넣으면 켜져요 · 지금은 아래 다른 곳에서 찾기를 써 주세요':esc(e.message))+'</div>';
   }
 }
