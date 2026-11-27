@@ -1281,10 +1281,10 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wtp .nm i { width:8px; height:8px; border-radius:50%; flex:none; }
 .wtp b { font-size:20px; font-weight:800; letter-spacing:-0.02em; color:var(--txt); }
 .wtp b small { font-size:12px; font-weight:600; color:var(--mute); margin-left:1px; }
-.wtp b.x40 { color:#FF7300; } .wtp b.x52 { color:#f04452; }
+.wtp b.x40 { color:color-mix(in srgb, var(--pc) 75%, #191f28); } .wtp b.x52 { color:color-mix(in srgb, var(--pc) 70%, #191f28); }
 .wtp .bar { position:relative; height:6px; border-radius:3px; background:#e5e8eb; }
 .wtp .bar i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--txt); }
-.wtp .bar i.x40 { background:#FF7300; } .wtp .bar i.x52 { background:#f04452; }
+.wtp .bar i { background:#b0b8c1; } .wtp .bar i.x40 { background:color-mix(in srgb, var(--pc) 60%, #fff); } .wtp .bar i.x52 { background:var(--pc); }
 .wtp .bar em { position:absolute; top:-2px; bottom:-2px; width:1.5px; background:var(--faint); }
 .wtn { margin:10px 0 0; font-size:12px; color:var(--mute); }
 .wsq { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
@@ -1881,7 +1881,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm205';
+var APP_VER = '20261127hm206';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2943,7 +2943,7 @@ function wtCard() {
     var x = (WT.people || []).filter(function (q) { return q.p === n; })[0];
     var w = x && !x.none && !x.err ? (x.weeks || []).filter(function (w) { return w.s <= TODAY && TODAY <= w.e; })[0] : null;
     var t = w ? +w.tot || 0 : 0, c = w && (w.over > 0 || t > 52 * 60) ? 'x52' : w && (w.ot > 0 || t > 40 * 60) ? 'x40' : '';
-    return '<div class="wtp"><span class="nm"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span><b class="' + c + '">' + (w ? hm(t) : '<small>기록 없음</small>') + '</b>' +
+    return '<div class="wtp" style="--pc:' + dcol(n) + '"><span class="nm">' + esc(n) + '</span><b class="' + c + '">' + (w ? hm(t) : '<small>기록 없음</small>') + '</b>' +
       '<span class="bar"><i class="' + c + '" style="width:' + Math.min(100, t / (52 * 60) * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span></div>';
   }).join('') + '</div><p class="wtn">이번 주 · 근무표 기준 · 선은 40시간, 끝은 52시간</p>';
   return '<div class="wsc wfull wgo" data-ng="wl"><h3>근무시간 통계<button type="button" data-ng="wl">근태</button></h3>' + body + '</div>';
