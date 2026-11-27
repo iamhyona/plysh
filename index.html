@@ -1334,6 +1334,13 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .hmc .wk > .lc { padding:1px 3px; display:flex; flex-direction:column; gap:2px; }
 .hmc .wk > .lf { min-height:6px; }
 .hmc .wk > .out { opacity:.35; }
+/* 2026-11-27 실장님: 자주 쓰는 도구 글자 잘림 → 왼쪽 열에선 2칸 × 2줄, 아이콘 옆에 이름 한 줄 */
+@media (min-width:1024px) { .wdg .wdl .wsq { grid-template-columns:repeat(2, minmax(0, 1fr)) !important; } }
+.wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
+.wdg .wdl .wsq button .nvi { flex:none; }
+.hmc .wk .ev i { display:none; }
+/* 2026-11-27 실장님: 근무시간 막대는 40시간 아래여도 디자이너별 색 (52시간 넘으면 진하게) */
+.wtp .bar i, .wmk .bar i { background:color-mix(in srgb, var(--pc) 70%, #fff) !important; } .wtp .bar i.x52, .wmk .bar i.x52 { background:color-mix(in srgb, var(--pc) 80%, #191f28) !important; }
 @media (max-width:640px) { .hmc .wk { min-height:56px; } .hmc .wk > .dh { justify-content:center; } .hmc .wk > .dh small { display:none; } }
 /* 2026-11-27 실장님: 홈 3등분 격자 — 모든 줄의 열 경계를 맞춤 */
 .wdg { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; align-items:stretch; }
@@ -2023,7 +2030,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm211';
+var APP_VER = '20261127hm212';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3148,7 +3155,7 @@ function puCard() {
     '<div class="tks">' + [9, 12, 15, 18, 21].map(function (t) { return '<span style="left:' + pc(t * 60) + '%">' + t + '시</span>'; }).join('') + '</div></div>'
   var left = 1080 - st.nm, foot = k === 'off' ? '오늘 ' + (r.i || '').replace(/^0/, '') + '–' + tm.o.replace(/^0/, '') + ' 근무했어요' : k === 'no' ? '출근을 누르면 지금 시각으로 근무표에 적혀요' : left > 0 ? '18시까지 ' + wlHk(left) + ' 남음' : '18시 지나 ' + wlHk(-left) + ' 더 일하는 중';
   bar += '<p class="wckf">' + foot + '<span>점심 12–13시 빼고 계산</span></p>';
-  return '<div class="wsc wck" style="--pc:var(--acc)"><h3>출퇴근<span class="wckh">' + (auto ? '<span class="wckme">' + esc(me) + '</span>' : '<button type="button" id="puWho">' + esc(me) + ' 바꾸기</button>') + '<button type="button" id="puEd">기록 고치기</button></span></h3>' +
+  return '<div class="wsc wck" style="--pc:' + dcol(me) + '"><h3>출퇴근<span class="wckh">' + (auto ? '<span class="wckme">' + esc(me) + '</span>' : '<button type="button" id="puWho">' + esc(me) + ' 바꾸기</button>') + '<button type="button" id="puEd">기록 고치기</button></span></h3>' +
     '<div class="wckn"><b id="puClk">' + wlHm(nm) + '</b><span class="' + k + '">' + line + '</span></div>' +
     '<div class="wckb">' + [['i', '출근'], ['x', '외근'], ['b', '복귀'], ['o', '퇴근']].map(function (b) {
       return '<button type="button" data-pu="' + b[0] + '" class="' + (nx === b[0] ? 'nx ' : '') + (tm[b[0]] ? 'done' : '') + '"' + (dis[b[0]] ? ' disabled' : '') + '>' + puIc(b[0]) + '<b>' + b[1] + '</b><small>' + (tm[b[0]] ? tm[b[0]].replace(/^0(?=\d:)/, '') : '–') + '</small></button>';
@@ -3218,8 +3225,8 @@ function myWeekCard() {
     var x = o.x, h = x ? Math.min(100, x.m / 720 * 100) : 0;
     return '<button type="button" class="' + (o.d === TODAY ? 'td' : '') + '" data-wgd="' + o.d + '|' + esc(me) + '"><b>' + (x ? wlHm(x.m) : '') + '</b><i class="' + (x && x.def ? 'df' : '') + (x && x.live ? ' lv' : '') + (x && x.m > 600 ? ' hi' : '') + '" style="height:' + h.toFixed(1) + '%"></i></button>';
   }).join('') + '<em style="bottom:' + (480 / 720 * 100).toFixed(1) + '%"><small>8시간</small></em></div><div class="dl">' + D.map(function (o) { return '<span class="' + (o.d === TODAY ? 'td' : '') + '">' + W[P(o.d).getDay()] + '</span>'; }).join('') + '</div></div>';
-  return '<div class="wsc wmy" style="--pc:var(--acc)"><h3>내 이번 주<button type="button" data-ng="wl">근태 그래프</button></h3>' + kpi + '</div>' +
-    '<div class="wsc wmy wmy2" style="--pc:var(--acc)"><h3>요일별 근무<button type="button" data-ng="wl">근태</button></h3>' + bars + '</div>';
+  return '<div class="wsc wmy" style="--pc:' + dcol(me) + '"><h3>내 이번 주<button type="button" data-ng="wl">근태 그래프</button></h3>' + kpi + '</div>' +
+    '<div class="wsc wmy wmy2" style="--pc:' + dcol(me) + '"><h3>요일별 근무<button type="button" data-ng="wl">근태</button></h3>' + bars + '</div>';
 }
 // 2026-11-23 실장님: 홈에 근무시간 통계 (근무표 기준 이번 주) · 누르면 근태로
 function wtLoad(ymK, v) {
