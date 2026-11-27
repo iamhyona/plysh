@@ -3041,7 +3041,7 @@ function renderStart() {
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort).slice(0, 7);
   var PL = pjMerged(), R = NAV.rec.slice(0, 8), RN = R.map(function (r) { return r.name; }); PL.map(wsFrom).forEach(function (r) { if (R.length < 8 && RN.indexOf(r.name) < 0) { R.push(r); RN.push(r.name); } });
   // 2026-11-27 실장님: 정렬 — 홈 전체를 3등분 격자 하나로 (줄마다 열 경계가 위아래로 맞게)
-  // PC: [출퇴근 / 오늘 팀 | 달력 2칸] · [이번 주 마감 | 오늘 할 일 | 자주 쓰는 도구] · [내 이번 주 | 요일별 근무 | 팀 공지] (실장님 13:24 순서 바꿈) · 근무시간 통계는 오늘 팀·달력 바로 아래 · 근무시간 통계 · 최근 프로젝트
+  // PC: [출퇴근 / 오늘 팀 | 달력 2칸] · [이번 주 마감 | 오늘 할 일 | 자주 쓰는 도구] · [내 이번 주 | 요일별 근무 | 팀 공지] (실장님 13:24 순서 바꿈) · 근무시간 통계는 마감·할 일·도구 줄 바로 아래 · 근무시간 통계 · 최근 프로젝트
   var dlCard = '<div class="wsc"><h3>이번 주 마감<button type="button" data-ng="sched">일정</button></h3>' +
     (E.length ? E.map(function (e) { return '<button type="button" class="wsr" data-wf="' + e.f + '"><span class="dd' + (e.d === TODAY ? ' td' : '') + '">' + dot(e.d).slice(3) + '</span><span class="pn">' + esc(e.file.short) + '</span><span class="tx">' + esc(e.t) + '</span></button>'; }).join('') : '<div class="emp">이번 주 마감이 없어요</div>') + '</div>';
   var tdCard = '<div class="wsc wgo" data-ng="todo"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
@@ -3050,7 +3050,7 @@ function renderStart() {
   var recCard = '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.slice(0, 6).map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>';
   wlMeInit();
   var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small class="wwx">' + wxHtml() + '</small></div>' +
-    '<div class="wdg">' + puCard() + homeCal() + teamNowCard() + wtCard() + dlCard + tdCard + toolsCard + myWeekCard() + ntHtml() + recCard + '</div>';
+    '<div class="wdg">' + puCard() + homeCal() + teamNowCard() + dlCard + tdCard + toolsCard + wtCard() + myWeekCard() + ntHtml() + recCard + '</div>';
   $('#main').innerHTML = h; bindGo($('#main')); bindNt(); bindPu(); bindHomeCal();
   $$('#main [data-wgd]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); var a = b.dataset.wgd.split('|'); openWl(a[0], a[1]); }; });
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
