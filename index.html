@@ -4890,7 +4890,7 @@ function wlGraph(y, m, wp, T, WT) {
   };
   var wk = function (n) { var x = WT && (WT.people || []).filter(function (q) { return q.p === n; })[0]; return x && !x.none && !x.err ? x.weeks || [] : null; };
   var wc = function (w) { var t = +w.tot || 0; return t > 3720 ? 'x52 x62' : w.over > 0 || t > 3120 ? 'x52' : w.ot > 0 || t > 2400 ? 'x40' : ''; };
-  var md = function (d) { return (+d.slice(5, 7)) + '/' + (+d.slice(8, 10)); };
+  var md = function (d) { return d.slice(5, 7) + '/' + d.slice(8, 10); };
   var lg = '<div class="wghl" style="--pc:' + (wp ? dcol(wp) : '#f04452') + '"><span>적음</span>' + [1, 2, 3, 4, 5].map(function (l) { return '<i class="l' + l + '"></i>'; }).join('') + '<span>많음</span><em>8시간 · 9시간 30분 · 11시간 · 12시간 30분 기준</em></div>';
   var h = '', P0 = F(new Date(y, m - 2, 1)), pdays = []; for (var d0 = P0; d0 < first; d0 = addD(d0, 1)) pdays.push(d0);
   // 점 막대(도트 스파크라인): 날마다 한 줄, 값만큼 아래부터 채움
@@ -5021,7 +5021,7 @@ function renderWl() {
   S.wt = S.wt || {}; var WT = S.wt[ymK];
   if (!WT && S.wtBusy !== ymK) { S.wtBusy = ymK; call('appWlWt', S.pin, ymK).then(function (r) { S.wt[ymK] = r; }, function (e) { S.wt[ymK] = { err: errMsg(e), people: [] }; }).then(function () { S.wtBusy = ''; if (S.view === 'wl') render(); }); }
   var hmK = function (n) { n = +n || 0; return Math.floor(n / 60) + '시간' + (n % 60 ? ' ' + (n % 60) + '분' : ''); };
-  var md = function (d) { return d ? (+d.slice(5, 7)) + '/' + (+d.slice(8, 10)) : ''; };
+  var md = function (d) { return d ? d.slice(5, 7) + '/' + d.slice(8, 10) : ''; };
   var wtRow = function (n) {
     if (!WT) return '<div class="wlwk"><span class="wl0">근무표 불러오는 중…</span></div>';
     var x = (WT.people || []).filter(function (q) { return q.p === n; })[0];
