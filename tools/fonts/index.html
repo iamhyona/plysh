@@ -245,6 +245,7 @@ textarea.inp{height:70px;padding:12px;resize:vertical}
   #fside .seg button.on{background:#191f28;color:#fff;font-weight:600}
   #fside #optBtn{margin:0 !important;width:100%;height:36px;border:0;border-radius:10px;background:#f2f4f6;color:#191f28;font-size:14px;font-weight:600;justify-content:center}
 }
+.fhit .fsrc{font-style:normal;font-size:11px;font-weight:700;color:var(--sub,#4e5968);background:var(--chip,#f2f4f6);border-radius:6px;padding:2px 6px;margin-left:4px;vertical-align:1px}.fgos{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end}a.fgo{text-decoration:none;display:inline-flex;align-items:center}
 </style>
 </head>
 <body>
@@ -796,7 +797,10 @@ async function findAI(){
     if(!L.length){ box.innerHTML='<div class="fwait">비슷한 폰트를 못 찾았어요 · 글자 부분만 크게 잘라 다시 올려 주세요</div>'; return; }
     box.innerHTML='<div class="flab">비슷한 폰트</div>'+L.map(x=>{
       const nm=String(x.name||''), key=nm.toLowerCase().replace(/\s+/g,''), hit=S.data.find(f=>String(f.n||'').toLowerCase().replace(/\s+/g,'')===key) || S.data.find(f=>String(f.n||'').toLowerCase().replace(/\s+/g,'').indexOf(key)===0);
-      return `<div class="fhit"><div><b>${esc(nm)}</b><span>${esc(x.why||'')}</span></div>${hit?`<button type="button" class="fgo" data-fid="${esc(hit.id)}">아카이브에서 보기</button>`:`<button type="button" class="fgo" data-fq="${esc(nm)}">검색</button>`}</div>`;
+      // 2026-11-27 실장님: 아카이브에 없는 폰트도 보여 주고, 어도비·구글 폰트는 그 사이트에서 바로 보기
+      const src=String(x.src||'').toLowerCase(), tag=src==='adobe'?'Adobe Fonts':src==='google'?'Google Fonts':src==='free'?'무료':'', q=encodeURIComponent(nm);
+      const ext=src==='adobe'?'https://fonts.adobe.com/search?query='+q:src==='google'?'https://fonts.google.com/?query='+q:'https://www.google.com/search?q='+q+'+font';
+      return `<div class="fhit"><div><b>${esc(nm)}${tag?` <em class="fsrc">${tag}</em>`:''}</b><span>${esc(x.why||'')}</span></div><div class="fgos">${hit?`<button type="button" class="fgo" data-fid="${esc(hit.id)}">아카이브에서 보기</button>`:''}<a class="fgo" href="${ext}" target="_blank" rel="noopener">${src==='adobe'?'어도비에서 보기':src==='google'?'구글에서 보기':'웹에서 찾기'}</a></div></div>`;
     }).join('');
     box.querySelectorAll('[data-fid]').forEach(b=>b.onclick=()=>openDetail(b.dataset.fid));
     box.querySelectorAll('[data-fq]').forEach(b=>b.onclick=()=>{ closeOv(); const q=$('#q'); q.value=b.dataset.fq; q.dispatchEvent(new Event('input')); });

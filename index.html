@@ -2189,6 +2189,14 @@ html[data-nav] #cvSeg { display:none !important; }
 #ncr .wday.hcw { margin:0; font-size:18px; color:var(--txt); display:flex; align-items:center; gap:0; min-width:0; overflow:hidden; white-space:nowrap; }
 #ncr .wday.hcw small { font-size:13px; margin-left:10px !important; }
 @media (min-width:1024px) { html[data-nav="w"] #main .wday:not(.hcw) { display:none; } }
+/* 2026-11-27 창 너비 검수: 좁은 PC에서는 맨 위 날씨 줄의 체감·습도 등 세부를 감추고 한 줄 유지 */
+@media (max-width:1439px) { #ncr .wday.hcw .wxs { display:none; } }
+#ncr .wday.hcw > * { flex:none; } #ncr .wday.hcw small { white-space:nowrap; }
+/* 홈 자주 쓰는 도구: 좁은 칸에서 이름이 잘리지 않게 줄바꿈 */
+.wdg .wdl .wsq button { white-space:normal; line-height:1.35; }
+/* 모바일 아래 탭: 아주 좁은 폭에서도 이름 한 줄 */
+html[data-nav="w"] #ntb button { white-space:nowrap; min-width:0; }
+@media (max-width:359px) { html[data-nav="w"] #ntb button { font-size:10px; letter-spacing:-.02em; } }
 
 /* 모바일 전체 메뉴: 하위 없는 대메뉴는 바로 가는 큰 글자 (hm258) */
 #nfm .col.c1 > b { font-size:18px !important; font-weight:600 !important; color:var(--sub) !important; letter-spacing:0; margin:0 !important; padding:9px 0; line-height:1.4; }
@@ -2262,6 +2270,40 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 #main #mFold { width:auto !important; padding:0 12px !important; font-size:13px !important; font-weight:700; white-space:nowrap; }
 @media (max-width:1023px) { #main .hm2.hdt .hrt { flex-wrap:wrap; } #main .hm2.hdt .hrt > .pjtb.pjin { width:100%; flex-wrap:nowrap; margin:0; gap:6px; } #main .hm2.hdt .hrt:has(.pjin) > .hwr { display:none !important; } .pjtb.pjin .cvk button { padding:0 8px !important; } .pjtb.pjin .cvk svg { display:none; } .pjtb.pjin .pmd { min-width:0; } }
 
+/* 캘린더 + 할 일 한 화면 (hm266) */
+#main.ctdOn { display:grid; grid-template-columns:minmax(0, 1fr); gap:16px; }
+@media (min-width:1280px) { #main.ctdOn { grid-template-columns:minmax(0, 1fr) 340px; align-items:start; } #main.ctdOn > .ctd { overflow:auto; box-sizing:border-box; } }
+.ctdL { min-width:0; }
+.ctd { background:var(--card, #fff); border-radius:20px; padding:16px 16px 18px; }
+.ctdh { display:flex; align-items:center; gap:4px; margin-bottom:12px; }
+.ctdh b { flex:1; text-align:center; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; }
+.ctdt { font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--txt); border-radius:6px; padding:2px 6px; }
+.ctdn, .ctdtd { flex:none; height:30px; min-width:30px; border:0; border-radius:8px; background:var(--chip); color:var(--sub); display:inline-flex; align-items:center; justify-content:center; padding:0 !important; margin:0 !important; cursor:pointer; }
+.ctdn svg { width:15px; height:15px; } .ctdtd { padding:0 10px !important; font:inherit; font-size:12px; font-weight:700; }
+.ctds { border-top:1px solid var(--line); padding-top:12px; margin-top:12px; }
+.ctdst { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:800; margin-bottom:8px; } .ctdst small { font-size:12px; font-weight:600; color:var(--mute); }
+.ctda { margin:0 0 0 auto !important; height:30px; padding:0 11px 0 8px !important; border:0; border-radius:8px; background:var(--txt); color:#fff; font:inherit; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:3px; cursor:pointer; }
+.ctda svg { width:14px; height:14px; }
+.ctdev { display:grid; gap:4px; }
+.ctd0 { font-size:13px; color:var(--mute); padding:6px 0; }
+.ctd0b { display:block; width:100%; text-align:left; border:1px dashed var(--line); border-radius:10px; background:none; padding:9px 12px; margin:0 !important; font:inherit; font-size:13px; color:var(--mute); cursor:pointer; }
+.ctdp + .ctdp { margin-top:12px; }
+.ctdpn { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:800; margin-bottom:4px; }
+.ctdpn i { width:8px; height:8px; border-radius:50%; flex:none; } .ctdpn small { font-size:11px; font-weight:700; color:var(--mute); }
+.ctdq { margin:0 0 0 auto !important; width:26px; height:26px; border:0; border-radius:7px; background:var(--chip); color:var(--sub); display:inline-flex; align-items:center; justify-content:center; padding:0 !important; cursor:pointer; } .ctdq svg { width:14px; height:14px; }
+/* 2026-11-27 실장님: 고른 날은 테두리 없이 날짜 숫자만 검정으로 칠하기 */
+#main .mcal .grid > button.ctdon .dn b { background:var(--txt); color:#fff; border-radius:11px; padding:1px 7px; }
+#main th.ctdon, #main td.ctdon { background:rgba(25,31,40,.04); }
+
+@media (max-width:1279px) { #main.ctdOn .mcal .grid.ctdwk { overflow-y:auto; overscroll-behavior:contain; position:relative; }
+  /* 2026-11-27 실장님: 모바일 리스트·가로형도 정해진 높이 상자 안에서만 스크롤 → 아래 할 일이 바로 보이게 */
+  #main.ctdOn .ctdL > .pjs1 { max-height:480px; overflow-y:auto; overscroll-behavior:contain; } }
+
+/* 2026-11-27 실장님: 그날 패널 · 날짜 팝업의 프로젝트명은 색 없이 */
+.ctd .it .m small span, #dyB .it .m small span, .ctd .tdpj { color:var(--mute) !important; }
+/* 2026-11-27 실장님: 할 일 체크는 디자이너별 색 */
+.ctdpn .tdallck { margin:0 0 0 auto !important; height:26px; } .ctdpn .tdallck + .ctdq { margin-left:6px !important; }
+
 /* 2026-11-27 실장님: 날짜 색 = 평일은 무조건 검정, 토 · 일 · 공휴일 · 대체공휴일은 빨강 (오늘도 평일이면 검정) */
 .pgt .pgd.sat b, .pgt .pgd.sat small, .hmc .wk > .sa > b, .hmc .wd .sa, .hmc .sa .dn b, .hcal i.sa, .hcal span.sa, .hcal > button.sa { color:var(--red, #f04452) !important; }
 .pgt .pgd.td:not(.sun):not(.sat) b, .pgt .pgd.td:not(.sun):not(.sat) small, .pdg.td .pdd, .pdg.td .pdd small, .pcal .grid button.td:not(.has) .dnum { color:var(--txt) !important; }
@@ -2273,6 +2315,35 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 /* 2026-11-27 실장님: 사이드바 PLYSH 칸 어디를 눌러도 홈 */
 #nsd .sbh { padding:0 !important; margin:-16px -12px 0; }
 #nsd .sbh button { flex:1; display:block; text-align:left; padding:20px 22px 14px !important; margin:0 !important; cursor:pointer; border-radius:0; }
+
+/* 세로형 달력: 프로젝트 줄 고정 빈 줄 (hm274) */
+.mcal .grid > button .ev.evx { visibility:hidden; }
+.mcal .grid > button[hidden] { display:none !important; }
+
+/* 프로젝트 필터 단추: 모든 화면 같은 모양·색 (hm274) */
+.pmd > .pmdb, .whc .hch .pmd > .pmdb, .whc .hcbar .pmd > .pmdb, .pjtb .pmd > .pmdb, #main .hm2.hdt .hrt .pmd > .pmdb { background:var(--card, #fff) !important; color:var(--txt) !important; box-shadow:inset 0 0 0 1px var(--line) !important; font-weight:600 !important; }
+.pmd > .pmdb span { display:inline-flex; align-items:center; gap:6px; line-height:1; }
+.pmd > .pmdb .fcn { font-style:normal; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:var(--txt); color:#fff; font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
+
+/* 2026-11-27 실장님: 캘린더+할 일 화면 머리 — 보기·필터 단추 줄은 늘 둘째 줄 왼쪽부터 (넓이에 따라 들쭉날쭉하지 않게) */
+#main.ctdOn .ctdL > .hm2 > .hrt { flex:1 0 100%; margin-left:0 !important; justify-content:flex-start !important; }
+
+/* 2026-11-27 실장님: PC 캘린더+할 일 — 두 상자 높이 고정 (프로젝트가 많은 주를 기준으로 1000px), 넘치면 상자 안에서 스크롤 */
+@media (min-width:1280px) {
+  #main.ctdOn .ctdL > .mcal { height:1000px; box-sizing:border-box; display:flex; flex-direction:column; }
+  #main.ctdOn .ctdL > .mcal > .grid { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; align-content:start; }
+  #main.ctdOn .ctdL > .pjs1 { height:1000px; box-sizing:border-box; overflow-y:auto; overscroll-behavior:contain; }
+  #main.ctdOn .ctdL > .pjs1:has(> .pgw) { overflow:hidden; } #main.ctdOn .ctdL > .pjs1 > .pgw { height:100%; box-sizing:border-box; overflow:auto; overscroll-behavior:contain; }
+}
+
+/* 2026-11-27 실장님: 근태 달력 칸이 좁으면 성을 빼고 이름만, 아이콘·시간도 작게 (칸 넓이 기준) */
+.wlev > span { container-type:inline-size; }
+.wlev b .sn { font-style:normal; }
+@container (max-width:112px) {
+  .wlev b .sn { display:none; }
+  .wlev small { width:14px; height:14px; } .wlev small svg { width:10px; height:10px; }
+  .wlev em { font-size:10.5px; letter-spacing:-0.02em; }
+}
 </style>
 </head>
 <body>
@@ -2586,7 +2657,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm273';
+var APP_VER = '20261127hm274';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3079,6 +3150,7 @@ function render() {
   // 2026-11-27 실장님: 새로고침하면 다른 화면(근태 작성 등)이 잠깐 보였다 바뀜 → 주소의 화면을 처음부터 바로 그림
   if (!RT.done) { RT.done = 1; var hk = decodeURIComponent((location.hash || '').slice(1)); if (hk && hk !== rtKey()) { RT.pop = 1; var ok = false; try { navGo(hk); ok = true; } catch (e) {} RT.pop = 0; if (ok) return; } }
   var keep = {}; $$('.tabs2[id]').forEach(function (t) { keep[t.id] = t.scrollLeft; });
+  var mm0 = $('#main'); if (mm0) mm0.classList.remove('ctdOn');   // 2026-11-27: 캘린더+할 일 2열 틀이 다른 메뉴에 남아 화면이 깨지던 문제
   renderView(); rtSync();
   try { var mnu = window.plMenu && plMenu(); if (window.plog && S.tok && mnu) { var ssk = 'd4:mnu:' + mnu; if (!sessionStorage.getItem(ssk)) { sessionStorage.setItem(ssk, '1'); plog('메뉴', { menu: mnu }); } } } catch (e) {} // 2026-11-27 월간리포트 PLYSH 통계: 메뉴는 탭마다 처음 연 한 번만
   $$('.tabs2[id]').forEach(function (t) { if (t.id in keep) t.scrollLeft = keep[t.id]; chipVis(t); });
@@ -4230,7 +4302,8 @@ function subHtml() {
 }
 function crumbHtml() {
   // 2026-11-27 실장님: 홈 메뉴 없앰 — PC 홈은 맨 위 경로 자리에 날짜 · 날씨 · 세부 정보 (아래 날짜 줄은 숨김)
-  if (S.view === 'start') { var d0 = new Date(); return '<div class="wday hcw">' + (d0.getMonth() + 1) + '월 ' + d0.getDate() + '일 ' + '일월화수목금토'.charAt(d0.getDay()) + '요일<small class="wwx">' + wxHtml() + '</small></div>'; }
+  // 2026-11-27 실장님: 모든 메뉴 맨 위 줄은 홈과 같은 오늘 날짜 · 날씨 (경로 글자 대신)
+  if (true) { var d0 = new Date(); return '<div class="wday hcw">' + (d0.getMonth() + 1) + '월 ' + d0.getDate() + '일 ' + '일월화수목금토'.charAt(d0.getDay()) + '요일<small class="wwx">' + wxHtml() + '</small></div>'; }
   var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur(), it = spItems(sp || { g: [] }).filter(function (x) { return x.k === cur; })[0];
   var sep = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">' + NAV_IC.cv + '</svg>';
   if (inWs()) return sp.t + sep + '<b>' + esc(S.ws.name) + '</b>';
@@ -4342,8 +4415,8 @@ $('#rfBtn').onclick = function () { load().then(function () { toast('시트에�
 // 2026-11-20 실장님: 프로젝트 칩 줄 → 여러 개 고르는 드롭다운 (안에 검색)
 function filterBar(home) {
   var fs = pfs(), on = fs.filter(function (f) { return !S.off[f.id]; }), all = on.length === fs.length, nm = function (f) { return f.type === 'work' ? '업무일지' : f.name; };
-  var lab = all ? '프로젝트 전체' : on.length === 1 ? '<i style="background:' + on[0].color + '"></i>' + esc(nm(on[0])) : '프로젝트 ' + on.length + '개';
-  if (home) lab = '프로젝트 필터' + (all ? '' : '<em class="fcn">' + on.length + '</em>');   // 2026-11-27 실장님: 홈은 '프로젝트 필터' 단추
+  // 2026-11-27 실장님: 프로젝트 고르는 필터는 어디서나 같은 모양 · 같은 색 · 같은 이름 '프로젝트 필터' (일부만 고르면 개수 표시)
+  var lab = '프로젝트 필터' + (all ? '' : '<em class="fcn">' + on.length + '</em>');
   var q = (S.fltQ || '').trim().toLowerCase().replace(/\s+/g, '');
   return '<div class="pmd' + (S.fltO ? ' open' : '') + '" id="flt"><button type="button" class="pmdb" id="fltB"><span>' + lab + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
     '<div class="pmdp"><input type="search" id="fltQ" placeholder="프로젝트 검색" value="' + esc(S.fltQ || '') + '"><div class="pmdl">' +
@@ -4531,16 +4604,27 @@ function renderMonth() {
   var y = S.y, m = S.m, first = y + '-' + pad(m) + '-01', start = sunOf(first), L = pvis();
   var last = F(new Date(y, m, 0)), end = addD(sunOf(last), 6);
   // 이번 달: 지난 주차는 접고, 접은 만큼 다음 달 주차를 더 보여줌 (2026-10-20)
-  var tw = sunOf(TODAY), cur = TODAY.slice(0, 7) === first.slice(0, 7), pastN = cur ? Math.round((P(tw) - P(start)) / 864e5 / 7) : 0, folded = pastN > 0 && !S.calPast;
+  var tw = sunOf(TODAY), cur = TODAY.slice(0, 7) === first.slice(0, 7), pastN = cur ? Math.round((P(tw) - P(start)) / 864e5 / 7) : 0, folded = pastN > 0 && !S.calPast && innerWidth >= 1100;   // 모바일은 한 주씩 스크롤이라 접지 않음
+  if (innerWidth < 1100) pastN = 0;
   if (folded) { start = tw; end = addD(end, pastN * 7); }
   var h = calHead(y, m) + '<div class="pjtb">' + cvKSeg() + filterBar() + '</div>';
   h += '<div class="mcal' + (S.fold ? ' fold' : '') + '"><div class="wd">' + WEN.map(function (w) { return '<div>' + w + '</div>'; }).join('') + '</div>' +
     (pastN > 0 ? '<button class="wkf" id="wkF">' + (folded ? '지난 ' + pastN + '주 펼치기' : '지난 주 접기') + '<i class="chev' + (folded ? '' : ' up') + '"></i>' + '</button>' : '') + '<div class="grid">';
+  // 2026-11-27 실장님: 프로젝트마다 줄 위치 고정 — 주마다 그 주에 나오는 프로젝트를 같은 순서(홈 달력과 같은 순서)로 줄 세우고, 그날 일정이 없으면 빈 줄
+  var RK = {}; pfs().forEach(function (f) { RK[f.id] = pjRel(f) + '|' + f.name; });
+  var lanes = [], lmax = {};
   for (var d = start; d <= end; d = addD(d, 1)) {
-    var l = onDay(d, L), w = P(d).getDay(), hl = hol(d), max = 999;   // 2026-11-27 실장님: +n으로 숨기지 말고 다 보이게
-    h += '<button data-d="' + d + '" class="' + (d.slice(0, 7) !== first.slice(0, 7) ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (hl ? 'hol ' : '') + (w === 0 ? 'sun ' : w === 6 ? 'sat ' : '') + (l.length ? 'has ' : '') + (S.sel === d ? 'sel' : '') + '">' +
+    if (P(d).getDay() === 0) {
+      var we = addD(d, 6), WE = L.filter(function (e) { return e.d >= d && e.d <= we; }); lanes = []; lmax = {};
+      WE.forEach(function (e) { if (lanes.indexOf(e.f) < 0) lanes.push(e.f); var k = e.f + '|' + e.d; lmax[k] = (lmax[k] || 0) + 1; });
+      lanes.sort(function (p, q) { return (RK[p] || '') < (RK[q] || '') ? -1 : (RK[p] || '') > (RK[q] || '') ? 1 : 0; });
+      var mx = {}; Object.keys(lmax).forEach(function (k) { var f = k.split('|')[0]; mx[f] = Math.max(mx[f] || 0, lmax[k]); }); lmax = mx;
+    }
+    var l0 = onDay(d, L), l = [], w = P(d).getDay(), hl = hol(d), max = 999;   // 2026-11-27 실장님: +n으로 숨기지 말고 다 보이게
+    lanes.forEach(function (f) { var x = l0.filter(function (e) { return e.f === f; }); l = l.concat(x); for (var i = x.length; i < lmax[f]; i++) l.push(null); });
+    h += '<button data-d="' + d + '" class="' + (d.slice(0, 7) !== first.slice(0, 7) ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (hl ? 'hol ' : '') + (w === 0 ? 'sun ' : w === 6 ? 'sat ' : '') + (l0.length ? 'has ' : '') + (S.sel === d ? 'sel' : '') + '">' +
       '<span class="dn"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</span>' +
-      l.slice(0, l.length > max ? max - 1 : max).map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (e.k === '소속사' ? ' ag' : '') + '" data-mv="' + esc(e.id) + '"><i style="background:' + e.file.color + '"></i>' + (e.file.type === 'proj' ? '<b class="ea">' + esc(e.file.short) + '</b>' : '') + esc(e.t) + '</span>'; }).join('') +
+      l.slice(0, l.length > max ? max - 1 : max).map(function (e) { if (!e) return '<span class="ev evx" aria-hidden="true">&nbsp;</span>'; return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (e.k === '소속사' ? ' ag' : '') + '" data-mv="' + esc(e.id) + '"><i style="background:' + e.file.color + '"></i>' + (e.file.type === 'proj' ? '<b class="ea">' + esc(e.file.short) + '</b>' : '') + esc(e.t) + '</span>'; }).join('') +
       (l.length > max ? '<span class="evm">+' + (l.length - max + 1) + '</span>' : '') + '</button>';
   }
   h += '</div></div>';
@@ -5352,12 +5436,79 @@ function tdSort(a, b) {
 function tdCount(L) { var n = L.filter(function (x) { return x.c; }).length; return L.length ? n + '/' + L.length : ''; }
 
 // CALENDAR = 달력 + 프로젝트(예전 TODO)
+// 2026-11-27 실장님: 캘린더 + 할 일 한 화면 — 달력을 보면서 할 일 쓰기. PC = 오른쪽 패널, 모바일 = 달력 아래. 날짜를 누르면 그날 일정 · 할 일
+function ctdHtml() {
+  var d = S.ctd || TODAY, T = team(), me = hmMe(), hl = hol(d);
+  var ev = onDay(d, pvis());
+  var R = tdRows(function (x) { return x.k === '데일리' && x.d === d; });
+  var TT = me && T.indexOf(me) >= 0 ? [me].concat(T.filter(function (n) { return n !== me; })) : T;
+  var h = '<div class="ctdh"><button type="button" class="ctdn" id="ctdP" aria-label="전날">' + IC_L + '</button><b>' + (+d.slice(5, 7)) + '.' + (+d.slice(8, 10)) + ' <em class="hwd">' + W[P(d).getDay()] + '</em>' + (d === TODAY ? '<em class="ctdt">오늘</em>' : '') + (hl ? '<em class="hwd">' + esc(hl) + '</em>' : '') + '</b><button type="button" class="ctdn" id="ctdN" aria-label="다음 날">' + IC_R + '</button>' +
+    (d !== TODAY ? '<button type="button" class="ctdtd" id="ctdT">오늘</button>' : '') + '</div>';
+  h += '<div class="ctds"><div class="ctdst">일정<small>' + ev.length + '</small><button type="button" class="ctda" id="ctdE">' + IC_PS + '일정</button></div>' + (ev.length ? '<div class="ctdev">' + ev.map(function (e) { return itemHtml(e); }).join('') + '</div>' : '<div class="ctd0">일정이 없어요</div>') + '</div>';
+  h += '<div class="ctds"><div class="ctdst">할 일<small>' + R.filter(function (x) { return x.c; }).length + ' / ' + R.length + '</small>' + (me ? '<button type="button" class="ctda" data-tdq="' + esc(me) + '|' + d + '">' + IC_PS + '할 일</button>' : '') + '</div>';
+  var any = false;
+  TT.forEach(function (n) {
+    var L = R.filter(function (x) { return x.p === n; }); if (!L.length && n !== me) return; any = true;
+    h += '<div class="ctdp"><div class="ctdpn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + (n === me ? '<small>나</small>' : '') + (L.length ? (function () { var all = L.every(function (x) { return x.c; }); return '<button type="button" class="tdallck' + (all ? ' on' : '') + '" data-tdall="' + esc(L.map(function (x) { return x.id; }).join('\n')) + '">' + CKSVG + (all ? '전체 풀기' : '전체 완료') + '</button>'; })() : '') + '<button type="button" class="ctdq" data-tdq="' + esc(n) + '|' + d + '" aria-label="' + esc(n) + ' 할 일 추가">' + IC_PS + '</button></div>' +
+      (L.length ? '<div class="tdl">' + tdGroup(L) + '</div>' : '<button type="button" class="ctd0 ctd0b" data-tdq="' + esc(n) + '|' + d + '">+ 이 날 할 일 쓰기</button>') + '</div>';
+  });
+  if (!any) h += '<div class="ctd0">이 날 할 일이 없어요</div>';
+  return h + '</div>';
+}
+function ctdPaint() {
+  var a = $('#ctd'); if (!a) return;
+  a.innerHTML = ctdHtml(); bindItems(a); bindTd(a);
+  $$('[data-tdall]', a).forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); tdAllCk(b.dataset.tdall.split('\n')); setTimeout(ctdPaint, 50); }; });
+  a.onclick = function (ev) { if (ev.target.closest('[data-tdck]')) setTimeout(ctdPaint, 60); };
+  $$('[data-tdq]', a).forEach(function (b) { b.onclick = function () { var x = b.dataset.tdq.split('|'); openTdq(x[0], x[1]); }; });
+  var go = function (d) { S.ctd = d; ctdSel(); ctdPaint(); ctdWeek(); };
+  $('#ctdP').onclick = function () { go(addD(S.ctd || TODAY, -1)); }; $('#ctdN').onclick = function () { go(addD(S.ctd || TODAY, 1)); };
+  if ($('#ctdT')) $('#ctdT').onclick = function () { go(TODAY); };
+  $('#ctdE').onclick = function () { openEdit(null, S.ctd || TODAY); };
+}
+function ctdSel() { var d = S.ctd || TODAY; $$('#main .ctdon').forEach(function (x) { x.classList.remove('ctdon'); }); $$('#main .mcal .grid > button[data-d="' + d + '"], #main [data-gd="' + d + '"]').forEach(function (x) { x.classList.add('ctdon'); }); }
+function ctdMount() {
+  var m = $('#main'); if (!m || S.view !== 'month') return;
+  var gw0 = $('.pjs1 .pgw', m), sl = gw0 ? gw0.scrollLeft : 0, y0 = window.scrollY;
+  var L = document.createElement('div'); L.className = 'ctdL'; while (m.firstChild) L.appendChild(m.firstChild);
+  var A = document.createElement('aside'); A.className = 'ctd'; A.id = 'ctd';
+  m.appendChild(L); m.appendChild(A); m.classList.add('ctdOn'); ctdPaint(); ctdSel();
+  if (gw0) { gw0.scrollLeft = sl; var th = [].filter.call(gw0.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw0.querySelector('.pgn'); if (!sl && th && nm) gw0.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
+  window.scrollTo(0, y0);
+  // 날짜를 누르면 오른쪽(아래) 할 일이 그날로 — 세로형 칸 · 가로형 날짜 머리
+  $$('.mcal .grid > button[data-d]', L).forEach(function (b) { b.onclick = function () { S.ctd = b.dataset.d; ctdSel(); ctdPaint(); }; });
+  $$('[data-gd]', L).forEach(function (c) { c.addEventListener('click', function (ev) { if (ev.target.closest('[data-mv], button, a, input')) return; S.ctd = c.dataset.gd; ctdSel(); ctdPaint(); }); });
+  ctdWeek(); ctdFit(); setTimeout(ctdFit, 0); setTimeout(ctdFit, 300);
+}
+// 2026-11-27 실장님: 모바일 세로형은 달력 상자를 최대 3주 높이로 (지난주 · 고른 주 · 다음 주), 그 안에서 위아래로 스크롤해 다른 주
+function ctdWeek() {
+  var g = $('#main.ctdOn .mcal .grid'); if (!g) return;
+  if (innerWidth >= 1280) { g.style.maxHeight = ''; g.classList.remove('ctdwk'); return; }
+  var B = [].slice.call(g.querySelectorAll(':scope > button[data-d]')); if (!B.length) return;
+  var c = g.querySelector('button[data-d="' + (S.ctd || TODAY) + '"]') || g.querySelector('button.td') || B[0];
+  var rows = []; B.forEach(function (b) { var t = b.offsetTop; if (rows.indexOf(t) < 0) rows.push(t); }); rows.sort(function (a, b) { return a - b; });
+  var ci = rows.indexOf(c.offsetTop), a = Math.max(0, Math.min(ci - 1, rows.length - 3)), z = Math.min(rows.length, a + 3);
+  var bot = 0; B.forEach(function (b) { if (b.offsetTop === rows[z - 1]) bot = Math.max(bot, b.offsetTop + b.offsetHeight); });
+  g.classList.add('ctdwk'); g.style.maxHeight = (bot - rows[a]) + 'px'; g.scrollTop = rows[a] - rows[0];
+}
+// 2026-11-27 실장님: PC 오른쪽 할 일 패널은 달력과 위·아래 높이를 맞추고, 넘치면 패널 안에서 스크롤
+function ctdFit() {
+  var A = $('#ctd'), L = $('#main .ctdL'); if (!A || !L) return;
+  if (innerWidth < 1280) { A.style.marginTop = A.style.height = ''; return; }
+  var t = $('.mcal', L) || $('.pjs1', L) || L.lastElementChild; if (!t) return;
+  A.style.marginTop = Math.max(0, t.getBoundingClientRect().top - L.getBoundingClientRect().top) + 'px';
+  A.style.height = t.offsetHeight + 'px';
+  var dy = A.getBoundingClientRect().top - t.getBoundingClientRect().top; if (Math.abs(dy) > 0.5) A.style.marginTop = (parseFloat(A.style.marginTop) - dy) + 'px';
+}
+window.addEventListener('resize', function () { if ($('#main.ctdOn')) { ctdWeek(); ctdFit(); } });
 function renderCal() {
   S.mm = 'sched'; S.pm = 'sched';   // 제작일정/팀 업무 전환 없앰 (2026-10-19)
+  $('#main').classList.remove('ctdOn');
   if (S.cv === 'proj') renderProject(); else renderMonth();
   if ($('#pSeg')) $('#pSeg').remove(); if ($('#mSeg')) $('#mSeg').remove();
   pjSeg();
   $$('#cvK button').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; if (k === 'v') S.cv = 'cal'; else { S.cv = 'proj'; S.pjm = k === 'l' ? 'p' : 'd'; ls.set('d4:pjm', S.pjm); } ls.set('d4:cv', S.cv); window.scrollTo(0, 0); render(); }; });
+  ctdMount();
 }
 // 2026-11-21 실장님: 달력 하나에 보기 3가지 (세로형 = 달력, 가로형 = 날짜가 가로로 놓인 일정표, 리스트 = 프로젝트별), '일정' 메뉴는 달력 안으로
 function cvKSeg() {
@@ -5639,7 +5790,7 @@ function pdLoad(force) {
 }
 function clOf(o) {
   var ids = [o.g && o.g.f && o.g.f.id, o.sp && o.sp.id].filter(Boolean);
-  var d = (S.pd || []).filter(function (x) { return ids.some(function (i) { return (x.f || []).indexOf(i) >= 0; }); })[0];
+  var d = (Array.isArray(S.pd) ? S.pd : []).filter(function (x) { return ids.some(function (i) { return (x.f || []).indexOf(i) >= 0; }); })[0];
   return d && d.cl;
 }
 function nasOf(o) { var c = clOf(o); if (c) return { u: c, cl: 1 }; var k = pjKey(o.artist, o.title); return ((S.nas && S.nas.rows) || []).filter(function (r) { return pjKey(r.a, r.t) === k && r.u; })[0]; }
@@ -6186,7 +6337,7 @@ function renderWl() {
     h += '<button data-wd="' + d + '" class="' + (d.slice(0, 7) !== first.slice(0, 7) ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (hl ? 'hol ' : '') + (w === 0 ? 'sun ' : w === 6 ? 'sat ' : '') + '">' +
       '<span class="dn"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</span>' +
       (L.length ? '<span class="wlbars">' + L.map(function (r) { return '<i class="' + (r.fd ? 'fd ' : '') + (r.tx ? 'tx' : '') + '" style="background:' + dcol(r.p) + '" title="' + esc(r.p) + '"></i>'; }).join('') + '</span>' : '') +
-      (L.length ? '<span class="wlev">' + (wp ? L : T.map(function (n) { return L.filter(function (r) { return r.p === n; })[0] || { p: n, emp: 1 }; })).map(function (r) { if (r.emp) return '<span class="emp"></span>'; var tg = (r.fd ? '<small title="야근식사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M18 21V3c-2.5 1.5-3.5 4.5-3.5 8H18"/></svg></small>' : '') + (r.tx ? '<small title="야근택시"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 16.5V13l2-5.5h13l2 5.5v3.5zM6 16.5v2.5M18 16.5v2.5M3.5 13h17M9.5 4.5h5"/></svg></small>' : ''), sh = function (t) { return String(t || '').replace(/^0(?=\d:)/, ''); }; return '<span style="--pc:' + dcol(r.p) + '" title="' + esc(r.p) + ' ' + esc(r.i || '') + (r.o ? '–' + esc(hmOut(r.i, r.o)) : '') + (r.fd ? ' · 야근식사' : '') + (r.tx ? ' · 야근택시' : '') + '">' + (wp ? '' : '<b>' + esc(r.p) + '</b>') + tg + '<em>' + sh(r.i) + (r.o ? '–' + sh(hmOut(r.i, r.o)) : r.i ? ' 출근' : '') + '</em></span>'; }).join('') + '</span>' : '') +
+      (L.length ? '<span class="wlev">' + (wp ? L : T.map(function (n) { return L.filter(function (r) { return r.p === n; })[0] || { p: n, emp: 1 }; })).map(function (r) { if (r.emp) return '<span class="emp"></span>'; var tg = (r.fd ? '<small title="야근식사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M18 21V3c-2.5 1.5-3.5 4.5-3.5 8H18"/></svg></small>' : '') + (r.tx ? '<small title="야근택시"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 16.5V13l2-5.5h13l2 5.5v3.5zM6 16.5v2.5M18 16.5v2.5M3.5 13h17M9.5 4.5h5"/></svg></small>' : ''), sh = function (t) { return String(t || '').replace(/^0(?=\d:)/, ''); }; return '<span style="--pc:' + dcol(r.p) + '" title="' + esc(r.p) + ' ' + esc(r.i || '') + (r.o ? '–' + esc(hmOut(r.i, r.o)) : '') + (r.fd ? ' · 야근식사' : '') + (r.tx ? ' · 야근택시' : '') + '">' + (wp ? '' : '<b>' + (String(r.p).length === 3 ? '<i class="sn">' + esc(r.p.charAt(0)) + '</i>' + esc(r.p.slice(1)) : esc(r.p)) + '</b>') + tg + '<em>' + sh(r.i) + (r.o ? '–' + sh(hmOut(r.i, r.o)) : r.i ? ' 출근' : '') + '</em></span>'; }).join('') + '</span>' : '') +
       ''      + '</button>';
   }
   h += '</div><div class="wllg"><span><i></i>9시–18시 외 근무 (색 = 디자이너)</span><span><i class="fd"></i>야근식사</span><span><i class="tx"></i>야근택시</span><span><i class="fd tx"></i>둘 다</span></div></div>'; }
