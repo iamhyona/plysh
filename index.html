@@ -871,6 +871,9 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wlcal .grid > button { min-height:70px; }
 .wlbars { display:flex; flex-wrap:wrap; gap:4px; padding:5px 3px 0; }
 /* 2026-11-27 실장님: PC 달력은 점 대신 이름 · 출퇴근 시각 · 식사/택시 */
+.wlvr { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.wlcd { display:none !important; }
+@media (min-width:1024px) { .wlcd { display:inline-flex !important; } }
 .wlev { display:none; }
 @media (min-width:1024px) {
   .wlcal .wlbars { display:none; }
@@ -886,6 +889,11 @@ details.fday:not([open]) > summary { margin-bottom:0; }
   .wlcal .wllg { display:none; }
   .wlcal:not(.one) .wlev > span { box-sizing:border-box; height:40px; align-content:center; }
   .wlev > span.emp { visibility:hidden; background:none; box-shadow:none; }
+  .wlcal.cmp .wlev { gap:2px; }
+  .wlcal.cmp .wlev > span { height:22px; flex-wrap:nowrap; padding:0 4px 0 7px; }
+  .wlcal.cmp .wlev b { display:none; }
+  .wlcal.cmp .wlev em { flex:1 1 auto; order:-1; font-size:11px; color:color-mix(in srgb, var(--pc) 60%, #191f28); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wlcal.cmp .wlev small { width:14px; height:14px; } .wlcal.cmp .wlev small svg { width:10px; height:10px; }
   .wlcal.one .wlev > span.emp { display:none; }
 }
 
@@ -930,7 +938,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wlw2 b em { font-style:normal; font-size:11.5px; font-weight:700; margin-left:6px; padding:2px 7px; border-radius:999px; background:#e5e8eb; }
 .wlw2 b.x52 em { background:#fdecec; }
 /* 근태 그래프 2026-11-27 */
-.wlvs { max-width:240px; }
+.wlvs { max-width:240px; } .wlvr > .seg { flex:0 0 240px; width:240px; } .wlvr > .wlcd { flex-basis:180px; width:180px; }
 .wgg { display:grid; gap:12px; }
 .wgg2 { display:grid; gap:12px; }
 .wgtop { display:grid; gap:12px; }
@@ -1051,7 +1059,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgk b i { font-style:normal; font-size:14px; color:var(--mute); font-weight:600; }
 .wgsk { display:flex; gap:3px; margin-top:6px; } .wgsk i { width:12px; height:6px; border-radius:3px; background:#e5e8eb; display:block; } .wgsk i.on { background:var(--pc); }
 .wgal { display:flex; gap:12px; align-items:flex-start; background:#fff; border-radius:16px; padding:14px 16px; }
-.wgal.x52 { background:#fff; box-shadow:inset 3px 0 0 #191f28; }
+.wgal.x52 { background:#fff; }
 .wgal svg { width:20px; height:20px; flex:none; color:#4e5968; margin-top:1px; } .wgal.x52 svg { color:#191f28; }
 .wgal div { display:flex; flex-direction:column; gap:2px; min-width:0; } .wgal b { font-size:14px; font-weight:800; } .wgal span { font-size:13px; color:var(--sub); }
 .wgnw { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
@@ -1061,7 +1069,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgnc { border:0; background:#fff; border-radius:12px; padding:10px 12px; text-align:left; display:flex; flex-direction:column; gap:2px; font-family:inherit; }
 .wgnc b { display:flex; align-items:center; gap:6px; font-size:14px; } .wgnc b i { width:8px; height:8px; border-radius:50%; } .wgnc small { font-size:12px; color:var(--mute); font-variant-numeric:tabular-nums; }
 .wgn0 { font-size:12.5px; color:var(--faint); padding:4px 2px; }
-.wgnl.on .wgnh { color:#f04452; } .wgnl.on .wgnh em { background:#f04452; color:#fff; } .wgnl.on .wgnc { box-shadow:inset 3px 0 0 #f04452; } .wgnl.on .wgnc b { color:#f04452; }
+/* 근무 중 = 접속 중처럼 이름 앞 빨간 동그라미, 퇴근 = 회색 동그라미 + 흐리게 */
+.wgnl.on .wgnh em { background:#f04452; color:#fff; } .wgnl.on .wgnc b i, .wgnl.off .wgnc b i { display:block !important; width:9px; height:9px; } .wgnl.on .wgnc b i { background:#f04452 !important; box-shadow:0 0 0 3px rgba(240,68,82,.18); } .wgnl.off .wgnc b i { background:#b0b8c1 !important; }
 .wgnl.off .wgnh, .wgnl.off .wgnc { opacity:.45; }
 /* 2026-11-27 실장님: 그래프 화면 이름 앞 색 동그라미 빼기 */
 .wgmn i, .wgnc b i, .wgnh i { display:none; }
@@ -5002,9 +5011,10 @@ function renderWl() {
     '<div class="arw">' + (wlShUrl(wlMe()) ? '<a class="wlshm" href="' + esc(wlShUrl(wlMe())) + '" target="_blank" rel="noopener" title="내 근무표 시트 열기" aria-label="내 근무표 시트 열기">' + SHIC + '</a>' : '') + '<button class="tod" id="wlQ">빠른 입력</button>' + (isCur ? '' : '<button class="tod" id="wlT">이번 달</button>') + '<button id="wlPv">' + IC_L + '</button><button id="wlNx">' + IC_R + '</button></div></div>';
   h += '<div class="tabs2" id="wlP"><button data-n="" class="' + (wp ? '' : 'on') + '">전체</button>' + T.map(function (n) { return '<button data-n="' + esc(n) + '" class="' + (wp === n ? 'on' : '') + '">' + esc(n) + '</button>'; }).join('') + '</div>';
   var wv = ls.get('d4:wlv') === 'g' ? 'g' : 'c';
-  h += '<div class="seg sm wlvs" id="wlV"><button data-v="c" class="' + (wv === 'c' ? 'on' : '') + '">달력</button><button data-v="g" class="' + (wv === 'g' ? 'on' : '') + '">그래프</button></div>';
+  var wcd = ls.get('d4:wlcd') !== 'f';
+  h += '<div class="wlvr"><div class="seg sm wlvs" id="wlV"><button data-v="c" class="' + (wv === 'c' ? 'on' : '') + '">달력</button><button data-v="g" class="' + (wv === 'g' ? 'on' : '') + '">그래프</button></div>' + (wv === 'c' && !wp ? '<div class="seg sm wlcd" id="wlCd"><button data-v="s" class="' + (wcd ? 'on' : '') + '">간략히</button><button data-v="f" class="' + (wcd ? '' : 'on') + '">자세히</button></div>' : '') + '</div>';
   if (wv === 'g') h += wlGraph(y, m, wp, T, wtLoad(y + '-' + pad(m), 'wl'));
-  else { h += '<div class="mcal wlcal' + (wp ? ' one' : '') + '"><div class="wd">' + WEN.map(function (w) { return '<div>' + w + '</div>'; }).join('') + '</div><div class="grid">';
+  else { h += '<div class="mcal wlcal' + (wp ? ' one' : wcd ? ' cmp' : '') + '"><div class="wd">' + WEN.map(function (w) { return '<div>' + w + '</div>'; }).join('') + '</div><div class="grid">';
   for (var d = start; d <= end; d = addD(d, 1)) {
     var L = wlRows(function (r) { return r.d === d && (!wp || r.p === wp) && wlOdd(r); }).sort(function (a, b) { return T.indexOf(a.p) - T.indexOf(b.p); }), w = P(d).getDay(), hl = hol(d);
     h += '<button data-wd="' + d + '" class="' + (d.slice(0, 7) !== first.slice(0, 7) ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (hl ? 'hol ' : '') + (w === 0 ? 'sun ' : w === 6 ? 'sat ' : '') + '">' +
@@ -5052,6 +5062,7 @@ function renderWl() {
   $('#wlNx').onclick = function () { S.wm++; if (S.wm > 12) { S.wm = 1; S.wy++; } render(); };
   $('#wlQ').onclick = openWlx;
   $$('#wlV button').forEach(function (b) { b.onclick = function () { ls.set('d4:wlv', b.dataset.v); render(); }; });
+  $$('#wlCd button').forEach(function (b) { b.onclick = function () { ls.set('d4:wlcd', b.dataset.v); render(); }; });
   $$('[data-wgd]').forEach(function (b) { b.onclick = function () { var a = b.dataset.wgd.split('|'); openWl(a[0], a[1]); }; });
   if ($('#wlT')) $('#wlT').onclick = function () { S.wy = +TODAY.slice(0, 4); S.wm = +TODAY.slice(5, 7); render(); };
   $('#wlMo').onchange = function () { var v = String(this.value || ''); if (/^\d{4}-\d\d/.test(v)) { S.wy = +v.slice(0, 4); S.wm = +v.slice(5, 7); render(); } };
