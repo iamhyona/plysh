@@ -880,9 +880,13 @@ details.fday:not([open]) > summary { margin-bottom:0; }
   .wlev em { font-style:normal; color:var(--sub); font-variant-numeric:tabular-nums; flex:1 0 100%; font-size:11px; }
   .wlcal.one .wlev em { flex:1 1 auto; order:-1; font-size:11.5px; color:var(--txt); }
   .wlev small + small { margin-left:0; }
+  .wlev small svg { width:11px; height:11px; display:block; }
   .wlev small { flex:none; font-size:10px; font-weight:700; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; margin-left:auto; background:#fff; color:color-mix(in srgb, var(--pc) 70%, #191f28); }
   .wlcal .grid > button { align-items:stretch; }
   .wlcal .wllg { display:none; }
+  .wlcal:not(.one) .wlev > span { box-sizing:border-box; height:40px; align-content:center; }
+  .wlev > span.emp { visibility:hidden; background:none; box-shadow:none; }
+  .wlcal.one .wlev > span.emp { display:none; }
 }
 
 .wlbars i { width:12px; height:12px; border-radius:50%; display:block; position:relative; }
@@ -1057,6 +1061,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgnc { border:0; background:#fff; border-radius:12px; padding:10px 12px; text-align:left; display:flex; flex-direction:column; gap:2px; font-family:inherit; }
 .wgnc b { display:flex; align-items:center; gap:6px; font-size:14px; } .wgnc b i { width:8px; height:8px; border-radius:50%; } .wgnc small { font-size:12px; color:var(--mute); font-variant-numeric:tabular-nums; }
 .wgn0 { font-size:12.5px; color:var(--faint); padding:4px 2px; }
+.wgnl.on .wgnh { color:#f04452; } .wgnl.on .wgnh em { background:#f04452; color:#fff; } .wgnl.on .wgnc { box-shadow:inset 3px 0 0 #f04452; } .wgnl.on .wgnc b { color:#f04452; }
+.wgnl.off .wgnh, .wgnl.off .wgnc { opacity:.45; }
 /* 2026-11-27 실장님: 그래프 화면 이름 앞 색 동그라미 빼기 */
 .wgmn i, .wgnc b i, .wgnh i { display:none; }
 @media (min-width:1024px) { .wgg2 > .wgfull { grid-column:1 / -1; } }
@@ -4885,7 +4891,7 @@ function wlGraph(y, m, wp, T, WT) {
   var wk = function (n) { var x = WT && (WT.people || []).filter(function (q) { return q.p === n; })[0]; return x && !x.none && !x.err ? x.weeks || [] : null; };
   var wc = function (w) { var t = +w.tot || 0; return t > 3720 ? 'x52 x62' : w.over > 0 || t > 3120 ? 'x52' : w.ot > 0 || t > 2400 ? 'x40' : ''; };
   var md = function (d) { return (+d.slice(5, 7)) + '/' + (+d.slice(8, 10)); };
-  var lg = '<div class="wghl" style="--pc:' + (wp ? dcol(wp) : '#8b95a1') + '"><span>적음</span>' + [1, 2, 3, 4, 5].map(function (l) { return '<i class="l' + l + '"></i>'; }).join('') + '<span>많음</span><em>8시간 · 9시간 30분 · 11시간 · 12시간 30분 기준</em></div>';
+  var lg = '<div class="wghl" style="--pc:' + (wp ? dcol(wp) : '#f04452') + '"><span>적음</span>' + [1, 2, 3, 4, 5].map(function (l) { return '<i class="l' + l + '"></i>'; }).join('') + '<span>많음</span><em>8시간 · 9시간 30분 · 11시간 · 12시간 30분 기준</em></div>';
   var h = '', P0 = F(new Date(y, m - 2, 1)), pdays = []; for (var d0 = P0; d0 < first; d0 = addD(d0, 1)) pdays.push(d0);
   // 점 막대(도트 스파크라인): 날마다 한 줄, 값만큼 아래부터 채움
   // 작은 추이 그래프: 근무시간(lo=0) = 날짜별 얇은 막대, 출퇴근 시각 = 선 + 기준 점선(9시·18시 30분)
@@ -4934,21 +4940,21 @@ function wlGraph(y, m, wp, T, WT) {
       var col = { on: [], off: [], no: [] };
       T.forEach(function (n) { var r = wlRows(function (x) { return x.d === TODAY && x.p === n; })[0]; if (r && r.o) col.off.push([n, r]); else if (r && r.i) col.on.push([n, r]); else col.no.push([n, r]); });
       var card = function (o, k) { var n = o[0], r = o[1]; return '<button class="wgnc" data-wgd="' + TODAY + '|' + esc(n) + '"><b><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</b><small>' + (k === 'on' ? r.i + ' 출근' : k === 'off' ? r.i + '–' + r.o : '기록 전 · 9:00 기본') + '</small></button>'; };
-      h += '<div class="wgc"><div class="wgt">오늘 현황<small>' + dw(TODAY) + ' · 이름을 누르면 기록 쓰기</small></div><div class="wgnw">' + [['on', '근무 중', '#3182f6'], ['off', '퇴근', '#4e5968'], ['no', '기록 없음', '#b0b8c1']].map(function (c) { return '<div class="wgnl"><div class="wgnh"><i style="background:' + c[2] + '"></i>' + c[1] + '<em>' + col[c[0]].length + '</em></div>' + (col[c[0]].length ? col[c[0]].map(function (o) { return card(o, c[0]); }).join('') : '<div class="wgn0">없음</div>') + '</div>'; }).join('') + '</div></div>';
+      h += '<div class="wgc"><div class="wgt">오늘 현황<small>' + dw(TODAY) + ' · 이름을 누르면 기록 쓰기</small></div><div class="wgnw">' + [['on', '근무 중', '#3182f6'], ['off', '퇴근', '#4e5968'], ['no', '기록 없음', '#b0b8c1']].map(function (c) { return '<div class="wgnl ' + c[0] + '"><div class="wgnh"><i style="background:' + c[2] + '"></i>' + c[1] + '<em>' + col[c[0]].length + '</em></div>' + (col[c[0]].length ? col[c[0]].map(function (o) { return card(o, c[0]); }).join('') : '<div class="wgn0">없음</div>') + '</div>'; }).join('') + '</div></div>';
     }
     // 팀 전체: 사람 × 날짜 농도표 + 주별 근무시간
-    h += '<div class="wgc"><div class="wgt">팀 근무시간 농도<small>사람마다 자기 색 · 진할수록 오래 일한 날</small></div><div class="wgsx"><div class="wgm" style="--n:' + days.length + '">' +
+    h += '<div class="wgc"><div class="wgt">팀 근무시간 농도<small>진할수록 오래 일한 날</small></div><div class="wgsx"><div class="wgm" style="--n:' + days.length + '">' +
       '<span class="wgmn"></span>' + days.map(function (d) { var w = P(d).getDay(); return '<span class="wgmd' + (w === 0 || w === 6 || hol(d) ? ' we' : '') + (d === TODAY ? ' td' : '') + '">' + P(d).getDate() + '</span>'; }).join('') + '<span class="wgma">평균 출근 · 퇴근</span>';
     T.forEach(function (n) {
       var S2 = stat(n);
-      h += '<span class="wgmn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span>' + S2.D.map(function (x, i) { return '<button class="wgmc l' + (x ? wlLv(x.m) : 0) + (x && x.def ? ' df' : '') + '" style="--pc:' + dcol(n) + '" data-wgd="' + days[i] + '|' + esc(n) + '" title="' + esc(n) + ' ' + md(days[i]) + (x ? ' · ' + wlHk(x.m) + (x.def ? ' (기본)' : ' · ' + wlHm(x.i) + '–' + wlHm(x.o)) : '') + '"></button>'; }).join('') +
+      h += '<span class="wgmn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span>' + S2.D.map(function (x, i) { return '<button class="wgmc l' + (x ? wlLv(x.m) : 0) + (x && x.def ? ' df' : '') + '" style="--pc:#f04452" data-wgd="' + days[i] + '|' + esc(n) + '" title="' + esc(n) + ' ' + md(days[i]) + (x ? ' · ' + wlHk(x.m) + (x.def ? ' (기본)' : ' · ' + wlHm(x.i) + '–' + wlHm(x.o)) : '') + '"></button>'; }).join('') +
         '<span class="wgma">' + (S2.ai != null ? wlHm(S2.ai) + ' · ' + wlHm(S2.ao) : '<em>9:00 · 18:00</em>') + '</span>';
     });
     h += '</div></div>' + lg + '</div>';
     var WH = []; T.forEach(function (n) { var x = wk(n); if (x && x.length > WH.length) WH = x; }); var NW = Math.max(1, WH.length);
     h += '<div class="wgc"><div class="wgt">주별 근무시간<small>근무표 기준 · 눈금 40 · 52 · 62시간</small></div>' + (!WT ? '<div class="wl0">근무표 불러오는 중…</div>' : '<div class="wgw" style="--n:' + NW + '"><span></span>' + WH.map(function (w) { return '<span class="wgwh">' + md(w.s) + '–' + md(w.e) + '</span>'; }).join('') + T.map(function (n) {
       var Wn = wk(n);
-      return '<span class="wgmn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span>' + (Wn ? Wn.map(function (w) { var c = wc(w); return '<div class="wgwc" style="--pc:' + dcol(n) + '" title="' + md(w.s) + '–' + md(w.e) + ' · ' + wlHk(w.tot) + '"><b class="' + c + '">' + wlHm(w.tot) + '</b><span class="trk"><i class="' + c + '" style="width:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i><em></em><em class="t52"></em><em class="t62"></em></span></div>'; }).join('') : '<span class="wl0" style="grid-column:span ' + NW + '">근무표에 이 달 탭이 없어요</span>');
+      return '<span class="wgmn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span>' + (Wn ? Wn.map(function (w) { var c = wc(w); return '<div class="wgwc" style="--pc:#f04452" title="' + md(w.s) + '–' + md(w.e) + ' · ' + wlHk(w.tot) + '"><b class="' + c + '">' + wlHm(w.tot) + '</b><span class="trk"><i class="' + c + '" style="width:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i><em></em><em class="t52"></em><em class="t62"></em></span></div>'; }).join('') : '<span class="wl0" style="grid-column:span ' + NW + '">근무표에 이 달 탭이 없어요</span>');
     }).join('') + '</div>') + '</div>';
     return '<div class="wgg">' + h + '</div>';
   }
@@ -5004,7 +5010,7 @@ function renderWl() {
     h += '<button data-wd="' + d + '" class="' + (d.slice(0, 7) !== first.slice(0, 7) ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (hl ? 'hol ' : '') + (w === 0 ? 'sun ' : w === 6 ? 'sat ' : '') + '">' +
       '<span class="dn"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</span>' +
       (L.length ? '<span class="wlbars">' + L.map(function (r) { return '<i class="' + (r.fd ? 'fd ' : '') + (r.tx ? 'tx' : '') + '" style="background:' + dcol(r.p) + '" title="' + esc(r.p) + '"></i>'; }).join('') + '</span>' : '') +
-      (L.length ? '<span class="wlev">' + L.map(function (r) { var tg = (r.fd ? '<small title="야근식사">식</small>' : '') + (r.tx ? '<small title="야근택시">택</small>' : ''), sh = function (t) { return String(t || '').replace(/^0(?=\d:)/, ''); }; return '<span style="--pc:' + dcol(r.p) + '" title="' + esc(r.p) + ' ' + esc(r.i || '') + (r.o ? '–' + esc(hmOut(r.i, r.o)) : '') + (r.fd ? ' · 야근식사' : '') + (r.tx ? ' · 야근택시' : '') + '">' + (wp ? '' : '<b>' + esc(r.p) + '</b>') + tg + '<em>' + sh(r.i) + (r.o ? '–' + sh(hmOut(r.i, r.o)) : r.i ? ' 출근' : '') + '</em></span>'; }).join('') + '</span>' : '') +
+      (L.length ? '<span class="wlev">' + (wp ? L : T.map(function (n) { return L.filter(function (r) { return r.p === n; })[0] || { p: n, emp: 1 }; })).map(function (r) { if (r.emp) return '<span class="emp"></span>'; var tg = (r.fd ? '<small title="야근식사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M18 21V3c-2.5 1.5-3.5 4.5-3.5 8H18"/></svg></small>' : '') + (r.tx ? '<small title="야근택시"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 16.5V13l2-5.5h13l2 5.5v3.5zM6 16.5v2.5M18 16.5v2.5M3.5 13h17M9.5 4.5h5"/></svg></small>' : ''), sh = function (t) { return String(t || '').replace(/^0(?=\d:)/, ''); }; return '<span style="--pc:' + dcol(r.p) + '" title="' + esc(r.p) + ' ' + esc(r.i || '') + (r.o ? '–' + esc(hmOut(r.i, r.o)) : '') + (r.fd ? ' · 야근식사' : '') + (r.tx ? ' · 야근택시' : '') + '">' + (wp ? '' : '<b>' + esc(r.p) + '</b>') + tg + '<em>' + sh(r.i) + (r.o ? '–' + sh(hmOut(r.i, r.o)) : r.i ? ' 출근' : '') + '</em></span>'; }).join('') + '</span>' : '') +
       ''      + '</button>';
   }
   h += '</div><div class="wllg"><span><i></i>9시–18시 외 근무 (색 = 디자이너)</span><span><i class="fd"></i>야근식사</span><span><i class="tx"></i>야근택시</span><span><i class="fd tx"></i>둘 다</span></div></div>'; }
