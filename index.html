@@ -2217,6 +2217,19 @@ html[data-nav] #cvSeg { display:none !important; }
 .hdr .hdc { position:static !important; display:inline-block; width:8px !important; height:8px; border-radius:50%; background:var(--c); margin-right:7px; vertical-align:2px; }
 .hdr .hdn .pjn2 { padding-left:15px; }
 .hmc .ev i { width:6px !important; height:6px; align-self:center !important; border-radius:50% !important; }
+
+/* 일정 끌어 옮기기 (hm260) */
+#main [data-mv] { cursor:grab; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+html.mving, html.mving * { cursor:grabbing !important; }
+html.mving #main { touch-action:none; }
+.mvsrc { opacity:.35; }
+.mvgh { position:fixed; left:0; top:0; z-index:9999; pointer-events:none; display:flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:10px; background:#fff; box-shadow:0 8px 24px rgba(0,0,0,.18); font-size:13px; font-weight:600; color:var(--txt); white-space:nowrap; max-width:260px; overflow:hidden; } .mvgh i { width:7px; height:7px; border-radius:50%; flex:none; } .mvgh b { font-weight:800; }
+.mvon { outline:2px solid var(--acc) !important; outline-offset:-2px; background:rgba(49,130,246,.08) !important; }
+#mvT { position:fixed; left:50%; bottom:28px; transform:translate(-50%, 20px); z-index:9998; display:flex; align-items:center; gap:12px; max-width:calc(100vw - 32px); padding:10px 10px 10px 18px; border-radius:14px; background:#191f28; color:#fff; font-size:14px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
+#mvT.on { opacity:1; transform:translate(-50%, 0); pointer-events:auto; }
+#mvT span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#mvT button { flex:none; height:34px; padding:0 14px; border:0; border-radius:10px; background:#fff; color:#191f28; font:inherit; font-size:13px; font-weight:800; cursor:pointer; margin:0 !important; }
+@media (max-width:1023px) { #mvT { bottom:calc(78px + env(safe-area-inset-bottom)); } }
 </style>
 </head>
 <body>
@@ -2530,7 +2543,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm259';
+var APP_VER = '20261127hm260';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2549,6 +2562,67 @@ setInterval(function () { if (!document.hidden) checkUpdate(); }, 300000);
 checkUpdate();
 function errMsg(e) { return (e && e.message ? e.message : String(e)).replace(/^(Exception|Error):\s*/, '').replace(/^(LOGIN|WAIT):\s*/, ''); }
 function toast(t) { var el = $('#toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(function () { el.style.display = 'none'; }, 2200); }
+
+/* ───── 일정 끌어 옮기기 (2026-11-27 실장님): 모든 달력에서 일정을 다른 날짜로 끌면 제작일정 시트 날짜 칸만 바뀜, 되돌리기 ───── */
+var MV = null;
+function mvTargetAt(x, y) { var el = document.elementFromPoint(x, y); el = el && el.closest('[data-d],[data-hcd],[data-gd]'); if (!el || !el.closest('#main')) return null; var d = el.dataset.d || el.dataset.hcd || el.dataset.gd; return /^\d{4}-\d\d-\d\d$/.test(d || '') ? { el: el, d: d } : null; }
+function mvEnd(cancel) {
+  if (!MV) return; var m = MV; MV = null;
+  clearTimeout(m.lt); document.removeEventListener('pointermove', mvMove); document.removeEventListener('pointerup', mvUp); document.removeEventListener('pointercancel', mvCancel); document.removeEventListener('touchmove', mvTouch, { passive: false });
+  if (m.gh) m.gh.remove(); if (m.tg) m.tg.classList.remove('mvon'); m.src.classList.remove('mvsrc'); document.documentElement.classList.remove('mving');
+  if (!m.on || cancel) return;
+  window._mvClick = Date.now();
+  var t = m.tg && m.tg.dataset ? (m.tg.dataset.d || m.tg.dataset.hcd || m.tg.dataset.gd) : '';
+  if (t && t !== m.e.d) evMove(m.e, t);
+}
+function mvStart(m, x, y) {
+  m.on = true; document.documentElement.classList.add('mving'); m.src.classList.add('mvsrc');
+  var r = m.src.getBoundingClientRect(), g = document.createElement('div'); g.className = 'mvgh'; g.innerHTML = '<i style="background:' + (m.e.file && m.e.file.color || '#8b95a1') + '"></i>' + (m.e.file && m.e.file.type === 'proj' ? '<b>' + esc(m.e.file.short) + '</b>' : '') + esc(m.e.t);
+  m.dx = Math.min(24, x - r.left); m.dy = 16; document.body.appendChild(g); m.gh = g; mvPos(x, y);
+  if (navigator.vibrate && m.touch) try { navigator.vibrate(15); } catch (er) {}
+}
+function mvPos(x, y) {
+  var m = MV; if (!m || !m.gh) return; m.gh.style.transform = 'translate(' + (x - m.dx) + 'px,' + (y - m.dy) + 'px)';
+  var t = mvTargetAt(x, y), el = t ? t.el : null; if (el !== m.tg) { if (m.tg) m.tg.classList.remove('mvon'); if (el) el.classList.add('mvon'); m.tg = el; }
+}
+function mvMove(ev) {
+  var m = MV; if (!m) return;
+  if (!m.on) { if (m.touch) { if (Math.abs(ev.clientX - m.x) + Math.abs(ev.clientY - m.y) > 10) mvEnd(true); return; } if (Math.abs(ev.clientX - m.x) + Math.abs(ev.clientY - m.y) < 6) return; mvStart(m, ev.clientX, ev.clientY); }
+  ev.preventDefault(); mvPos(ev.clientX, ev.clientY);
+}
+function mvTouch(ev) { if (MV && MV.on) ev.preventDefault(); }
+function mvUp() { mvEnd(false); }
+function mvCancel() { mvEnd(true); }
+document.addEventListener('pointerdown', function (ev) {
+  if (ev.button > 0 || MV) return;
+  var src = ev.target.closest && ev.target.closest('#main [data-mv]'); if (!src || ev.target.closest('.pgk')) return;
+  var id = src.dataset.mv, e = S.D.events.filter(function (x) { return String(x.id) === id; })[0]; if (!e) return;
+  MV = { src: src, e: e, x: ev.clientX, y: ev.clientY, touch: ev.pointerType !== 'mouse', on: false };
+  document.addEventListener('pointermove', mvMove); document.addEventListener('pointerup', mvUp); document.addEventListener('pointercancel', mvCancel);
+  document.addEventListener('touchmove', mvTouch, { passive: false });
+  if (MV.touch) MV.lt = setTimeout(function () { if (MV && !MV.on) mvStart(MV, MV.x, MV.y); }, 420);   // 모바일: 꾹 눌러 끌기
+}, true);
+document.addEventListener('click', function (ev) { if (window._mvClick && Date.now() - window._mvClick < 400) { ev.stopPropagation(); ev.preventDefault(); } }, true);
+document.addEventListener('contextmenu', function (ev) { if (MV && MV.touch) ev.preventDefault(); }, true);
+function mvToast(msg, undo) {
+  var el = $('#mvT'); if (!el) { el = document.createElement('div'); el.id = 'mvT'; document.body.appendChild(el); }
+  el.innerHTML = '<span>' + msg + '</span>' + (undo ? '<button type="button">되돌리기</button>' : ''); el.classList.add('on');
+  if (undo) el.querySelector('button').onclick = function () { el.classList.remove('on'); undo(); };
+  clearTimeout(mvToast.h); mvToast.h = setTimeout(function () { el.classList.remove('on'); }, 6000);
+}
+function evMove(e, nd, isUndo) {
+  var od = e.d, f = e.f, t = e.t, k = e.k;
+  e.d = nd; render();   // 먼저 화면에서 옮김
+  mvToast((isUndo ? '되돌리는 중…' : esc(t) + ' → ' + (+nd.slice(5, 7)) + '.' + (+nd.slice(8, 10)) + ' 옮기는 중…'));
+  call('appEdit', S.pin, { id: e.id, old: t, f: f, d: nd, k: k, t: t, moved: true }).then(function () {
+    return load().then(function () {
+      mvToast(isUndo ? '되돌렸어요' : esc(t) + ' 일정을 ' + (+nd.slice(5, 7)) + '.' + (+nd.slice(8, 10)) + '로 옮겼어요', isUndo ? null : function () {
+        var e2 = S.D.events.filter(function (x) { return x.f === f && x.t === t && x.d === nd; })[0];
+        if (e2) evMove(e2, od, true); else toast('되돌릴 일정을 찾지 못했어요');
+      });
+    });
+  }).catch(function (er) { e.d = od; render(); mvToast('옮기지 못했어요: ' + esc(errMsg(er))); });
+}
 
 /* ───── 데이터 ───── */
 function setData(d) {
@@ -3461,11 +3535,11 @@ var SPACES = [
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   // 2026-11-27 실장님: 퀵 배차 · 사내연락망은 안내에서 빼서 따로 대메뉴 (하위 없이 바로 열림)
-  { k: 'ctm', t: '사내연락망', d: '사운드웨이브 · 사운드컨텐츠 직원 메일과 휴대전화', home: 'ct', ic: 'qk', g: [] },
   { k: 'admin', t: '안내', d: '사무실 이용, 업무 시스템, 행정 업무 (초과근무 · 택시 · 법인카드 · 지출결의 · 명함)', home: 'space:admin', ic: 'office', g: [
     { g: '안내', i: [{ k: 'gd:g.html?id=office&s=1', t: '사무실 출입', s: '사무실 출입 방법' }, { k: 'gd:g.html?id=office&s=2', t: '나스(NAS)', s: '맥에서 연결 · 사무실 밖에서 접속 · 공유 링크' }, { k: 'gd:g.html?id=office&s=3', t: '와이파이', s: '사무실 와이파이' }, { k: 'gd:g.html?id=office&s=4', t: '복합기 사용', s: '프린터 연결 · 스캔 받기' }, { k: 'gd:g.html?id=system&s=1', t: '위하고 접속', s: '접속 정보 · 로그인 순서' }, { k: 'gd:g.html?id=system&s=2', t: '메일플러그 접속', s: '웹에서 사용 · 맥 Mail 앱 연결' }, { k: 'gd:g.html?id=system&s=3', t: '메일 서명 수정', s: '팀 서명 양식 · 웹메일 · 맥 Mail 앱' }] },
     // 2026-11-27 실장님: 행정 업무는 한 페이지 목차가 아니라 하위 메뉴별 페이지로
     { g: '행정 업무', i: [{ k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }, { k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 제작 방법', s: '신청 정보 · 제작 순서 · 데이터' }] }] },
+  { k: 'ctm', t: '사내연락망', d: '사운드웨이브 · 사운드컨텐츠 직원 메일과 휴대전화', home: 'ct', ic: 'qk', g: [] },
   // 2026-11-27 실장님: 월간리포트는 맨 밑
   { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
 ];
@@ -3692,7 +3766,7 @@ function homeCal() {
         l = cont.concat(nw); prev = l.map(function (e) { return e.t; });
         return '<div class="lc ' + cls(d) + '" data-hcd="' + d + '">' + l.map(function (e) {
           var c = cont.indexOf(e) >= 0, nm = !c;
-          return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (c ? ' cont' : '') + '" style="--c:' + e.file.color + '" title="' + esc(e.file.name + ' · ' + e.t) + '"><i></i><em>' + (c ? '' : (nm ? '<b>' + esc(e.file.short) + '</b> ' : '') + esc(e.t)) + '</em></span>';
+          return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (c ? ' cont' : '') + '" data-mv="' + esc(e.id) + '" style="--c:' + e.file.color + '" title="' + esc(e.file.name + ' · ' + e.t) + '"><i></i><em>' + (c ? '' : (nm ? '<b>' + esc(e.file.short) + '</b> ' : '') + esc(e.t)) + '</em></span>';
         }).join('') + '</div>';
       }).join('');
     });
@@ -4417,7 +4491,7 @@ function renderMonth() {
     var l = onDay(d, L), w = P(d).getDay(), hl = hol(d), max = 999;   // 2026-11-27 실장님: +n으로 숨기지 말고 다 보이게
     h += '<button data-d="' + d + '" class="' + (d.slice(0, 7) !== first.slice(0, 7) ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (hl ? 'hol ' : '') + (w === 0 ? 'sun ' : w === 6 ? 'sat ' : '') + (l.length ? 'has ' : '') + (S.sel === d ? 'sel' : '') + '">' +
       '<span class="dn"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</span>' +
-      l.slice(0, l.length > max ? max - 1 : max).map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (e.k === '소속사' ? ' ag' : '') + '"><i style="background:' + e.file.color + '"></i>' + (e.file.type === 'proj' ? '<b class="ea">' + esc(e.file.short) + '</b>' : '') + esc(e.t) + '</span>'; }).join('') +
+      l.slice(0, l.length > max ? max - 1 : max).map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (e.k === '소속사' ? ' ag' : '') + '" data-mv="' + esc(e.id) + '"><i style="background:' + e.file.color + '"></i>' + (e.file.type === 'proj' ? '<b class="ea">' + esc(e.file.short) + '</b>' : '') + esc(e.t) + '</span>'; }).join('') +
       (l.length > max ? '<span class="evm">+' + (l.length - max + 1) + '</span>' : '') + '</button>';
   }
   h += '</div></div>';
@@ -4488,8 +4562,8 @@ function pjGrid() {
   return '<div class="pgw"><table class="pgt"><thead><tr><th class="pgn"></th>' + D.map(hd).join('') + '</tr></thead><tbody>' +
     P.map(function (q) {
       return '<tr><th class="pgn"><i style="background:' + q.color + '"></i><span>' + artB2(q.name) + '</span></th>' + D.map(function (d) {
-        return '<td class="' + (d === TODAY ? 'td' : '') + '">' + E.filter(function (e) { return e.f === q.f.id && e.d === d; }).map(function (e) {
-          return '<div class="pge' + (evDone(e) ? ' done' : '') + '" data-ekrow="' + esc(evKey(e)) + '" style="--pc:' + q.color + '"><button class="pgk" data-eck="' + esc(e.id) + '" aria-label="완료">' + CKSVG + '</button><button class="pgx" data-e="' + esc(e.id) + '">' + esc(e.t) + '</button></div>';
+        return '<td class="' + (d === TODAY ? 'td' : '') + '" data-gd="' + d + '">' + E.filter(function (e) { return e.f === q.f.id && e.d === d; }).map(function (e) {
+          return '<div class="pge' + (evDone(e) ? ' done' : '') + '" data-mv="' + esc(e.id) + '" data-ekrow="' + esc(evKey(e)) + '" style="--pc:' + q.color + '"><button class="pgk" data-eck="' + esc(e.id) + '" aria-label="완료">' + CKSVG + '</button><button class="pgx" data-e="' + esc(e.id) + '">' + esc(e.t) + '</button></div>';
         }).join('') + '</td>';
       }).join('') + '</tr>';
     }).join('') + '</tbody></table></div>';
