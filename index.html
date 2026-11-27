@@ -2586,7 +2586,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm271';
+var APP_VER = '20261127hm272';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3581,7 +3581,7 @@ var SPACES = [
     { g: '음반', i: [{ k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · LP · 바이닐 · 포장 · 마감 · 실물 포맷 · 엔터 · 팬 굿즈' }] },
     { g: '디자인', i: [{ k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
-    { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
+    { g: '작업 기초 지침', i: [{ k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   // 2026-11-27 실장님: 퀵 배차 · 사내연락망은 안내에서 빼서 따로 대메뉴 (하위 없이 바로 열림)
   // 2026-11-27 실장님: 안내 → 전산실(사무실 · 전산) + 행정실(행정 업무), 이름 실장님 그대로
   { k: 'itm', t: '전산실', d: '사무실 출입 · 와이파이 · 나스 · 복합기 · 위하고 · 메일', home: 'space:itm', ic: 'monitor', g: [
@@ -3617,7 +3617,7 @@ function navGo(k) {
   if (k === 'ref:부위' || k === 'ref:명칭 공통') k = 'ref:명칭 MD 공통 용어'; // 2026-11-22 명칭 대메뉴로 분리
   if (k === 'ref:지류') k = 'ref:지류 소재'; // 2026-11-22 지류를 소재·인쇄·후가공·제본·포장으로 나눔
   if (k.indexOf('ref:') === 0) { NAV.refHome = 0; NAV.refPart = S.refP = k.slice(4); k = 'ref'; } // 용어사전 > 지류 · MD · 디자인
-  if (k === 'space:make' || k === 'space:tool' || k === 'tools') k = 'filename'; // 2026-11-27 도구 대메뉴 없앰 → 옛 주소는 폴더·파일명 생성기로
+  if (k === 'space:make' || k === 'space:tool' || k === 'tools' || k === 'gd:folder-file.html') k = 'filename'; // 2026-11-27 폴더·파일 작성법은 생성기 아래로 // 2026-11-27 도구 대메뉴 없앰 → 옛 주소는 폴더·파일명 생성기로
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
   if (k.indexOf('gd:') === 0) { S.gdf = k.slice(3); S.view = 'gdoc'; window.scrollTo(0, 0); return render(); }
   if (k.indexOf('gl:') === 0) { S.gl = +k.slice(3); S.view = 'glist'; window.scrollTo(0, 0); return render(); }
