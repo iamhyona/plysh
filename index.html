@@ -933,7 +933,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 @media (max-width:759px) { .wgk { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
 .wgk > div { background:#fff; border-radius:20px; padding:16px 18px; display:flex; flex-direction:column; gap:2px; min-width:0; }
 .wgk small { font-size:12.5px; font-weight:600; color:var(--mute); }
-.wgk b { font-size:24px; font-weight:800; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; } .wgk b.x52 { color:#f04452; }
+.wgk b { font-size:24px; font-weight:800; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; } .wgk b.x52 { color:#191f28; }
 .wgk span { font-size:12px; color:var(--faint); min-height:16px; }
 /* 농도 단계: 회색 → 파랑 5단계 */
 /* 농도 = 팀원 색(--pc)을 5단계로 (2026-11-27 실장님: 팀원 색 기준) */
@@ -962,22 +962,36 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgw { display:grid; grid-template-columns:64px repeat(var(--n), minmax(0, 1fr)); gap:12px 14px; align-items:center; }
 .wgwh { font-size:11px; color:var(--mute); font-variant-numeric:tabular-nums; }
 .wgwc { display:flex; flex-direction:column; gap:5px; min-width:0; }
-.wgwc b { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--sub); } .wgwc b.x40 { color:#191f28; } .wgwc b.x52 { color:#f04452; } .wgwc b.x62 { color:#a8142c; }
+.wgwc b { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--sub); } .wgwc b.x40 { color:#4e5968; } .wgwc b.x52 { color:#191f28; } .wgwc b.x62 { color:#000; font-weight:800; }
 .wgwc .trk { position:relative; height:6px; background:#f2f4f6; border-radius:3px; }
-.wgwc .trk i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:#b0b8c1; } .wgwc .trk i.x40 { background:#4e5968; } .wgwc .trk i.x52 { background:#f04452; } .wgwc .trk i.x62 { background:#a8142c; }
+.wgwc .trk i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:#b0b8c1; } .wgwc .trk i.x40 { background:#8b95a1; } .wgwc .trk i.x52 { background:#4e5968; } .wgwc .trk i.x62 { background:#191f28; }
 .wgwc .trk em { position:absolute; left:62.5%; top:-2px; bottom:-2px; width:1.5px; background:#191f28; opacity:.35; }
-.wgwc .trk em.t52 { left:81.25%; background:#f04452; opacity:.6; } .wgwc .trk em.t62 { left:96.9%; background:#a8142c; opacity:.8; }
+.wgwc .trk em.t52 { left:81.25%; opacity:.5; } .wgwc .trk em.t62 { left:96.9%; opacity:.8; }
 @media (max-width:759px) { .wgw { grid-template-columns:56px repeat(var(--n), minmax(0, 1fr)); gap:10px 8px; } .wgwh { font-size:9.5px; } .wgwc b { font-size:11.5px; } }
 /* 한 사람 주별 막대 */
 .wgv { display:grid; grid-template-columns:22px minmax(0, 1fr); gap:6px; height:180px; padding-top:18px; }
 .wgvl { position:relative; } .wgvl span { position:absolute; right:0; transform:translateY(50%); font-size:10px; color:var(--faint); font-variant-numeric:tabular-nums; }
 .wgvp { position:relative; display:flex; align-items:flex-end; gap:10px; border-bottom:1px solid var(--line); }
-.wgvp em { position:absolute; left:0; right:0; border-top:1.5px dashed #b0b8c1; } .wgvp em.g52 { border-color:#f04452; } .wgvp em.g62 { border-color:#a8142c; border-top-width:2px; }
+.wgvp em { position:absolute; left:0; right:0; border-top:1.5px dashed #b0b8c1; } .wgvp em.g40 { border-color:#d1d6db; } .wgvp em.g52 { border-color:#8b95a1; } .wgvp em.g62 { border-color:#191f28; }
 .wgvc { flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; min-width:0; }
-.wgvc i { display:block; width:100%; max-width:48px; background:color-mix(in srgb, var(--pc, #3182f6) 45%, #fff); border-radius:8px 8px 0 0; } .wgvc i.x40 { background:var(--pc, #3182f6); } .wgvc i.x52 { background:#f04452; } .wgvc i.x62 { background:#a8142c; }
-.wgvc b { font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; } .wgvc b.x52 { color:#f04452; } .wgvc b.x62 { color:#a8142c; }
+.wgvc i { display:block; width:100%; max-width:48px; background:color-mix(in srgb, var(--pc, #3182f6) 45%, #fff); border-radius:8px 8px 0 0; } .wgvc i.x40 { background:var(--pc, #3182f6); } .wgvc i.x52 { background:#4e5968; } .wgvc i.x62 { background:#191f28; }
+.wgvc b { font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; } .wgvc b.x52 { color:#4e5968; } .wgvc b.x62 { color:#191f28; font-weight:800; }
 .wgvx { display:flex; gap:10px; margin-left:28px; padding-top:6px; } .wgvx span { flex:1; text-align:center; font-size:10.5px; color:var(--mute); min-width:0; font-variant-numeric:tabular-nums; }
 /* 출퇴근 시각 */
+.wgcl { container-type:inline-size; }
+.wgcv, .wgcd { display:grid; grid-template-columns:30px minmax(0, 1fr); gap:6px; }
+.wgcy { position:relative; height:240px; } .wgcy span { position:absolute; right:0; transform:translateY(-50%); font-size:10px; color:var(--faint); white-space:nowrap; }
+.wgcp { position:relative; height:240px; display:flex; }
+.wgcp > i { position:absolute; left:0; right:0; pointer-events:none; } .wgcp > i.band { background:#f2f4f6; border-radius:4px; } .wgcp > i.gl { border-top:1px dashed #e5e8eb; }
+.wgcc { position:relative; flex:1 1 0; min-width:0; border:0; background:none; padding:0; font-family:inherit; cursor:pointer; }
+.wgcc.mo { border-left:1px solid #e5e8eb; }
+.wgcc i.bar { position:absolute; left:50%; transform:translateX(-50%); width:min(12px, 60%); border-radius:6px; background:var(--pc, #3182f6); }
+.wgcc i.bar.df { background:#fff; } .wgcc i.bar.late { background:color-mix(in srgb, var(--pc, #3182f6) 72%, #191f28); }
+.wgcc b { position:absolute; left:50%; transform:translate(-50%, 4px); font-size:9.5px; font-weight:700; color:var(--sub); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.wgcc.td i.bar { box-shadow:0 0 0 2px #fff, 0 0 0 3.5px var(--txt); }
+.wgcd { margin-top:22px; } .wgcd > div { display:flex; } .wgcd > div span { flex:1 1 0; min-width:0; text-align:center; font-size:11px; font-weight:600; color:var(--sub); font-variant-numeric:tabular-nums; line-height:1.2; }
+.wgcd small { display:block; font-size:9.5px; font-weight:500; color:var(--faint); } .wgcd span.td { color:var(--txt); font-weight:800; }
+@container (max-width:600px) { .wgcc b { display:none; } .wgcd small { display:none; } .wgcd > div span { font-size:9px; } .wgcd { margin-top:6px; } }
 .wgtl { display:grid; gap:2px; }
 .wgtx, .wgtr { display:grid; grid-template-columns:72px minmax(0, 1fr); gap:8px; align-items:center; }
 .wgtx div { position:relative; height:18px; } .wgtx em { position:absolute; transform:translateX(-50%); font-style:normal; font-size:10px; color:var(--faint); white-space:nowrap; }
@@ -1001,15 +1015,15 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgdt span { display:flex; flex-direction:column; gap:2px; align-items:center; }
 .wgdt i { width:100%; max-width:5px; aspect-ratio:1 / 1; border-radius:50%; background:#e5e8eb; display:block; }
 .wgdt i.on { background:var(--pc); }
-.wgtd { font-style:normal; font-size:12px; font-weight:700; color:var(--mute); } .wgtd.up { color:#f04452; } .wgtd.dn { color:#3182f6; }
+.wgtd { font-style:normal; font-size:12px; font-weight:700; color:var(--mute); } .wgtd.up { color:#191f28; } .wgtd.dn { color:#3182f6; }
 .wgkr { flex-direction:row !important; align-items:center; gap:14px !important; }
 .wgkr > div { display:flex; flex-direction:column; gap:2px; min-width:0; }
 .wgrg { width:64px; height:64px; flex:none; }
 .wgk b i { font-style:normal; font-size:14px; color:var(--mute); font-weight:600; }
 .wgsk { display:flex; gap:3px; margin-top:6px; } .wgsk i { width:12px; height:6px; border-radius:3px; background:#e5e8eb; display:block; } .wgsk i.on { background:var(--pc); }
-.wgal { display:flex; gap:12px; align-items:flex-start; background:#fff6e5; border-radius:16px; padding:14px 16px; }
-.wgal.x52 { background:#fdecec; }
-.wgal svg { width:20px; height:20px; flex:none; color:#ff7300; margin-top:1px; } .wgal.x52 svg { color:#f04452; }
+.wgal { display:flex; gap:12px; align-items:flex-start; background:#fff; border-radius:16px; padding:14px 16px; }
+.wgal.x52 { background:#fff; box-shadow:inset 3px 0 0 #191f28; }
+.wgal svg { width:20px; height:20px; flex:none; color:#4e5968; margin-top:1px; } .wgal.x52 svg { color:#191f28; }
 .wgal div { display:flex; flex-direction:column; gap:2px; min-width:0; } .wgal b { font-size:14px; font-weight:800; } .wgal span { font-size:13px; color:var(--sub); }
 .wgnw { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
 @media (max-width:759px) { .wgnw { grid-template-columns:1fr; } }
@@ -4930,11 +4944,15 @@ function wlGraph(y, m, wp, T, WT) {
   h += '<div class="wgc"><div class="wgt">주별 근무시간<small>근무표 기준</small></div>' + (!WT ? '<div class="wl0">근무표 불러오는 중…</div>' : !WK ? '<div class="wl0">근무표에 이 달 탭이 없어요</div>' :
     '<div class="wgv"><div class="wgvl"><span style="bottom:' + (62 / 64 * 100).toFixed(1) + '%">62</span><span style="bottom:' + (52 / 64 * 100).toFixed(1) + '%">52</span><span style="bottom:' + (40 / 64 * 100).toFixed(1) + '%">40</span><span style="bottom:0">0</span></div><div class="wgvp"><em class="g62" style="bottom:' + (62 / 64 * 100).toFixed(1) + '%"></em><em class="g52" style="bottom:' + (52 / 64 * 100).toFixed(1) + '%"></em><em class="g40" style="bottom:' + (40 / 64 * 100).toFixed(1) + '%"></em>' + WK.map(function (w) { var c = wc(w); return '<div class="wgvc"><b class="' + c + '">' + wlHm(w.tot) + '</b><i class="' + c + '" style="height:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i></div>'; }).join('') + '</div></div><div class="wgvx">' + WK.map(function (w) { return '<span>' + md(w.s) + '–' + md(w.e) + '</span>'; }).join('') + '</div>') + '</div>' +
     '<div class="wgc"><div class="wgt">요일 · 시간대<small>그 시간에 일한 날이 많을수록 진하게</small></div>' + dayHour(S1.D, pc1) + '</div></div>';
-  // 출퇴근 시각 타임라인 (6시~새벽 2시)
-  var A = 360, B = 1560, pc = function (v) { return ((Math.min(B, Math.max(A, v)) - A) / (B - A) * 100).toFixed(2); };
-  var rows = days.map(function (d, i) { return { d: d, x: S1.D[i] }; }).filter(function (o) { return o.x; });
-  h += '<div class="wgc" style="--pc:' + dcol(wp) + '"><div class="wgt">출퇴근 시각<small>회색 띠 = 9시–18시 · 흰 막대 = 기록 없는 날(9시–18시로 계산)</small></div><div class="wgtl"><div class="wgtx"><span></span><div>' + [6, 9, 12, 15, 18, 21, 24].map(function (t) { return '<em style="left:' + pc(t * 60) + '%">' + (t === 24 ? '0시' : t + '시') + '</em>'; }).join('') + '</div></div>' +
-    (rows.length ? rows.map(function (o) { var x = o.x, late = x.o >= 1320; return '<button class="wgtr" data-wgd="' + o.d + '|' + esc(wp) + '"><span>' + md(o.d) + ' (' + W[P(o.d).getDay()] + ')' + '</span><div><i class="band" style="left:' + pc(540) + '%;width:' + (pc(1080) - pc(540)).toFixed(2) + '%"></i><i class="bar' + (x.def ? ' df' : '') + (late ? ' late' : '') + '" style="left:' + pc(x.i) + '%;width:' + Math.max(1, pc(x.o) - pc(x.i)).toFixed(2) + '%"></i>' + (x.def ? '' : '<b style="left:' + pc(x.o) + '%">' + wlHm(x.o) + '</b>') + '</div></button>'; }).join('') : '<div class="wl0">이 달 근무 기록이 없어요</div>') + '</div></div>';
+  // 출퇴근 시각: 날짜마다 세로 막대 (위 = 출근, 아래 = 퇴근, 7시~새벽 2시)
+  var A = 420, B = 1560, pc = function (v) { return ((Math.min(B, Math.max(A, v)) - A) / (B - A) * 100).toFixed(2); };
+  var cols = days.map(function (d, i) { return { d: d, x: S1.D[i], w: P(d).getDay() }; }).filter(function (o) { return o.x || (o.w > 0 && o.w < 6); });
+  h += '<div class="wgc wgcl" style="--pc:' + dcol(wp) + '"><div class="wgt">출퇴근 시각<small>막대 위 = 출근 · 아래 = 퇴근 · 회색 띠 9시–18시 · 흰 막대 = 기록 없는 날</small></div>' +
+    '<div class="wgcv"><div class="wgcy">' + [9, 12, 15, 18, 21, 24].map(function (t) { return '<span style="top:' + pc(t * 60) + '%">' + (t === 24 ? '0시' : t + '시') + '</span>'; }).join('') + '</div>' +
+    '<div class="wgcp"><i class="band" style="top:' + pc(540) + '%;height:' + (pc(1080) - pc(540)).toFixed(2) + '%"></i>' + [12, 15, 21, 24].map(function (t) { return '<i class="gl" style="top:' + pc(t * 60) + '%"></i>'; }).join('') +
+    cols.map(function (o) { var x = o.x; return '<button class="wgcc' + (o.d === TODAY ? ' td' : '') + (o.w === 1 ? ' mo' : '') + '" data-wgd="' + o.d + '|' + esc(wp) + '" title="' + md(o.d) + ' (' + W[o.w] + ')' + (x ? ' · ' + (x.def ? '기록 없음 (9:00–18:00)' : wlHm(x.i) + '–' + wlHm(x.o)) : '') + '">' +
+      (x ? '<i class="bar' + (x.def ? ' df' : '') + (x.o >= 1320 ? ' late' : '') + '" style="top:' + pc(x.i) + '%;height:' + Math.max(1, pc(x.o) - pc(x.i)).toFixed(2) + '%"></i>' + (x.def ? '' : '<b style="top:' + pc(x.o) + '%">' + wlHm(x.o) + '</b>') : '') + '</button>'; }).join('') + '</div></div>' +
+    '<div class="wgcd"><span></span><div>' + cols.map(function (o) { return '<span class="' + (o.d === TODAY ? 'td' : '') + (o.w === 1 ? ' mo' : '') + '">' + P(o.d).getDate() + '<small>' + W[o.w] + '</small></span>'; }).join('') + '</div></div></div>';
   return '<div class="wgg">' + h + '</div>';
 }
 function renderWl() {
