@@ -1358,6 +1358,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
 .tdcard.tdall { grid-column:1 / -1; }
+.whc .hcbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 8px; } .whc .hcbar .hcv { margin:0; } .whc .hcbar .pmd { margin:0; } .whc .hcbar .pmdb { min-height:36px; height:36px; font-size:13px; background:var(--chip); }
+
 /* 2026-11-27 실장님: 수정 모드에서도 손잡이로 순서 바꾸기 */
 .tdei .tdgrip { flex:none; align-self:center; width:30px; height:36px; display:flex; align-items:center; justify-content:center; color:var(--faint); cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; border-radius:8px; }
 .tdei .tdgrip svg { width:16px; height:16px; } .tdei .tdgrip:hover { color:var(--sub); background:var(--chip); }
@@ -2327,7 +2329,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm241';
+var APP_VER = '20261127hm242';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3372,8 +3374,11 @@ var CLK_T = 0;
 function clkTick() { clearTimeout(CLK_T); var hH = document.getElementById('chH'); if (!hH) return; var n = new Date(), hh = n.getHours(), ac = document.getElementById('aClk'); if (ac) ac.classList.toggle('night', hh >= 18 || hh < 6); var sec = n.getSeconds(), mi = n.getMinutes() + sec / 60, hr = n.getHours() % 12 + mi / 60; hH.setAttribute('transform', 'rotate(' + hr * 30 + ' 50 50)'); document.getElementById('chM').setAttribute('transform', 'rotate(' + mi * 6 + ' 50 50)'); document.getElementById('chS').setAttribute('transform', 'rotate(' + sec * 6 + ' 50 50)'); CLK_T = setTimeout(clkTick, 1000 - n.getMilliseconds()); }
 function renderStart() {
   var d = P(TODAY), wk = '일월화수목금토'.charAt(d.getDay()), end = addD(TODAY, 7);
-  var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && !agEv(e) && e.d >= TODAY && e.d <= end; }).slice(0, 10);
+  var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && !S.off[e.f] && !agEv(e) && e.d >= TODAY && e.d <= end; }).slice(0, 10);
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort);
+  // 2026-11-27 실장님: 홈에서도 드롭다운으로 고른 프로젝트만 보기 (프로젝트 메뉴 달력과 같은 선택을 같이 씀)
+  var offN = pfs().filter(function (f) { return S.off[f.id]; }).map(function (f) { return pnorm(f.name); });
+  if (offN.length) Td = Td.filter(function (x) { return !x.j || offN.indexOf(pnorm(sgFix(x.j))) < 0; });
   var PL = pjMerged(), R = NAV.rec.slice(0, 8), RN = R.map(function (r) { return r.name; }); PL.map(wsFrom).forEach(function (r) { if (R.length < 8 && RN.indexOf(r.name) < 0) { R.push(r); RN.push(r.name); } });
   // 2026-11-27 실장님: 정렬 — 홈 전체를 3등분 격자 하나로 (줄마다 열 경계가 위아래로 맞게)
   // PC: [출퇴근 / 오늘 팀 | 달력 2칸] · [이번 주 마감 | 오늘 할 일 | 자주 쓰는 도구] · [내 이번 주 | 요일별 근무 | 팀 공지] 13:32 실장님: 왼쪽 열 = 출퇴근·오늘 팀·자주 쓰는 도구 | 달력(세로로 늘어남) · 마감 | 할 일 | 최근 프로젝트 · 근무시간 통계 · 내 이번 주 | 요일별 | 공지 · 근무시간 통계 · 최근 프로젝트
@@ -3390,7 +3395,7 @@ function renderStart() {
   wlMeInit();
   var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small class="wwx">' + wxHtml() + '</small></div>' +
     '<div class="wdg"><div class="wcol wdl">' + puCard() + toolsCard + dlCard.replace('<div class="wsc">', '<div class="wsc wdlc">') + teamNowCard() + '</div>' + homeCal() + tdCard + recCard + wtCard() + myWeekCard() + ntHtml() + '</div>';
-  $('#main').innerHTML = h; bindGo($('#main')); bindNt(); bindPu(); bindHomeCal();
+  $('#main').innerHTML = h; bindGo($('#main')); bindNt(); bindPu(); bindHomeCal(); bindFilter();
   $$('#main [data-wgd]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); var a = b.dataset.wgd.split('|'); openWl(a[0], a[1]); }; });
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
@@ -3415,7 +3420,7 @@ function homeCal() {
       return { id: e.id, d: e.d, k: '', t: e.t.replace(p, '').replace(/^[\s·:,-]+/, '').trim() || e.t, f: 'p:' + p, file: { color: p === '팀' ? '#8b95a1' : dcol(p), short: p, name: p } }; });
     RK = {}; T.concat(['팀']).forEach(function (n, i) { RK['p:' + n] = pad(i); }); }
   var h = '<div class="wsc whc"><h3><span class="hct">' + y + '.' + pad(m) + '</span><span class="hca">' + (cur ? '' : '<button type="button" id="hcT">이번 달</button>') + '<button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button><button type="button" data-ng="cal">달력 전체</button><button type="button" class="hcadd" id="hcAdd">' + IC_PS + '일정 추가</button></span></h3>' +
-    '<div class="aseg hcv" id="hcV"><button type="button" data-v="" class="' + (me ? '' : 'on') + '">프로젝트</button><button type="button" data-v="me" class="' + (me ? 'on' : '') + '">개인 일정</button></div>' +
+    '<div class="hcbar">' + filterBar() + '<div class="aseg hcv" id="hcV"><button type="button" data-v="" class="' + (me ? '' : 'on') + '">프로젝트</button><button type="button" data-v="me" class="' + (me ? 'on' : '') + '">개인 일정</button></div>' + '</div>' +
     '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd gl">';
   for (var ws = st; ws <= en; ws = addD(ws, 7)) {
     var days = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return addD(ws, i); });
