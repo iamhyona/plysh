@@ -1354,6 +1354,10 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+/* 2026-11-27 실장님: 달력 글자가 다 빨갛게 보임 → 일정 글자는 검정, 데드라인·공식 일정은 굵게만 (색 구분은 앞 동그라미) · 다음 달 칸도 덜 흐리게 */
+.mcal .ev.dl, .hmc .ev.dl { color:var(--txt) !important; font-weight:800 !important; }
+.mcal .grid > button.out { opacity:.6; }
+.pjbx { margin-top:12px; } .pjbh { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:800; color:var(--txt); padding:4px 0 10px; border-bottom:1px solid var(--line); margin-bottom:4px; } .pjbh i { width:10px; height:10px; border-radius:50%; flex:none; } .pjbh small { font-size:12.5px; font-weight:600; color:var(--mute); }
 .wtdc { display:flex; flex-direction:column; } .wtdl { max-height:440px; overflow:auto; margin:0 -4px; padding:0 4px; }
 .wtdg + .wtdg { margin-top:10px; } .wtdh { font-size:12.5px; font-weight:800; color:var(--txt); padding:4px 4px 2px; display:flex; gap:6px; align-items:baseline; } .wtdh small { font-size:11.5px; font-weight:600; color:var(--mute); }
 .wtdg .wsr { border-top:1px solid var(--line); } .wtdg .wtdh + .wsr { border-top:0; }
@@ -2028,6 +2032,8 @@ var TODAY = F(new Date());
 var KIND = { '디자인': '#3182f6', '리터칭': '#4e5968', '소속사': '#8b95a1', '데드라인': '#f04452', '공식': '#191f28', '업무': '#6b7684', '휴가': '#c9cdd2' };
 var KIND_BG = { '디자인': '#e8f3ff', '리터칭': '#eceef1', '소속사': '#f2f4f6', '데드라인': '#fdecec', '공식': '#e5e8eb', '업무': '#f2f4f6', '휴가': '#f6f7f9' };
 var PROJ_K = ['디자인', '리터칭', '소속사', '데드라인', '공식'], WORK_K = ['업무', '휴가'];
+// 2026-11-27 실장님: 프로젝트끼리 색이 비슷해 보임 → 색상(hue)이 뚜렷이 다른 12색, 진행 중인 프로젝트에 발매일 순으로 먼저 나눠 줌 (12개까지 겹치지 않음)
+var PJCOL = ['#3b82f6', '#f97316', '#10b981', '#ec4899', '#8b5cf6', '#06b6d4', '#ef4444', '#d4a106', '#3341a8', '#65a30d', '#a0522d', '#64748b'];
 var PCOL = ['#6f9fe8', '#e08aa6', '#6dba8f', '#e2aa5e', '#a092e0', '#5fb4d4', '#e48f80', '#6cbcb2', '#c08fd8', '#e7a173'];
 var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', tk: ls.get('d4:tk') || '', y: +TODAY.slice(0, 4), m: +TODAY.slice(5, 7), ws: sunOf(TODAY),
   off: JSON.parse(ls.get('d4:off') || '{}'), D: null, sel: null };
@@ -2050,7 +2056,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm215';
+var APP_VER = '20261127hm216';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2077,6 +2083,11 @@ function setData(d) {
   var FM = {}; files.forEach(function (f) { FM[f.id] = f; });
   d.events.forEach(function (e) { e.file = FM[e.f]; });
   d.events = d.events.filter(function (e) { return e.file; });
+  (function () { var T0 = F(new Date()), from = F(new Date(Date.now() - 45 * 864e5)), nx = {}, act = [], rest = [];
+    d.events.forEach(function (e) { if (e.file.type !== 'proj') return; var k = e.f; if (e.d >= from) nx[k] = nx[k] || '9999'; if (e.d >= T0 && e.d < nx[k]) nx[k] = e.d; });
+    files.forEach(function (f) { if (f.type === 'work') return; (nx[f.id] ? act : rest).push(f); });
+    act.sort(function (a, b) { return nx[a.id] < nx[b.id] ? -1 : nx[a.id] > nx[b.id] ? 1 : a.name < b.name ? -1 : 1; });
+    act.concat(rest).forEach(function (f, i) { f.color = PJCOL[i % PJCOL.length]; }); })();
   d.events.sort(function (a, b) { return a.d === b.d ? (a.file.type === b.file.type ? (a.s - b.s) : (a.file.type === 'proj' ? -1 : 1)) : (a.d < b.d ? -1 : 1); });
   d.todo = d.todo || []; if (window.TD_PEND) d.todo.forEach(function (x) { if (x.id in TD_PEND) x.c = TD_PEND[x.id]; }); d.wl = d.wl || []; d.rep = (d.rep || []).sort(function (a, b) { return a.d === b.d ? rid(a.r) - rid(b.r) : (a.d < b.d ? -1 : 1); }); d.alias = d.alias || {};
   d.FM = FM; S.D = d;
@@ -3861,7 +3872,8 @@ function pjListProj() {
   var g = projList().filter(function (q) { return q.f && !S.off[q.f.id]; }).map(function (q) {
     var E = S.D.events.filter(function (e) { return e.f === q.f.id && inL(e.d) && !agEv(e); }); if (!E.length) return '';
     var first = true;
-    return '<div class="mh" style="color:' + q.color + '">' + esc(q.name) + '</div><div class="day list">' + E.map(function (e) {
+    // 2026-11-27 실장님: 프로젝트 이름은 박스 안, 이름 앞 색 동그라미로 구분 (이름은 검정)
+    return '<div class="day list pjbx"><div class="pjbh"><i style="background:' + q.color + '"></i>' + esc(q.name) + '<small>' + E.length + '</small></div>' + E.map(function (e) {
       var x = ''; if (first && e.d >= TODAY) { x = '<div class="pjnow">오늘 이후</div>'; first = false; }
       return x + ckItem(e, true, true);
     }).join('') + '</div>';
@@ -3875,7 +3887,7 @@ function pjGrid() {
   var E = S.D.events.filter(function (e) { return ids[e.f] && inL(e.d) && !agEv(e); });
   P = P.filter(function (q) { return E.some(function (e) { return e.f === q.f.id; }); });
   if (!P.length) return '<div class="day"><div class="empty2">일정이 없어요</div></div>';
-  var D = []; E.forEach(function (e) { if (D.indexOf(e.d) < 0) D.push(e.d); }); D.sort();
+  var D = []; E.forEach(function (e) { if (D.indexOf(e.d) < 0) D.push(e.d); }); if (inL(TODAY) && D.indexOf(TODAY) < 0) D.push(TODAY); D.sort();
   var hd = function (d) { var hl = hol(d), w = P2(d).getDay(); return '<th class="pgd' + (d === TODAY ? ' td' : '') + (w === 0 || hl ? ' sun' : w === 6 ? ' sat' : '') + '" data-gd="' + d + '"><b>' + (+d.slice(5, 7)) + '.' + (+d.slice(8, 10)) + '</b><small>' + W[w] + (d === TODAY ? ' · 오늘' : '') + '</small></th>'; };
   function P2(d) { return new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)); }
   return '<div class="pgw"><table class="pgt"><thead><tr><th class="pgn"></th>' + D.map(hd).join('') + '</tr></thead><tbody>' +
@@ -3968,7 +3980,8 @@ function renderProject() {
     '<div class="pjtb">' + (tm ? '<div class="aseg" id="pjM">' + MODES.map(function (x) { return '<button data-m="' + x[0] + '" class="' + (x[0] === md ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' : cvKSeg()) + filterBar() + '</div>' +
     '<div class="pjs1">' + body + '</div>';
   $('#main').innerHTML = h; bindItems(); bindRep(); bindEvCk(); bindFilter();
-  var gw = $('.pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
+  // 2026-11-27 실장님: 가로형은 오늘 칸부터 보이게 (예전엔 다른 .pgw 단추를 잡아서 안 움직였음)
+  var gw = $('#main .pjs1 .pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
   $$('#lSeg button').forEach(function (b) { b.onclick = function () { S.lp = b.dataset.p; ls.set('d4:lp', S.lp); render(); }; });
   if ($('#lSegD')) $('#lSegD').onchange = function () { if (this.value) { S.ld = this.value; render(); } };
   if ($('#lF')) { $('#lF').onchange = function () { if (this.value) { S.lf = this.value; ls.set('d4:lf', S.lf); render(); } }; $('#lT').onchange = function () { if (this.value) { S.lt = this.value; ls.set('d4:lt', S.lt); render(); } }; }
