@@ -1354,6 +1354,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+.hmt .hmts { font-size:13px; font-weight:600; color:var(--mute); margin-left:10px; }
 .pgt .pgn span, .pjbh span { font-weight:500; } .artb { font-weight:800; }
 .hmc .wk .ev em { font-weight:500; } .hmc .wk .ev em b { font-weight:800 !important; }
 /* 2026-11-27 실장님: 달력 글자가 다 빨갛게 보임 → 일정 글자는 검정, 데드라인·공식 일정은 굵게만 (색 구분은 앞 동그라미) · 다음 달 칸도 덜 흐리게 */
@@ -2058,7 +2059,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm217';
+var APP_VER = '20261127hm218';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3979,6 +3980,8 @@ function renderProject() {
       '<div class="arw">' + (cur ? '' : '<button class="tod" id="nT">오늘</button>') + '<button id="lP" aria-label="이전">' + IC_L + '</button><button id="lN" aria-label="다음">' + IC_R + '</button></div></div>'; })();
   // 2026-11-20 실장님: 프로젝트 칩 줄 → 보기(날짜별·프로젝트별·디자이너별) + 프로젝트 여러 개 고르는 드롭다운(검색), 달력과 같은 선택
   var MODES = [['d', '날짜별'], ['p', '프로젝트별']].concat(tm ? [['w', '디자이너별']] : []), md = S.pjm || ls.get('d4:pjm') || 'd'; if (!MODES.some(function (x) { return x[0] === md; })) md = 'd'; S.pjm = md;
+  // 2026-11-27 실장님: 가로형은 달 단위로 자르지 말고 지난 일정부터 앞으로 잡힌 일정(1·2월…)까지 한 줄로, 열면 오늘 칸, 좌우 스크롤로 오가기
+  if (!tm && md === 'd') { S.lrg = [addD(TODAY, -183), '9999-12-31']; top = '<div class="hm2 hm2a"><label class="hmt">전체 일정<small class="hmts">지난 6개월부터 · 좌우로 넘겨 보기</small></label></div>'; }
   var body = tm ? (md === 'p' ? pjTeamProj() : md === 'w' ? pjTeam(null) : pjTeamDate()) : (md === 'p' ? pjListProj() : pjGrid());
   var h = top + '<div class="seg" id="pSeg"><button data-m="sched" class="' + (tm ? '' : 'on') + '">제작일정</button><button data-m="team" class="' + (tm ? 'on' : '') + '">팀 업무</button></div>' +
     '<div class="pjtb">' + (tm ? '<div class="aseg" id="pjM">' + MODES.map(function (x) { return '<button data-m="' + x[0] + '" class="' + (x[0] === md ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' : cvKSeg()) + filterBar() + '</div>' +
