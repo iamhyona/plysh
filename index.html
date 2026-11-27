@@ -1356,10 +1356,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .hmc .wk .ev i { display:none; }
 #bgSv { position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px); z-index:400; background:#191f28; color:#fff; font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; white-space:nowrap; max-width:calc(100vw - 32px); }
 /* 출퇴근 단추 확인 문구는 잘리지 않게 줄바꿈 */
-/* 2026-11-27 실장님: 출퇴근 단추 가로형 2×2 (아이콘·이름 왼쪽, 시각 오른쪽) · 찍힌 단추는 흐리지 않게 고정 */
-.wdg .wckb { grid-template-columns:repeat(2, minmax(0, 1fr)); }
-.wdg .wckb button { height:52px !important; flex-direction:row !important; justify-content:flex-start !important; gap:8px !important; padding:0 14px !important; }
-.wdg .wckb button b { font-size:15px !important; } .wdg .wckb button small { margin-left:auto; font-size:13.5px !important; }
+/* 2026-11-27 실장님: 출퇴근 단추는 세로형 4칸 유지(한 번 누르면 바로 기록이라 확인 문구 없음) · 찍힌 단추는 흐리지 않게 */
 .wdg .wckb button.done { opacity:1; } .wdg .wckb button.done small { color:var(--txt); font-weight:700; }
 .wdg .wckb button.nx, .wdg .wckb button.nx b, .wdg .wckb button.nx small, .wdg .wckb button.nx svg { color:#fff !important; }
 .wdg .wckb button.sure small { font-size:12.5px !important; font-weight:700; white-space:nowrap; }
@@ -2101,7 +2098,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm223';
+var APP_VER = '20261127hm224';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
