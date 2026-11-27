@@ -1354,6 +1354,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+.whc .hcv { display:inline-flex; width:auto; max-width:max-content; margin:0 0 8px; } .whc .hcv button { height:30px; padding:0 12px; font-size:12.5px; }
+
 .tdqb { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; height:40px; margin:10px 0 4px; border:0; border-radius:10px; background:var(--chip); color:var(--sub); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
 .tdqb svg { width:16px; height:16px; }
 .tdadd .tdjx { flex:0 1 38%; min-width:0; height:38px; border:0; background:var(--chip); border-radius:10px; padding:0 10px; font-size:13px; outline:0; }
@@ -2117,7 +2119,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm225';
+var APP_VER = '20261127hm226';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3181,14 +3183,23 @@ function renderStart() {
 /* 2026-11-27 실장님: 홈 달력을 한눈에 — 맨 위 오른쪽, 칸마다 제작일정 (PC는 글자, 모바일은 색 막대) */
 // 2026-11-27 실장님: 일정이 많아도 다 보이게(칸이 세로로 늘어남) · 프로젝트 줄은 발매(릴리즈)일 순서로 고정
 // 주마다 그 주에 일정이 있는 프로젝트를 한 줄씩(발매일 빠른 순) 깔아서, 같은 프로젝트는 일주일 내내 같은 높이에 보임
+var PSN_RX = /연차|반차|반반차|휴무|휴가|병원|대휴|조퇴|외출|병가|경조|예비군|민방위|건강검진|오프|OFF/i;
 function pjRel(f) {
   var E = S.D.events.filter(function (e) { return e.f === f.id; }), r = E.filter(function (e) { return /발매|릴리즈|출시|판매\s*(시작|오픈)|공개|오픈/.test(e.t); })[0];
   return r ? r.d : f.to || (E.length ? E[E.length - 1].d : '9999');
 }
 function homeCal() {
+  if (S.hcv == null) { try { S.hcv = ls.get('d4:hcv') || ''; } catch (x) { S.hcv = ''; } }
   var b = S.hcb || TODAY.slice(0, 7), y = +b.slice(0, 4), m = +b.slice(5, 7), first = b + '-01', last = F(new Date(y, m, 0)), st = sunOf(first), en = addD(sunOf(last), 6), L = pvis(), cur = b === TODAY.slice(0, 7);
   var RK = {}; pfs().forEach(function (f) { RK[f.id] = pjRel(f) + '|' + f.name; });
+  // 2026-11-27 실장님: 개인 일정(연차·반차·휴무·병원·대휴 등)만 보기 — 업무일지의 휴가 칸 + 개인 사유가 적힌 업무, 사람마다 한 줄·각자 색
+  var me = S.hcv === 'me';
+  if (me) { var T = team(); L = S.D.events.filter(function (e) { return e.file && e.file.type === 'work' && (e.k === '휴가' || PSN_RX.test(e.t)); }).map(function (e) {
+      var p = T.filter(function (n) { return e.t.indexOf(n) >= 0 || e.t.indexOf(n.slice(1)) >= 0; })[0] || '팀';
+      return { id: e.id, d: e.d, k: '', t: e.t.replace(p, '').replace(/^[\s·:,-]+/, '').trim() || e.t, f: 'p:' + p, file: { color: p === '팀' ? '#8b95a1' : dcol(p), short: p, name: p } }; });
+    RK = {}; T.concat(['팀']).forEach(function (n, i) { RK['p:' + n] = pad(i); }); }
   var h = '<div class="wsc whc"><h3><span class="hct">' + y + '.' + pad(m) + '</span><span class="hca">' + (cur ? '' : '<button type="button" id="hcT">이번 달</button>') + '<button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button><button type="button" data-ng="cal">달력 전체</button><button type="button" class="hcadd" id="hcAdd">' + IC_PS + '일정 추가</button></span></h3>' +
+    '<div class="aseg hcv" id="hcV"><button type="button" data-v="" class="' + (me ? '' : 'on') + '">프로젝트</button><button type="button" data-v="me" class="' + (me ? 'on' : '') + '">개인 일정</button></div>' +
     '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd gl">';
   for (var ws = st; ws <= en; ws = addD(ws, 7)) {
     var days = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return addD(ws, i); });
@@ -3220,6 +3231,7 @@ function bindHomeCal() {
   if ($('#hcP')) { $('#hcP').onclick = function () { mv(-1); }; $('#hcN').onclick = function () { mv(1); }; }
   if ($('#hcT')) $('#hcT').onclick = function () { S.hcb = ''; render(); };
   if ($('#hcAdd')) $('#hcAdd').onclick = function (ev) { ev.stopPropagation(); openBulk(); };
+  $$('#hcV button').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); S.hcv = b.dataset.v; try { ls.set('d4:hcv', S.hcv); } catch (x) {} render(); }; });
 }
 /* 2026-11-27 실장님: 홈 = 대시보드 · 출근·외근·복귀·퇴근 단추를 누르면 지금 시각으로 근태(WORK LOG) 기록
    외근은 WORK LOG '외근 내용'에 '14:10–16:30 장소'로 남김 (서버 항목 그대로 씀) */
@@ -6156,6 +6168,7 @@ function bkMode(m) {
   $$('#bk .bkp').forEach(function (x) { x.classList.toggle('hide', x.dataset.p !== m); });
 }
 function bkProjs() { return S.D.files.filter(function (f) { return f.type === 'proj'; }); }
+function bkWork() { return S.D.files.filter(function (f) { return f.type === 'work'; })[0] || null; }
 function bkFind(line) {
   var L = line.replace(/\s+/g, '').toLowerCase(), best = null, bl = 0;
   bkProjs().forEach(function (f) {
@@ -6187,7 +6200,8 @@ function bkParse(text) {
     if (f) { [f.name.replace(/\[[^\]]*\]|제작\s*일정/g, '').trim(), f.short].forEach(function (k) { if (k) t = t.replace(k, ' '); }); }
     t = t.replace(/^[\s\-–·:|,)]+|[\s\-–·:|,(]+$/g, '').replace(/\s+/g, ' ').trim();
     if (!t) return;
-    var k = bkKind(t);
+    var k = bkKind(t), wk = bkWork();
+    if (wk && PSN_RX.test(t) && (!f || PSN_RX.test(ln.slice(0, 12)))) { f = wk; k = '휴가'; }
     out.push({ f: f ? f.id : '', d: dt.d, k: k, t: t, on: k !== '소속사' && !!f });
   });
   return out;
@@ -6202,13 +6216,13 @@ function bkDraw() {
   var P = bkProjs(), R = BK.rows, n = R.filter(function (r) { return r.on; }).length;
   $('#bkL').innerHTML = R.length ? '<div class="bkh">' + R.length + '개 읽음 · 체크한 ' + n + '개를 시트에 써요</div>' + R.map(function (r, i) {
     return '<div class="bkr' + (r.on ? '' : ' off') + '" data-i="' + i + '"><button type="button" class="bkc' + (r.on ? ' on' : '') + '" data-c="' + i + '">' + CKSVG + '</button>' +
-      '<div class="bkf"><select data-k="f">' + '<option value="">프로젝트 고르기</option>' + P.map(function (f) { return '<option value="' + f.id + '"' + (f.id === r.f ? ' selected' : '') + '>' + esc(f.name) + '</option>'; }).join('') + '</select>' +
-      '<input type="date" data-k="d" value="' + r.d + '"><select data-k="k">' + PROJ_K.map(function (k) { return '<option' + (k === r.k ? ' selected' : '') + '>' + k + '</option>'; }).join('') + '</select>' +
+      '<div class="bkf"><select data-k="f">' + '<option value="">프로젝트 고르기</option>' + P.map(function (f) { return '<option value="' + f.id + '"' + (f.id === r.f ? ' selected' : '') + '>' + esc(f.name) + '</option>'; }).join('') + (bkWork() ? '<option value="' + bkWork().id + '"' + (bkWork().id === r.f ? ' selected' : '') + '>개인 일정 (연차·휴무·병원)</option>' : '') + '</select>' +
+      '<input type="date" data-k="d" value="' + r.d + '"><select data-k="k">' + kindsOf(r.f).map(function (k) { return '<option' + (k === r.k ? ' selected' : '') + '>' + k + '</option>'; }).join('') + '</select>' +
       '<input data-k="t" value="' + esc(r.t) + '" maxlength="80">' + (r.dup ? '<small>이미 시트에 있어요</small>' : r.k === '소속사' ? '<small>소속사 일정은 달력에 안 보여요</small>' : '') + '</div></div>';
   }).join('') : '';
   $('#bkS').disabled = !n; $('#bkS').textContent = n ? n + '개 시트에 저장' : '시트에 저장';
   $$('#bkL [data-c]').forEach(function (b) { b.onclick = function () { var r = BK.rows[+b.dataset.c]; r.on = !r.on && !!r.f; if (!r.f) toast('프로젝트를 먼저 골라 주세요'); bkDraw(); }; });
-  $$('#bkL .bkr').forEach(function (row) { var r = BK.rows[+row.dataset.i]; $$('[data-k]', row).forEach(function (el) { el.onchange = function () { r[el.dataset.k] = el.value.trim(); if (el.dataset.k === 'f' && r.f && !r.dup) r.on = true; bkDraw(); }; }); });
+  $$('#bkL .bkr').forEach(function (row) { var r = BK.rows[+row.dataset.i]; $$('[data-k]', row).forEach(function (el) { el.onchange = function () { r[el.dataset.k] = el.value.trim(); if (el.dataset.k === 'f') { if (r.f && !r.dup) r.on = true; if (kindsOf(r.f).indexOf(r.k) < 0) r.k = kindsOf(r.f)[r.f && S.D.FM[r.f] && S.D.FM[r.f].type === 'work' ? 1 : 0]; } bkDraw(); }; }); });
 }
 $$('#bkM button').forEach(function (b) { b.onclick = function () { bkMode(b.dataset.m); }; });
 $('#bkRead').onclick = function () { bkAdd(bkParse($('#bkT').value)); };
@@ -6234,7 +6248,8 @@ $('#bkLoad').onclick = function () {
 $('#bkS').onclick = function () {
   var R = BK.rows.filter(function (r) { return r.on && r.f && r.d && r.t; }), btn = this, done = 0; if (!R.length) return;
   btn.classList.add('busy'); btn.disabled = true; BG.n++; bgBar();
-  R.reduce(function (p, r) { return p.then(function () { return call('appAdd', S.pin, { f: r.f, d: r.d, k: r.k, t: r.t }).then(function () { done++; r.on = false; r.dup = 1; btn.textContent = done + ' / ' + R.length + ' 저장 중…'; }); }); }, Promise.resolve())
+  R.reduce(function (p, r) { return p.then(function () { var wt = S.D.FM[r.f] && S.D.FM[r.f].type === 'work', nm = hmMe(), tt = wt && nm && !team().some(function (n) { return r.t.indexOf(n) >= 0; }) ? nm + ' ' + r.t : r.t;
+      return call('appAdd', S.pin, { f: r.f, d: r.d, k: r.k, t: tt }).then(function () { done++; r.on = false; r.dup = 1; btn.textContent = done + ' / ' + R.length + ' 저장 중…'; }); }); }, Promise.resolve())
     .then(function () { closeBs(); toast(done + '개 일정을 시트에 저장했어요'); BK.rows = []; return load(); })
     .catch(function (e) { toast((done ? done + '개 저장 후 멈췄어요: ' : '') + errMsg(e)); bkDraw(); })
     .then(function () { btn.classList.remove('busy'); BG.n--; bgBar(); });
