@@ -983,7 +983,7 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgmn { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; }
 .wgmn i { width:8px; height:8px; border-radius:50%; flex:none; }
 .wgmd { font-size:9.5px; text-align:center; color:var(--sub); font-variant-numeric:tabular-nums; } .wgmd.we { color:var(--faint); } .wgmd.td { color:var(--txt); font-weight:800; }
-.wgmc { border:0; padding:0; height:22px; border-radius:5px; }
+.wgmc { border:0; padding:0; aspect-ratio:1 / 1; height:auto; width:100%; border-radius:6px; }
 .wgma { font-size:12px; color:var(--sub); text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; } .wgma em { font-style:normal; color:var(--faint); }
 /* 팀 주별 막대 */
 .wgw { display:grid; grid-template-columns:64px repeat(var(--n), minmax(0, 1fr)); gap:12px 14px; align-items:center; }
@@ -1055,7 +1055,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgtd { font-style:normal; font-size:12px; font-weight:700; color:var(--mute); } .wgtd.up { color:#191f28; } .wgtd.dn { color:#3182f6; }
 .wgkr { flex-direction:row !important; align-items:center; gap:14px !important; }
 .wgkr > div { display:flex; flex-direction:column; gap:2px; min-width:0; }
-.wgrg { width:64px; height:64px; flex:none; }
+.wgrg { width:88px; height:88px; flex:none; }
+@media (min-width:1024px) { .wgrg { width:100px; height:100px; } }
 .wgk b i { font-style:normal; font-size:14px; color:var(--mute); font-weight:600; }
 .wgsk { display:flex; gap:3px; margin-top:6px; } .wgsk i { width:12px; height:6px; border-radius:3px; background:#e5e8eb; display:block; } .wgsk i.on { background:var(--pc); }
 .wgal { display:flex; gap:12px; align-items:flex-start; background:#fff; border-radius:16px; padding:14px 16px; }
@@ -4917,7 +4918,7 @@ function wlGraph(y, m, wp, T, WT) {
       '<em style="top:' + (ry / 32 * 100).toFixed(1) + '%">' + (ref === 540 ? '9:00' : '18:30') + '</em></div>';
   };
   var trend = function (cur, prev, unit) { if (prev == null || !prev) return ''; var dlt = cur - prev; if (Math.abs(dlt) < 1) return '<em class="wgtd">지난달과 같음</em>'; return '<em class="wgtd ' + (dlt > 0 ? 'up' : 'dn') + '">지난달보다 ' + (dlt > 0 ? '+' : '−') + unit(Math.abs(dlt)) + '</em>'; };
-  var ring = function (pct, col) { var r = 22, c = 2 * Math.PI * r; return '<svg class="wgrg" viewBox="0 0 56 56"><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="#e5e8eb" stroke-width="6"/><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="6" stroke-linecap="round" stroke-dasharray="' + (c * pct / 100).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 28 28)"/><text x="28" y="32" text-anchor="middle" font-size="12" font-weight="800" fill="#191f28">' + Math.round(pct) + '%</text></svg>'; };
+  var ring = function (pct, col) { var r = 22, c = 2 * Math.PI * r; return '<svg class="wgrg" viewBox="0 0 56 56"><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="#e5e8eb" stroke-width="5"/><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (c * pct / 100).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 28 28)"/><text x="28" y="32" text-anchor="middle" font-size="11" font-weight="800" fill="#191f28">' + Math.round(pct) + '%</text></svg>'; };
   var ontime = function (D) { var W0 = D.filter(Boolean); return { n: W0.filter(function (x) { return x.o <= 1110; }).length, of: W0.length, last: W0.slice(-10) }; };
   // 주의 띠: 이 달 40·52·62시간 넘은 주
   var alert = function (names) {
