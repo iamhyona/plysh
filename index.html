@@ -980,18 +980,28 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 /* 출퇴근 시각 */
 .wgcl { container-type:inline-size; }
 .wgcv, .wgcd { display:grid; grid-template-columns:30px minmax(0, 1fr); gap:6px; }
-.wgcy { position:relative; height:240px; } .wgcy span { position:absolute; right:0; transform:translateY(-50%); font-size:10px; color:var(--faint); white-space:nowrap; }
+.wgcy { position:relative; height:240px; } .wgcy span { position:absolute; right:0; transform:translateY(50%); font-size:10px; color:var(--faint); white-space:nowrap; }
 .wgcp { position:relative; height:240px; display:flex; }
-.wgcp > i { position:absolute; left:0; right:0; pointer-events:none; } .wgcp > i.band { background:#f2f4f6; border-radius:4px; } .wgcp > i.gl { border-top:1px dashed #e5e8eb; }
+.wgcp > i { position:absolute; left:0; right:0; pointer-events:none; } .wgcp > i.band { background:#f2f4f6; border-radius:4px; } .wgcp > i.gl { border-bottom:1px dashed #e5e8eb; }
 .wgcc { position:relative; flex:1 1 0; min-width:0; border:0; background:none; padding:0; font-family:inherit; cursor:pointer; }
 .wgcc.mo { border-left:1px solid #e5e8eb; }
 .wgcc i.bar { position:absolute; left:50%; transform:translateX(-50%); width:min(12px, 60%); border-radius:6px; background:var(--pc, #3182f6); }
 .wgcc i.bar.df { background:#fff; } .wgcc i.bar.late { background:color-mix(in srgb, var(--pc, #3182f6) 72%, #191f28); }
-.wgcc b { position:absolute; left:50%; transform:translate(-50%, 4px); font-size:9.5px; font-weight:700; color:var(--sub); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.wgcc b { position:absolute; left:50%; transform:translate(-50%, -4px); font-size:9.5px; font-weight:700; color:var(--sub); white-space:nowrap; font-variant-numeric:tabular-nums; }
 .wgcc.td i.bar { box-shadow:0 0 0 2px #fff, 0 0 0 3.5px var(--txt); }
-.wgcd { margin-top:22px; } .wgcd > div { display:flex; } .wgcd > div span { flex:1 1 0; min-width:0; text-align:center; font-size:11px; font-weight:600; color:var(--sub); font-variant-numeric:tabular-nums; line-height:1.2; }
+.wgcd { margin-top:8px; } .wgcv { padding-top:18px; } .wgcd > div { display:flex; } .wgcd > div span { flex:1 1 0; min-width:0; text-align:center; font-size:11px; font-weight:600; color:var(--sub); font-variant-numeric:tabular-nums; line-height:1.2; }
 .wgcd small { display:block; font-size:9.5px; font-weight:500; color:var(--faint); } .wgcd span.td { color:var(--txt); font-weight:800; }
-@container (max-width:600px) { .wgcc b { display:none; } .wgcd small { display:none; } .wgcd > div span { font-size:9px; } .wgcd { margin-top:6px; } }
+@container (max-width:600px) { .wgcc b { display:none; } .wgcd small { display:none; } .wgcd > div span { font-size:9px; } .wgcv { padding-top:4px; } }
+.wgb { position:relative; display:grid; gap:10px; padding-top:4px; }
+.wgbr { display:grid; grid-template-columns:84px minmax(0, 1fr); gap:10px; align-items:center; }
+.wgbr > span { font-size:12px; color:var(--sub); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.wgbt { position:relative; height:26px; margin-right:44px; }
+.wgbt i { position:absolute; left:0; top:0; bottom:0; border-radius:0 7px 7px 0; background:color-mix(in srgb, var(--pc, #3182f6) 45%, #fff); } .wgbt i.x40 { background:var(--pc, #3182f6); } .wgbt i.x52 { background:#4e5968; } .wgbt i.x62 { background:#191f28; }
+.wgbt b { position:absolute; top:50%; transform:translate(8px, -50%); font-size:12px; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; } .wgbt b.x52 { color:#4e5968; } .wgbt b.x62 { color:#191f28; font-weight:800; }
+.wgbx { position:absolute; inset:0; pointer-events:none; } .wgbx .wgbt { height:auto; align-self:stretch; }
+.wgbx em { position:absolute; top:0; bottom:-18px; border-left:1.5px dashed #d1d6db; } .wgbx em.g52 { border-color:#8b95a1; } .wgbx em.g62 { border-color:#191f28; }
+.wgbx small { font-style:normal; position:absolute; bottom:0; left:0; transform:translateX(-50%); font-size:10px; color:var(--faint); }
+.wgb { padding-bottom:22px; }
 .wgtl { display:grid; gap:2px; }
 .wgtx, .wgtr { display:grid; grid-template-columns:72px minmax(0, 1fr); gap:8px; align-items:center; }
 .wgtx div { position:relative; height:18px; } .wgtx em { position:absolute; transform:translateX(-50%); font-style:normal; font-size:10px; color:var(--faint); white-space:nowrap; }
@@ -1034,8 +1044,9 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgn0 { font-size:12.5px; color:var(--faint); padding:4px 2px; }
 @media (min-width:1024px) { .wgg2 > .wgfull { grid-column:1 / -1; } }
 .wgdh { display:grid; grid-template-columns:24px repeat(var(--n), minmax(0, 1fr)); gap:3px; align-items:center; }
-.wgdh i { display:block; height:18px; border-radius:4px; }
+.wgdh i { display:block; aspect-ratio:1 / 1; border-radius:4px; }
 .wgdhw { font-size:11px; color:var(--mute); }
+.wgg2 > .wgc { display:flex; flex-direction:column; } .wgg2 > .wgc > .wgdh, .wgg2 > .wgc > .wgb { margin:auto 0; width:100%; }
 .wgdh em { font-style:normal; font-size:10px; color:var(--faint); white-space:nowrap; }
 
 .wlsb { border:0; background:var(--chip); border-radius:999px; padding:5px 10px; font-size:13px; font-weight:600; color:var(--sub); }
@@ -4942,16 +4953,17 @@ function wlGraph(y, m, wp, T, WT) {
   h += '<div class="wgg2" style="--pc:' + dcol(wp) + '">';
   // 주별 막대
   h += '<div class="wgc"><div class="wgt">주별 근무시간<small>근무표 기준</small></div>' + (!WT ? '<div class="wl0">근무표 불러오는 중…</div>' : !WK ? '<div class="wl0">근무표에 이 달 탭이 없어요</div>' :
-    '<div class="wgv"><div class="wgvl"><span style="bottom:' + (62 / 64 * 100).toFixed(1) + '%">62</span><span style="bottom:' + (52 / 64 * 100).toFixed(1) + '%">52</span><span style="bottom:' + (40 / 64 * 100).toFixed(1) + '%">40</span><span style="bottom:0">0</span></div><div class="wgvp"><em class="g62" style="bottom:' + (62 / 64 * 100).toFixed(1) + '%"></em><em class="g52" style="bottom:' + (52 / 64 * 100).toFixed(1) + '%"></em><em class="g40" style="bottom:' + (40 / 64 * 100).toFixed(1) + '%"></em>' + WK.map(function (w) { var c = wc(w); return '<div class="wgvc"><b class="' + c + '">' + wlHm(w.tot) + '</b><i class="' + c + '" style="height:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i></div>'; }).join('') + '</div></div><div class="wgvx">' + WK.map(function (w) { return '<span>' + md(w.s) + '–' + md(w.e) + '</span>'; }).join('') + '</div>') + '</div>' +
+    '<div class="wgb">' + WK.map(function (w) { var c = wc(w); return '<div class="wgbr"><span>' + md(w.s) + '–' + md(w.e) + '</span><div class="wgbt"><i class="' + c + '" style="width:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i><b class="' + c + '" style="left:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%">' + wlHm(w.tot) + '</b></div></div>'; }).join('') +
+      '<div class="wgbr wgbx"><span></span><div class="wgbt">' + [[40, ''], [52, 'g52'], [62, 'g62']].map(function (g) { return '<em class="' + g[1] + '" style="left:' + (g[0] / 64 * 100).toFixed(2) + '%"><small>' + g[0] + '</small></em>'; }).join('') + '</div></div>'+ '</div>') + '</div>' +
     '<div class="wgc"><div class="wgt">요일 · 시간대<small>그 시간에 일한 날이 많을수록 진하게</small></div>' + dayHour(S1.D, pc1) + '</div></div>';
-  // 출퇴근 시각: 날짜마다 세로 막대 (위 = 출근, 아래 = 퇴근, 7시~새벽 2시)
+  // 출퇴근 시각: 날짜마다 세로 막대 (아래 = 출근·아침, 위 = 퇴근·밤, 7시~새벽 2시)
   var A = 420, B = 1560, pc = function (v) { return ((Math.min(B, Math.max(A, v)) - A) / (B - A) * 100).toFixed(2); };
   var cols = days.map(function (d, i) { return { d: d, x: S1.D[i], w: P(d).getDay() }; }).filter(function (o) { return o.x || (o.w > 0 && o.w < 6); });
-  h += '<div class="wgc wgcl" style="--pc:' + dcol(wp) + '"><div class="wgt">출퇴근 시각<small>막대 위 = 출근 · 아래 = 퇴근 · 회색 띠 9시–18시 · 흰 막대 = 기록 없는 날</small></div>' +
-    '<div class="wgcv"><div class="wgcy">' + [9, 12, 15, 18, 21, 24].map(function (t) { return '<span style="top:' + pc(t * 60) + '%">' + (t === 24 ? '0시' : t + '시') + '</span>'; }).join('') + '</div>' +
-    '<div class="wgcp"><i class="band" style="top:' + pc(540) + '%;height:' + (pc(1080) - pc(540)).toFixed(2) + '%"></i>' + [12, 15, 21, 24].map(function (t) { return '<i class="gl" style="top:' + pc(t * 60) + '%"></i>'; }).join('') +
+  h += '<div class="wgc wgcl" style="--pc:' + dcol(wp) + '"><div class="wgt">출퇴근 시각<small>막대 아래 = 출근 · 위 = 퇴근 · 회색 띠 9시–18시 · 흰 막대 = 기록 없는 날</small></div>' +
+    '<div class="wgcv"><div class="wgcy">' + [9, 12, 15, 18, 21, 24].map(function (t) { return '<span style="bottom:' + pc(t * 60) + '%">' + (t === 24 ? '0시' : t + '시') + '</span>'; }).join('') + '</div>' +
+    '<div class="wgcp"><i class="band" style="bottom:' + pc(540) + '%;height:' + (pc(1080) - pc(540)).toFixed(2) + '%"></i>' + [12, 15, 21, 24].map(function (t) { return '<i class="gl" style="bottom:' + pc(t * 60) + '%"></i>'; }).join('') +
     cols.map(function (o) { var x = o.x; return '<button class="wgcc' + (o.d === TODAY ? ' td' : '') + (o.w === 1 ? ' mo' : '') + '" data-wgd="' + o.d + '|' + esc(wp) + '" title="' + md(o.d) + ' (' + W[o.w] + ')' + (x ? ' · ' + (x.def ? '기록 없음 (9:00–18:00)' : wlHm(x.i) + '–' + wlHm(x.o)) : '') + '">' +
-      (x ? '<i class="bar' + (x.def ? ' df' : '') + (x.o >= 1320 ? ' late' : '') + '" style="top:' + pc(x.i) + '%;height:' + Math.max(1, pc(x.o) - pc(x.i)).toFixed(2) + '%"></i>' + (x.def ? '' : '<b style="top:' + pc(x.o) + '%">' + wlHm(x.o) + '</b>') : '') + '</button>'; }).join('') + '</div></div>' +
+      (x ? '<i class="bar' + (x.def ? ' df' : '') + (x.o >= 1320 ? ' late' : '') + '" style="bottom:' + pc(x.i) + '%;height:' + Math.max(1, pc(x.o) - pc(x.i)).toFixed(2) + '%"></i>' + (x.def ? '' : '<b style="bottom:' + pc(x.o) + '%">' + wlHm(x.o) + '</b>') : '') + '</button>'; }).join('') + '</div></div>' +
     '<div class="wgcd"><span></span><div>' + cols.map(function (o) { return '<span class="' + (o.d === TODAY ? 'td' : '') + (o.w === 1 ? ' mo' : '') + '">' + P(o.d).getDate() + '<small>' + W[o.w] + '</small></span>'; }).join('') + '</div></div></div>';
   return '<div class="wgg">' + h + '</div>';
 }
