@@ -782,25 +782,21 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .lgh { margin:18px 4px 8px; font-size:13px; font-weight:700; color:var(--sub); }
 .lgh:first-child { margin-top:4px; }
 .lgnote { font-size:12px; color:var(--mute); line-height:1.6; margin:16px 4px 4px; }
-/* 사내연락망 (2026-11-27): 위하고 조직도 → @PLYSH_연락처 시트 */
-.ctl { background:#fff; border-radius:18px; overflow:hidden; }
-.ctr { display:grid; grid-template-columns:minmax(150px,200px) minmax(110px,170px) minmax(0,1fr) 150px; align-items:center; gap:12px; min-height:52px; padding:8px 18px; border-bottom:1px solid #f2f4f6; }
-.ctr:last-child { border-bottom:0; }
-.ctr .cn { min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:15px; }
-.ctr .cn b { font-weight:700; } .ctr .cn span { color:var(--sub); font-size:13px; margin-left:6px; }
-.ctr .ctm { min-width:0; color:var(--sub); font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.ctr .cta { display:flex; align-items:center; gap:6px; min-width:0; height:32px; border:0; background:none; padding:0 8px; margin:0 -8px; border-radius:8px; font-size:14px; color:var(--txt); text-decoration:none; text-align:left; cursor:pointer; }
-.ctr .cta:hover { background:var(--chip); }
-.ctr .cta span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.ctr .cta svg { width:16px; height:16px; flex:none; color:var(--mute); }
+/* 사내연락망 (2026-11-27): 위하고 조직도 → @PLYSH_연락처 시트 · 카드 (이름 · 오른쪽 위 본부 > 팀 · 연락처 · 메일주소) */
+.ctg { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:10px; }
+.ctc { background:#fff; border-radius:18px; padding:16px 18px 12px; min-width:0; }
+.ctc .cth { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:32px; margin-bottom:6px; }
+.ctc .cn { min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:16px; }
+.ctc .cn b { font-weight:700; } .ctc .cn span { color:var(--sub); font-size:13px; margin-left:6px; }
+.ctc .cto { display:flex; align-items:center; gap:2px; min-width:0; flex:none; max-width:60%; font-size:13px; color:var(--sub); white-space:nowrap; }
+.ctc .cto span { overflow:hidden; text-overflow:ellipsis; }
+.ctc .cto svg { width:14px; height:14px; flex:none; color:var(--faint); }
+.ctc .ctf { display:grid; grid-template-columns:60px minmax(0,1fr); align-items:center; gap:8px; }
+.ctc .ctf em { font-style:normal; font-size:12.5px; color:var(--mute); }
+.ctc .cta { display:block; min-width:0; height:32px; line-height:32px; border:0; background:none; padding:0 8px; margin:0 -8px; border-radius:8px; font-size:14px; color:var(--txt); text-decoration:none; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+.ctc .cta:hover { background:var(--chip); }
 .ctn { font-size:12px; color:var(--mute); line-height:1.6; margin:16px 4px 4px; }
-@media (max-width:899px) {
-  .ctr { grid-template-columns:minmax(0,1fr) auto; gap:2px 10px; padding:12px 16px; }
-  .ctr .cn { grid-column:1; } .ctr .ctm { grid-column:1; grid-row:2; font-size:12.5px; }
-  .ctr .cta { height:32px; }
-  .ctr .cta.ml { grid-column:1 / -1; grid-row:3; justify-self:start; max-width:100%; }
-  .ctr .cta.tel { grid-column:2; grid-row:1 / 3; }
-}
+@media (max-width:899px) { .ctg { grid-template-columns:minmax(0,1fr); } }
 /* GUIDE (2026-11-10) */
 .gdl { display:grid; gap:10px; }
 .gdc { display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:center; width:100%; text-align:left; border:0; background:#fff; border-radius:18px; padding:18px 18px; font:inherit; color:var(--txt); cursor:pointer; }
@@ -5684,8 +5680,6 @@ var KQ_URL = 'https://quick.kakaomobility.com/orders/quick';
 /* ───── 사내연락망 (2026-11-27): 위하고 조직도 → 드라이브 PLASH / @PLYSH_연락처 시트 (서버 appContacts) ───── */
 S.ct = null; S.ctq = '';
 var CT_CO = ['사운드컨텐츠', '사운드웨이브'];
-var CT_IC = { ml: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
-  tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>' };
 function ctLoad(force) {
   if (S.ct && !force) return Promise.resolve(S.ct);
   if (!S.ct) { try { S.ct = JSON.parse(ls.get('d4:ct') || 'null'); } catch (e) {} }
@@ -5726,17 +5720,19 @@ function ctList() {
     if (da !== db) return da - db;
     return G[a][0]._i - G[b][0]._i;
   });
-  var h = '';
+  var h = '', lastCo = null, CV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
   order.forEach(function (g) {
     var A = g.split('|'), R = G[g].slice().sort(function (a, b) { var x = ctTeamKey(a.t), y = ctTeamKey(b.t); return x < y ? -1 : x > y ? 1 : a._i - b._i; });
-    h += '<div class="lgh">' + esc(A[1] ? A[0] + ' · ' + A[1] : A[0]) + '</div><div class="ctl">' + R.map(function (r) {
-      var tel = r.m || r.l;
-      return '<div class="ctr"><div class="cn"><b>' + esc(r.n) + '</b>' + (r.j ? '<span>' + esc(r.j) + '</span>' : '') + '</div>' +
-        '<div class="ctm">' + esc(r.t || r.b || r.co) + '</div>' +
-        (r.e ? '<button type="button" class="cta ml" data-cc="' + esc(r.e) + '" title="메일 주소 복사">' + CT_IC.ml + '<span>' + esc(r.e) + '</span></button>' : '<div></div>') +
-        (tel ? '<a class="cta tel" href="tel:' + esc(tel.replace(/[^\d+]/g, '')) + '" data-ct="' + esc(tel) + '" title="휴대전화">' + CT_IC.tel + '<span>' + esc(tel) + '</span></a>' : '<div></div>') + '</div>';
-    }).join('') + '</div>';
+    if (A[0] !== lastCo) { h += (lastCo === null ? '' : '</div>') + '<div class="lgh">' + esc(A[0]) + '</div><div class="ctg">'; lastCo = A[0]; }
+    h += R.map(function (r) {
+      var tel = r.m || r.l, org = r.b ? esc(r.b) + (r.t ? CV + esc(r.t) : '') : r.t ? esc(r.t) : '';
+      return '<div class="ctc"><div class="cth"><div class="cn"><b>' + esc(r.n) + '</b>' + (r.j ? '<span>' + esc(r.j) + '</span>' : '') + '</div>' +
+        (org ? '<div class="cto"><span>' + org.split(CV).join('</span>' + CV + '<span>') + '</span></div>' : '') + '</div>' +
+        '<div class="ctf"><em>연락처</em>' + (tel ? '<a class="cta" href="tel:' + esc(tel.replace(/[^\d+]/g, '')) + '" data-ct="' + esc(tel) + '" title="번호 복사 · 휴대폰에서는 전화">' + esc(tel) + '</a>' : '<span class="cta mute">없음</span>') + '</div>' +
+        '<div class="ctf"><em>메일주소</em>' + (r.e ? '<button type="button" class="cta" data-cc="' + esc(r.e) + '" title="메일 주소 복사">' + esc(r.e) + '</button>' : '<span class="cta mute">없음</span>') + '</div></div>';
+    }).join('');
   });
+  if (lastCo !== null) h += '</div>';
   if (!rows.length) h = '<div class="ld">' + (q || k ? '찾는 사람이 없어요' : '연락망이 비어 있어요') + '</div>';
   else h += '<div class="ctn">위하고 조직도 기준 · 고칠 내용은 오른쪽 위 시트 아이콘으로 연락망 시트를 열어 바로 고치면 돼요</div>';
   L.innerHTML = h;
