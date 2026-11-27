@@ -1811,6 +1811,107 @@ html[data-nav] #cvSeg { display:none !important; }
 .pst em { right:44px !important; } .psb { position:absolute; right:6px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:2px; }
 .psb button { width:30px; height:19px; border:0; border-radius:6px; background:#fff; color:#4e5968; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; box-shadow:0 0 0 1px #e5e8eb; } .psb button:active { background:#e5e8eb; }
 #nfm .fsg { display:block; font-style:normal; font-size:12px; font-weight:600; color:var(--mute); margin:12px 0 2px; }
+/* 월간리포트 (2026-11-27) */
+.mrg { display:grid; gap:12px; }
+.mrtop, .mr2 { display:grid; gap:12px; grid-template-columns:minmax(0, 1fr); }
+@media (min-width:760px) { .mrtop, .mr2 { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); align-items:stretch; } }
+.mrc { background:#fff; border-radius:20px; padding:20px; min-width:0; }
+@media (max-width:759px) { .mrc { padding:16px; } }
+.mrt { font-size:16px; font-weight:700; letter-spacing:-0.02em; margin-bottom:16px; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; }
+.mrt small { font-size:12.5px; font-weight:500; color:var(--mute); }
+.mr0 { font-size:13px; color:var(--mute); padding:6px 0; }
+.mrk { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-auto-rows:1fr; gap:12px; }
+.mrk > div { background:#fff; border-radius:20px; padding:16px 18px; display:flex; flex-direction:column; justify-content:center; gap:4px; min-width:0; }
+.mrk small { font-size:13px; font-weight:600; color:var(--mute); white-space:nowrap; }
+.mrk b { font-size:26px; font-weight:800; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.mrk b i, .mrws b i, .mrot b i, .mrhl b i { font-style:normal; font-size:14px; font-weight:700; color:var(--mute); margin-left:2px; }
+.mrk span, .mrk .mrtd { font-size:12px; font-weight:500; font-style:normal; color:var(--faint); line-height:1.4; }
+.mrk > div.rg { flex-direction:row; align-items:center; justify-content:flex-start; gap:12px; }
+.mrk > div.rg > div { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.mrrg { width:56px; height:56px; flex:none; display:block; }
+@media (max-width:420px) { .mrk > div.rg { flex-direction:column; align-items:flex-start; gap:8px; } .mrk b { font-size:22px; } }
+.mrbar { display:flex; align-items:flex-end; gap:2px; height:150px; padding-top:20px; }
+.mrbar span { position:relative; flex:1 1 0; min-width:0; height:100%; display:flex; align-items:flex-end; justify-content:center; }
+.mrbar span i { display:block; width:100%; max-width:12px; border-radius:3px 3px 1px 1px; background:var(--pc); }
+.mrbar span.we i { background:color-mix(in srgb, var(--pc) 30%, #fff); }
+.mrbar span.td::after { content:''; position:absolute; left:50%; bottom:-6px; width:4px; height:4px; margin-left:-2px; border-radius:50%; background:var(--txt); }
+.mrbar span b { position:absolute; bottom:calc(100% + 0px); font-size:12px; font-weight:800; color:var(--txt); }
+.mrbar span b { bottom:auto; top:-18px; }
+.mrbx { display:flex; gap:2px; margin-top:8px; border-top:1px solid var(--line); padding-top:6px; }
+.mrbx span { flex:1 1 0; min-width:0; text-align:center; font-size:11px; font-weight:600; color:var(--mute); white-space:nowrap; overflow:visible; }
+.mrlg { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:14px; font-size:12px; color:var(--mute); }
+.mrlg span { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+.mrlg i { width:10px; height:10px; border-radius:3px; background:var(--pc); display:block; }
+.mrlg i.we { background:color-mix(in srgb, var(--pc) 30%, #fff); }
+.mrlg i.tk { width:3px; height:12px; border-radius:2px; background:#8b95a1; } .mrlg i.tk.of { background:var(--txt); height:14px; width:4px; } .mrlg i.tk.dl { background:#f04452; }
+.mrlg i.nw { width:0; height:12px; border-left:1px dashed #8b95a1; border-radius:0; background:none; }
+.mrlg .nx { color:var(--faint); }
+/* 디자이너별 */
+.mrps { display:grid; grid-template-columns:auto minmax(0, 1.3fr) 28px minmax(0, 1fr) 56px; gap:10px 8px; align-items:center; }
+.mrps > b { font-size:13px; font-weight:800; color:var(--txt); text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; } .mrps > b i { font-style:normal; font-size:11px; font-weight:600; color:var(--mute); margin-left:1px; }
+.mrps .hd { font-size:12px; font-weight:600; color:var(--mute); }
+.mrps .nm { margin-right:4px; border:0; background:none; padding:0; font-size:14px; font-weight:700; color:var(--txt); text-align:left; white-space:nowrap; min-height:24px; cursor:pointer; }
+.mrps .tr { position:relative; height:22px; border-radius:6px; background:#f2f4f6; overflow:hidden; display:block; }
+.mrps .tr i { position:absolute; left:0; top:0; bottom:0; border-radius:6px; display:block; }
+.mrps .tr i.a { background:color-mix(in srgb, var(--pc) 35%, #fff); } .mrps .tr i.b { background:var(--pc); }
+.mrps .tr.hr i.a { background:color-mix(in srgb, var(--pc) 60%, #fff); }
+/* 프로젝트 비중 */
+.mrsh { display:flex; height:16px; border-radius:8px; overflow:hidden; gap:2px; background:#f2f4f6; }
+.mrsh i { display:block; height:100%; min-width:3px; }
+.mrsl { display:grid; gap:10px; margin-top:16px; }
+.mrsl > div { display:grid; grid-template-columns:10px minmax(0, 1fr) auto 44px; gap:10px; align-items:center; font-size:14px; }
+.mrsl i { width:10px; height:10px; border-radius:3px; display:block; }
+.mrsl span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--sub); } .mrsl span .artb { color:var(--txt); }
+.mrsl b { font-weight:800; font-variant-numeric:tabular-nums; }
+.mrsl em { font-style:normal; font-size:12px; color:var(--mute); text-align:right; font-variant-numeric:tabular-nums; }
+/* 제작일정 */
+.mrkd { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.mrkd span { display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px; border-radius:999px; background:#f2f4f6; font-size:13px; font-weight:600; color:var(--sub); white-space:nowrap; }
+.mrkd i { width:8px; height:8px; border-radius:2px; display:block; }
+.mrkd b { color:var(--txt); font-weight:800; font-variant-numeric:tabular-nums; }
+.mrgw { display:grid; gap:4px; --nw:180px; }
+@media (max-width:759px) { .mrgw { --nw:104px; } }
+.mrgh, .mrgr { display:grid; grid-template-columns:var(--nw) minmax(0, 1fr) 28px; gap:10px; align-items:center; }
+.mrgh > div { position:relative; height:16px; }
+.mrgh > div span { position:absolute; transform:translateX(-50%); font-size:11px; font-weight:600; color:var(--mute); }
+.mrgr { border:0; background:none; padding:0; min-height:32px; text-align:left; cursor:pointer; border-radius:8px; }
+.mrgr:hover { background:#f9fafb; }
+.mrgr .nm { font-size:13.5px; color:var(--sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .mrgr .nm .artb { color:var(--txt); }
+.mrgr .tk { position:relative; height:24px; border-radius:6px; background:#f7f8fa; }
+.mrgr .tk .sp { position:absolute; top:10px; height:4px; border-radius:2px; opacity:.3; }
+.mrgr .tk .ev { position:absolute; top:6px; width:3px; height:12px; margin-left:-1.5px; border-radius:2px; background:var(--c); }
+.mrgr .tk .ev.of { top:3px; height:18px; width:4px; margin-left:-2px; background:var(--txt); }
+.mrgr .tk .ev.dl { background:#f04452; }
+.mrgr .tk .now { position:absolute; top:-2px; bottom:-2px; border-left:1px dashed #8b95a1; }
+.mrgr > em { font-style:normal; font-size:12px; font-weight:700; color:var(--mute); text-align:right; font-variant-numeric:tabular-nums; }
+/* 근태 */
+.mrws { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+.mrws > div { background:#f7f8fa; border-radius:14px; padding:14px; display:grid; grid-template-columns:20px minmax(0, 1fr); column-gap:8px; row-gap:4px; align-items:center; min-width:0; }
+.mrws .ic { width:20px; height:20px; color:var(--pc); display:flex; } .mrws .ic svg { width:20px; height:20px; }
+.mrws small { font-size:12.5px; font-weight:600; color:var(--mute); white-space:nowrap; }
+.mrws b { grid-column:1 / -1; font-size:20px; font-weight:800; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.mrws em { grid-column:1 / -1; font-style:normal; font-size:12px; color:var(--mute); }
+.mrot { display:flex; align-items:center; gap:12px; margin:16px 0 18px; }
+.mrot > div { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.mrot b { font-size:16px; font-weight:800; white-space:nowrap; } .mrot span { font-size:12.5px; color:var(--mute); }
+.mrwk { display:grid; gap:8px; }
+.mrwk .r { display:grid; grid-template-columns:92px minmax(0, 1fr) 48px; gap:10px; align-items:center; }
+.mrwk .r > span { font-size:12.5px; font-weight:600; color:var(--mute); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.mrwk .t { position:relative; height:14px; border-radius:7px; background:#f2f4f6; }
+.mrwk .t i { position:absolute; left:0; top:0; bottom:0; border-radius:7px; background:color-mix(in srgb, var(--pc) 70%, #fff); display:block; }
+.mrwk .t i.x52 { background:#4e5968; }
+.mrwk .r > b { font-size:13px; font-weight:800; text-align:right; font-variant-numeric:tabular-nums; } .mrwk .r > b.x52 { color:#191f28; }
+.mrwk .gx .t { background:none; height:16px; }
+.mrwk .gx em { position:absolute; top:0; height:16px; border-left:1px dashed #b0b8c1; }
+.mrwk .gx em small { position:absolute; left:4px; top:0; font-size:11px; font-weight:600; color:var(--mute); }
+.mrnt { font-size:12px; color:var(--mute); margin-top:4px; }
+/* 이달의 기록 */
+.mrhl { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+@media (min-width:760px) { .mrg > .mrc .mrhl { grid-template-columns:repeat(4, minmax(0, 1fr)); } }
+.mrhl > div { background:#f7f8fa; border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:4px; min-width:0; }
+.mrhl small { font-size:12.5px; font-weight:600; color:var(--mute); }
+.mrhl b { font-size:20px; font-weight:800; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.mrhl span { font-size:12.5px; color:var(--sub); line-height:1.45; overflow:hidden; text-overflow:ellipsis; }
 </style>
 </head>
 <body>
@@ -2101,7 +2202,7 @@ var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', tk: ls.g
 S.cv = ls.get('d4:cv') || 'proj'; // 2026-11-23 실장님: 달력 기본 = 가로형
 if (S.view === 'designer' || S.view === 'team' || S.view === 'project') { S.view = 'month'; S.cv = 'proj'; }
 if (S.view === 'home' || S.view === 'tl' || S.view === 'spec') S.view = 'pj';
-if (['pj', 'month', 'todo', 'wl', 'spec', 'qk', 'ct', 'exp'].indexOf(S.view) < 0) S.view = 'start';
+if (['pj', 'month', 'todo', 'wl', 'spec', 'qk', 'ct', 'exp', 'mrep'].indexOf(S.view) < 0) S.view = 'start';
 
 S.pj = ls.get('d4:pj'); S.mm = ls.get('d4:mm') || 'sched'; S.pm = ls.get('d4:pm') || 'sched'; S.dp = ls.get('d4:dp') || 'd'; S.dn = ls.get('d4:dn') || ''; S.dd = TODAY; S.pf = ls.get('d4:pf') || ''; S.fold = !!ls.get('d4:fold'); S.lp = ls.get('d4:lp') || 'a'; S.ld = TODAY; S.tl = ls.get('d4:tl') || 'date';
 var API = 'https://script.google.com/macros/s/AKfycbzpvNlxuCa95ZxGvg8N4SiPqmsPzyYx_n9ikhmdRlIng7VzWzks_WS6DDyviPXsfoaO/exec';
@@ -2117,7 +2218,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm225';
+var APP_VER = '20261127hm226';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2952,7 +3053,7 @@ function renderView() {
   try { var nb = document.querySelector('#nav button.on'), nv = document.getElementById('nav'); if (nb && nv) { var br = nb.getBoundingClientRect(), vr = nv.getBoundingClientRect(); if (br.left < vr.left || br.right > vr.right) nv.scrollBy({ left: br.left - vr.left - 16, behavior: 'smooth' }); } } catch (e) {}
   $('#fab').style.display = fabOn() ? '' : 'none';
   $('#fab').setAttribute('aria-label', S.view === 'qk' ? '연락처 추가' : '추가');
-  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, kq: renderQk, ct: renderCt, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, ws: renderWs, refs: renderRefs, space: function () { renderSpace(S.spk || 'tool'); }, gdoc: renderGdoc, glist: renderGlist })[S.view]();
+  ({ home: renderHome, month: renderCal, todo: renderTodo, wl: renderWl, qk: renderQk, kq: renderQk, ct: renderCt, exp: renderExp, pj: renderPj, week: renderWeek, project: renderProject, tl: renderSheetList, designer: renderDesigner, team: renderTeam, spec: renderSpec, calc: renderCalc, guide: renderGuide, logo: renderLogo, review: renderReview, impose: renderImpose, tools: renderToolsHome, tk: renderTk, spine: renderSpine, start: renderStart, mrep: renderMrep, ws: renderWs, refs: renderRefs, space: function () { renderSpace(S.spk || 'tool'); }, gdoc: renderGdoc, glist: renderGlist })[S.view]();
 }
 $$('#nav button').forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; ls.set('d4:view', S.view); window.scrollTo(0, 0); render(); }; });
 $('#brand').onclick = function () { S.view = 'pj'; ls.set('d4:view', 'pj'); window.scrollTo(0, 0); render(); };
@@ -2978,6 +3079,7 @@ var NAV_IC = {
   chk: '<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/>',
   qk: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
   todo: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
   cv: '<path d="M9 6l6 6-6 6"/>', back: '<path d="M15 6l-6 6 6 6"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
@@ -2993,6 +3095,8 @@ var SPACES = [
     { g: '개인', i: [{ k: 'todo', t: '할 일', s: '오늘 · 이번 주 할 일과 팀 공지' }, { k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
     { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로' }] }] },
+  // 2026-11-27 실장님: 월간리포트 대메뉴 — 팀 활동 · 업무 · 근태를 한 달 단위 그래프로
+  { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
   { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
     { g: '지류', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] },
@@ -3594,7 +3698,7 @@ function crumbHtml() {
   if (!it && cur === sp.home) return '<b>' + esc(sp.t) + '</b>';
   return esc(sp.t) + sep + '<b>' + esc(it ? it.ct || it.t : cur === 'spec' ? '사양서' : sp.t) + '</b>';
 }
-var PG_DESC = {
+var PG_DESC = { mrep: '팀 활동 · 업무 · 근태를 한 달 단위로 · 소속사 일정은 빼고 집계',
   todo: '오늘 · 이번 주 할 일과 팀 공지', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '상품 후면 표시사항 문구와 케어 · 주의 · 원산지 같은 부착 라벨 정리',
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', unit: 'mm · cm · m · in · ft · yd · pt · pc · Q · px를 한 번에 바꿔요 · px는 해상도(ppi)를 골라서', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
@@ -4157,7 +4261,7 @@ sure($('#edDel'), function () {
     .catch(function (er) { toast(errMsg(er)); }).then(function () { btn.classList.remove('busy'); });
 });
 document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#pgW'); if (b) $('#fab').onclick(); });
-function fabOn() { return !(S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || S.view === 'ct' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj'); }
+function fabOn() { return !(S.view === 'mrep' || S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || S.view === 'ct' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj'); }
 $('#fab').onclick = function () {
   if (S.view === 'todo') return openCompose();
   if (S.view === 'wl') return openWl(TODAY);
@@ -5492,6 +5596,130 @@ function renderWl() {
   $('#wlMo').onchange = function () { var v = String(this.value || ''); if (/^\d{4}-\d\d/.test(v)) { S.wy = +v.slice(0, 4); S.wm = +v.slice(5, 7); render(); } };
   $$('#wlP button').forEach(function (b) { b.onclick = function () { ls.set('d4:wlp', b.dataset.n); render(); }; });
   $$('[data-wd]').forEach(function (b) { b.onclick = function () { openWl(b.dataset.wd); }; });
+}
+/* ───── 월간리포트 (2026-11-27 실장님): 팀 활동 · 업무 · 근태를 한 달 단위 인포그래픽으로 ─────
+ * 색: 팀 전체 = 팀 색(빨강) 하나 · 한 사람 = 그 사람 지정 색 · 프로젝트 비중·일정 = 프로젝트 색 · 일정 구분 = 달력 구분색
+ * 집계에서 빼는 것: 소속사 쪽 일정(agEv) · [옹성우] 시즌그리팅(4팀 업무 아님) · 일정 화면에서 끈 프로젝트 */
+function mrpEx(n) { var k = pnorm(n); return /옹성우/.test(k) && /sg/.test(k); }
+function mrpMd(d) { return d.slice(5, 7) + '/' + d.slice(8, 10); }
+function mrpRing(pct, col) { var r = 22, c = 2 * Math.PI * r; pct = Math.max(0, Math.min(100, pct || 0)); return '<svg class="mrrg" viewBox="0 0 56 56"><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="#e5e8eb" stroke-width="5"/>' + (pct ? '<circle cx="28" cy="28" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (c * pct / 100).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 28 28)"/>' : '') + '<text x="28" y="32" text-anchor="middle" font-size="11" font-weight="800" fill="#191f28">' + Math.round(pct) + '%</text></svg>'; }
+function mrpTrend(cur, prev, unit) { if (!prev) return ''; var d = cur - prev; if (Math.abs(d) < 1) return '<em class="mrtd">지난달과 같음</em>'; return '<em class="mrtd">지난달보다 ' + (d > 0 ? '+' : '−') + unit(Math.abs(d)) + '</em>'; }
+var MRP_IC = {
+  fd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M18 21V3c-2.5 1.5-3.5 4.5-3.5 8H18"/></svg>',
+  tx: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 16.5V13l2-5.5h13l2 5.5v3.5zM6 16.5v2.5M18 16.5v2.5M3.5 13h17M9.5 4.5h5"/></svg>',
+  in: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2"/></svg>',
+  out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>'
+};
+// 한 달 숫자 모으기 (p = 사람, 비우면 팀 전체)
+function mrpStat(y, m, p) {
+  var first = y + '-' + pad(m) + '-01', last = F(new Date(y, m, 0)), T = p ? [p] : team(), days = [];
+  for (var d = first; d <= last; d = addD(d, 1)) days.push(d);
+  var inM = function (d) { return d >= first && d <= last; };
+  var td = tdRows(function (x) { return x.k === '데일리' && inM(x.d) && T.indexOf(x.p) >= 0 && !mrpEx(x.j); });
+  var rp = (S.D.rep || []).filter(function (r) { return inM(r.d) && T.indexOf(r.p) >= 0 && !mrpEx(r.j) && !repOff(r.j); });
+  var ev = S.D.events.filter(function (e) { return inM(e.d) && e.file.type === 'proj' && !S.off[e.f] && !agEv(e) && !mrpEx(e.file.name); });
+  // 사람이 맡은 프로젝트(할 일 · 업무보고에 적힌 프로젝트)
+  var mine = {}; td.concat(rp).forEach(function (x) { if (x.j) mine[pnorm(x.j)] = 1; });
+  if (p) ev = ev.filter(function (e) { return mine[pnorm(e.file.name)]; });
+  var act = days.map(function (d) { return td.filter(function (x) { return x.d === d; }).length + rp.filter(function (r) { return r.d === d; }).length; });
+  var WD = T.map(function (n) { return days.map(function (d) { return wlDay(d, n); }); });
+  var tot = 0, rec = [], lateO = null, longD = null, fd = 0, tx = 0, fare = 0;
+  WD.forEach(function (L, i) { L.forEach(function (x, k) { if (!x) return; tot += x.m; if (x.def) return; rec.push(x); var o = { n: T[i], d: days[k], x: x };
+    if (!lateO || x.o > lateO.x.o) lateO = o; if (!longD || x.m > longD.x.m) longD = o; }); });
+  (S.D.wl || []).forEach(function (r) { if (!inM(r.d) || T.indexOf(r.p) < 0) return; if (r.fd) fd++; if (r.tx) { tx++; fare += +r.fare || 0; } });
+  var avg = function (k) { return rec.length ? rec.reduce(function (s, x) { return s + x[k]; }, 0) / rec.length : null; };
+  var pjs = {}; ev.forEach(function (e) { pjs[e.f] = 1; });
+  return { first: first, last: last, days: days, T: T, td: td, rp: rp, ev: ev, act: act, WD: WD, tot: tot, rec: rec, lateO: lateO, longD: longD, fd: fd, tx: tx, fare: fare,
+    ai: avg('i'), ao: avg('o'), ot: rec.filter(function (x) { return x.o <= 1110; }).length, np: Object.keys(pjs).length, tdc: td.filter(function (x) { return x.c; }).length };
+}
+function renderMrep() {
+  wlMeInit();
+  S.mry = S.mry || +TODAY.slice(0, 4); S.mrm = S.mrm || +TODAY.slice(5, 7);
+  var y = S.mry, m = S.mrm, T = team(), p = ls.get('d4:mrp') || ''; if (p && T.indexOf(p) < 0) p = '';
+  var pc = p ? dcol(p) : '#f04452', ymK = y + '-' + pad(m), isCur = TODAY.slice(0, 7) === ymK;
+  var py = m === 1 ? y - 1 : y, pm = m === 1 ? 12 : m - 1;
+  var A = mrpStat(y, m, p), B = mrpStat(py, pm, p), WT = wtLoad(ymK, 'mrep');
+  var cnt = function (n) { return n + '건'; };
+  var h = '<div class="hm2"><label class="hmt">' + y + '.' + pad(m) + '<input type="month" class="dpk" id="mrMo" value="' + ymK + '"></label>' +
+    '<div class="arw">' + (isCur ? '' : '<button class="tod" id="mrT">이번 달</button>') + '<button id="mrPv" aria-label="이전 달">' + IC_L + '</button><button id="mrNx" aria-label="다음 달">' + IC_R + '</button></div></div>';
+  h += '<div class="tabs2" id="mrP"><button data-n="" class="' + (p ? '' : 'on') + '">팀 전체</button>' + T.map(function (n) { return '<button data-n="' + esc(n) + '" class="' + (p === n ? 'on' : '') + '">' + esc(n) + '</button>'; }).join('') + '</div>';
+  h += '<div class="mrg" style="--pc:' + pc + '">';
+  // 1) 요약 2×2 + 옆에 날짜별 활동
+  var tdp = A.td.length ? A.tdc / A.td.length * 100 : 0;
+  h += '<div class="mrtop"><div class="mrk">' +
+    '<div><small>' + (p ? '맡은 프로젝트' : '진행 프로젝트') + '</small><b>' + A.np + '<i>개</i></b>' + (mrpTrend(A.np, B.np, function (v) { return v + '개'; }) || '<span>이번 달 일정이 있는 프로젝트</span>') + '</div>' +
+    '<div class="rg">' + mrpRing(tdp, pc) + '<div><small>할 일 완료</small><b>' + A.tdc + '<i>/' + A.td.length + '</i></b><span>' + (A.td.length ? '남은 할 일 ' + (A.td.length - A.tdc) + '개' : '할 일 기록 없음') + '</span></div></div>' +
+    '<div><small>업무보고</small><b>' + A.rp.length + '<i>건</i></b>' + (mrpTrend(A.rp.length, B.rp.length, cnt) || '<span>' + (A.rp.length ? '완료 ' + A.rp.filter(function (r) { return r.s === '완료'; }).length + '건' : '기록 없음') + '</span>') + '</div>' +
+    '<div><small>' + (p ? '근무시간' : '팀 근무시간') + '</small><b>' + Math.floor(A.tot / 60) + '<i>시간</i></b>' + (mrpTrend(A.tot, B.tot, wlHk) || '<span>' + (p ? '' : T.length + '명 합계 · ') + '기록 없는 평일은 8시간</span>') + '</div></div>';
+  var amx = Math.max(1, Math.max.apply(null, A.act)), asum = A.act.reduce(function (s, v) { return s + v; }, 0);
+  var bi = A.act.indexOf(Math.max.apply(null, A.act));
+  h += '<div class="mrc"><div class="mrt">날짜별 활동<small>할 일 + 업무보고 · 모두 ' + asum + '건</small></div><div class="mrbar">' +
+    A.days.map(function (d, i) { var w = P(d).getDay(), v = A.act[i]; return '<span class="' + (w === 0 || w === 6 || hol(d) ? 'we' : '') + (d === TODAY ? ' td' : '') + '" title="' + mrpMd(d) + ' (' + W[w] + ') · ' + v + '건">' + (v && i === bi ? '<b>' + v + '</b>' : '') + '<i style="height:' + (v ? Math.max(4, v / amx * 100) : 0).toFixed(1) + '%"></i></span>'; }).join('') +
+    '</div><div class="mrbx">' + A.days.map(function (d) { var n = P(d).getDate(), w = P(d).getDay(); return '<span>' + (w === 1 || (n === 1 && w !== 0 && w !== 6) ? n : '') + '</span>'; }).join('') + '</div><div class="mrlg"><span><i></i>평일</span><span><i class="we"></i>주말 · 휴일</span><span class="nx">숫자는 날짜 · 월요일마다</span></div></div></div>';
+  // 2) 디자이너별 (팀 전체) 또는 프로젝트별 비중
+  var PJ = {}, PO = []; A.td.concat(A.rp).forEach(function (x) { if (!x.j) return; var q = pinfo(sgFix(x.j)), k = pnorm(q.name); if (!PJ[k]) { PJ[k] = { n: q.name, c: q.color, v: 0 }; PO.push(PJ[k]); } PJ[k].v++; });
+  PO.sort(function (a, b) { return b.v - a.v; }); var pall = PO.reduce(function (s, o) { return s + o.v; }, 0), top = PO.slice(0, 6), rest = PO.slice(6).reduce(function (s, o) { return s + o.v; }, 0);
+  if (rest) top.push({ n: '그 밖 ' + (PO.length - 6) + '개', c: '#c9cdd2', v: rest });
+  var share = '<div class="mrc"><div class="mrt">프로젝트별 업무 비중<small>할 일 + 업무보고 ' + pall + '건</small></div>' + (pall ? '<div class="mrsh">' + top.map(function (o) { return '<i style="width:' + (o.v / pall * 100).toFixed(2) + '%;background:' + o.c + '" title="' + esc(o.n) + ' ' + o.v + '건"></i>'; }).join('') + '</div><div class="mrsl">' +
+    top.map(function (o) { return '<div><i style="background:' + o.c + '"></i><span>' + artB(o.n) + '</span><b>' + Math.round(o.v / pall * 100) + '%</b><em>' + o.v + '건</em></div>'; }).join('') + '</div>' : '<div class="mr0">프로젝트가 적힌 할 일 · 업무보고가 없어요</div>') + '</div>';
+  if (!p) {
+    var PS = T.map(function (n) { var td = A.td.filter(function (x) { return x.p === n; }), rp = A.rp.filter(function (r) { return r.p === n; }), i = A.T.indexOf(n), m0 = A.WD[i].reduce(function (s, x) { return s + (x ? x.m : 0); }, 0); return { n: n, td: td.length, tc: td.filter(function (x) { return x.c; }).length, rp: rp.length, m: m0 }; });
+    var mxA = Math.max(1, Math.max.apply(null, PS.map(function (o) { return o.td + o.rp; }))), mxM = Math.max(1, Math.max.apply(null, PS.map(function (o) { return o.m; })));
+    h += '<div class="mr2"><div class="mrc"><div class="mrt">디자이너별 업무량<small>막대 = 할 일 + 업무보고 · 진한 부분 = 완료한 할 일</small></div><div class="mrps"><span class="hd"></span><span class="hd">업무</span><span class="hd"></span><span class="hd">근무시간</span><span class="hd"></span>' +
+      PS.map(function (o) { return '<button type="button" class="nm" data-mrp="' + esc(o.n) + '">' + esc(o.n) + '</button>' +
+        '<span class="tr" title="할 일 ' + o.td + '개(완료 ' + o.tc + ') · 업무보고 ' + o.rp + '건"><i class="a" style="width:' + ((o.td + o.rp) / mxA * 100).toFixed(1) + '%"></i><i class="b" style="width:' + (o.tc / mxA * 100).toFixed(1) + '%"></i></span><b>' + (o.td + o.rp) + '</b>' +
+        '<span class="tr hr"><i class="a" style="width:' + (o.m / mxM * 100).toFixed(1) + '%"></i></span><b>' + Math.floor(o.m / 60) + '<i>시간</i></b>'; }).join('') + '</div></div>' + share + '</div>';
+  }
+  // 3) 제작일정 (프로젝트 타임라인 + 일정 구분)
+  var FS = {}, FO = []; A.ev.forEach(function (e) { if (!FS[e.f]) { FS[e.f] = { f: e.file, E: [] }; FO.push(FS[e.f]); } FS[e.f].E.push(e); });
+  FO.sort(function (a, b) { var x = a.E[a.E.length - 1].d, z = b.E[b.E.length - 1].d; return x < z ? -1 : x > z ? 1 : 0; });
+  var nd = A.days.length, X = function (d) { return ((P(d).getDate() - 0.5) / nd * 100).toFixed(2); };
+  var KN = ['디자인', '리터칭', '데드라인', '공식'], KC = {}; A.ev.forEach(function (e) { var k = KN.indexOf(e.k) >= 0 ? e.k : '기타'; KC[k] = (KC[k] || 0) + 1; });
+  var kAll = A.ev.length, kL = KN.concat(['기타']).filter(function (k) { return KC[k]; });
+  var tdx = isCur ? '<em class="now" style="left:' + X(TODAY) + '%"></em>' : '';
+  var gantt = '<div class="mrc mrgt"><div class="mrt">제작일정<small>' + (p ? '맡은 프로젝트 · ' : '') + '소속사 일정 빼고 ' + kAll + '건 · 프로젝트 ' + FO.length + '개</small></div>' +
+    (kAll ? '<div class="mrkd">' + kL.map(function (k) { return '<span><i style="background:' + (KIND[k] || '#c9cdd2') + '"></i>' + k + '<b>' + KC[k] + '</b></span>'; }).join('') + '</div>' +
+      '<div class="mrgw"><div class="mrgh"><span></span><div>' + A.days.map(function (d) { var n = P(d).getDate(), w = P(d).getDay(); return '<span style="left:' + X(d) + '%">' + (w === 1 || (n === 1 && w !== 0 && w !== 6) ? n : '') + '</span>'; }).join('') + '</div></div>' +
+      FO.map(function (o) { var a = o.E[0].d, b = o.E[o.E.length - 1].d, c = o.f.color;
+        return '<button type="button" class="mrgr" data-mrf="' + esc(o.f.id) + '"><span class="nm">' + artB(o.f.name) + '</span><div class="tk">' + tdx +
+          '<i class="sp" style="left:' + X(a) + '%;width:calc(' + (X(b) - X(a)).toFixed(2) + '% + 2px);background:' + c + '"></i>' +
+          o.E.map(function (e) { return '<i class="ev' + (e.k === '공식' ? ' of' : e.k === '데드라인' ? ' dl' : '') + '" style="left:' + X(e.d) + '%;--c:' + c + '" title="' + mrpMd(e.d) + ' ' + esc(e.t) + '"></i>'; }).join('') + '</div><em>' + o.E.length + '</em></button>'; }).join('') +
+      '</div><div class="mrlg"><span><i class="tk"></i>일정</span><span><i class="tk of"></i>공식 (공개 · 발매)</span><span><i class="tk dl"></i>데드라인</span>' + (isCur ? '<span><i class="nw"></i>오늘</span>' : '') + '</div>' : '<div class="mr0">이 달 제작일정이 없어요</div>') + '</div>';
+  // 4) 근태
+  var wk = function (n) { var x = WT && (WT.people || []).filter(function (q) { return q.p === n; })[0]; return x && !x.none && !x.err ? x.weeks || [] : null; };
+  var WH = []; A.T.forEach(function (n) { var x = wk(n); if (x && x.length > WH.length) WH = x; });
+  var wkRows = WH.map(function (w0, i) { var L = A.T.map(function (n) { var x = wk(n); return x && x[i] ? +x[i].tot || 0 : null; }).filter(function (v) { return v != null; }); return { s: w0.s, e: w0.e, v: L.length ? L.reduce(function (s, v) { return s + v; }, 0) / L.length : 0, mx: L.length ? Math.max.apply(null, L) : 0 }; });
+  var G = 3840, gx = function (v) { return Math.min(100, v / G * 100).toFixed(2); };
+  var wlc = '<div class="mrc"><div class="mrt">근태<small>' + (p ? '' : '팀 평균 · ') + '주별 근무시간은 근무표 기준</small></div>' +
+    '<div class="mrws">' +
+      '<div><span class="ic">' + MRP_IC.in + '</span><small>평균 출근</small><b>' + (A.ai != null ? wlHm(A.ai) : '9:00') + '</b></div>' +
+      '<div><span class="ic">' + MRP_IC.out + '</span><small>평균 퇴근</small><b>' + (A.ao != null ? wlHm(A.ao) : '18:00') + '</b></div>' +
+      '<div><span class="ic">' + MRP_IC.fd + '</span><small>야근식사</small><b>' + A.fd + '<i>건</i></b></div>' +
+      '<div><span class="ic">' + MRP_IC.tx + '</span><small>야근택시</small><b>' + A.tx + '<i>건</i></b>' + (A.fare ? '<em>' + won(A.fare) + '원</em>' : '') + '</div></div>' +
+    '<div class="mrot">' + mrpRing(A.rec.length ? A.ot / A.rec.length * 100 : 0, pc) + '<div><b>정시 퇴근 ' + A.ot + '<i>/' + A.rec.length + '일</i></b><span>18시 30분 전 퇴근 · 근태 기록이 있는 날 기준</span></div></div>' +
+    '<div class="mrwk">' + (!WT ? '<div class="mr0">근무표 불러오는 중…</div>' : !wkRows.length ? '<div class="mr0">근무표에 이 달 탭이 없어요</div>' :
+      wkRows.map(function (o) { var c = o.mx > 3120 ? ' x52' : ''; return '<div class="r"><span>' + mrpMd(o.s) + '–' + mrpMd(o.e) + '</span><div class="t"><i class="' + c + '" style="width:' + gx(o.v) + '%"></i></div><b class="' + c + '">' + wlHm(o.v) + '</b></div>'; }).join('') +
+      '<div class="r gx"><span></span><div class="t">' + [40, 52].map(function (g) { return '<em style="left:' + gx(g * 60) + '%"><small>' + g + '</small></em>'; }).join('') + '</div><b></b></div>' +
+      (p ? '' : (wkRows.some(function (o) { return o.mx > 3120; }) ? '<div class="mrnt">진한 막대 = 그 주에 52시간 넘긴 사람이 있음</div>' : ''))) + '</div></div>';
+  if (p) h += '<div class="mr2">' + share + wlc + '</div>' + gantt; else h += gantt;
+  // 5) 이달의 기록
+  var HL = [];
+  HL.push(['가장 바빴던 날', asum ? mrpMd(A.days[bi]) + ' <i>' + W[P(A.days[bi]).getDay()] + '</i>' : '–', asum ? '할 일 · 업무보고 ' + A.act[bi] + '건' : '기록 없음']);
+  HL.push(['가장 늦은 퇴근', A.lateO ? wlHm(A.lateO.x.o) : '–', A.lateO ? mrpMd(A.lateO.d) + (p ? '' : ' · ' + esc(A.lateO.n)) : '기록 없음']);
+  HL.push(['가장 오래 일한 날', A.longD ? wlHk(A.longD.x.m) : '–', A.longD ? mrpMd(A.longD.d) + (p ? '' : ' · ' + esc(A.longD.n)) : '기록 없음']);
+  var OF = A.ev.filter(function (e) { return e.k === '공식'; });
+  HL.push(['공개 · 발매 일정', OF.length + '<i>건</i>', OF.length ? OF.slice(0, 2).map(function (e) { return mrpMd(e.d) + ' ' + esc(e.file.short); }).join(' · ') + (OF.length > 2 ? ' 외' : '') : '이 달 공식 일정 없음']);
+  var hlc = '<div class="mrc"><div class="mrt">이달의 기록</div><div class="mrhl">' + HL.map(function (x) { return '<div><small>' + x[0] + '</small><b>' + x[1] + '</b><span>' + x[2] + '</span></div>'; }).join('') + '</div></div>';
+  h += p ? hlc : '<div class="mr2">' + wlc + hlc + '</div>';
+  h += '</div>';
+  $('#main').innerHTML = h;
+  var mv = function (dm) { S.mrm += dm; if (S.mrm < 1) { S.mrm = 12; S.mry--; } if (S.mrm > 12) { S.mrm = 1; S.mry++; } render(); };
+  $('#mrPv').onclick = function () { mv(-1); }; $('#mrNx').onclick = function () { mv(1); };
+  if ($('#mrT')) $('#mrT').onclick = function () { S.mry = +TODAY.slice(0, 4); S.mrm = +TODAY.slice(5, 7); render(); };
+  $('#mrMo').onchange = function () { var v = String(this.value || ''); if (/^\d{4}-\d\d/.test(v)) { S.mry = +v.slice(0, 4); S.mrm = +v.slice(5, 7); render(); } };
+  $$('#mrP button').forEach(function (b) { b.onclick = function () { ls.set('d4:mrp', b.dataset.n); window.scrollTo(0, 0); render(); }; });
+  $$('[data-mrp]').forEach(function (b) { b.onclick = function () { ls.set('d4:mrp', b.dataset.mrp); window.scrollTo(0, 0); render(); }; });
+  $$('[data-mrf]').forEach(function (b) { b.onclick = function () { openProj(b.dataset.mrf); }; });
 }
 var WLS = null;
 function openWl(d, p) {
