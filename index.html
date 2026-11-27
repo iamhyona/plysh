@@ -1522,7 +1522,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .hmc .su .dn b { color:#f04452; } .hmc .sa .dn b { color:#3182f6; }
 .hmc .td .dn b { background:#191f28; color:#fff; font-weight:700; }
 .hmc .out { opacity:.35; } .hmc .pa .ev { opacity:.55; }
-.hmc .ev { display:flex; align-items:center; gap:3px; min-width:0; font-size:10.5px; line-height:1.35; color:#333d4b; border-radius:4px; padding:1px 3px; background:color-mix(in srgb, var(--c) 12%, #fff); }
+.hmc .ev { display:flex; align-items:center; gap:3px; min-width:0; font-size:10.5px; line-height:1.35; color:#333d4b; border-radius:4px; padding:1px 3px; background:color-mix(in srgb, var(--c) 20%, #fff); }
 .hmc .ev i { width:3px; align-self:stretch; border-radius:2px; background:var(--c); flex:none; }
 .hmc .ev em { font-style:normal; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
 .hmc .ev.dl { color:#f04452; font-weight:700; }
@@ -2256,7 +2256,8 @@ var KIND = { '디자인': '#3182f6', '리터칭': '#4e5968', '소속사': '#8b95
 var KIND_BG = { '디자인': '#e8f3ff', '리터칭': '#eceef1', '소속사': '#f2f4f6', '데드라인': '#fdecec', '공식': '#e5e8eb', '업무': '#f2f4f6', '휴가': '#f6f7f9' };
 var PROJ_K = ['디자인', '리터칭', '소속사', '데드라인', '공식'], WORK_K = ['업무', '휴가'];
 // 2026-11-27 실장님: 프로젝트끼리 색이 비슷해 보임 → 색상(hue)이 뚜렷이 다른 12색, 진행 중인 프로젝트에 발매일 순으로 먼저 나눠 줌 (12개까지 겹치지 않음)
-var PJCOL = ['#3b82f6', '#f97316', '#10b981', '#ec4899', '#8b5cf6', '#06b6d4', '#ef4444', '#d4a106', '#3341a8', '#65a30d', '#a0522d', '#64748b'];
+// 2026-11-27 실장님: 프로젝트 색은 무지개처럼 알록달록 — 쨍한 12색, 이웃한 프로젝트끼리 멀리 떨어진 색
+var PJCOL = ['#ff3b30', '#007aff', '#ffb800', '#af52de', '#34c759', '#ff7a00', '#ff2d92', '#00c2b8', '#5856d6', '#8bd100', '#1fb5ff', '#e0218a'];
 var PCOL = ['#6f9fe8', '#e08aa6', '#6dba8f', '#e2aa5e', '#a092e0', '#5fb4d4', '#e48f80', '#6cbcb2', '#c08fd8', '#e7a173'];
 var S = { pin: ls.get('d4:pin') || '', view: ls.get('d4:view') || 'pj', tk: ls.get('d4:tk') || '', y: +TODAY.slice(0, 4), m: +TODAY.slice(5, 7), ws: sunOf(TODAY),
   off: JSON.parse(ls.get('d4:off') || '{}'), D: null, sel: null };
@@ -2279,7 +2280,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm232';
+var APP_VER = '20261127hm233';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
