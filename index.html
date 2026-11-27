@@ -1360,7 +1360,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wckb { grid-template-columns:repeat(2, minmax(0, 1fr)); }
 .wdg .wckb button { height:52px !important; flex-direction:row !important; justify-content:flex-start !important; gap:8px !important; padding:0 14px !important; }
 .wdg .wckb button b { font-size:15px !important; } .wdg .wckb button small { margin-left:auto; font-size:13.5px !important; }
-.wdg .wckb button.done:disabled { opacity:1; } .wdg .wckb button.done:disabled small { color:var(--txt); font-weight:700; }
+.wdg .wckb button.done { opacity:1; } .wdg .wckb button.done small { color:var(--txt); font-weight:700; }
 .wdg .wckb button.nx, .wdg .wckb button.nx b, .wdg .wckb button.nx small, .wdg .wckb button.nx svg { color:#fff !important; }
 .wdg .wckb button.sure small { font-size:12.5px !important; font-weight:700; white-space:nowrap; }
 .wdg .wckb button.sure:not(.nx) small { color:color-mix(in srgb, var(--pc) 85%, #191f28) !important; }
@@ -2101,7 +2101,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm222';
+var APP_VER = '20261127hm223';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3250,7 +3250,7 @@ function puCard() {
   return '<div class="wsc wck" style="--pc:' + dcol(me) + '"><h3>출퇴근<span class="wckh">' + (auto ? '<span class="wckme">' + esc(me) + '</span>' : '<button type="button" id="puWho">' + esc(me) + ' 바꾸기</button>') + '<button type="button" id="puEd">기록 고치기</button></span></h3>' +
     '<div class="wckn"><b id="puClk">' + wlHm(nm) + '</b><span class="' + k + '">' + line + '</span></div>' +
     '<div class="wckb">' + [['i', '출근'], ['x', '외근'], ['b', '복귀'], ['o', '퇴근']].map(function (b) {
-      return '<button type="button" data-pu="' + b[0] + '" class="' + (nx === b[0] ? 'nx ' : '') + (tm[b[0]] ? 'done' : '') + '"' + (dis[b[0]] || (tm[b[0]] && b[0] !== 'x') ? ' disabled' : '') + '>' + puIc(b[0]) + '<b>' + b[1] + '</b><small>' + (tm[b[0]] ? tm[b[0]].replace(/^0(?=\d:)/, '') : '–') + '</small></button>';
+      return '<button type="button" data-pu="' + b[0] + '" class="' + (nx === b[0] ? 'nx ' : '') + (tm[b[0]] ? 'done' : '') + '"' + (dis[b[0]] && !tm[b[0]] ? ' disabled' : '') + '>' + puIc(b[0]) + '<b>' + b[1] + '</b><small>' + (tm[b[0]] ? tm[b[0]].replace(/^0(?=\d:)/, '') : '–') + '</small></button>';
     }).join('') + '</div>' +
     '<div class="wckx" id="puEx" hidden><input id="puExT" maxlength="60" placeholder="외근 장소·내용 (안 적어도 돼요)" enterkeyhint="done"><button type="button" id="puExGo">외근 시작</button></div>' +
     bar + '</div>';
@@ -3277,8 +3277,8 @@ function bindPu() {
   $$('[data-pu]').forEach(function (b) { b.onclick = function () {
     var k = b.dataset.pu;
     if (k === 'x') { var ex = $('#puEx'); ex.hidden = !ex.hidden; if (!ex.hidden) $('#puExT').focus(); return; }
-    // 2026-11-27 실장님: 이미 찍힌 출근·복귀·퇴근은 다시 안 눌림 (고칠 땐 '기록 고치기')
-    if (b.classList.contains('done') && k !== 'x') return;
+    // 2026-11-27 실장님: 이미 찍힌 출근·복귀·퇴근을 다시 누르면 '기록 고치기' 창이 바로 열림 (덮어쓰지 않음)
+    if (b.classList.contains('done') && k !== 'x') { var me = hmMe(); if (me) openWl(wlNow(me).d, me); return; }
     puSave(k);
   }; });
   if ($('#puExGo')) { $('#puExGo').onclick = function () { puSave('x', $('#puExT').value.trim()); }; $('#puExT').onkeydown = function (ev) { if (ev.key === 'Enter') $('#puExGo').click(); }; }
