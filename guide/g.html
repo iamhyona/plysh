@@ -284,6 +284,29 @@ td{font-size:14.5px;padding:10px 12px}th{font-size:12.5px}
 .golink{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border:1px solid #cfd6df;border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:16px;font-weight:600;letter-spacing:var(--track);cursor:pointer}
 .golink:hover{border-color:var(--ink)}
 .golinks{display:flex;flex-wrap:wrap;gap:10px;padding-top:8px}
+/* 2026-11-27 핵심 정보 카드 (행정 업무 · 초과근무) */
+.kcs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kcs.k2c{grid-template-columns:repeat(2,minmax(0,1fr))}
+.kc{border:1px solid #cfd6df;border-radius:12px;padding:16px 18px;display:grid;gap:6px;align-content:start;background:#fff;min-width:0}
+.kc small{font-size:13.5px;font-weight:600;color:var(--muted)}
+.kc b{font-size:24px;font-weight:700;letter-spacing:-0.03em;line-height:1.25;color:var(--ink)}
+.kc span{font-size:14.5px;color:var(--muted);line-height:1.5}
+.kc.hot{border-color:var(--st,var(--accent));background:var(--stbg,#eef3ff)}
+.kc.hot b{color:var(--st,var(--accent))}
+.kc.ng{border-color:var(--ng);background:#fdecea}
+.kc.ng b{color:var(--ng)}
+.calcs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.calc{border:1px solid #cfd6df;border-radius:12px;padding:16px 18px;display:grid;gap:8px;align-content:start;background:#fff}
+.calc .ct{font-size:13.5px;font-weight:700;color:var(--st,var(--accent))}
+.calc .r{display:flex;justify-content:space-between;gap:12px;font-size:15.5px}
+.calc .r span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+.calc .r.t{border-top:1px solid var(--line);padding-top:10px;font-weight:700;font-size:17px}
+.calc .r.t span:last-child{color:var(--st,var(--accent))}
+.nolist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.nolist>div{position:relative;border:1px solid #f1c7c0;background:#fff7f5;border-radius:10px;padding:12px 14px 12px 40px;font-size:15.5px;line-height:1.5}
+.nolist>div::before{content:"";position:absolute;left:15px;top:50%;width:14px;height:2px;background:var(--ng);transform:translateY(-50%) rotate(45deg)}
+.nolist>div::after{content:"";position:absolute;left:15px;top:50%;width:14px;height:2px;background:var(--ng);transform:translateY(-50%) rotate(-45deg)}
+@media (max-width:640px){.kcs{grid-template-columns:repeat(2,minmax(0,1fr))}.kc{padding:14px}.kc b{font-size:20px}.kc span{font-size:13.5px}.calcs,.nolist{grid-template-columns:1fr}}
 /* 표 첫 칸이 길면 모바일에서 둘째 칸이 한 글자씩 세로로 쪼개지던 문제 (2026-11-22) */
 td{word-break:keep-all}
 @media (max-width:640px){td:first-child,td.k{white-space:normal;min-width:6em;max-width:44%}}
@@ -295,7 +318,7 @@ section>table:last-child tr:last-child>td,section>:last-child>table:last-child t
 </head>
 <body>
 <div class="wrap" data-toc id="root"><a class="back" href="./"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg> 가이드 목록</a></div>
-<script src="gdata.js?v=20261123g5i"></script>
+<script src="gdata.js?v=20261127hm202"></script>
 <script>
 (function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1],g=window.GD&&GD[id],r=document.getElementById('root');
 if(!g){r.insertAdjacentHTML('beforeend','<p>가이드를 찾을 수 없음.</p>');return}
