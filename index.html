@@ -1310,7 +1310,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wsg.wtop .nth { margin:-6px 0 4px; } .wsg.wtop .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
 @media (max-width:1023px) { .wsg.wtop { grid-template-columns:1fr; } }
 .tnlg { display:flex; flex-wrap:wrap; gap:6px 14px; margin:-2px 0 10px; font-size:12px; font-weight:600; color:var(--sub); font-variant-numeric:tabular-nums; }
-.tnlg span, .tnr { --dc:#16a34a; } .tnlg .ex, .tnr.ex { --dc:#3182f6; } .tnlg .off, .tnr.off { --dc:#b0b8c1; } .tnlg .no, .tnr.no { --dc:transparent; }
+.tnlg span, .tnr { --dc:#16a34a; } .tnlg .ex, .tnr.ex { --dc:#f5b400; } .tnlg .off, .tnr.off { --dc:#b0b8c1; } .tnlg .no, .tnr.no { --dc:transparent; }
 .tnlg span { display:inline-flex; align-items:center; gap:5px; }
 .tnlg i, .tnr i { width:8px; height:8px; border-radius:50%; background:var(--dc); flex:none; box-sizing:border-box; }
 .tnlg .no i, .tnr.no i { box-shadow:inset 0 0 0 1.5px #8b95a1; }
@@ -2008,7 +2008,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm209';
+var APP_VER = '20261127hm210';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
