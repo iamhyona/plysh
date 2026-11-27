@@ -2319,6 +2319,8 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 
 /* 세로형 달력: 프로젝트 줄 고정 빈 줄 (hm274) */
 .mcal .grid > button .ev.evx { visibility:hidden; }
+/* 2026-11-27 실장님 '왜이래': 일정이 많아 달력 상자 높이를 넘으면 줄 높이가 눌려 글자가 반쯤 잘리던 문제 → 줄은 내용만큼, 넘치면 상자 안에서 스크롤 */
+.mcal .grid { grid-auto-rows:max-content; } .mcal .grid > button > * { flex-shrink:0; }
 .mcal .grid > button[hidden] { display:none !important; }
 
 /* 프로젝트 필터 단추: 모든 화면 같은 모양·색 (hm274) */
@@ -2658,7 +2660,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm275';
+var APP_VER = '20261127hm276';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
