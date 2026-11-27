@@ -962,9 +962,9 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgw { display:grid; grid-template-columns:64px repeat(var(--n), minmax(0, 1fr)); gap:12px 14px; align-items:center; }
 .wgwh { font-size:11px; color:var(--mute); font-variant-numeric:tabular-nums; }
 .wgwc { display:flex; flex-direction:column; gap:5px; min-width:0; }
-.wgwc b { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--sub); } .wgwc b.x40 { color:#4e5968; } .wgwc b.x52 { color:#191f28; } .wgwc b.x62 { color:#000; font-weight:800; }
+.wgwc b { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--sub); } .wgwc b.x40 { color:#191f28; } .wgwc b.x52 { color:color-mix(in srgb, var(--pc) 80%, #191f28); } .wgwc b.x62 { color:color-mix(in srgb, var(--pc) 55%, #191f28); font-weight:800; }
 .wgwc .trk { position:relative; height:6px; background:#f2f4f6; border-radius:3px; }
-.wgwc .trk i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:#b0b8c1; } .wgwc .trk i.x40 { background:#8b95a1; } .wgwc .trk i.x52 { background:#4e5968; } .wgwc .trk i.x62 { background:#191f28; }
+.wgwc .trk i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:#b0b8c1; } .wgwc .trk i.x40 { background:color-mix(in srgb, var(--pc) 45%, #fff); } .wgwc .trk i.x52 { background:var(--pc); } .wgwc .trk i.x62 { background:color-mix(in srgb, var(--pc) 65%, #191f28); }
 .wgwc .trk em { position:absolute; left:62.5%; top:-2px; bottom:-2px; width:1.5px; background:#191f28; opacity:.35; }
 .wgwc .trk em.t52 { left:81.25%; opacity:.5; } .wgwc .trk em.t62 { left:96.9%; opacity:.8; }
 @media (max-width:759px) { .wgw { grid-template-columns:56px repeat(var(--n), minmax(0, 1fr)); gap:10px 8px; } .wgwh { font-size:9.5px; } .wgwc b { font-size:11.5px; } }
@@ -996,8 +996,8 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgbr { display:grid; grid-template-columns:84px minmax(0, 1fr); gap:10px; align-items:center; }
 .wgbr > span { font-size:12px; color:var(--sub); white-space:nowrap; font-variant-numeric:tabular-nums; }
 .wgbt { position:relative; height:26px; margin-right:44px; }
-.wgbt i { position:absolute; left:0; top:0; bottom:0; border-radius:0 7px 7px 0; background:color-mix(in srgb, var(--pc, #3182f6) 45%, #fff); } .wgbt i.x40 { background:var(--pc, #3182f6); } .wgbt i.x52 { background:#4e5968; } .wgbt i.x62 { background:#191f28; }
-.wgbt b { position:absolute; top:50%; transform:translate(8px, -50%); font-size:12px; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; } .wgbt b.x52 { color:#4e5968; } .wgbt b.x62 { color:#191f28; font-weight:800; }
+.wgbt i { position:absolute; left:0; top:0; bottom:0; border-radius:0 7px 7px 0; background:#c9cdd2; } .wgbt i.x40 { background:color-mix(in srgb, var(--pc, #3182f6) 45%, #fff); } .wgbt i.x52 { background:var(--pc, #3182f6); } .wgbt i.x62 { background:color-mix(in srgb, var(--pc, #3182f6) 65%, #191f28); }
+.wgbt b { position:absolute; top:50%; transform:translate(8px, -50%); font-size:12px; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; } .wgbt b.x52 { color:color-mix(in srgb, var(--pc) 80%, #191f28); } .wgbt b.x62 { color:color-mix(in srgb, var(--pc) 55%, #191f28); font-weight:800; }
 .wgbx { position:absolute; inset:0; pointer-events:none; } .wgbx .wgbt { height:auto; align-self:stretch; }
 .wgbx em { position:absolute; top:0; bottom:-18px; border-left:1.5px dashed #d1d6db; } .wgbx em.g52 { border-color:#8b95a1; } .wgbx em.g62 { border-color:#191f28; }
 .wgbx small { font-style:normal; position:absolute; bottom:0; left:0; transform:translateX(-50%); font-size:10px; color:var(--faint); }
@@ -1844,7 +1844,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm204';
+var APP_VER = '20261127hm205';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4931,7 +4931,7 @@ function wlGraph(y, m, wp, T, WT) {
     var WH = []; T.forEach(function (n) { var x = wk(n); if (x && x.length > WH.length) WH = x; }); var NW = Math.max(1, WH.length);
     h += '<div class="wgc"><div class="wgt">주별 근무시간<small>근무표 기준 · 눈금 40 · 52 · 62시간</small></div>' + (!WT ? '<div class="wl0">근무표 불러오는 중…</div>' : '<div class="wgw" style="--n:' + NW + '"><span></span>' + WH.map(function (w) { return '<span class="wgwh">' + md(w.s) + '–' + md(w.e) + '</span>'; }).join('') + T.map(function (n) {
       var Wn = wk(n);
-      return '<span class="wgmn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span>' + (Wn ? Wn.map(function (w) { var c = wc(w); return '<div class="wgwc" title="' + md(w.s) + '–' + md(w.e) + ' · ' + wlHk(w.tot) + '"><b class="' + c + '">' + wlHm(w.tot) + '</b><span class="trk"><i class="' + c + '" style="width:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i><em></em><em class="t52"></em><em class="t62"></em></span></div>'; }).join('') : '<span class="wl0" style="grid-column:span ' + NW + '">근무표에 이 달 탭이 없어요</span>');
+      return '<span class="wgmn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</span>' + (Wn ? Wn.map(function (w) { var c = wc(w); return '<div class="wgwc" style="--pc:' + dcol(n) + '" title="' + md(w.s) + '–' + md(w.e) + ' · ' + wlHk(w.tot) + '"><b class="' + c + '">' + wlHm(w.tot) + '</b><span class="trk"><i class="' + c + '" style="width:' + Math.min(100, (+w.tot || 0) / 3840 * 100).toFixed(1) + '%"></i><em></em><em class="t52"></em><em class="t62"></em></span></div>'; }).join('') : '<span class="wl0" style="grid-column:span ' + NW + '">근무표에 이 달 탭이 없어요</span>');
     }).join('') + '</div>') + '</div>';
     return '<div class="wgg">' + h + '</div>';
   }
