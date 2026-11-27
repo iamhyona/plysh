@@ -322,7 +322,10 @@ section>table:last-child tr:last-child>td,section>:last-child>table:last-child t
 <script>
 (function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1],g=window.GD&&GD[id],r=document.getElementById('root');
 if(!g){r.insertAdjacentHTML('beforeend','<p>가이드를 찾을 수 없음.</p>');return}
-document.title='DESIGN_4 '+g.t;r.insertAdjacentHTML('beforeend',g.h+'<footer>디자인4팀 · 초안 — 노란 표시 항목은 확인 후 업데이트.</footer>');})();
+document.title='DESIGN_4 '+g.t;r.insertAdjacentHTML('beforeend',g.h+'<footer>디자인4팀 · 초안 — 노란 표시 항목은 확인 후 업데이트.</footer>');
+/* 2026-11-27 실장님: &s=N 이면 그 꼭지 하나만 (안내 메뉴에서 꼭지마다 따로 메뉴) */
+var sn=+((location.search.match(/[?&]s=(\d+)/)||[])[1]||0);if(sn){var secs=[].slice.call(r.children).filter(function(e){return e.tagName==='SECTION'&&e.querySelector('h2')});var keep=secs[sn-1];if(keep){secs.forEach(function(e){if(e!==keep)e.remove()});var hd=r.querySelector('header');if(hd)hd.remove();var n=keep.querySelector('h2 .n');if(n)n.remove();document.title='DESIGN_4 '+keep.querySelector('h2').textContent.trim();}}
+})();
 </script>
 <script>/* data-go = PLYSH 메뉴로 이동 */document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(!b)return;e.preventDefault();var k=b.getAttribute('data-go');try{if(parent!==window&&parent.navGo){parent.navGo(k);return}}catch(x){}if(k.indexOf('gd:g.html')===0)location.href=k.slice(3);else location.href='../'})</script>
 <script>/* 체크리스트 저장 */(function(){var id=(location.search.match(/[?&]id=([\w-]+)/)||[])[1]||'x';document.querySelectorAll('.ckl input').forEach(function(c,i){var k='gdck:'+id+':'+i;try{c.checked=localStorage.getItem(k)==='1'}catch(e){}c.addEventListener('change',function(){try{localStorage.setItem(k,c.checked?'1':'0')}catch(e){}})})})()</script>
