@@ -2125,7 +2125,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm227';
+var APP_VER = '20261127hm229';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4914,7 +4914,7 @@ var IC_DOC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 var IC_DIR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.5h7.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>';
 function pjKey(a, t) { return (String(a || '') + '|' + String(t || '')).toLowerCase().replace(/[\s_\-·.,()\[\]]/g, ''); }
 // 같은 아티스트 다른 표기 (제작일정·사양서 묶을 때)
-var PJ_ALIAS = [[/skz|스트레이\s*키즈|stray\s*kids/gi, '스키즈']];
+var PJ_ALIAS = [[/skz|스트레이\s*키즈|stray\s*kids/gi, '스키즈'], [/g-?dragon|지드래곤|지디/gi, 'gd']];  // 2026-11-27 실장님: GD·G-DRAGON·지드래곤 = 같은 프로젝트로 묶기
 function pjTk(t) { t = String(t || ''); PJ_ALIAS.forEach(function (x) { t = t.replace(x[0], x[1]); }); return t.toLowerCase().replace(/20\d\d/g, '').replace(/[\s_\-·.,()\[\]]/g, ''); }
 function pjMerged() {
   var G = pfs().map(sheetInfo), P = specList(), used = {}, out = [];
@@ -5125,7 +5125,7 @@ function exOcr(b64, edit) {
     if (r.v) { $(k.v).value = r.v; n++; }
     if (r.u && (!$(k.u).value.trim() || $(k.u).value === exTaxiU(S.ex.p))) { $(k.u).value = r.u; n++; } // 자리표시 기본값은 자동으로 불러온 값으로 바꿈
     if (!edit) exDraftSave();
-    toast(n ? '영수증에서 읽어 채웠어요 · 맞는지 확인해 주세요' : '영수증 글자를 못 읽었어요. 직접 적어 주세요');
+    toast(r.cap ? '결제 ' + (+r.aPaid).toLocaleString('ko-KR') + '원 → 야근식대 한도 ' + r.cap.n + '명 × 1만원 = ' + (+r.a).toLocaleString('ko-KR') + '원으로 맞췄어요' : n ? '영수증에서 읽어 채웠어요 · 맞는지 확인해 주세요' : '영수증 글자를 못 읽었어요. 직접 적어 주세요');
   }).catch(function (e) { toast('자동 인식 실패 · ' + errMsg(e)); }).then(function () { lab.innerHTML = keep; });
 }
 // 영수증 여러 장 한 번에 (2026-11-26 실장님): 사진마다 자동 인식 → 카드로 확인·고치기 → 모두 올리기 (한 건씩 차례로)
@@ -5147,7 +5147,7 @@ function exBatchAdd(files) {
       it.img = b64; it.st = '영수증 읽는 중…'; exBatchDraw();
       return call('appExpOcr', S.pin, { img: b64, p: X.p, d: TODAY }).then(function (r) {
         it.d = r.d || ''; it.a = r.a ? (+r.a).toLocaleString('ko-KR') : ''; it.v = r.v || ''; it.u = r.u || (exIsTaxi(r.v) ? exTaxiU(X.p) : '');
-        it.st = r.d || r.a ? '' : '글자를 못 읽었어요. 직접 적어 주세요';
+        it.st = r.cap ? '결제 ' + (+r.aPaid).toLocaleString('ko-KR') + '원 → 한도 ' + r.cap.n + '명 × 1만원' : r.d || r.a ? '' : '글자를 못 읽었어요. 직접 적어 주세요';
       }).catch(function () { it.st = '자동 인식 실패 · 직접 적어 주세요'; });
     }).catch(function () { it.st = '사진을 열지 못했어요'; }).then(function () { exBatchDraw(); run(); });
   }
@@ -5189,6 +5189,7 @@ function exBatchSave() {
     if (!i.d) return toast((k + 1) + '번 지출일자를 골라 주세요');
     if (!+String(i.a).replace(/[^\d]/g, '')) return toast((k + 1) + '번 사용금액을 적어 주세요');
     if (!String(i.u).trim()) return toast((k + 1) + '번 사용목적을 적어 주세요');
+    var mc = exMealCap(i.a, i.u); if (mc.was) { i.a = won(mc.a); toast((k + 1) + '번 ' + exCapMsg(mc)); }
   }
   X.busy = true; b.disabled = true; var all = X.B.length, ok = 0;
   (function next() {
@@ -5246,7 +5247,8 @@ $('#exES').onclick = function () {
   if (!o.d) return toast('지출일자를 골라 주세요');
   if (!+o.a) return toast('사용금액을 적어 주세요');
   if (!o.u) return toast('사용목적을 적어 주세요');
-  exEditSend(o, this, '고쳤어요');
+  var mc = exMealCap(o.a, o.u); if (mc.was) { o.a = String(mc.a); $('#exEA').value = won(mc.a); }
+  exEditSend(o, this, mc.was ? exCapMsg(mc) : '고쳤어요');
 };
 sure($('#exEDel'), function () { var X = S.ex; if (!EXE) return; exEditSend({ p: X.p, ym: X.ym, n: EXE.x.n, del: true }, $('#exEDel'), '지웠어요'); });
 function exList() {
@@ -5269,6 +5271,15 @@ function exList() {
     call('appExpTidy', S.pin, X.p, X.ym).then(function (res) { X.D[X.p + '|' + X.ym] = res; exList(); toast('빈 칸을 지웠어요'); }).catch(function (e) { toast(errMsg(e)); }).then(function () { b.classList.remove('busy'); });
   };
 }
+// 야근식대 한도 (2026-11-27 경영지원): 1인당 최대 1만원 → 사용목적 괄호 속 명단 수 × 10,000원 넘으면 한도로 맞춤
+function exMealCap(a, u) {
+  a = +String(a).replace(/[^\d]/g, '') || 0; u = String(u || '');
+  if (!/야근\s*식대/.test(u)) return { a: a };
+  var m = u.match(/\(([^)]*)\)\s*$/), n = m ? m[1].split(/[,，、·]/).map(function (x) { return x.trim(); }).filter(function (x) { return /^[가-힣]{2,4}$/.test(x); }).length : 0;
+  n = n || 1; var cap = n * 10000;
+  return a > cap ? { a: cap, was: a, n: n } : { a: a };
+}
+function exCapMsg(c) { return '야근식대는 1인 1만원까지라 ' + won(c.was) + '원 → ' + c.n + '명 ' + won(c.a) + '원으로 맞췄어요'; }
 function exSave() {
   var X = S.ex, b = $('#exS');
   if (X.busy) return;
@@ -5277,6 +5288,7 @@ function exSave() {
   if (!o.d) return toast('지출일자를 골라 주세요');
   if (!+o.a) return toast('사용금액을 적어 주세요');
   if (!o.u) return toast('사용목적을 적어 주세요');
+  var mc = exMealCap(o.a, o.u); if (mc.was) { o.a = String(mc.a); $('#exA').value = won(mc.a); toast(exCapMsg(mc)); }
   if (!o.img && !confirm0()) return;
   X.busy = true; b.classList.add('busy'); b.textContent = '올리는 중…';
   call('appExpAdd', S.pin, o).then(function (res) {
