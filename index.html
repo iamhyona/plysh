@@ -2184,6 +2184,15 @@ html[data-nav] #cvSeg { display:none !important; }
 .ctos { display:none; margin-bottom:12px; }
 .ctos select { width:100%; height:40px; border:0; border-radius:10px; background:#fff; padding:0 12px; font:inherit; font-size:14px; font-weight:600; color:var(--txt); }
 @media (max-width:1099px) { .ctw { grid-template-columns:minmax(0,1fr); } .ctt { display:none; } .ctos { display:block; } }
+
+/* PC 홈: 날짜 · 날씨를 맨 위 경로 줄로 (hm258) */
+#ncr .wday.hcw { margin:0; font-size:18px; color:var(--txt); display:flex; align-items:center; gap:0; min-width:0; overflow:hidden; white-space:nowrap; }
+#ncr .wday.hcw small { font-size:13px; margin-left:10px !important; }
+@media (min-width:1024px) { html[data-nav="w"] #main .wday:not(.hcw) { display:none; } }
+
+/* 모바일 전체 메뉴: 하위 없는 대메뉴는 바로 가는 큰 글자 (hm258) */
+#nfm .col.c1 > b { font-size:18px !important; font-weight:600 !important; color:var(--sub) !important; letter-spacing:0; margin:0 !important; padding:9px 0; line-height:1.4; }
+#nfm .col.c1 { padding-top:2px !important; padding-bottom:2px !important; border-top:0 !important; }
 </style>
 </head>
 <body>
@@ -2497,7 +2506,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm257';
+var APP_VER = '20261127hm258';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3389,6 +3398,7 @@ var NAV_IC = {
   qk: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
   todo: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11"/>',
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
   cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
@@ -3399,15 +3409,16 @@ function navIc(k) { return '<svg class="nvi" viewBox="0 0 24 24" fill="none" str
 function tl(k) { return TOOL_LIST.filter(function (x) { return x.k === k; })[0] || {}; }
 // 네 공간: 메뉴 하나 = { k(뷰나 도구 키), t, s(설명) }
 // 2026-11-20 실장님이 정한 메뉴 구성 (이름도 그대로)
+function spVis() { return SPACES.filter(function (s) { return !s.hid; }); }
 var SPACES = [
-  { k: 'home', t: '홈', d: '이번 주 마감, 오늘 할 일, 최근 프로젝트, 자주 쓰는 도구', home: 'start', ic: 'home', g: [] },
-  // 2026-11-27 실장님: '할 일'은 개인에서 빼서 프로젝트 아래로 (할 일은 프로젝트에 쓰자)
-  { k: 'me', t: '개인', d: '근태, 지출결의를 한곳에서', home: 'wl', ic: 'todo', g: [
-    { g: '개인', i: [{ k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
-  { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
-    { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로' }, { k: 'todo', t: '할 일', s: '팀 공지와 프로젝트별 할 일' }] }] },
-  // 2026-11-27 실장님: 월간리포트 대메뉴 — 팀 활동 · 업무 · 근태를 한 달 단위 그래프로
-  { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
+  { k: 'home', hid: 1, t: '홈', d: '이번 주 마감, 오늘 할 일, 최근 프로젝트, 자주 쓰는 도구', home: 'start', ic: 'home', g: [] },
+  // 2026-11-27 실장님: 홈 메뉴 없앰(PLYSH 로고 = 홈), 자주 쓰는 6개를 하위 없는 대메뉴로 맨 위에 (이름 실장님 그대로)
+  { k: 'wlm', t: '근태 작성', d: '출퇴근 · 휴가 · 업무 기록', home: 'wl', ic: 'clock', g: [] },
+  { k: 'pjm', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [] },
+  { k: 'calm', t: '캘린더', d: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로', home: 'cal', ic: 'cal', g: [] },
+  { k: 'tdm', t: '투두리스트', d: '팀 공지와 프로젝트별 할 일', home: 'todo', ic: 'todo', g: [] },
+  { k: 'qkm', t: '퀵 배차', d: '카카오 T 퀵 주문 · 거래처 주소와 연락처', home: 'qk', ic: 'truck', g: [] },
+  { k: 'expm', t: '지출 결의서 작성', d: '지출결의서 작성 · 목록', home: 'exp', ic: 'doc', g: [] },
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
   { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
     { g: '지류', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] },
@@ -3426,12 +3437,13 @@ var SPACES = [
   { k: 'design', t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드, 자가점검리스트', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   // 2026-11-27 실장님: 퀵 배차 · 사내연락망은 안내에서 빼서 따로 대메뉴 (하위 없이 바로 열림)
-  { k: 'qkm', t: '퀵 배차', d: '카카오 T 퀵 주문 · 거래처 주소와 연락처', home: 'qk', ic: 'truck', g: [] },
   { k: 'ctm', t: '사내연락망', d: '사운드웨이브 · 사운드컨텐츠 직원 메일과 휴대전화', home: 'ct', ic: 'qk', g: [] },
   { k: 'admin', t: '안내', d: '사무실 이용, 업무 시스템, 행정 업무 (초과근무 · 택시 · 법인카드 · 지출결의 · 명함)', home: 'space:admin', ic: 'office', g: [
     { g: '안내', i: [{ k: 'gd:g.html?id=office&s=1', t: '사무실 출입', s: '사무실 출입 방법' }, { k: 'gd:g.html?id=office&s=2', t: '나스(NAS)', s: '맥에서 연결 · 사무실 밖에서 접속 · 공유 링크' }, { k: 'gd:g.html?id=office&s=3', t: '와이파이', s: '사무실 와이파이' }, { k: 'gd:g.html?id=office&s=4', t: '복합기 사용', s: '프린터 연결 · 스캔 받기' }, { k: 'gd:g.html?id=system&s=1', t: '위하고 접속', s: '접속 정보 · 로그인 순서' }, { k: 'gd:g.html?id=system&s=2', t: '메일플러그 접속', s: '웹에서 사용 · 맥 Mail 앱 연결' }, { k: 'gd:g.html?id=system&s=3', t: '메일 서명 수정', s: '팀 서명 양식 · 웹메일 · 맥 Mail 앱' }] },
     // 2026-11-27 실장님: 행정 업무는 한 페이지 목차가 아니라 하위 메뉴별 페이지로
-    { g: '행정 업무', i: [{ k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }, { k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 제작 방법', s: '신청 정보 · 제작 순서 · 데이터' }] }] }
+    { g: '행정 업무', i: [{ k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }, { k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 제작 방법', s: '신청 정보 · 제작 순서 · 데이터' }] }] },
+  // 2026-11-27 실장님: 월간리포트는 맨 밑
+  { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
 ];
 // 2026-11-27 실장님: 안내는 '안내 · 행정 업무' 구분 없이 한 목록
 SPACES.forEach(function (sp) { if (sp.k === 'admin' && sp.g.length > 1) sp.g = [{ g: sp.t, i: [].concat.apply([], sp.g.map(function (g) { return g.i; })) }]; });
@@ -3561,7 +3573,7 @@ function wxFetch() {
       .then(function (r) { return r.json(); }).then(function (j) {
         var c = j && j.current; if (!c || typeof c.temperature_2m !== 'number') return;
         ls.set('d4:wx2', JSON.stringify({ t: c.temperature_2m, c: c.weather_code, f: c.apparent_temperature, h: c.relative_humidity_2m, ws: c.wind_speed_10m, p: j.daily && j.daily.precipitation_sum ? j.daily.precipitation_sum[0] : null, at: Date.now() }));
-        var el = document.querySelector('.wwx'); if (el) el.innerHTML = wxHtml();
+        document.querySelectorAll('.wwx').forEach(function (el) { el.innerHTML = wxHtml(); });
       }).catch(function () {}).then(function () { WX_BUSY = 0; });
   };
   var seoul = function () { go(37.5665, 126.978); };
@@ -3689,7 +3701,7 @@ function nowMin() { var n = new Date(); return n.getHours() * 60 + n.getMinutes(
 var IC_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>', IC_DN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>', IC_XS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>';
 var QT_DEF = ['review', 'gcheck', 'wo', 'qk'], QT_IC = { review: 'chk', gcheck: 'chk', wo: 'doc', qk: 'qk' }, QT_MAX = 8;
 function qtKey() { return 'd4:qtl:' + (hmMe() || '_'); }
-function qtAll() { var L = [], seen = {}; SPACES.forEach(function (sp) { if (sp.k === 'home') return; var it = sp.k === 'proj' ? [{ k: 'pj', t: '프로젝트 목록' }, { k: 'cal', t: '프로젝트 달력' }, { k: 'todo', t: '할 일' }] : (sp.k === 'qkm' || sp.k === 'ctm') ? [{ k: sp.home, t: sp.t, s: sp.d }] : spItems(sp);
+function qtAll() { var L = [], seen = {}; SPACES.forEach(function (sp) { if (sp.k === 'home') return; var it = sp.k === 'proj' ? [{ k: 'pj', t: '프로젝트 목록' }, { k: 'cal', t: '프로젝트 달력' }, { k: 'todo', t: '할 일' }] : (!sp.g.length && sp.home !== 'mrep') ? [{ k: sp.home, t: sp.t, s: sp.d }] : spItems(sp);
   it.forEach(function (x) { if (!x.k || seen[x.k] || /^space:/.test(x.k)) return; seen[x.k] = 1; L.push({ k: x.k, t: TOOL_SHORT[x.k] || x.t, ic: QT_IC[x.k] || x.ic || sp.ic, sp: sp.t }); }); }); return L; }
 function qtList() { var A = qtAll(), M = {}; A.forEach(function (x) { M[x.k] = x; }); var L; try { L = JSON.parse(ls.get(qtKey()) || 'null'); } catch (e) { L = null; } if (!Array.isArray(L)) L = QT_DEF; return L.filter(function (k) { return M[k]; }).map(function (k) { return M[k]; }); }
 function qtCard() { var L = qtList();
@@ -4029,7 +4041,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + SPACES.map(function (sp) { return '<div class="col"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
@@ -4053,7 +4065,7 @@ function sideHtml() {
   var cur = navCur(), sk = spOf();
   if (NAV.lastSk !== sk) { NAV.lastSk = sk; if (!SOPEN[sk]) { SOPEN[sk] = 1; soSave(); } }
   return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
-    SPACES.map(function (sp) {
+    spVis().map(function (sp) {
       // 2026-11-23 실장님: 대메뉴 오른쪽에도 접고 펴는 꺾쇠
       var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj', op = !!SOPEN[sp.k], h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
       if (!sub || !op) return h;
@@ -4070,6 +4082,8 @@ function subHtml() {
   return sp.g.map(function (g) { return (sp.g.length > 1 ? '<i>' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" data-ng="' + x.k + '" class="' + (x.k === cur ? 'on' : '') + '">' + esc(TOOL_SHORT[x.k] || x.t) + '</button>'; }).join(''); }).join('');
 }
 function crumbHtml() {
+  // 2026-11-27 실장님: 홈 메뉴 없앰 — PC 홈은 맨 위 경로 자리에 날짜 · 날씨 · 세부 정보 (아래 날짜 줄은 숨김)
+  if (S.view === 'start') { var d0 = new Date(); return '<div class="wday hcw">' + (d0.getMonth() + 1) + '월 ' + d0.getDate() + '일 ' + '일월화수목금토'.charAt(d0.getDay()) + '요일<small class="wwx">' + wxHtml() + '</small></div>'; }
   var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur(), it = spItems(sp).filter(function (x) { return x.k === cur; })[0];
   var sep = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">' + NAV_IC.cv + '</svg>';
   if (inWs()) return sp.t + sep + '<b>' + esc(S.ws.name) + '</b>';
@@ -4112,7 +4126,7 @@ function navSync() {
   document.documentElement.toggleAttribute('data-navc', NAV.s === 'c');
   var hd = $('header .hd'), hdr = $('header'), sk = spOf();
   navEl('nsp', 'div', function (e) { $('#brand').insertAdjacentElement('afterend', e); });
-  $('#nsp').innerHTML = SPACES.map(function (sp) { return '<button type="button" data-sp="' + sp.k + '" class="' + (sp.k === sk ? 'on' : '') + '">' + esc(sp.t) + '</button>'; }).join('');
+  $('#nsp').innerHTML = spVis().map(function (sp) { return '<button type="button" data-sp="' + sp.k + '" class="' + (sp.k === sk ? 'on' : '') + '">' + esc(sp.t) + '</button>'; }).join('');
   $$('#nsp button').forEach(function (b) {
     var sp = SPACES.filter(function (s) { return s.k === b.dataset.sp; })[0];
     b.onclick = function () { navGo(sp.home); };
@@ -4138,7 +4152,7 @@ function navSync() {
     // 2026-11-27 실장님: 하위 메뉴가 있는 대메뉴는 글자를 눌러도 펴고 접힘 (꺾쇠만이 아니라 줄 전체)
     $$('.ss.tgh', sd).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); e.preventDefault(); var k = (SPACES.filter(function (sp) { return sp.home === b.dataset.ng; })[0] || {}).k; if (!k) return; if (SOPEN[k]) SOPEN[k] = 0; else SOPEN[k] = 1; soSave(); var y = sd.scrollTop; navSync(); var s2 = $("#nsd"); if (s2) s2.scrollTop = y; }; });
     $$('[data-sst]', sd).forEach(function (c) { c.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); var b = c.parentNode, k = (SPACES.filter(function (sp) { return sp.home === b.dataset.ng; })[0] || {}).k; if (!k) return; if (SOPEN[k]) SOPEN[k] = 0; else SOPEN[k] = 1; soSave(); var y = sd.scrollTop; navSync(); var s2 = $("#nsd"); if (s2) s2.scrollTop = y; }, true); }); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
-    var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['all', 'menu', '전체']];
+    var T = [['home', 'home', '홈'], ['wlm', 'clock', '근태 작성'], ['calm', 'cal', '캘린더'], ['tdm', 'todo', '투두리스트'], ['all', 'menu', '전체']];   // 2026-11-27 새 대메뉴에 맞춤
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
     $$('#ntb button').forEach(function (b) { b.onclick = function () { if (b.dataset.nt === 'all') return fullMenu(); if (b.dataset.nt === 'find') return navPal(); navGo(SPACES.filter(function (s) { return s.k === b.dataset.nt; })[0].home); }; });
