@@ -1355,6 +1355,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
 #bgSv { position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px); z-index:400; background:#191f28; color:#fff; font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; white-space:nowrap; max-width:calc(100vw - 32px); }
+/* 출퇴근 단추 확인 문구는 잘리지 않게 줄바꿈 */
+.wck [data-pu].sure small { white-space:normal; line-height:1.25; text-align:center; font-size:11px; word-break:keep-all; }
 #bgSv.on { opacity:1; transform:translate(-50%, 0); }
 #bgSv i { width:14px; height:14px; border-radius:50%; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; animation:bgspin .8s linear infinite; flex:none; }
 @keyframes bgspin { to { transform:rotate(360deg); } }
@@ -2092,7 +2094,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm219';
+var APP_VER = '20261127hm220';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3269,7 +3271,7 @@ function bindPu() {
     var k = b.dataset.pu;
     if (k === 'x') { var ex = $('#puEx'); ex.hidden = !ex.hidden; if (!ex.hidden) $('#puExT').focus(); return; }
     // 이미 찍힌 출근·퇴근은 한 번 더 눌러야 바꿈
-    if (b.classList.contains('done') && !b.classList.contains('sure')) { b.classList.add('sure'); b.querySelector('small').textContent = '한 번 더 누르면 지금으로'; clearTimeout(b.h); b.h = setTimeout(function () { render(); }, 3000); return; }
+    if (b.classList.contains('done') && !b.classList.contains('sure')) { b.classList.add('sure'); b.querySelector('small').textContent = '다시 누르면 지금 시각'; clearTimeout(b.h); b.h = setTimeout(function () { render(); }, 3000); return; }
     puSave(k);
   }; });
   if ($('#puExGo')) { $('#puExGo').onclick = function () { puSave('x', $('#puExT').value.trim()); }; $('#puExT').onkeydown = function (ev) { if (ev.key === 'Enter') $('#puExGo').click(); }; }
