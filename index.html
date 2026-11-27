@@ -1339,6 +1339,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 @media (min-width:1024px) { .wdg > .wdl { grid-column:1; grid-row:1; } .wdg > .whc { grid-column:2 / 4 !important; grid-row:1 !important; } }
 @media (max-width:1023px) { .wdg > .wdl { display:contents; } .wdg .wck { order:0; } .wdg > .whc { order:1; } .wdg .wtn2, .wdg > .wdl > :nth-child(3) { order:2; } .wdg > .whc ~ * { order:3; } }
 .hmc .gd.gl { display:flex !important; flex-direction:column; flex:none; }
+/* 2026-11-27 실장님: 프로젝트·개인 일정 보기 모두 달력 칸이 카드 높이를 꽉 채우게 (주마다 같은 비율로 늘어남) */
+.hmc .gd.gl { flex:1 1 auto !important; } .hmc .gd.gl > .wk { flex:1 0 auto; }
 .hmc .wk { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); border-bottom:1px solid var(--line); min-height:84px; }
 .hmc .wk > * { min-width:0; cursor:pointer; }
 .hmc .wk > .dh { border:0; background:none; padding:5px 3px 2px; display:flex; align-items:center; gap:3px; font-family:inherit; text-align:left; }
@@ -1354,6 +1356,10 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+.rpi .tdgrip { user-select:none; -webkit-user-select:none; flex:none; align-self:center; width:28px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--faint); cursor:grab; touch-action:none; border-radius:8px; }
+.rpi .tdgrip svg { width:16px; height:16px; } .rpi .tdgrip:hover { color:var(--sub); background:var(--chip); }
+.rpi.drag { position:relative; z-index:5; background:var(--card); box-shadow:0 6px 20px rgba(0,0,0,.14); border-radius:10px; } .rpi.drag .tdgrip { cursor:grabbing; color:var(--sub); }
+
 .whc .hcv { display:inline-flex; width:auto; max-width:max-content; margin:0 0 8px; } .whc .hcv button { height:30px; padding:0 12px; font-size:12.5px; }
 
 .tdqb { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; height:40px; margin:10px 0 4px; border:0; border-radius:10px; background:var(--chip); color:var(--sub); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
@@ -2119,7 +2125,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm226';
+var APP_VER = '20261127hm227';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3167,6 +3173,7 @@ function renderStart() {
   // 2026-11-27 실장님: 오늘 할 일 = 팀원 모두의 데일리를 프로젝트별로 묶고, 줄 오른쪽에 담당자
   var TG = {}, TO = []; Td.forEach(function (x) { var k = x.j ? sgFix(x.j) : ''; if (!TG[k]) { TG[k] = []; TO.push(k); } TG[k].push(x); });
   TO.sort(function (a, b) { return !a ? 1 : !b ? -1 : a < b ? -1 : 1; });
+  TO.forEach(function (k) { TG[k].sort(function (a, b) { return (tdoRank(a) - tdoRank(b)) || (rid(a.id) - rid(b.id)); }); });
   var tdCard = '<div class="wsc wgo wtdc" data-ng="todo"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? '<div class="wtdl">' + TO.map(function (k) { return '<div class="wtdg"><div class="wtdh">' + esc(k || '프로젝트 없음') + '<small>' + TG[k].length + '</small></div>' + TG[k].map(function (x) { return '<div class="wsr wtdr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + '</span><span class="who">' + esc(x.p || '') + '</span></div>'; }).join('') + '</div>'; }).join('') + '</div>' : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>';
   var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['review', 'chk', '인쇄파일 검수기'], ['gcheck', 'chk', '작업지시서 검수기'], ['wo', 'doc', '작업지시서 양식'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
@@ -3231,6 +3238,10 @@ function bindHomeCal() {
   if ($('#hcP')) { $('#hcP').onclick = function () { mv(-1); }; $('#hcN').onclick = function () { mv(1); }; }
   if ($('#hcT')) $('#hcT').onclick = function () { S.hcb = ''; render(); };
   if ($('#hcAdd')) $('#hcAdd').onclick = function (ev) { ev.stopPropagation(); openBulk(); };
+  // 2026-11-27 실장님: 두 보기 높이 같게 — 프로젝트 보기 카드 높이를 기억해 개인 일정 보기에도 같은 높이(칸은 늘어나 꽉 채움)
+  (function () { var c = $('.whc'); if (!c) return; c.style.minHeight = '';
+    if (S.hcv !== 'me') { var hh = c.offsetHeight; if (hh) { S.hcPH = hh; try { ls.set('d4:hcph', String(hh)); } catch (x) {} } }
+    else { var ph = S.hcPH || +(ls.get('d4:hcph') || 0); if (ph && innerWidth >= 1024) c.style.minHeight = ph + 'px'; } })();
   $$('#hcV button').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); S.hcv = b.dataset.v; try { ls.set('d4:hcv', S.hcv); } catch (x) {} render(); }; });
 }
 /* 2026-11-27 실장님: 홈 = 대시보드 · 출근·외근·복귀·퇴근 단추를 누르면 지금 시각으로 근태(WORK LOG) 기록
@@ -4645,10 +4656,19 @@ function tdRows(fn) { return (S.D.todo || []).filter(fn); }
 function tdWait(x) { return /대기/.test(x.m || ''); }
 function tdImp(x) { return /중요/.test(x.m || ''); }
 function tdPjIdx(j) { if (!j) return 9999; var L = projList(), k = pnorm(j); for (var i = 0; i < L.length; i++) if (pnorm(sgFix(L[i].name)) === k) return i; return 5000; }
+// 2026-11-27 실장님: 할 일 순서 바꾸기 — 손잡이로 끌어 옮긴 순서를 기억 (같은 프로젝트 안에서, 새로 추가한 건 맨 아래)
+var TDO = (function () { try { return JSON.parse(ls.get('d4:tdo') || '{}') || {}; } catch (x) { return {}; } })();
+function tdoKey(x) { return x.d + '|' + x.p + '|' + x.t; }
+function tdoRank(x) { var r = TDO[tdoKey(x)]; return r == null ? 1e6 + (rid(x.id) % 1e6) : r; }
+function tdoSave(keys) {
+  keys.forEach(function (k, i) { TDO[k] = i; });
+  var cut = addD(TODAY, -60); Object.keys(TDO).forEach(function (k) { if (k.slice(0, 10) < cut) delete TDO[k]; });
+  try { ls.set('d4:tdo', JSON.stringify(TDO)); } catch (x) {}
+}
 function tdSort(a, b) {
   if (/메모$/.test(a.k)) return (a.c - b.c) || (tdImp(b) - tdImp(a)) || (rid(a.id) - rid(b.id));
   var aj = a.j ? sgFix(a.j) : '', bj = b.j ? sgFix(b.j) : '';
-  return (tdPjIdx(aj) - tdPjIdx(bj)) || aj.localeCompare(bj, 'ko') || (rid(a.id) - rid(b.id));   // 프로젝트별로 모아서
+  return (tdPjIdx(aj) - tdPjIdx(bj)) || aj.localeCompare(bj, 'ko') || (tdoRank(a) - tdoRank(b)) || (rid(a.id) - rid(b.id));   // 프로젝트별로 모아서, 그 안은 직접 정한 순서
 }
 function tdCount(L) { var n = L.filter(function (x) { return x.c; }).length; return L.length ? n + '/' + L.length : ''; }
 
@@ -4682,7 +4702,8 @@ function tdItem(x, opt) {
   return '<div class="rpi' + (x.c ? ' done' : '') + (tdImp(x) ? ' imp' : '') + (x.tmp ? ' tmp' : '') + '" data-tdrow="' + esc(x.id) + '">' +
     '<button class="ck" data-tdck="' + esc(x.id) + '"' + (x.p ? ' style="--ckc:' + dcol(x.p) + '"' : '') + ' aria-label="완료">' + CKSVG + '</button>' +
     '<button class="rpt" data-tdx="' + esc(x.id) + '">' + who + '<span class="tx' + (pj ? ' tx2' : '') + '">' + pj + (tdImp(x) ? '<em class="star">' + IC_STAR + '</em>' : '') + esc(x.t) + '</span>' +
-    (tdWait(x) ? '<span class="wt">대기</span>' : '') + (x.c && x.ct ? '<span class="tdct">' + tdCt(x.ct) + '</span>' : '') + '</button></div>';
+    (tdWait(x) ? '<span class="wt">대기</span>' : '') + (x.c && x.ct ? '<span class="tdct">' + tdCt(x.ct) + '</span>' : '') + '</button>' +
+    (opt.drag && !x.tmp ? '<span class="tdgrip" data-tdo="' + esc(tdoKey(x)) + '" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>' : '') + '</div>';
 }
 // 완료 시각 표시: 2026-10-28 14:05 → 26.10.28(수) 14:05 (2026-10-28)
 function tdCt(s) { var m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}:\d{2})/); if (!m) return esc(s); var w = '일월화수목금토'.charAt(new Date(+m[1], +m[2] - 1, +m[3]).getDay()); return m[1].slice(2) + '.' + m[2] + '.' + m[3] + '(' + w + ') ' + m[4]; }
@@ -4717,7 +4738,7 @@ function tdGroup(L) {
   L.sort(tdSort).forEach(function (x) {
     var j = x.j ? sgFix(x.j) : '';
     if (j !== cur) { cur = j; if (j || many) h += '<div class="tdpj" style="color:' + (j ? dcol(x.p) : 'var(--mute)') + '">' + esc(j || '기타') + '</div>'; }
-    h += tdItem(x, { noPj: 1 });
+    h += tdItem(x, { noPj: 1, drag: 1 });
   });
   return h;
 }
@@ -4759,7 +4780,7 @@ function renderTodo() {
   $$('#tdW button').forEach(function (b) { b.onclick = function () { ls.set('d4:tp', b.dataset.n); window.scrollTo(0, 0); render(); }; });
   $$('[data-go]').forEach(function (b) { b.onclick = function () { ls.set('d4:tp', b.dataset.go); window.scrollTo(0, 0); render(); }; });
   $$('[data-ted]').forEach(function (b) { b.onmousedown = function (e) { e.preventDefault(); }; b.onclick = function () { var a = document.activeElement; if (a && a.closest && a.closest('.tdei')) a.blur(); S.tdEdit = S.tdEdit === b.dataset.ted ? '' : b.dataset.ted; render(); }; });
-  bindTdEdit();
+  bindTdEdit(); bindTdDrag();
   $$('[data-tdq]').forEach(function (b) { b.onclick = function () { var a = b.dataset.tdq.split('|'); openTdq(a[0], a[1]); }; });
   $$('[data-pst]').forEach(function (b) { b.onclick = function () { var a = b.dataset.pst.split('|'); openPaste({ d: a[0], p: a[1] }); }; });
   if ($('#tdPaste')) $('#tdPaste').onclick = function () { openPaste(); };
@@ -6383,6 +6404,33 @@ function tdEditList(L) {
       g.L.map(function (x) { return '<div class="tdei" data-tei="' + esc(x.id) + '"><input value="' + esc(x.t) + '" maxlength="120"><button class="tdex" aria-label="삭제">' + IC_X + '</button></div>'; }).join('') +
       '<div class="tdea" data-d="' + esc(g.d) + '" data-p="' + esc(g.p) + '" data-j="' + esc(g.j) + '" data-k="' + esc(g.k) + '"><input placeholder="+ 할 일 추가" maxlength="120" enterkeyhint="done"></div>';
   }).join('') + '</div>';
+}
+// 같은 프로젝트 묶음(제목 줄 사이) 안에서만 위아래로 옮김 · 마우스·손가락 둘 다
+function bindTdDrag() {
+  $$('.tdgrip').forEach(function (g) {
+    g.onpointerdown = function (ev) {
+      if (ev.button > 0) return; ev.preventDefault();
+      var row = g.closest('.rpi'), par = row.parentNode, grp = [], n = row;
+      while (n.previousElementSibling && n.previousElementSibling.classList.contains('rpi')) n = n.previousElementSibling;
+      for (; n && n.classList.contains('rpi'); n = n.nextElementSibling) grp.push(n);
+      if (grp.length < 2) return;
+      var y0 = ev.clientY, moved = false; row.classList.add('drag'); try { g.setPointerCapture(ev.pointerId); } catch (x) {}
+      g.onpointermove = function (e) {
+        var dy = e.clientY - y0; if (Math.abs(dy) > 3) moved = true;
+        row.style.transform = 'translateY(' + dy + 'px)';
+        var prev = row.previousElementSibling, next = row.nextElementSibling, r = row.getBoundingClientRect(), mid = r.top + r.height / 2;
+        if (next && next.classList.contains('rpi') && mid > next.getBoundingClientRect().top + next.offsetHeight / 2) { var h = next.offsetHeight; par.insertBefore(next, row); y0 += h; row.style.transform = 'translateY(' + (e.clientY - y0) + 'px)'; }
+        else if (prev && prev.classList.contains('rpi') && mid < prev.getBoundingClientRect().top + prev.offsetHeight / 2) { var h2 = prev.offsetHeight; par.insertBefore(row, prev); y0 -= h2; row.style.transform = 'translateY(' + (e.clientY - y0) + 'px)'; }
+      };
+      g.onpointerup = g.onpointercancel = function () {
+        g.onpointermove = g.onpointerup = g.onpointercancel = null; row.classList.remove('drag'); row.style.transform = '';
+        if (!moved) return;
+        var keys = []; n = row; while (n.previousElementSibling && n.previousElementSibling.classList.contains('rpi')) n = n.previousElementSibling;
+        for (; n && n.classList.contains('rpi'); n = n.nextElementSibling) { var k = n.querySelector('[data-tdo]'); if (k) keys.push(k.dataset.tdo); }
+        tdoSave(keys);
+      };
+    };
+  });
 }
 function bindTdEdit() {
   $$('.tdea').forEach(function (w) {
