@@ -1320,13 +1320,28 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .tnr b { font-size:14px; font-weight:700; color:#191f28; flex:none; }
 .tnr small { margin-left:auto; font-size:12.5px; color:var(--mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; font-variant-numeric:tabular-nums; }
 .tnr.off { opacity:.45; }
+.wdg > .wdl { display:flex; flex-direction:column; gap:12px; align-self:start; }
+@media (min-width:1024px) { .wdg > .wdl { grid-column:1; grid-row:1; } .wdg > .whc { grid-column:2 / 4 !important; grid-row:1 !important; } }
+@media (max-width:1023px) { .wdg > .wdl { display:contents; } .wdg .wck { order:0; } .wdg > .whc { order:1; } .wdg .wtn2, .wdg > .wdl > :nth-child(3) { order:2; } .wdg > .whc ~ * { order:3; } }
+.hmc .gd.gl { display:flex !important; flex-direction:column; flex:none; }
+.hmc .wk { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); border-bottom:1px solid var(--line); min-height:84px; }
+.hmc .wk > * { min-width:0; cursor:pointer; }
+.hmc .wk > .dh { border:0; background:none; padding:5px 3px 2px; display:flex; align-items:center; gap:3px; font-family:inherit; text-align:left; }
+.hmc .wk > .dh b { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#333d4b; flex:none; font-variant-numeric:tabular-nums; }
+.hmc .wk > .dh small { font-size:9.5px; color:#f04452; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hmc .wk > .su b { color:#f04452; } .hmc .wk > .sa b { color:#3182f6; }
+.hmc .wk > .td b { background:#191f28; color:#fff; font-weight:700; }
+.hmc .wk > .lc { padding:1px 3px; display:flex; flex-direction:column; gap:2px; }
+.hmc .wk > .lf { min-height:6px; }
+.hmc .wk > .out { opacity:.35; }
+@media (max-width:640px) { .hmc .wk { min-height:56px; } .hmc .wk > .dh { justify-content:center; } .hmc .wk > .dh small { display:none; } }
 /* 2026-11-27 실장님: 홈 3등분 격자 — 모든 줄의 열 경계를 맞춤 */
 .wdg { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; align-items:stretch; }
 .wdg > * { min-width:0; margin:0 !important; }
 .wdg > .wfull { grid-column:1 / -1; }
 .wdg > .ntbox { padding:16px !important; border-radius:16px !important; background:#fff; }
 .wdg > .ntbox .nth { margin:-6px 0 4px; } .wdg > .ntbox .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
-@media (min-width:1024px) { .wdg > .wck { grid-column:1; grid-row:1; } .wdg > .whc { grid-column:2 / 4; grid-row:1 / 3; } .wdg > .wtn2 { grid-column:1; grid-row:2; } .wdg .wpc { grid-template-columns:repeat(3, minmax(0, 1fr)) !important; } .wdg .wtg { grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+@media (min-width:1024px) { .wdg > .wck { grid-column:1; grid-row:1; } .wdg > .whc { grid-column:2 / 4; grid-row:1 / 3; } .wdg > .wtn2 { grid-column:1; grid-row:2; } .wdg .wrec .wpc { grid-template-columns:repeat(2, minmax(0, 1fr)) !important; } .wdg .wtg { grid-template-columns:repeat(6, minmax(0, 1fr)); } }
 @media (max-width:1023px) { .wdg { grid-template-columns:1fr; } }
 .wdg .wsq { grid-template-columns:repeat(2, minmax(0, 1fr)); }
 .wck h3 .wckh { display:flex; align-items:center; gap:10px; } .wck h3 #puEd { height:28px; padding:0 10px; border-radius:999px; background:var(--bg); color:var(--sub); font-size:12.5px; font-weight:700; }
@@ -3041,16 +3056,16 @@ function renderStart() {
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort).slice(0, 7);
   var PL = pjMerged(), R = NAV.rec.slice(0, 8), RN = R.map(function (r) { return r.name; }); PL.map(wsFrom).forEach(function (r) { if (R.length < 8 && RN.indexOf(r.name) < 0) { R.push(r); RN.push(r.name); } });
   // 2026-11-27 실장님: 정렬 — 홈 전체를 3등분 격자 하나로 (줄마다 열 경계가 위아래로 맞게)
-  // PC: [출퇴근 / 오늘 팀 | 달력 2칸] · [이번 주 마감 | 오늘 할 일 | 자주 쓰는 도구] · [내 이번 주 | 요일별 근무 | 팀 공지] (실장님 13:24 순서 바꿈) · 근무시간 통계는 마감·할 일·도구 줄 바로 아래 · 근무시간 통계 · 최근 프로젝트
+  // PC: [출퇴근 / 오늘 팀 | 달력 2칸] · [이번 주 마감 | 오늘 할 일 | 자주 쓰는 도구] · [내 이번 주 | 요일별 근무 | 팀 공지] 13:32 실장님: 왼쪽 열 = 출퇴근·오늘 팀·자주 쓰는 도구 | 달력(세로로 늘어남) · 마감 | 할 일 | 최근 프로젝트 · 근무시간 통계 · 내 이번 주 | 요일별 | 공지 · 근무시간 통계 · 최근 프로젝트
   var dlCard = '<div class="wsc"><h3>이번 주 마감<button type="button" data-ng="sched">일정</button></h3>' +
     (E.length ? E.map(function (e) { return '<button type="button" class="wsr" data-wf="' + e.f + '"><span class="dd' + (e.d === TODAY ? ' td' : '') + '">' + dot(e.d).slice(3) + '</span><span class="pn">' + esc(e.file.short) + '</span><span class="tx">' + esc(e.t) + '</span></button>'; }).join('') : '<div class="emp">이번 주 마감이 없어요</div>') + '</div>';
   var tdCard = '<div class="wsc wgo" data-ng="todo"><h3>오늘 할 일<button type="button" data-ng="todo">할 일 전체</button></h3>' +
     (Td.length ? Td.map(function (x) { return '<div class="wsr wtdr' + (x.c ? ' done' : '') + '"><span class="ck"></span><span class="tx">' + esc(x.t) + (x.j ? '<small>' + esc(sgFix(x.j)) + '</small>' : '') + '</span></div>'; }).join('') : '<div class="emp">오늘 할 일이 없어요</div>') + '</div>';
   var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['review', 'chk', '인쇄파일 검수기'], ['gcheck', 'chk', '작업지시서 검수기'], ['wo', 'doc', '작업지시서 양식'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
-  var recCard = '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.slice(0, 6).map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>';
+  var recCard = '<div class="wsc wrec"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.slice(0, 8).map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>';
   wlMeInit();
   var h = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + wk + '요일<small class="wwx">' + wxHtml() + '</small></div>' +
-    '<div class="wdg">' + puCard() + homeCal() + teamNowCard() + dlCard + tdCard + toolsCard + wtCard() + myWeekCard() + ntHtml() + recCard + '</div>';
+    '<div class="wdg"><div class="wcol wdl">' + puCard() + teamNowCard() + toolsCard + '</div>' + homeCal() + dlCard + tdCard + recCard + wtCard() + myWeekCard() + ntHtml() + '</div>';
   $('#main').innerHTML = h; bindGo($('#main')); bindNt(); bindPu(); bindHomeCal();
   $$('#main [data-wgd]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); var a = b.dataset.wgd.split('|'); openWl(a[0], a[1]); }; });
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
@@ -3058,15 +3073,31 @@ function renderStart() {
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
 }
 /* 2026-11-27 실장님: 홈 달력을 한눈에 — 맨 위 오른쪽, 칸마다 제작일정 (PC는 글자, 모바일은 색 막대) */
+// 2026-11-27 실장님: 일정이 많아도 다 보이게(칸이 세로로 늘어남) · 프로젝트 줄은 발매(릴리즈)일 순서로 고정
+// 주마다 그 주에 일정이 있는 프로젝트를 한 줄씩(발매일 빠른 순) 깔아서, 같은 프로젝트는 일주일 내내 같은 높이에 보임
+function pjRel(f) {
+  var E = S.D.events.filter(function (e) { return e.f === f.id; }), r = E.filter(function (e) { return /발매|릴리즈|출시|판매\s*(시작|오픈)|공개|오픈/.test(e.t); })[0];
+  return r ? r.d : f.to || (E.length ? E[E.length - 1].d : '9999');
+}
 function homeCal() {
   var b = S.hcb || TODAY.slice(0, 7), y = +b.slice(0, 4), m = +b.slice(5, 7), first = b + '-01', last = F(new Date(y, m, 0)), st = sunOf(first), en = addD(sunOf(last), 6), L = pvis(), cur = b === TODAY.slice(0, 7);
+  var RK = {}; pfs().forEach(function (f) { RK[f.id] = pjRel(f) + '|' + f.name; });
   var h = '<div class="wsc whc"><h3><span class="hct">' + y + '.' + pad(m) + '</span><span class="hca">' + (cur ? '' : '<button type="button" id="hcT">이번 달</button>') + '<button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button><button type="button" data-ng="cal">달력 전체</button></span></h3>' +
-    '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd">';
-  for (var d = st; d <= en; d = addD(d, 1)) {
-    var l = onDay(d, L), w = P(d).getDay(), hl = hol(d), mx = 3;
-    h += '<button type="button" data-hcd="' + d + '" class="' + (d.slice(0, 7) !== b ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (w === 0 || hl ? 'su ' : w === 6 ? 'sa ' : '') + (d < TODAY ? 'pa' : '') + '"><span class="dn"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</span>' +
-      l.slice(0, l.length > mx ? mx - 1 : mx).map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + '" style="--c:' + e.file.color + '"><i></i><em>' + esc(e.file.short) + ' ' + esc(e.t) + '</em></span>'; }).join('') +
-      (l.length > mx ? '<span class="evm">+' + (l.length - mx + 1) + '</span>' : '') + '</button>';
+    '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd gl">';
+  for (var ws = st; ws <= en; ws = addD(ws, 7)) {
+    var days = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return addD(ws, i); });
+    var cls = function (d) { var w = P(d).getDay(), hl = hol(d); return (d.slice(0, 7) !== b ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (w === 0 || hl ? 'su ' : w === 6 ? 'sa ' : '') + (d < TODAY ? 'pa' : ''); };
+    var WE = L.filter(function (e) { return e.d >= days[0] && e.d <= days[6]; }), lanes = [];
+    WE.forEach(function (e) { if (lanes.indexOf(e.f) < 0) lanes.push(e.f); });
+    lanes.sort(function (p, q) { return (RK[p] || '') < (RK[q] || '') ? -1 : 1; });
+    h += '<div class="wk" style="--n:' + lanes.length + '">' + days.map(function (d) { var hl = hol(d); return '<button type="button" class="dh ' + cls(d) + '" data-hcd="' + d + '"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</button>'; }).join('');
+    lanes.forEach(function (fid) {
+      h += days.map(function (d) {
+        var l = WE.filter(function (e) { return e.f === fid && e.d === d; });
+        return '<div class="lc ' + cls(d) + '" data-hcd="' + d + '">' + l.map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + '" style="--c:' + e.file.color + '" title="' + esc(e.file.name + ' · ' + e.t) + '"><i></i><em>' + esc(e.file.short) + ' ' + esc(e.t) + '</em></span>'; }).join('') + '</div>';
+      }).join('');
+    });
+    h += days.map(function (d) { return '<div class="lf ' + cls(d) + '" data-hcd="' + d + '"></div>'; }).join('') + '</div>';
   }
   return h + '</div></div></div>';
 }
@@ -3179,7 +3210,7 @@ function myWeekCard() {
   var c = tot > 3120 ? 'x52' : tot > 2400 ? 'x40' : '', r = 22, cc = 2 * Math.PI * r, pct = W0.length ? ot / W0.length * 100 : 0;
   var ring = '<svg class="wgrg" viewBox="0 0 56 56"><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="#e5e8eb" stroke-width="5"/><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (cc * pct / 100).toFixed(1) + ' ' + cc.toFixed(1) + '" transform="rotate(-90 28 28)"/></svg>';
   var kpi = '<div class="wmk">' +
-    '<div><small>이번 주 근무</small><b class="' + c + '">' + wlHk(tot) + '</b><span class="bar"><i class="' + c + '" style="width:' + Math.min(100, tot / 3120 * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span><span>' + (w ? '근무표 기준 · 선 40시간' : '근태 기록 기준') + '</span></div>' +
+    '<div><small>이번 주 근무</small><b class="' + c + '">' + Math.floor(tot / 60) + '<i>시간</i>' + (tot % 60 ? ' ' + (tot % 60) + '<i>분</i>' : '') + '</b><span class="bar"><i class="' + c + '" style="width:' + Math.min(100, tot / 3120 * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span><span>' + (w ? '근무표 기준 · 선 40시간' : '근태 기록 기준') + '</span></div>' +
     '<div><small>평균 출근</small><b>' + (avg('i') != null ? wlHm(avg('i')) : '–') + '</b><span>' + R.length + '일 기록</span></div>' +
     '<div><small>평균 퇴근</small><b>' + (avg('o') != null ? wlHm(avg('o')) : '–') + '</b><span>' + (R.length ? '가장 늦게 ' + wlHm(R.reduce(function (s, x) { return Math.max(s, x.o); }, 0)) : '기록 없음') + '</span></div>' +
     '<div class="rg">' + ring + '<div><small>정시 퇴근</small><b>' + ot + '<i>/' + W0.length + '일</i></b><span>18:30 전 퇴근</span></div></div></div>';
