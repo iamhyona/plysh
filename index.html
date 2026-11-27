@@ -2193,6 +2193,30 @@ html[data-nav] #cvSeg { display:none !important; }
 /* 모바일 전체 메뉴: 하위 없는 대메뉴는 바로 가는 큰 글자 (hm258) */
 #nfm .col.c1 > b { font-size:18px !important; font-weight:600 !important; color:var(--sub) !important; letter-spacing:0; margin:0 !important; padding:9px 0; line-height:1.4; }
 #nfm .col.c1 { padding-top:2px !important; padding-bottom:2px !important; border-top:0 !important; }
+
+/* 근태 월 합계 카드: 그래프형 · 좁게 (hm259) */
+@media (min-width:1024px) { .wls2 { grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)) !important; } }
+.wlc.wlcg { padding:16px 16px 14px; }
+.wlc .wlch { margin-bottom:10px; }
+.wlcps { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.wlcp { display:inline-flex; align-items:center; gap:3px; height:30px; padding:0 11px; border:0; border-radius:999px; background:var(--chip); font:inherit; font-size:12.5px; font-weight:600; color:var(--sub); cursor:pointer; margin:0 !important; }
+.wlcp b { font-size:14px; font-weight:800; color:var(--txt); margin-left:2px; } .wlcp span { margin-left:6px; font-weight:700; color:var(--sub); }
+.wlcp:disabled { cursor:default; opacity:.55; } .wlcp:disabled b { color:var(--faint); }
+.wlgb { border-top:1px solid var(--line); padding-top:12px; margin-top:0; }
+.wlgb .t { margin-bottom:8px; }
+.wgr { display:grid; grid-template-columns:40px minmax(0,1fr) 84px; align-items:center; gap:10px; height:26px; }
+.wgd { font-size:12px; font-weight:600; color:var(--mute); }
+.wgt { position:relative; height:10px; border-radius:5px; background:var(--chip); overflow:visible; }
+.wgt i { position:absolute; left:0; top:0; bottom:0; border-radius:5px; }
+.wgt i.ov { background:#E5484D; border-radius:0 5px 5px 0; }
+.wgt em { position:absolute; top:-3px; bottom:-3px; width:1.5px; background:#9aa0a8; transform:translateX(-50%); } .wgt em.e52 { background:#E5484D; opacity:.6; }
+.wgr b { text-align:right; font-size:13px; font-weight:800; white-space:nowrap; } .wgr b.x52 { color:#E5484D; } .wgr b.x40 { color:var(--txt); }
+.wlc.wlc0 { padding:14px 16px; } .wlc.wlc0 .wlch { margin:0; } .wl0s { font-size:12.5px; color:var(--mute); font-weight:600; }
+
+/* 2026-11-27 실장님: 카드 왼쪽 색 선 금지 — 색 구분은 이름 앞 동그라미만 (hm259) */
+.hdr .hdc { position:static !important; display:inline-block; width:8px !important; height:8px; border-radius:50%; background:var(--c); margin-right:7px; vertical-align:2px; }
+.hdr .hdn .pjn2 { padding-left:15px; }
+.hmc .ev i { width:6px !important; height:6px; align-self:center !important; border-radius:50% !important; }
 </style>
 </head>
 <body>
@@ -2506,7 +2530,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm258';
+var APP_VER = '20261127hm259';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4640,7 +4664,7 @@ function openHomeDay(d) {
   $('#dyT').innerHTML = mdw(d) + (hl ? '<em class="hwd">' + esc(hl) + '</em>' : '');
   $('#dyB').innerHTML = ord.length ? '<div class="hdl">' + ord.map(function (k) {
     var g = G[k], f = g.f;
-    return '<div class="hdr" style="--c:' + f.color + '"><i class="hdc"></i><div class="hdm"><div class="hdn">' + (me ? '<b class="artb">개인 일정</b>' : artB2(f.name)) + '</div>' +
+    return '<div class="hdr" style="--c:' + f.color + '"><div class="hdm"><div class="hdn">' + (me ? '<b class="artb"><i class="hdc"></i>개인 일정</b>' : artB2(f.name).replace('<b class="artb">', '<b class="artb"><i class="hdc"></i>')) + '</div>' +
       '<ul>' + g.l.map(function (e) { return '<li' + (e.k === '데드라인' || e.k === '공식' ? ' class="dl"' : '') + '>' + (e.k && !me ? '<small>' + esc(e.k) + '</small>' : '') + esc(e.t) + '</li>'; }).join('') + '</ul></div>' +
       (f.url ? '<a class="gsl" href="' + esc(f.url) + '" target="_blank" rel="noopener" title="제작일정 시트 열기" aria-label="제작일정 시트 열기">' + IC_GSH + '</a>' : '') + '</div>';
   }).join('') + '</div>' : '<div class="empty2">' + (me ? '개인 일정이 없어요' : '프로젝트 일정이 없어요') + '</div>';
@@ -6031,7 +6055,12 @@ function renderWl() {
     if (!WT) return '<div class="wlwk"><span class="wl0">근무표 불러오는 중…</span></div>';
     var x = (WT.people || []).filter(function (q) { return q.p === n; })[0];
     if (!x || x.none || x.err) return '<div class="wlwt"><div class="t">주별 근무시간</div><div class="wl0">' + esc(x && x.err ? x.err : WT.err || '근무표에 이 달 탭이 없어요') + '</div></div>';
-    return '<div class="wlwt"><div class="t">주별 근무시간 <small>근무표 기준</small></div>' + (x.weeks || []).map(function (w) { var c = w.over > 0 || w.tot > 52 * 60 ? 'x52' : w.ot > 0 || w.tot > 40 * 60 ? 'x40' : ''; return '<div class="wlw2"><span>' + md(w.s) + ' – ' + md(w.e) + '</span><b class="' + c + '">' + hmK(w.tot) + (c ? '<em>' + (c === 'x52' ? '52시간 초과' : '40시간 초과') + '</em>' : '') + '</b></div>'; }).join('') + '</div>';
+    // 2026-11-27 실장님: 숫자 나열 말고 그래프 — 주마다 가로 막대, 40 · 52시간 선, 52 넘은 부분은 빨강
+    var MX = 72 * 60, pc = function (v) { return (Math.min(v, MX) / MX * 100).toFixed(1) + '%'; };
+    return '<div class="wlwt wlgb"><div class="t">주별 근무시간 <small>근무표 기준 · 선 40 · 52시간</small></div>' + (x.weeks || []).map(function (w) {
+      var t = +w.tot || 0, c = t > 52 * 60 ? 'x52' : t > 40 * 60 ? 'x40' : '';
+      return '<div class="wgr"><span class="wgd">' + md(w.s) + '</span><span class="wgt"><i style="width:' + pc(Math.min(t, 52 * 60)) + ';background:' + dcol(n) + '"></i>' + (t > 52 * 60 ? '<i class="ov" style="left:' + pc(52 * 60) + ';width:' + (parseFloat(pc(t)) - parseFloat(pc(52 * 60))).toFixed(1) + '%"></i>' : '') + '<em style="left:' + pc(40 * 60) + '"></em><em class="e52" style="left:' + pc(52 * 60) + '"></em></span><b class="' + c + '">' + (t ? hmK(t) : '–') + '</b></div>';
+    }).join('') + '</div>';
   };
   var apBtn = function (n) {
     var x = WT && (WT.people || []).filter(function (q) { return q.p === n; })[0]; if (!x || x.none || x.err) return '';
@@ -6040,9 +6069,11 @@ function renderWl() {
   };
   h += '<div class="wlsh">' + m + '월 합계</div><div class="wls2">' + (wp ? [wp] : T).map(function (n) {
     var L = M.filter(function (r) { return r.p === n; }), c = function (k) { return L.filter(function (r) { return r[k]; }).length; }, fare = L.reduce(function (a, r) { return a + (+r.fare || 0); }, 0);
-    return '<div class="wlc"><div class="wlch"><b><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</b>' + apBtn(n) + '</div><div class="wlst">' +
-      '<button data-wls="' + esc(n) + '|fd"' + (c('fd') ? '' : ' disabled') + '><small>야근식사</small><b>' + c('fd') + '<em>건</em></b></button>' +
-      '<button data-wls="' + esc(n) + '|tx"' + (c('tx') ? '' : ' disabled') + '><small>야근택시</small><b>' + c('tx') + '<em>건</em></b>' + (fare ? '<span>' + won(fare) + '원</span>' : '') + '</button></div>' + (wv === 'g' ? '' : wtRow(n)) + '</div>';
+    var wx = WT && (WT.people || []).filter(function (q) { return q.p === n; })[0], noWk = WT && (!wx || wx.none || wx.err || !(wx.weeks || []).some(function (w) { return +w.tot > 0; }));
+    var chip = function (k, lb, extra) { var v = c(k); return '<button class="wlcp" data-wls="' + esc(n) + '|' + k + '"' + (v ? '' : ' disabled') + '>' + lb + ' <b>' + v + '</b>건' + (extra || '') + '</button>'; };
+    var chips = '<div class="wlcps">' + chip('fd', '야근식사') + chip('tx', '야근택시', fare ? '<span>' + won(fare) + '원</span>' : '') + '</div>';
+    if (noWk && !c('fd') && !c('tx')) return '<div class="wlc wlc0"><div class="wlch"><b><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</b><span class="wl0s">' + (wx && wx.none ? '근무표에 이 달 탭이 없어요' : '이번 달 기록 없음') + '</span></div></div>';
+    return '<div class="wlc wlcg"><div class="wlch"><b><i style="background:' + dcol(n) + '"></i>' + esc(n) + '</b>' + apBtn(n) + '</div>' + chips + (wv === 'g' ? '' : wtRow(n)) + '</div>';
   }).join('') + '</div>';
   $('#main').innerHTML = h;
   $$('[data-wls]').forEach(function (b) { b.onclick = function () { var a = b.dataset.wls.split('|'); openWlList(a[0], a[1], first, last); }; });
