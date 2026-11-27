@@ -2367,7 +2367,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm244';
+var APP_VER = '20261127hm245';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3303,7 +3303,21 @@ function navGo(k) {
   if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'tools') { S.spk = 'tool'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'cal' ? 'proj' : k === 'sched' ? 'proj' : (ls.get('d4:cv') || 'proj'); if (k === 'cal') { S.pjm = 'd'; ls.set('d4:pjm', 'd'); } ls.set('d4:cv', S.cv); k = 'month'; }
+  menuReset(k);
   S.view = k; if (k !== 'refs') ls.set('d4:view', k); window.scrollTo(0, 0); render();
+}
+// 2026-11-27 실장님: 메뉴를 다시 누르면 늘 그 메뉴의 첫 화면 — 고른 사람·보기(그래프 등)·달·검색·수정 중 상태를 비움 (프로젝트 선택 필터 S.off는 홈과 함께 쓰므로 그대로)
+function menuReset(k) {
+  var y = +TODAY.slice(0, 4), m = +TODAY.slice(5, 7);
+  try {
+    if (k === 'wl') { ls.set('d4:wlp', ''); ls.set('d4:wlv', 'c'); S.wy = y; S.wm = m; }
+    if (k === 'todo') { ls.set('d4:tp', ''); S.tdp = 'd'; ls.set('d4:tdp', 'd'); S.tdd = TODAY; S.tdEdit = null; }
+    if (k === 'month') { S.y = y; S.m = m; S.sel = null; }
+    if (k === 'pj' || k === 'sheets') { S.gq = ''; S.ga = ''; S.gy = ''; }
+    if (k === 'exp' && S.ex) { S.ex.p = ''; S.ex.ym = ''; ls.set('d4:exp', ''); }
+    if (k === 'ct') { ls.set('d4:ctk', ''); S.ctq = ''; }
+    if (k === 'logo' && typeof LG !== 'undefined') { LG.tab = 'all'; LG.q = ''; ls.set('d4:lgtab', 'all'); }
+  } catch (x) {}
 }
 function navClose() { document.documentElement.style.overflow = ''; ['#npl', '#nmg', '#nbd', '#nfm', '#nfb'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
 function navEl(id, tag, where, html) { var e = document.getElementById(id); if (!e) { e = document.createElement(tag || 'div'); e.id = id; where(e); } if (html != null) e.innerHTML = html; return e; }
