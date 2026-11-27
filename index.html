@@ -1357,6 +1357,16 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
 .tdcard.tdall { grid-column:1 / -1; }
+/* 2026-11-27 실장님: 수정 모드에서도 손잡이로 순서 바꾸기 */
+.tdei .tdgrip { flex:none; align-self:center; width:30px; height:36px; display:flex; align-items:center; justify-content:center; color:var(--faint); cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; border-radius:8px; }
+.tdei .tdgrip svg { width:16px; height:16px; } .tdei .tdgrip:hover { color:var(--sub); background:var(--chip); }
+.tdei.drag { position:relative; z-index:5; background:var(--card); box-shadow:0 6px 20px rgba(0,0,0,.14); border-radius:12px; }
+@media (max-width:1023px) { .tdei .tdgrip { width:40px; height:44px; color:var(--mute); } }
+
+.tdallck { display:inline-flex; align-items:center; gap:4px; height:26px; padding:0 9px; margin-left:6px; border:0; border-radius:8px; background:var(--chip); color:var(--sub); font:inherit; font-size:12px; font-weight:700; cursor:pointer; touch-action:manipulation; }
+.tdallck svg { width:12px; height:12px; } .tdallck.on { color:var(--mute); }
+.rpi .ck, .rpi .rpt, .tdallck, .wckb button { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+
 .tdrow { grid-column:1 / -1; display:flex; gap:12px; align-items:flex-start; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; margin:0 -40px; padding:0 40px 12px; scroll-padding:0 40px; }
 .tdrow > .tdcard { flex:0 0 340px; scroll-snap-align:start; margin-bottom:0 !important; }
 .tdrow > .tdcard:first-child { flex-basis:380px; }
@@ -2316,7 +2326,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm239';
+var APP_VER = '20261127hm240';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -4380,7 +4390,7 @@ sure($('#edDel'), function () {
 document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#pgW'); if (b) $('#fab').onclick(); });
 function fabOn() { return !(S.view === 'mrep' || S.view === 'gdoc' || S.view === 'glist' || S.view === 'space' || S.view === 'start' || S.view === 'ws' || S.view === 'refs' || S.view === 'guide' || S.view === 'logo' || S.view === 'ct' || isToolView(S.view) || S.view === 'spec' || S.view === 'calc' || S.view === 'tl' || S.view === 'exp' || S.view === 'pj'); }
 $('#fab').onclick = function () {
-  if (S.view === 'todo') return openCompose();
+  if (S.view === 'todo') { var who = ls.get('d4:tp') || hmMe() || team()[0]; return openTdq(who, S.tdp === 'd' && S.tdd ? S.tdd : TODAY); }   // 2026-11-27 실장님: 할 일 추가는 어디서나 새 창 하나로
   if (S.view === 'wl') return openWl(TODAY);
   if (S.view === 'qk') return openQe(null);
   if (S.view === 'home') { var i = $('.tdadd .tdi'); if (i) i.focus(); return; }
@@ -4968,9 +4978,10 @@ function renderTodo() {
   (tp ? [tp] : TT).forEach(function (n) {
     var L = R.filter(function (x) { return x.p === n; });
     h += '<div class="bd tdd tdcard' + (tp ? ' tdall' : '') + '"><div class="bdh"><div>' + '<div class="tdnm">' + (tp ? '<b>' + esc(n) + '</b>' : '<button class="tdwho" data-go="' + esc(n) + '"><b>' + esc(n) + '</b></button>') +
-      (tdCount(L) ? '<span class="tdcn">' + tdCount(L) + ' 완료</span>' : '') + '</div></div>' +
+      (tdCount(L) ? '<span class="tdcn">' + tdCount(L) + ' 완료</span>' : '') +
+      (L.length && S.tdEdit !== n ? (function () { var all = L.every(function (x) { return x.c; }); return '<button type="button" class="tdallck' + (all ? ' on' : '') + '" data-tdall="' + esc(L.map(function (x) { return x.id; }).join('\n')) + '">' + CKSVG + (all ? '전체 풀기' : '전체 완료') + '</button>'; })() : '') + '</div></div>' +
       (L.length ? (S.tdEdit === n ? '<button class="tded on" data-ted="' + esc(n) + '">저장</button>' : '<button class="tded" data-ted="' + esc(n) + '" aria-label="편집"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>') : '') + '</div>' +
-      (S.tdEdit === n ? tdEditList(L) + '<div class="tdnewp">새 프로젝트 · 할 일 추가</div>' + tdAddRow('데일리', one ? S.tdd : TODAY, n) : '<div class="tdl">' + (one ? list(L) : byDate(L)) + '</div>' + '<button type="button" class="tdqb" data-tdq="' + esc(n) + '|' + (one ? S.tdd : TODAY) + '">' + IC_PS + '할 일 추가</button>') + '</div>';
+      (S.tdEdit === n ? tdEditList(L) + '<button type="button" class="tdqb" data-tdq="' + esc(n) + '|' + (one ? S.tdd : TODAY) + '">' + IC_PS + '할 일 추가</button>' : '<div class="tdl">' + (one ? list(L) : byDate(L)) + '</div>' + '<button type="button" class="tdqb" data-tdq="' + esc(n) + '|' + (one ? S.tdd : TODAY) + '">' + IC_PS + '할 일 추가</button>') + '</div>';
   });
   if (!tp) h += '</div>';
   var y0 = window.scrollY;
@@ -4986,6 +4997,7 @@ function renderTodo() {
   $$('[data-go]').forEach(function (b) { b.onclick = function () { ls.set('d4:tp', b.dataset.go); window.scrollTo(0, 0); render(); }; });
   $$('[data-ted]').forEach(function (b) { b.onmousedown = function (e) { e.preventDefault(); }; b.onclick = function () { var a = document.activeElement; if (a && a.closest && a.closest('.tdei')) a.blur(); S.tdEdit = S.tdEdit === b.dataset.ted ? '' : b.dataset.ted; render(); }; });
   bindTdEdit(); bindTdDrag();
+  $$('[data-tdall]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); tdAllCk(b.dataset.tdall.split('\n')); }; });
   $$('[data-tdq]').forEach(function (b) { b.onclick = function () { var a = b.dataset.tdq.split('|'); openTdq(a[0], a[1]); }; });
   $$('[data-pst]').forEach(function (b) { b.onclick = function () { var a = b.dataset.pst.split('|'); openPaste({ d: a[0], p: a[1] }); }; });
   if ($('#tdPaste')) $('#tdPaste').onclick = function () { openPaste(); };
@@ -5039,27 +5051,34 @@ function tdPaint(id, c) {
   $$('[data-tdrow="' + id + '"]').forEach(function (el) { el.classList.toggle('done', c); });
   var r = (S.D.rep || []).filter(function (y) { return y.r === id; })[0], x = tdFind(id); if (r && x) r.s = c ? '완료' : (tdWait(x) ? '대기' : '진행');
 }
-function tdToggle(id) {
+// 2026-11-27 실장님: 체크가 느림 → 누르는 즉시 화면만 바꾸고, 시트 저장은 뒤에서 한 줄씩 차례로 (응답 올 때마다 화면 전체를 다시 그리지 않고 다 끝나면 한 번만)
+var TDQ = [], TDQ_RUN = false, TDQ_RES = null, TDQ_T = 0;
+function tdToggle(id, want) {
   var x = tdFind(id); if (!x || x.tmp) return;
-  x.c = !x.c;
+  x.c = want == null ? !x.c : !!want;
   var nw = new Date(); x.ct = x.c ? nw.getFullYear() + '-' + pad(nw.getMonth() + 1) + '-' + pad(nw.getDate()) + ' ' + pad(nw.getHours()) + ':' + pad(nw.getMinutes()) : '';
   tdPaint(id, x.c); TD_PEND[id] = x.c;
-  if (!TD_SEND[id]) tdSend(id);
+  if (TDQ.indexOf(id) < 0) TDQ.push(id);
+  clearTimeout(TDQ_T); TDQ_T = setTimeout(function () { if (S.view === 'todo' || S.view === 'start') render(); }, 450);   // 완료 개수 등은 손을 멈춘 뒤 한 번만
+  if (!TDQ_RUN) tdRun();
 }
-function tdSend(id) {
-  var x = tdFind(id); if (!x) { delete TD_PEND[id]; return; }
+function tdRun() {
+  if (!TDQ.length) { TDQ_RUN = false; var r = TDQ_RES; TDQ_RES = null; if (!r || !tdMerge(r)) saveCache(); return; }
+  TDQ_RUN = true;
+  var id = TDQ.shift(), x = tdFind(id); if (!x || !(id in TD_PEND)) return tdRun();
   var want = TD_PEND[id]; TD_SEND[id] = 1;
   call('appTodoEdit', S.pin, { id: x.id, old: { d: x.d, p: x.p, t: x.t }, c: want })
-    .then(function (res) {
-      delete TD_SEND[id]; if (TD_PEND[id] === want) delete TD_PEND[id];
-      if (!tdMerge(res)) saveCache();
-      if (id in TD_PEND) tdSend(id);
-    })
-    .catch(function (e) {
-      delete TD_SEND[id]; delete TD_PEND[id];
-      var y = tdFind(id); if (y) { y.c = !want; tdPaint(id, y.c); }
-      toast(errMsg(e));
-    });
+    .then(function (res) { delete TD_SEND[id]; if (TD_PEND[id] === want) delete TD_PEND[id]; else if (TDQ.indexOf(id) < 0) TDQ.push(id); if (res) TDQ_RES = res; })
+    .catch(function (e) { delete TD_SEND[id]; delete TD_PEND[id]; var y = tdFind(id); if (y) { y.c = !want; tdPaint(id, y.c); } toast(errMsg(e)); })
+    .then(tdRun);
+}
+function tdSend(id) { if (TDQ.indexOf(id) < 0) TDQ.push(id); if (!TDQ_RUN) tdRun(); }
+// 카드의 '전체 완료' — 그 카드에 보이는 할 일을 한 번에 체크(이미 다 했으면 한 번에 풀기)
+function tdAllCk(ids) {
+  var L = ids.map(tdFind).filter(function (x) { return x && !x.tmp; }); if (!L.length) return;
+  var on = L.some(function (x) { return !x.c; });
+  L.forEach(function (x) { if (!!x.c !== on) tdToggle(x.id, on); });
+  toast(on ? L.length + '개 모두 완료로 표시했어요' : '완료 표시를 모두 풀었어요');
 }
 // 업무보고(데일리) 체크도 같은 시트를 고치도록
 toggleDone = function (r) {
@@ -6832,15 +6851,15 @@ $('#wl1S').onclick = function () {
 function tdEditList(L) {
   // 수정 모드: 프로젝트(합친 이름)별로 묶고, 묶음마다 맨 아래 '할 일 추가' 칸 (2026-10-20)
   var G = [], M = {};
-  L.slice().sort(function (a, b) { var aj = a.j ? sgFix(a.j) : '', bj = b.j ? sgFix(b.j) : ''; return a.d < b.d ? -1 : a.d > b.d ? 1 : (tdPjIdx(aj) - tdPjIdx(bj)) || aj.localeCompare(bj, 'ko') || (rid(a.id) - rid(b.id)); }).forEach(function (x) {
+  L.slice().sort(function (a, b) { var aj = a.j ? sgFix(a.j) : '', bj = b.j ? sgFix(b.j) : ''; return a.d < b.d ? -1 : a.d > b.d ? 1 : (tdPjIdx(aj) - tdPjIdx(bj)) || aj.localeCompare(bj, 'ko') || (tdoRank(a) - tdoRank(b)) || (rid(a.id) - rid(b.id)); }).forEach(function (x) {
     var j = x.j ? sgFix(x.j) : '', k = x.d + '|' + x.p + '|' + j;
     if (!M[k]) { M[k] = { d: x.d, p: x.p, j: j, k: x.k, L: [] }; G.push(M[k]); }
     M[k].L.push(x);
   });
   return '<div class="tdel">' + G.map(function (g) {
     return '<div class="tdpj" style="color:' + (g.j ? dcol(g.p) : 'var(--mute)') + '">' + esc(g.j || '기타') + '</div>' +
-      g.L.map(function (x) { return '<div class="tdei" data-tei="' + esc(x.id) + '"><input value="' + esc(x.t) + '" maxlength="120"><button class="tdex" aria-label="삭제">' + IC_X + '</button></div>'; }).join('') +
-      '<div class="tdea" data-d="' + esc(g.d) + '" data-p="' + esc(g.p) + '" data-j="' + esc(g.j) + '" data-k="' + esc(g.k) + '"><input placeholder="+ 할 일 추가" maxlength="120" enterkeyhint="done"></div>';
+      g.L.map(function (x) { return '<div class="tdei" data-tei="' + esc(x.id) + '"><input value="' + esc(x.t) + '" maxlength="120"><button class="tdex" aria-label="삭제">' + IC_X + '</button>' + (x.tmp ? '' : '<span class="tdgrip" data-tdo="' + esc(tdoKey(x)) + '" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>') + '</div>'; }).join('') +
+      '';   // 2026-11-27 실장님: 묶음마다 있던 한 줄 추가 칸은 빼고 아래 '할 일 추가' 창 하나로
   }).join('') + '</div>';
 }
 // 같은 프로젝트 묶음(제목 줄 사이) 안에서만 위아래로 옮김 · 마우스·손가락 둘 다
@@ -6848,23 +6867,23 @@ function bindTdDrag() {
   $$('.tdgrip').forEach(function (g) {
     g.onpointerdown = function (ev) {
       if (ev.button > 0) return; ev.preventDefault();
-      var row = g.closest('.rpi'), par = row.parentNode, grp = [], n = row;
-      while (n.previousElementSibling && n.previousElementSibling.classList.contains('rpi')) n = n.previousElementSibling;
-      for (; n && n.classList.contains('rpi'); n = n.nextElementSibling) grp.push(n);
+      var row = g.closest('.rpi, .tdei'), RC = row.classList.contains('tdei') ? 'tdei' : 'rpi', par = row.parentNode, grp = [], n = row;
+      while (n.previousElementSibling && n.previousElementSibling.classList.contains(RC)) n = n.previousElementSibling;
+      for (; n && n.classList.contains(RC); n = n.nextElementSibling) grp.push(n);
       if (grp.length < 2) return;
       var y0 = ev.clientY, moved = false; row.classList.add('drag'); try { g.setPointerCapture(ev.pointerId); } catch (x) {}
       g.onpointermove = function (e) {
         var dy = e.clientY - y0; if (Math.abs(dy) > 3) moved = true;
         row.style.transform = 'translateY(' + dy + 'px)';
         var prev = row.previousElementSibling, next = row.nextElementSibling, r = row.getBoundingClientRect(), mid = r.top + r.height / 2;
-        if (next && next.classList.contains('rpi') && mid > next.getBoundingClientRect().top + next.offsetHeight / 2) { var h = next.offsetHeight; par.insertBefore(next, row); y0 += h; row.style.transform = 'translateY(' + (e.clientY - y0) + 'px)'; }
-        else if (prev && prev.classList.contains('rpi') && mid < prev.getBoundingClientRect().top + prev.offsetHeight / 2) { var h2 = prev.offsetHeight; par.insertBefore(row, prev); y0 -= h2; row.style.transform = 'translateY(' + (e.clientY - y0) + 'px)'; }
+        if (next && next.classList.contains(RC) && mid > next.getBoundingClientRect().top + next.offsetHeight / 2) { var h = next.offsetHeight; par.insertBefore(next, row); y0 += h; row.style.transform = 'translateY(' + (e.clientY - y0) + 'px)'; }
+        else if (prev && prev.classList.contains(RC) && mid < prev.getBoundingClientRect().top + prev.offsetHeight / 2) { var h2 = prev.offsetHeight; par.insertBefore(row, prev); y0 -= h2; row.style.transform = 'translateY(' + (e.clientY - y0) + 'px)'; }
       };
       g.onpointerup = g.onpointercancel = function () {
         g.onpointermove = g.onpointerup = g.onpointercancel = null; row.classList.remove('drag'); row.style.transform = '';
         if (!moved) return;
-        var keys = []; n = row; while (n.previousElementSibling && n.previousElementSibling.classList.contains('rpi')) n = n.previousElementSibling;
-        for (; n && n.classList.contains('rpi'); n = n.nextElementSibling) { var k = n.querySelector('[data-tdo]'); if (k) keys.push(k.dataset.tdo); }
+        var keys = []; n = row; while (n.previousElementSibling && n.previousElementSibling.classList.contains(RC)) n = n.previousElementSibling;
+        for (; n && n.classList.contains(RC); n = n.nextElementSibling) { var k = n.querySelector('[data-tdo]'); if (k) keys.push(k.dataset.tdo); }
         tdoSave(keys);
       };
     };
