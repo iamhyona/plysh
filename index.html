@@ -1853,7 +1853,7 @@ html[data-nav] #cvSeg { display:none !important; }
 .mrlg span { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
 .mrlg i { width:10px; height:10px; border-radius:3px; background:var(--pc); display:block; }
 .mrlg i.we { background:color-mix(in srgb, var(--pc) 30%, #fff); }
-.mrlg i.tk { width:3px; height:12px; border-radius:2px; background:#8b95a1; } .mrlg i.tk.of { background:var(--txt); height:14px; width:4px; } .mrlg i.tk.dl { background:#f04452; }
+.mrlg i.tk { width:3px; height:12px; border-radius:2px; background:#8b95a1; } .mrlg i.tk.of { background:var(--txt); height:14px; width:4px; } .mrlg i.tk.dl { background:#4e5968; height:13px; }
 .mrlg i.nw { width:0; height:12px; border-left:1px dashed #8b95a1; border-radius:0; background:none; }
 .mrlg .nx { color:var(--faint); }
 /* 디자이너별 */
@@ -1891,7 +1891,7 @@ html[data-nav] #cvSeg { display:none !important; }
 .mrgr .tk .sp { position:absolute; top:10px; height:4px; border-radius:2px; opacity:.3; }
 .mrgr .tk .ev { position:absolute; top:6px; width:3px; height:12px; margin-left:-1.5px; border-radius:2px; background:var(--c); }
 .mrgr .tk .ev.of { top:3px; height:18px; width:4px; margin-left:-2px; background:var(--txt); }
-.mrgr .tk .ev.dl { background:#f04452; }
+.mrgr .tk .ev.dl { background:#4e5968; top:4px; height:16px; }
 .mrgr .tk .now { position:absolute; top:-2px; bottom:-2px; border-left:1px dashed #8b95a1; }
 .mrgr > em { font-style:normal; font-size:12px; font-weight:700; color:var(--mute); text-align:right; font-variant-numeric:tabular-nums; }
 /* 근태 */
@@ -1908,8 +1908,8 @@ html[data-nav] #cvSeg { display:none !important; }
 .mrwk .r { display:grid; grid-template-columns:92px minmax(0, 1fr) 48px; gap:10px; align-items:center; }
 .mrwk .r > span { font-size:12.5px; font-weight:600; color:var(--mute); white-space:nowrap; font-variant-numeric:tabular-nums; }
 .mrwk .t { position:relative; height:14px; border-radius:7px; background:#f2f4f6; }
-.mrwk .t i { position:absolute; left:0; top:0; bottom:0; border-radius:7px; background:color-mix(in srgb, var(--pc) 70%, #fff); display:block; }
-.mrwk .t i.x52 { background:#4e5968; }
+.mrwk .t i { position:absolute; left:0; top:0; bottom:0; border-radius:7px; background:#b0b8c1; display:block; }
+.mrwk .t i.x52 { background:#191f28; }
 .mrwk .r > b { font-size:13px; font-weight:800; text-align:right; font-variant-numeric:tabular-nums; } .mrwk .r > b.x52 { color:#191f28; }
 .mrwk .gx .t { background:none; height:16px; }
 .mrwk .gx em { position:absolute; top:0; height:16px; border-left:1px dashed #b0b8c1; }
@@ -1923,7 +1923,7 @@ html[data-nav] #cvSeg { display:none !important; }
 .mrhl b { font-size:20px; font-weight:800; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .mrhl span { font-size:12.5px; color:var(--sub); line-height:1.45; overflow:hidden; text-overflow:ellipsis; }
 /* 월간리포트 2차 (2026-11-27): 대표 배너 · 누적 활동 · 요일별 · 농도 달력 · 도넛 · 퇴근 시각 분포 */
-.mrhero { border-radius:24px; padding:28px; color:#fff; background:linear-gradient(135deg, var(--pc) 0%, color-mix(in srgb, var(--pc) 72%, #191f28) 100%); display:grid; gap:24px; }
+.mrhero { border-radius:24px; padding:28px; color:#fff; background:linear-gradient(135deg, #191f28 0%, #3d4550 100%); display:grid; gap:24px; }
 @media (min-width:1500px) { .mrhero { grid-template-columns:minmax(0, 0.8fr) minmax(0, 2fr); align-items:center; } }
 @media (max-width:759px) { .mrhero { padding:22px 20px; border-radius:20px; } }
 .mrhh { display:flex; flex-direction:column; gap:6px; min-width:0; }
@@ -1967,7 +1967,7 @@ html[data-nav] #cvSeg { display:none !important; }
 .mrhm .gd .l3, .mrlg .hl.l3 { background:color-mix(in srgb, var(--pc) 52%, #fff); }
 .mrhm .gd .l4, .mrlg .hl.l4 { background:color-mix(in srgb, var(--pc) 75%, #fff); }
 .mrhm .gd .l5, .mrlg .hl.l5 { background:var(--pc); }
-.mrhm .gd .l4 b, .mrhm .gd .l4 em, .mrhm .gd .l5 b, .mrhm .gd .l5 em { color:#fff; }
+.mrhm .gd .l3 b, .mrhm .gd .l3 em, .mrhm .gd .l4 b, .mrhm .gd .l4 em, .mrhm .gd .l5 b, .mrhm .gd .l5 em { color:#fff; }
 .mrhm .gd .td { box-shadow:inset 0 0 0 2px var(--txt); }
 @media (max-width:420px) { .mrhm .gd span em { display:none; } }
 .mrdw { display:flex; flex-wrap:wrap; gap:20px; align-items:center; }
@@ -2279,7 +2279,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm232';
+var APP_VER = '20261127hm233';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -5735,7 +5735,7 @@ function renderMrep() {
   wlMeInit();
   S.mry = S.mry || +TODAY.slice(0, 4); S.mrm = S.mrm || +TODAY.slice(5, 7);
   var y = S.mry, m = S.mrm, T = team(), p = ls.get('d4:mrp') || ''; if (p && T.indexOf(p) < 0) p = '';
-  var pc = p ? dcol(p) : '#f04452', ymK = y + '-' + pad(m), isCur = TODAY.slice(0, 7) === ymK;
+  var pc = '#191f28', ymK = y + '-' + pad(m), isCur = TODAY.slice(0, 7) === ymK;
   var py = m === 1 ? y - 1 : y, pm = m === 1 ? 12 : m - 1;
   var A = mrpStat(y, m, p), B = mrpStat(py, pm, p), WT = wtLoad(ymK, 'mrep');
   var cnt = function (n) { return n + '건'; };
@@ -5786,10 +5786,10 @@ function renderMrep() {
     '</div><div class="mrbx">' + A.days.map(function (d) { var n = P(d).getDate(), w = P(d).getDay(); return '<span>' + (w === 1 || (n === 1 && w !== 0 && w !== 6) ? n : '') + '</span>'; }).join('') + '</div><div class="mrlg"><span><i></i>평일</span><span><i class="we"></i>주말 · 휴일</span><span class="nx">숫자는 날짜 · 월요일마다</span></div></div>' + heat + '</div>';
   // 2) 디자이너별 (팀 전체) 또는 프로젝트별 비중
   var PJ = {}, PO = []; A.td.concat(A.rp).forEach(function (x) { if (!x.j) return; var q = pinfo(sgFix(x.j)), k = pnorm(q.name); if (!PJ[k]) { PJ[k] = { n: q.name, c: q.color, v: 0 }; PO.push(PJ[k]); } PJ[k].v++; });
-  PO.sort(function (a, b) { return b.v - a.v; }); var pall = PO.reduce(function (s, o) { return s + o.v; }, 0), top = PO.slice(0, 6), rest = PO.slice(6).reduce(function (s, o) { return s + o.v; }, 0);
-  if (rest) top.push({ n: '그 밖 ' + (PO.length - 6) + '개', c: '#c9cdd2', v: rest });
+  PO.sort(function (a, b) { return b.v - a.v; }); var GR = ['#191f28', '#3d4550', '#5f6b78', '#8b95a1', '#b0b8c1', '#d1d6db']; PO.forEach(function (o, i) { o.c = GR[Math.min(i, GR.length - 1)]; }); var pall = PO.reduce(function (s, o) { return s + o.v; }, 0), top = PO.slice(0, 6), rest = PO.slice(6).reduce(function (s, o) { return s + o.v; }, 0);
+  if (rest) top.push({ n: '그 밖 ' + (PO.length - 6) + '개', c: '#e5e8eb', v: rest, x: 1 });
   var share = '<div class="mrc"><div class="mrt">프로젝트별 업무 비중<small>할 일 + 업무보고</small></div>' + (pall ? '<div class="mrdw">' + mrpDonut(top, pall, pall, '건') + '<div class="mrsl">' +
-    top.map(function (o) { return '<div><i style="background:' + o.c + '"></i><span>' + artB(o.n) + '</span><b>' + Math.round(o.v / pall * 100) + '%</b><em>' + o.v + '건</em></div>'; }).join('') + '</div></div>' : '<div class="mr0">프로젝트가 적힌 할 일 · 업무보고가 없어요</div>') + '</div>';
+    top.map(function (o) { return '<div><i style="background:' + o.c + '"></i><span>' + (o.x ? esc(o.n) : artB(o.n)) + '</span><b>' + Math.round(o.v / pall * 100) + '%</b><em>' + o.v + '건</em></div>'; }).join('') + '</div></div>' : '<div class="mr0">프로젝트가 적힌 할 일 · 업무보고가 없어요</div>') + '</div>';
   if (!p) {
     var PS = T.map(function (n) { var td = A.td.filter(function (x) { return x.p === n; }), rp = A.rp.filter(function (r) { return r.p === n; }), i = A.T.indexOf(n), m0 = A.WD[i].reduce(function (s, x) { return s + (x ? x.m : 0); }, 0); return { n: n, td: td.length, tc: td.filter(function (x) { return x.c; }).length, rp: rp.length, m: m0 }; });
     var mxA = Math.max(1, Math.max.apply(null, PS.map(function (o) { return o.td + o.rp; }))), mxM = Math.max(1, Math.max.apply(null, PS.map(function (o) { return o.m; })));
@@ -5806,9 +5806,9 @@ function renderMrep() {
   var kAll = A.ev.length, kL = KN.concat(['기타']).filter(function (k) { return KC[k]; });
   var tdx = isCur ? '<em class="now" style="left:' + X(TODAY) + '%"></em>' : '';
   var gantt = '<div class="mrc mrgt"><div class="mrt">제작일정<small>' + (p ? '맡은 프로젝트 · ' : '') + '소속사 일정 빼고 ' + kAll + '건 · 프로젝트 ' + FO.length + '개</small></div>' +
-    (kAll ? '<div class="mrkd">' + kL.map(function (k) { return '<span><i style="background:' + (KIND[k] || '#c9cdd2') + '"></i>' + k + '<b>' + KC[k] + '</b></span>'; }).join('') + '</div>' +
+    (kAll ? '<div class="mrkd">' + kL.map(function (k) { return '<span><i style="background:' + ({ '디자인': '#8b95a1', '리터칭': '#b0b8c1', '데드라인': '#4e5968', '공식': '#191f28' }[k] || '#d1d6db') + '"></i>' + k + '<b>' + KC[k] + '</b></span>'; }).join('') + '</div>' +
       '<div class="mrgw"><div class="mrgh"><span></span><div>' + A.days.map(function (d) { var n = P(d).getDate(), w = P(d).getDay(); return '<span style="left:' + X(d) + '%">' + (w === 1 || (n === 1 && w !== 0 && w !== 6) ? n : '') + '</span>'; }).join('') + '</div></div>' +
-      FO.map(function (o) { var a = o.E[0].d, b = o.E[o.E.length - 1].d, c = o.f.color;
+      FO.map(function (o) { var a = o.E[0].d, b = o.E[o.E.length - 1].d, c = '#8b95a1';
         return '<button type="button" class="mrgr" data-mrf="' + esc(o.f.id) + '"><span class="nm">' + artB(o.f.name) + '</span><div class="tk">' + tdx +
           '<i class="sp" style="left:' + X(a) + '%;width:calc(' + (X(b) - X(a)).toFixed(2) + '% + 2px);background:' + c + '"></i>' +
           o.E.map(function (e) { return '<i class="ev' + (e.k === '공식' ? ' of' : e.k === '데드라인' ? ' dl' : '') + '" style="left:' + X(e.d) + '%;--c:' + c + '" title="' + mrpMd(e.d) + ' ' + esc(e.t) + '"></i>'; }).join('') + '</div><em>' + o.E.length + '</em></button>'; }).join('') +
