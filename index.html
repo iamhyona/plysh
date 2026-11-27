@@ -2660,7 +2660,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm276';
+var APP_VER = '20261127hm277';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3645,7 +3645,7 @@ var SPACES = [
   { k: 'wlm', t: '근태 작성', d: '출퇴근 · 휴가 · 업무 기록', home: 'wl', ic: 'clock', g: [] },
   { k: 'pjm', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [] },
   { k: 'calm', t: '캘린더', d: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로', home: 'cal', ic: 'cal', g: [] },
-  { k: 'tdm', t: '투두리스트', d: '팀 공지와 프로젝트별 할 일', home: 'todo', ic: 'todo', g: [] },
+  { k: 'tdm', t: '투두리스트', d: '프로젝트별 할 일', home: 'todo', ic: 'todo', g: [] },
   { k: 'qkm', t: '퀵 배차', d: '카카오 T 퀵 주문 · 거래처 주소와 연락처', home: 'qk', ic: 'truck', g: [] },
   { k: 'expm', t: '지출 결의서 작성', d: '지출결의서 작성 · 목록', home: 'exp', ic: 'won', g: [] },   // 2026-11-27 실장님: 돈 아이콘
   // 2026-11-27 실장님: 도구의 지류 · MD · 디자인을 대메뉴로 (지류도우미 · MD도우미 · 디자인도우미), 공통은 도구에 그대로
@@ -4323,7 +4323,7 @@ function crumbHtml() {
   return esc(sp.t) + sep + '<b>' + esc(it ? it.ct || it.t : cur === 'spec' ? '사양서' : sp.t) + '</b>';
 }
 var PG_DESC = { mrep: '팀 활동 · 업무 · 근태를 한 달 단위로 · 소속사 일정은 빼고 집계',
-  todo: '팀 공지와 프로젝트별 할 일', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
+  todo: '프로젝트별 할 일', wl: '출퇴근 · 휴가 · 업무 기록', exp: '지출결의서 작성 · 목록', pj: '아티스트 · 연도로 찾기', month: '모든 프로젝트 일정 달력', cal: '모든 프로젝트 일정을 달력으로', sched: '프로젝트별 일정표', spec: '프로젝트 사양서',
   review: '인쇄 전 PDF · AI · JPG · PNG 검수, 사양서 검수', doc: '품목을 모아 MASTER 양식 순서로 복사 · 이 기기에 저장돼요', formly: '상품 후면 표시사항 문구와 케어 · 주의 · 원산지 같은 부착 라벨 정리',
   spine: '쪽수 · 종이 · 제본으로 책등 두께와 표지 펼친 크기', unit: 'mm · cm · m · in · ft · yd · pt · pc · Q · px를 한 번에 바꿔요 · px는 해상도(ppi)를 골라서', cut: '완성 크기나 칼선 형태를 넣으면 원판마다 몇 개 앉는지, 몇 장(몇 연) 필요한지 비교해요 · 46전 788×1091 · 국전 636×939 · 아크릴 335×235', die: '형태 고르고 크기 넣으면 대략 전개도 · 절수 · 일러스트용 파일',
   impose: 'PDF를 올리면 인쇄 판에 페이지가 앉는 모양과 같은 판에 찍히는 페이지를 보여줘요', filename: '규칙에 맞는 파일명 · 작업폴더명 · 하위폴더명 복사',
@@ -5608,7 +5608,8 @@ function renderTodo() {
   // 2026-11-27 실장님: 전체 보기 = 내 할 일이 맨 앞, 나머지 사람은 옆으로 나란히 (가로 스크롤)
   var me0 = hmMe(), TT = me0 && T.indexOf(me0) >= 0 ? [me0].concat(T.filter(function (n) { return n !== me0; })) : T;
   // 2026-11-27 실장님: 팀 공지는 위 큰 상자가 아니라 가로 카드 줄의 맨 왼쪽 카드 (공지 → 내 할 일 → 다른 사람)
-  if (!tp) h += '<div class="tdrow"><div class="bd tdcard tdnt">' + ntHtml() + '</div>';
+  // 2026-11-27 23:45 실장님: 투두리스트에서 팀 공지 카드는 없앰 (내 할 일 → 다른 사람)
+  if (!tp) h += '<div class="tdrow">';
   (tp ? [tp] : TT).forEach(function (n) {
     var L = R.filter(function (x) { return x.p === n; });
     h += '<div class="bd tdd tdcard' + (tp ? ' tdall' : '') + '"><div class="bdh"><div>' + '<div class="tdnm">' + (tp ? '<b>' + esc(n) + '</b>' : '<button class="tdwho" data-go="' + esc(n) + '"><b>' + esc(n) + '</b></button>') +
