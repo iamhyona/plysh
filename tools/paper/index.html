@@ -147,7 +147,7 @@ function svgOf(S) {
 }
 function render() {
   var S = selected(), h = '<div class="phd"><b>용지 크기</b><small>규격 용지와 생활 속 인쇄물 크기를 실제 비율대로 겹쳐 보거나 나란히 비교해요</small></div><div class="wrap"><div class="card">';
-  h += '<div class="tools"><b class="cnt" style="font-size:13px;color:#8b95a1;align-self:center">' + S.length + '개 고름</b><button class="all" id="all">전체 선택</button><button class="clr" id="clr">모두 해제</button></div>';
+  h += '<div class="tools"><b class="cnt" style="font-size:13px;color:#8b95a1;align-self:center">' + S.length + '개 고름</b><button class="all" id="all">전체 선택</button><button class="clr" id="clr">전체 해제</button></div>';
   h += '<div class="sec"><b>규격 용지</b><small>국제 · 국내 표준 규격과 출판 관례 크기예요</small></div>';
   h += G.map(function (g) {
     var gk = items(g).map(function (x) { return key(g, x); }), gon = gk.every(function (k) { return ST.sel.indexOf(k) >= 0; });

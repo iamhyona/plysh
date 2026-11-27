@@ -1375,6 +1375,43 @@ html[data-nav="t"] #nsub.has { display:flex; }
 #qts .emp { font-size:13px; color:var(--mute); padding:8px 0; }
 #qts .acts .ghost { background:var(--chip, #f2f4f6); color:var(--txt); }
 .wqt .wsq .emp { grid-column:1 / -1; font-size:13px; color:var(--mute); padding:8px 0; }
+
+
+/* 할 일 공지 카드 · 카드 머리 세로 가운데 (hm251) */
+.tdrow > .tdnt { flex:0 0 300px !important; padding:0 !important; overflow:hidden; }
+.tdrow > .tdnt + .tdcard { flex-basis:380px; }
+.tdrow > .tdnt .ntbox { margin:0 !important; background:none; padding:18px 20px 14px !important; }
+.tdrow > .tdnt .nth { display:flex; align-items:center; justify-content:space-between; min-height:34px; margin:0 0 6px; } .tdrow > .tdnt .nth b { font-size:16px; font-weight:800; color:var(--txt); }
+.tdrow > .tdnt #ntAdd { width:34px; height:34px; min-height:34px; border-radius:10px; }
+.tdcard .bdh { display:flex; align-items:center; gap:8px; min-height:34px; }
+.tdcard .bdh > div:first-child { flex:1 1 auto; min-width:0; }
+.tdcard .tdnm { display:flex; align-items:center; gap:8px; flex-wrap:wrap; line-height:1.2; }
+.tdcard .tdnm .tdwho, .tdcard .tdnm > b { display:inline-flex; align-items:center; line-height:1.2; }
+.tdcard .tdcn { display:inline-flex; align-items:center; line-height:1; }
+.tdcard .tdallck { display:inline-flex; align-items:center; gap:4px; height:28px; min-height:28px; line-height:1; padding:0 10px; border-radius:8px; }
+.tdcard .tdallck svg { width:12px; height:12px; flex:none; }
+.tdcard .tded { width:34px !important; height:34px !important; min-height:34px !important; border-radius:10px !important; display:inline-flex !important; align-items:center; justify-content:center; flex:none; }
+.tdcard .tded.on { width:auto !important; padding:0 12px !important; }
+@media (max-width:1023px) { .tdrow > .tdnt { flex-basis:calc(100vw - 56px) !important; } .tdrow > .tdnt + .tdcard { flex-basis:calc(100vw - 56px); } }
+/* 메뉴 머리 한 패턴 (hm251) */
+#main .hm2.hdt { display:flex; align-items:center; gap:8px; flex-wrap:wrap; row-gap:10px; min-height:34px; }
+#main .hm2.hdt .hmt { flex:none; min-width:0; line-height:1.2; display:inline-flex; align-items:center; }
+#main .hm2.hdt .hnv { display:inline-flex; align-items:center; gap:0; flex:none; margin-left:-2px; }
+#main .hm2.hdt .hnv button { width:28px; height:28px; min-height:28px; border:0; border-radius:8px; background:none; color:var(--mute, #8b95a1); display:inline-flex; align-items:center; justify-content:center; padding:0; font-size:0; }
+#main .hm2.hdt .hnv button svg { width:16px; height:16px; } #main .hm2.hdt .hnv button:hover { background:#fff; color:var(--txt); }
+#main .hm2.hdt .hnv .tod { width:auto; font-size:12px; font-weight:700; padding:0 10px; margin-left:4px; background:#fff; color:var(--sub); border-radius:8px; }
+#main .hm2.hdt .hrt { display:inline-flex; align-items:center; gap:6px; margin-left:auto; flex-wrap:wrap; justify-content:flex-end; min-width:0; }
+#main .hm2.hdt .hrt > button, #main .hm2.hdt .hrt > a, #main .hm2.hdt .hrt > .tod { box-sizing:border-box; height:34px; min-height:34px; line-height:1; border:0; border-radius:10px; background:#fff; color:var(--sub); font-family:inherit; font-size:13px; font-weight:600; padding:0 12px; display:inline-flex; align-items:center; justify-content:center; gap:5px; white-space:nowrap; text-decoration:none; width:auto; box-shadow:none; }
+#main .hm2.hdt .hrt > a.hsh, #main .hm2.hdt .hrt > a.tdshi { width:34px; padding:0; } #main .hm2.hdt .hrt > a svg { width:17px; height:17px; }
+#main .hm2.hdt .hrt > .hwr { background:var(--txt); color:#fff; font-weight:700; } #main .hm2.hdt .hrt > .hwr svg { width:14px; height:14px; }
+#main .hm2.hdt .hrt .aseg, #main .hm2.hdt .hrt .seg { display:inline-flex; align-items:center; height:34px; box-sizing:border-box; padding:3px; gap:2px; margin:0; border-radius:10px !important; background:#e5e8eb !important; width:auto; flex:none; }
+#main .hm2.hdt .hrt .aseg button, #main .hm2.hdt .hrt .seg button { height:28px; min-height:28px; line-height:1; border-radius:8px; padding:0 11px; font-size:12.5px; font-weight:700; background:none; color:var(--mute); flex:none; }
+#main .hm2.hdt .hrt .aseg button.on, #main .hm2.hdt .hrt .seg button.on { background:#fff; color:var(--txt); box-shadow:0 1px 2px rgba(0,0,0,.06); }
+html[data-hdmv] #npg #pgW, html[data-hdmv] #npg .pga { display:none !important; }
+/* 근태 작성 보기 전환 (달력/그래프 · 간략히/자세히)도 같은 높이 */
+.wlvr { gap:6px; } .wlvr > .seg, .wlvr > .wlcd, .wlvs { flex:none !important; width:auto !important; max-width:none !important; display:inline-flex; align-items:center; height:34px; box-sizing:border-box; padding:3px; gap:2px; margin:0; border-radius:10px; }
+.wlvr .seg button { flex:none; height:28px; min-height:28px !important; line-height:1; padding:0 14px; border-radius:8px; font-size:12.5px; }
+@media (max-width:520px) { #main .hm2.hdt .hrt { margin-left:0; flex:1 1 100%; justify-content:flex-start; } #main .hm2.hdt .hnv ~ .hrt { } }
 /* 홈 날짜 팝업 (hm244) */
 .hdl { display:flex; flex-direction:column; gap:8px; }
 .hdr { display:flex; align-items:flex-start; gap:12px; padding:14px 14px 14px 16px; border-radius:14px; background:var(--chip, #f2f4f6); position:relative; overflow:hidden; }
@@ -2080,6 +2117,28 @@ html[data-nav] #cvSeg { display:none !important; }
 .mraw b { font-size:18px; font-weight:800; letter-spacing:-0.02em; white-space:nowrap; }
 .mraw em { font-style:normal; font-size:12.5px; color:var(--sub); }
 .mrg i.u { font-style:normal; font-size:0.78em; font-weight:600; color:var(--mute); margin-left:1px; } .mrhero i.u { color:inherit; opacity:.7; } .mraw em i.u { font-size:0.92em; }
+
+/* ───── 2026-11-27 실장님: PLYSH 공통 단추 3종 (hm251) — 따로 만든 단추도 모두 이 크기로 ─────
+   ① 전환(세그먼트) .aseg/.seg : 바깥 높이 36 · 안쪽 여백 사방 3 · 모서리 10 · 회색 바탕 / 칸 높이 30 · 좌우 12 · 글자 13 굵게 · 모서리 8
+   ② 일반 단추 : 높이 36 · 좌우 14 · 글자 13 · 모서리 10      ③ 아이콘 단추 : 36×36 · 모서리 10 (화살표만 28 가벼운 아이콘)
+   ④ 전체 선택이 있으면 전체 해제도 함께 */
+:root { --ui-h:36px; --ui-r:10px; --ui-fs:13px; --sg-pad:3px; --sg-h:30px; --sg-r:8px; }
+.aseg, .aseg.sw, .seg, .seg.sm, #main .hm2.hdt .hrt .aseg, #main .hm2.hdt .hrt .seg, .whc .hch .aseg.hcv, .wlvr > .seg, .wlvr > .wlcd, .wlvs {
+  display:inline-flex !important; align-items:center !important; box-sizing:border-box !important; height:var(--ui-h) !important; min-height:var(--ui-h) !important; padding:var(--sg-pad) !important; gap:2px !important; border-radius:var(--ui-r) !important; background:#e5e8eb !important; width:auto; max-width:100%; }
+.aseg button, .aseg.sw button, .seg button, .seg.sm button, #main .hm2.hdt .hrt .aseg button, #main .hm2.hdt .hrt .seg button, .whc .hch .aseg.hcv button, .wlvr .seg button {
+  box-sizing:border-box !important; height:var(--sg-h) !important; min-height:var(--sg-h) !important; padding:0 12px !important; margin:0 !important; border:0 !important; border-radius:var(--sg-r) !important; font-size:var(--ui-fs) !important; font-weight:700 !important; line-height:1 !important; letter-spacing:-0.01em; display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:5px; background:none !important; color:var(--mute) !important; box-shadow:none !important; white-space:nowrap; }
+.aseg button.on, .aseg.sw button.on, .seg button.on, .seg.sm button.on, #main .hm2.hdt .hrt .aseg button.on, .whc .hch .aseg.hcv button.on, .wlvr .seg button.on { background:#fff !important; color:var(--txt) !important; box-shadow:0 1px 2px rgba(0,0,0,.06) !important; }
+.aseg button svg, .seg button svg { width:14px !important; height:14px !important; flex:none; }
+.seg:not(.sm) { display:flex !important; } .seg:not(.sm) button { flex:1 1 0 !important; }
+/* 일반 단추 · 아이콘 단추 (머리 줄) */
+.whc .hch > .hcr > button, .whc .hch .pmdb, #main .hm2.hdt .hrt > button, #main .hm2.hdt .hrt > a, #main .hm2.hdt .hrt .pmdb, .pjtb .pmdb, #main .hm2.hdt .hnv .tod {
+  box-sizing:border-box !important; height:var(--ui-h) !important; min-height:var(--ui-h) !important; border-radius:var(--ui-r) !important; font-size:var(--ui-fs) !important; padding:0 14px !important; line-height:1 !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px; }
+.whc .hch .hcadd, #main .hm2.hdt .hrt > a.hsh, #main .hm2.hdt .hrt > a.tdshi { min-width:var(--ui-h); }
+#main .hm2.hdt .hrt > a.hsh, #main .hm2.hdt .hrt > a.tdshi { width:var(--ui-h) !important; padding:0 !important; }
+#main .hm2.hdt .hnv .tod { height:28px !important; min-height:28px !important; padding:0 10px !important; font-size:12px !important; border-radius:8px !important; }
+.whc .hch .hnv button[aria-label], #main .hm2.hdt .hnv button[aria-label] { width:28px !important; height:28px !important; min-height:28px !important; padding:0 !important; }
+@container whc (max-width:400px) { .whc .hch > .hcr > button.hcadd { width:var(--ui-h) !important; padding:0 !important; font-size:0 !important; gap:0 !important; } }
+.pmdf button[disabled] { opacity:.4; cursor:default; }
 </style>
 </head>
 <body>
@@ -2393,7 +2452,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm250';
+var APP_VER = '20261127hm251';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2830,7 +2889,33 @@ function render() {
   $$('.tabs2[id]').forEach(function (t) { if (t.id in keep) t.scrollLeft = keep[t.id]; chipVis(t); });
   // 날짜 글자를 누르면 날짜 고르기 창이 바로 열림 (2026.10.06)
   $$('.dpk').forEach(function (i) { i.addEventListener('click', function () { try { if (i.showPicker) i.showPicker(); } catch (e) {} }); });
+  document.documentElement.removeAttribute('data-hdmv'); try { hdTidy(); } catch (e) {}
 }
+// 2026-11-27 실장님: 메뉴 머리 단추 한 패턴 — 왼쪽 '날짜 + 가벼운 화살표(오늘·이번 달)', 오른쪽 끝 한 묶음(전환 · 빠른 입력 · 시트 · 작성하기), 모두 같은 높이 · 세로 가운데
+function hdTidy() {
+  if (S.view === 'mrep' || S.view === 'start') return;
+  $$('#main .hm2:not([data-hdt])').forEach(function (h, i) {
+    if (h.closest('.mrg')) return;
+    h.setAttribute('data-hdt', '1'); h.classList.add('hdt');
+    var t = $('.hmt', h); if (!t) return;
+    var nv = document.createElement('span'); nv.className = 'hnv';
+    var rt = document.createElement('span'); rt.className = 'hrt';
+    var arw = $('.arw', h);
+    if (arw) [].slice.call(arw.children).forEach(function (b) { var tx = (b.textContent || '').trim(); if ((b.tagName === 'BUTTON' && !tx && b.querySelector('svg')) || /^(오늘|이번 ?(달|주))$/.test(tx)) nv.appendChild(b); });
+    [].slice.call(h.children).forEach(function (c) { if (c !== t && c !== arw) rt.appendChild(c); });
+    if (arw) { [].slice.call(arw.children).forEach(function (b) { rt.appendChild(b); }); arw.remove(); }
+    $$('.tdshi', rt).forEach(function (a) { rt.appendChild(a); });   // 전환 단추 안에 끼어 있던 시트 아이콘은 밖으로
+    if (i === 0 && !h.closest('.bs')) {   // 첫 머리에만: 페이지 머리의 시트 아이콘 · 작성하기를 같은 줄 오른쪽 끝으로
+      var pa = $('#npg .pga'), pw = $('#npg #pgW');
+      if (pa && !rt.querySelector('.tdshi, .wlshm')) { var a2 = pa.cloneNode(true); a2.className = 'hsh'; rt.appendChild(a2); }
+      $$('.wlshm', rt).forEach(function (a) { a.classList.add('hsh'); });
+      if (pw) { var w2 = pw.cloneNode(true); w2.removeAttribute('id'); w2.className = 'hwr'; w2.onclick = function () { var o = $('#pgW'); if (o) o.click(); }; rt.appendChild(w2); }
+      document.documentElement.toggleAttribute('data-hdmv', !!(pa || pw));
+    }
+    t.after(nv); nv.after(rt);
+  });
+}
+(function () { var q = 0, mo = new MutationObserver(function () { if (q) return; q = 1; Promise.resolve().then(function () { q = 0; try { if (!$('#main .hm2:not([data-hdt])')) return; hdTidy(); } catch (e) {} }); }); var go = function () { var m = $('#main'); if (m) mo.observe(m, { childList: true, subtree: true }); }; if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go(); })();
 // LOGO 메뉴 (2026-11-18): 소속사·아티스트·인쇄·세탁·분리배출 로고 미리보기 + 한글/영어 검색 + .ai 다운로드
 var LG = { list: null, tab: ls.get('d4:lgtab') || 'all', vw: ls.get('d4:lgvw') || 'grid', q: '' };
 var LG_TABS = [['all', '전체'], ['agency', '소속사'], ['artist', '아티스트'], ['distributor', '유통사'], ['print', '인쇄'], ['laundry', '세탁기호'], ['recycle', '분리배출']];
@@ -4051,7 +4136,7 @@ function filterBar(home) {
   return '<div class="pmd' + (S.fltO ? ' open' : '') + '" id="flt"><button type="button" class="pmdb" id="fltB"><span>' + lab + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
     '<div class="pmdp"><input type="search" id="fltQ" placeholder="프로젝트 검색" value="' + esc(S.fltQ || '') + '"><div class="pmdl">' +
     fs.filter(function (f) { return !q || nm(f).toLowerCase().replace(/\s+/g, '').indexOf(q) > -1; }).map(function (f) { return '<label><input type="checkbox" data-f="' + f.id + '"' + (S.off[f.id] ? '' : ' checked') + '><span class="cb">' + CKSVG + '</span><i style="background:' + f.color + '"></i><span class="t">' + esc(nm(f)) + '</span></label>'; }).join('') +
-    '</div><div class="pmdf"><button type="button" data-fa="all">전체 선택</button><button type="button" data-fa="close">닫기</button></div></div></div>';
+    '</div><div class="pmdf"><button type="button" data-fa="all"' + (all ? ' disabled' : '') + '>전체 선택</button><button type="button" data-fa="none"' + (on.length ? '' : ' disabled') + '>전체 해제</button><button type="button" data-fa="close">닫기</button></div></div></div>';
 }
 function bindFilter() {
   var rr = function (keepQ) { ls.set('d4:off', JSON.stringify(S.off)); var y0 = window.scrollY; render(); window.scrollTo(0, y0); if (keepQ) { var qi = $('#fltQ'); if (qi) { qi.focus(); qi.setSelectionRange(qi.value.length, qi.value.length); } } };
@@ -4060,7 +4145,7 @@ function bindFilter() {
   $('#flt .pmdp').onclick = function (e) { e.stopPropagation(); };
   $('#fltQ').oninput = function () { S.fltQ = this.value; rr(1); };
   $$('#flt input[type=checkbox]').forEach(function (c) { c.onchange = function () { var id = c.dataset.f; if (c.checked) delete S.off[id]; else S.off[id] = 1; if (pfs().every(function (f) { return S.off[f.id]; })) S.off = {}; rr(); }; });
-  $$('#flt [data-fa]').forEach(function (b) { b.onclick = function () { if (b.dataset.fa === 'all') { S.off = {}; rr(); } else { S.fltO = false; $('#flt').classList.remove('open'); } }; });
+  $$('#flt [data-fa]').forEach(function (b) { b.onclick = function () { if (b.dataset.fa === 'all') { S.off = {}; rr(); } else if (b.dataset.fa === 'none') { S.off = {}; pfs().forEach(function (f) { S.off[f.id] = 1; }); rr(); } else { S.fltO = false; $('#flt').classList.remove('open'); } }; });
   if (!S.fltDoc) { S.fltDoc = 1; document.addEventListener('click', function () { if (S.fltO) { S.fltO = false; var f = $('#flt'); if (f) f.classList.remove('open'); } }); }
   $$('#flt button.x-old').forEach(function (b) {
     b.onclick = function () {
@@ -5113,7 +5198,8 @@ function renderTodo() {
   // '오늘 N/M 완료' 줄은 없앰 (2026-10-20)
   // 2026-11-27 실장님: 전체 보기 = 내 할 일이 맨 앞, 나머지 사람은 옆으로 나란히 (가로 스크롤)
   var me0 = hmMe(), TT = me0 && T.indexOf(me0) >= 0 ? [me0].concat(T.filter(function (n) { return n !== me0; })) : T;
-  if (!tp) h += '<div class="tdrow">';
+  // 2026-11-27 실장님: 팀 공지는 위 큰 상자가 아니라 가로 카드 줄의 맨 왼쪽 카드 (공지 → 내 할 일 → 다른 사람)
+  if (!tp) h += '<div class="tdrow"><div class="bd tdcard tdnt">' + ntHtml() + '</div>';
   (tp ? [tp] : TT).forEach(function (n) {
     var L = R.filter(function (x) { return x.p === n; });
     h += '<div class="bd tdd tdcard' + (tp ? ' tdall' : '') + '"><div class="bdh"><div>' + '<div class="tdnm">' + (tp ? '<b>' + esc(n) + '</b>' : '<button class="tdwho" data-go="' + esc(n) + '"><b>' + esc(n) + '</b></button>') +
@@ -5126,7 +5212,7 @@ function renderTodo() {
   var y0 = window.scrollY;
   var ntOn = tdRows(function (x) { return x.k === '공지' && !x.c; }).length;
   // 2026-11-27 실장님: 팀 공지는 할 일 화면 맨 앞에 늘 (공지가 없어도 + 단추로 바로 쓰게)
-  $('#main').innerHTML = ntHtml() + h; window.scrollTo(0, y0); bindTd(); bindNt();
+  $('#main').innerHTML = h; window.scrollTo(0, y0); bindTd(); bindNt();
   $$('#tdSeg button').forEach(function (b) { b.onclick = function () { S.tdp = b.dataset.p; ls.set('d4:tdp', S.tdp); render(); }; });
   if ($('#tdSegD')) $('#tdSegD').onchange = function () { if (this.value) { S.tdd = this.value; render(); } };
   if ($('#tdmP')) { $('#tdmP').onclick = function () { S.tdd = dMove(p, S.tdd, -1); render(); }; $('#tdmN').onclick = function () { S.tdd = dMove(p, S.tdd, 1); render(); }; }
