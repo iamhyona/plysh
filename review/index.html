@@ -222,15 +222,18 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
 }
 /* 2026-11-27 실장님: 자가 점검 리스트를 검수기 오른쪽(넓은 화면) · 아래(좁은 화면)에 — 자가점검리스트 메뉴와 같은 체크 상태를 함께 씀 */
 #ckp:empty { display:none; }
+#ckp { position:relative; }
+#ckp .cksel { position:sticky; top:-18px; z-index:2; background:var(--card); margin:0 -18px 4px; padding:6px 18px 10px; }
+#ckp .cksel select { width:100%; height:42px; border:0; border-radius:12px; background:var(--chip); padding:0 36px 0 14px; font-size:14px; font-weight:700; color:var(--txt); appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; cursor:pointer; }
+#ckp .cks { padding-top:14px; }
+#ckp .cks + .cks { margin-top:10px; border-top:1px solid var(--line); padding-top:18px; }
+#ckp .ckst { display:flex; align-items:center; gap:8px; margin-bottom:6px; } #ckp .ckst b { font-size:15px; font-weight:800; flex:1; }
+#ckp .ckst .ckn { margin:0; gap:10px; } #ckp .ckst .ckn em { font-style:normal; }
+
 #ckp .ckh { display:flex; align-items:center; gap:6px; margin-bottom:14px; }
 #ckp .ckh h3 { margin:0; flex:1; white-space:nowrap; min-width:0; }
 #ckp .ckh button { flex:none; border:0; background:var(--chip); color:var(--sub); border-radius:999px; height:30px; padding:0 12px; font-size:12.5px; font-weight:700; }
 #ckp .ckd { font-size:13px; color:var(--mute); line-height:1.5; margin:0 0 12px; }
-#ckp .ckt { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin:0 -18px 12px; padding:0 18px; }
-#ckp .ckt::-webkit-scrollbar { display:none; }
-#ckp .ckt button { flex:none; border:0; background:var(--chip); color:var(--sub); border-radius:999px; height:32px; padding:0 12px; font-size:13px; font-weight:700; white-space:nowrap; }
-#ckp .ckt button.on { background:var(--txt); color:#fff; }
-#ckp .ckt button small { font-size:11.5px; font-weight:600; opacity:.7; margin-left:4px; }
 #ckp .ckbar { height:6px; border-radius:3px; background:var(--chip); overflow:hidden; margin:0 0 6px; } #ckp .ckbar i { display:block; height:100%; background:var(--txt); border-radius:3px; }
 #ckp .ckn { display:flex; align-items:center; justify-content:space-between; min-height:24px; font-size:12.5px; color:var(--mute); font-weight:600; margin-bottom:6px; } #ckp .ckn button { border:0; background:none; color:var(--mute); font-size:12.5px; font-weight:700; padding:0; text-decoration:underline; text-underline-offset:2px; }
 #ckp .ckc { font-size:12.5px; font-weight:800; color:var(--mute); margin:14px 0 4px; }
@@ -246,6 +249,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   .wrap > h2:first-child { grid-column:1 / -1; } /* 제목은 두 칸 위로 → 오른쪽 상자 윗선 = 첫 카드 윗선 */
   .wrap > #ckp { grid-column:2; grid-row:2 / span 40; position:sticky; top:14px; max-height:calc(100vh - 28px); overflow:auto; overscroll-behavior:contain; margin-bottom:0; }
 }
+@media (max-width:899px) { #ckp .cksel { top:0; } }
 @media print { #ckp { display:none !important; } }
 @media print { body.spking .wrap > *:not(#specRep), body.spking #sheet, body.spking .ov { display:none !important; } body.spking #specRep .spk { padding:0; border-radius:0; } }
 @media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
@@ -401,25 +405,50 @@ var LIBS = {
       S = (new Function('return ' + m[1]))(); cb();
     }).catch(function () {});
   }
+  // 2026-11-28 실장님: 단계(자가체크·오탈자체크…)는 드롭다운으로 고르고, 전체가 이어진 목록이라 스크롤하면 드롭다운도 다음 단계로 자동 변경
+  function cnt(n) { var c2 = C[n] || {}; return S[n].items.filter(function (x) { return c2[x.id]; }).length; }
+  function scroller() { return getComputedStyle(el).overflowY === 'auto' && el.scrollHeight > el.clientHeight + 2 ? el : null; }
   function draw() {
     try { C = JSON.parse(localStorage.getItem(CK) || '{}'); } catch (e) { C = {}; }
     var N = names(); if (!N.length) return; if (N.indexOf(cur) < 0) cur = N[0];
-    var sh = S[cur], ck = C[cur] || {}, it = sh.items || [], done = it.filter(function (x) { return ck[x.id]; }).length;
-    var h = '<div class="ckh"><h3>자가 점검 리스트</h3>' + '<button type="button" id="ckGo">전체 보기</button></div>' +
-      '<div class="ckt">' +
-      N.map(function (n) { var c2 = C[n] || {}, t2 = S[n].items.length, d2 = S[n].items.filter(function (x) { return c2[x.id]; }).length; return '<button type="button" data-t="' + esc(n) + '"' + (n === cur ? ' class="on"' : '') + '>' + esc(n) + '<small>' + d2 + '/' + t2 + '</small></button>'; }).join('') + '</div>' +
-      (sh.desc ? '<p class="ckd">' + esc(sh.desc) + '</p>' : '') +
-      '<div class="ckbar"><i style="width:' + (it.length ? Math.round(done / it.length * 100) : 0) + '%"></i></div><div class="ckn"><span>' + done + ' / ' + it.length + ' 확인</span>' + (done ? '<button type="button" id="ckRs">체크 지우기</button>' : '') + '</div>';
-    var last = null;
-    it.forEach(function (x) { if (x.cat && x.cat !== last) { h += '<div class="ckc">' + esc(x.cat) + '</div>'; last = x.cat; } h += '<label' + (ck[x.id] ? ' class="on"' : '') + '><input type="checkbox" data-i="' + esc(x.id) + '"' + (ck[x.id] ? ' checked' : '') + '><span>' + esc(x.text) + '</span></label>'; });
-    var tb = el.querySelector('.ckt'), sl = tb ? tb.scrollLeft : 0;
-    el.innerHTML = h; var tb2 = el.querySelector('.ckt'); if (tb2) tb2.scrollLeft = sl;
-    el.querySelectorAll('.ckt button').forEach(function (b) { b.onclick = function () { cur = b.dataset.t; try { localStorage.setItem('rv:cktab', cur); } catch (e) {} draw(); }; });
-    el.querySelectorAll('input[data-i]').forEach(function (i) { i.onchange = function () { try { C = JSON.parse(localStorage.getItem(CK) || '{}'); } catch (e) { C = {}; } C[cur] = C[cur] || {}; C[cur][i.dataset.i] = i.checked; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (e) {} draw(); }; });
-    var rs = document.getElementById('ckRs'); if (rs) rs.onclick = function () { C[cur] = {}; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (e) {} draw(); };
+    var h = '<div class="ckh"><h3>자가 점검 리스트</h3><button type="button" id="ckGo">전체 보기</button></div>' +
+      '<div class="cksel"><select id="ckSel" aria-label="점검 단계">' + N.map(function (n) { return '<option value="' + esc(n) + '"' + (n === cur ? ' selected' : '') + '>' + esc(n) + '  ' + cnt(n) + ' / ' + S[n].items.length + '</option>'; }).join('') + '</select></div>';
+    N.forEach(function (n, si) {
+      var sh = S[n], ck = C[n] || {}, it = sh.items || [], done = cnt(n), last = null;
+      h += '<section class="cks" data-s="' + esc(n) + '"><div class="ckst"><b>' + esc(n) + '</b><span class="ckn"><em>' + done + ' / ' + it.length + '</em>' + '<button type="button" data-rs="' + esc(n) + '"' + (done ? '' : ' hidden') + '>체크 지우기</button></span></div>' +
+        (sh.desc ? '<p class="ckd">' + esc(sh.desc) + '</p>' : '') + '<div class="ckbar"><i style="width:' + (it.length ? Math.round(done / it.length * 100) : 0) + '%"></i></div>';
+      it.forEach(function (x) { if (x.cat && x.cat !== last) { h += '<div class="ckc">' + esc(x.cat) + '</div>'; last = x.cat; } h += '<label' + (ck[x.id] ? ' class="on"' : '') + '><input type="checkbox" data-n="' + esc(n) + '" data-i="' + esc(x.id) + '"' + (ck[x.id] ? ' checked' : '') + '><span>' + esc(x.text) + '</span></label>'; });
+      h += '</section>';
+    });
+    el.innerHTML = h;
+    el.querySelectorAll('input[data-i]').forEach(function (i) { i.onchange = function () { try { C = JSON.parse(localStorage.getItem(CK) || '{}'); } catch (e) { C = {}; } var n = i.dataset.n; C[n] = C[n] || {}; C[n][i.dataset.i] = i.checked; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (e) {} i.parentNode.classList.toggle('on', i.checked); upd(n); }; });
+    el.querySelectorAll('[data-rs]').forEach(function (b) { b.onclick = function () { var n = b.dataset.rs; C[n] = {}; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (e) {} el.querySelectorAll('input[data-n="' + n + '"]').forEach(function (i) { i.checked = false; i.parentNode.classList.remove('on'); }); upd(n); }; });
+    document.getElementById('ckSel').onchange = function () { go(this.value); };
     document.getElementById('ckGo').onclick = function () { try { if (parent !== window && parent.navGo) return parent.navGo('checklist'); } catch (e) {} window.open('../tools/design-checklist/', '_blank'); };
   }
-  load(draw);
+  function upd(n) {
+    var sec = el.querySelector('section[data-s="' + n + '"]'); if (!sec) return; var t = S[n].items.length, d = cnt(n);
+    sec.querySelector('.ckn em').textContent = d + ' / ' + t; sec.querySelector('[data-rs]').hidden = !d; sec.querySelector('.ckbar i').style.width = (t ? Math.round(d / t * 100) : 0) + '%';
+    var o = [].slice.call(document.getElementById('ckSel').options).filter(function (x) { return x.value === n; })[0]; if (o) o.textContent = n + '  ' + d + ' / ' + t;
+  }
+  var lock = 0;
+  function go(n) {
+    var sec = el.querySelector('section[data-s="' + n + '"]'); if (!sec) return; cur = n; try { localStorage.setItem('rv:cktab', n); } catch (e) {}
+    var bar = el.querySelector('.cksel'), off = (bar ? bar.offsetHeight : 0) + 4, sc = scroller(); lock = Date.now();
+    if (sc) sc.scrollTo({ top: sec.offsetTop - off, behavior: 'smooth' });
+    else window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off - 8, behavior: 'smooth' });
+  }
+  function spy() {
+    if (Date.now() - lock < 700) return; var bar = el.querySelector('.cksel'), sel = document.getElementById('ckSel'); if (!bar || !sel) return;
+    var line = bar.getBoundingClientRect().bottom + 12, pick = null;
+    el.querySelectorAll('section[data-s]').forEach(function (sec) { if (sec.getBoundingClientRect().top <= line) pick = sec.dataset.s; });
+    if (!pick) pick = el.querySelector('section[data-s]').dataset.s;
+    if (sel.value !== pick) { sel.value = pick; cur = pick; try { localStorage.setItem('rv:cktab', pick); } catch (e) {} }
+  }
+  el.addEventListener('scroll', spy, { passive: true }); window.addEventListener('scroll', spy, { passive: true });
+  // 오른쪽 상자 윗선 = 첫 카드 윗선 (PLYSH 안에서는 제목 줄이 숨겨져 있어 1행부터)
+  function fitRow() { var h = document.querySelector('.wrap > h2'); el.style.gridRow = (!h || getComputedStyle(h).display === 'none') ? '1 / span 40' : '2 / span 40'; }
+  load(function () { draw(); fitRow(); var n0 = cur; setTimeout(function () { var sec = el.querySelector('section[data-s="' + n0 + '"]'), sc = scroller(); if (sec && sc && sec !== el.querySelector('section')) { var bar = el.querySelector('.cksel'); sc.scrollTop = sec.offsetTop - (bar ? bar.offsetHeight : 0) - 4; } spy(); }, 50); }); fitRow(); setTimeout(fitRow, 500); setTimeout(fitRow, 2000); window.addEventListener('resize', fitRow); try { new MutationObserver(fitRow).observe(document.head, { childList: true }); } catch (e) {}
   window.addEventListener('storage', function (e) { if (S && (e.key === CK || e.key === SK)) { if (e.key === SK) { try { S = JSON.parse(e.newValue); } catch (x) {} } draw(); } });
 })();
 </script>
