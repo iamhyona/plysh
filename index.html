@@ -1372,29 +1372,35 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .hdr li small { display:inline-block; font-size:11px; font-weight:700; color:var(--mute); background:#fff; border-radius:6px; padding:1px 6px; margin-right:6px; vertical-align:1px; }
 .hdr .gsl { width:36px; height:36px; border-radius:10px; background:#fff; flex:none; } .hdr .gsl svg { width:18px; height:18px; }
 .whc .lc, .whc .lf, .whc .dh { cursor:pointer; }
-/* 홈 달력 머리 (hm244) */
+/* 홈 달력 머리 (hm244 → hm248: 무게 고르게) */
+.whc { container-type:inline-size; container-name:whc; }
 .whc .hch { display:flex; align-items:center; gap:8px; margin:0 0 12px; min-width:0; }
-.whc .hch .hct { font-size:17px; font-weight:800; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; margin-right:2px; white-space:nowrap; }
+.whc .hch .hct { font-size:17px; font-weight:800; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1; }
 .whc .hch .hnv, .whc .hch .hcg, .whc .hch .hcr { display:flex; align-items:center; gap:6px; min-width:0; }
-.whc .hch .hcg { margin-left:6px; }
+.whc .hch .hnv { gap:0; margin-left:-2px; }
+.whc .hch .hcg { margin-left:8px; }
 .whc .hch .hcr { margin-left:auto; flex:none; }
-.whc .hch button, .whc .hch .pmdb { height:34px; min-height:34px; border-radius:10px; border:0; font-family:inherit; font-size:13px; font-weight:600; letter-spacing:-0.01em; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:0 12px; background:var(--chip, #f2f4f6); color:var(--sub); cursor:pointer; white-space:nowrap; box-shadow:none; }
-.whc .hch .hnv button[aria-label] { width:34px; padding:0; }
+.whc .hch button, .whc .hch .pmdb { box-sizing:border-box; height:34px; min-height:34px; line-height:1; border-radius:10px; border:0; font-family:inherit; font-size:13px; font-weight:600; letter-spacing:-0.01em; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:0 12px; background:var(--chip, #f2f4f6); color:var(--sub); cursor:pointer; white-space:nowrap; box-shadow:none; }
+/* 이전·다음: 배경 없는 가벼운 아이콘 */
+.whc .hch .hnv button[aria-label] { width:28px; height:28px; min-height:28px; padding:0; background:none; color:var(--mute, #8b95a1); border-radius:8px; }
+.whc .hch .hnv button[aria-label]:hover { background:var(--chip, #f2f4f6); color:var(--txt); }
+.whc .hch .hnv #hcT { height:28px; min-height:28px; margin-left:4px; padding:0 10px; font-size:12px; }
 .whc .hch button svg { width:15px; height:15px; flex:none; }
 .whc .hch .hcadd { background:var(--txt) !important; color:#fff !important; }
-.whc .hch .pmd { margin:0; min-width:0; } .whc .hch .pmdb { max-width:220px; } .whc .hch .pmdb svg { width:14px; height:14px; }
-.whc .hch .aseg.hcv { display:inline-flex; height:34px; box-sizing:border-box; padding:3px; gap:2px; border-radius:10px !important; background:var(--chip, #f2f4f6) !important; margin:0; width:auto; max-width:max-content; flex:none; }
-.whc .hch .aseg.hcv button { height:28px; min-height:28px; border-radius:8px; padding:0 11px; font-size:12.5px; background:none; color:var(--mute); }
-.whc .hch .aseg.hcv button.on { background:#fff; color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.08); }
-.whc { container-type:inline-size; container-name:whc; }
-.whc .hch .hcal .ic { display:none; }
-@container whc (max-width:600px) {
-  .whc .hch { flex-wrap:wrap; row-gap:8px; }
-  .whc .hch .hct { order:1; } .whc .hch .hnv { order:2; } .whc .hch .hcr { order:3; }
-  .whc .hch .hcg { order:4; margin-left:0; flex:1 1 100%; }
-  .whc .hch .hcg .pmd { flex:1 1 auto; } .whc .hch .hcg .pmdb { max-width:100%; width:100%; justify-content:space-between; }
+.whc .hch .pmd { margin:0; min-width:0; position:relative; } .whc .hch .pmdb span { display:inline-flex; align-items:center; gap:6px; line-height:1; } .whc .hch .pmdb svg { width:14px; height:14px; }
+.whc .hch .pmdb .fcn { font-style:normal; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:var(--txt); color:#fff; font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
+.whc .hch .pmdp { left:auto; right:0; }
+.whc .hch .aseg.hcv { display:inline-flex; align-items:center; height:34px; box-sizing:border-box; padding:3px; gap:2px; border-radius:10px !important; background:var(--chip, #f2f4f6) !important; margin:0; width:auto; max-width:max-content; flex:none; }
+.whc .hch .aseg.hcv button { height:28px; min-height:28px; border-radius:8px; padding:0 11px; font-size:12.5px; line-height:1; background:none; color:var(--mute); }
+.whc .hch .aseg.hcv button.on { background:#fff; color:var(--txt); box-shadow:0 1px 2px rgba(0,0,0,.06); }
+@container whc (max-width:560px) {
+  .whc .hch { flex-wrap:wrap; row-gap:10px; }
+  .whc .hch .hcr { display:contents; }
+  .whc .hch .hct { order:1; } .whc .hch .hnv { order:2; } .whc .hch .hcadd { order:3; margin-left:auto; }
+  .whc .hch::after { content:""; order:4; flex:0 0 100%; height:0; }
+  .whc .hch .hcg { order:5; margin-left:0; } .whc .hch .pmd { order:6; margin-left:auto; }
 }
-@container whc (max-width:460px) { .whc .hch .hcadd, .whc .hch .hcal { width:34px; padding:0; font-size:0; gap:0; } .whc .hch .hcal .ic { display:inline-flex; } .whc .hch .hct { font-size:16px; } }
+@container whc (max-width:400px) { .whc .hch .hcadd { width:34px; padding:0; font-size:0; gap:0; } .whc .hch .hct { font-size:16px; } }
 
 .whc .hcbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 8px; } .whc .hcbar .hcv { margin:0; } .whc .hcbar .pmd { margin:0; } .whc .hcbar .pmdb { min-height:36px; height:36px; font-size:13px; background:var(--chip); }
 
@@ -2367,7 +2373,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm248';
+var APP_VER = '20261127hm249';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3476,8 +3482,8 @@ function homeCal() {
     RK = {}; T.concat(['팀']).forEach(function (n, i) { RK['p:' + n] = pad(i); }); }
   // 2026-11-27 실장님: 머리 단추 정리 — 모든 단추 높이 34px·모서리 10px 통일, PC 한 줄(왼쪽 연월·화살표·보기·프로젝트 / 오른쪽 달력 전체·일정 추가), 모바일 두 줄
   var h = '<div class="wsc whc"><div class="hch"><span class="hct">' + y + '.' + pad(m) + '</span><span class="hnv"><button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button>' + (cur ? '' : '<button type="button" id="hcT">이번 달</button>') + '</span>' +
-    '<span class="hcg"><span class="aseg hcv" id="hcV"><button type="button" data-v="" class="' + (me ? '' : 'on') + '">프로젝트</button><button type="button" data-v="me" class="' + (me ? 'on' : '') + '">개인 일정</button></span>' + filterBar() + '</span>' +
-    '<span class="hcr"><button type="button" class="hcal" data-ng="cal" aria-label="달력 전체"><span class="ic">' + IC_CALS + '</span>달력 전체</button><button type="button" class="hcadd" id="hcAdd" aria-label="일정 추가">' + IC_PS + '일정 추가</button></span></div>' +
+    '<span class="hcg"><span class="aseg hcv" id="hcV"><button type="button" data-v="" class="' + (me ? '' : 'on') + '">프로젝트</button><button type="button" data-v="me" class="' + (me ? 'on' : '') + '">개인 일정</button></span></span>' +
+    '<span class="hcr">' + filterBar(1) + '<button type="button" class="hcadd" id="hcAdd" aria-label="일정 추가">' + IC_PS + '일정 추가</button></span></div>' +
     '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd gl">';
   for (var ws = st; ws <= en; ws = addD(ws, 7)) {
     var days = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return addD(ws, i); });
@@ -3994,9 +4000,10 @@ window.addEventListener('resize', function () { if (S.D) { navClose(); navSync()
 $('#rfBtn').onclick = function () { load().then(function () { toast('시트에서 새로 불러왔어요'); }); };
 
 // 2026-11-20 실장님: 프로젝트 칩 줄 → 여러 개 고르는 드롭다운 (안에 검색)
-function filterBar() {
+function filterBar(home) {
   var fs = pfs(), on = fs.filter(function (f) { return !S.off[f.id]; }), all = on.length === fs.length, nm = function (f) { return f.type === 'work' ? '업무일지' : f.name; };
   var lab = all ? '프로젝트 전체' : on.length === 1 ? '<i style="background:' + on[0].color + '"></i>' + esc(nm(on[0])) : '프로젝트 ' + on.length + '개';
+  if (home) lab = '프로젝트 필터' + (all ? '' : '<em class="fcn">' + on.length + '</em>');   // 2026-11-27 실장님: 홈은 '프로젝트 필터' 단추
   var q = (S.fltQ || '').trim().toLowerCase().replace(/\s+/g, '');
   return '<div class="pmd' + (S.fltO ? ' open' : '') + '" id="flt"><button type="button" class="pmdb" id="fltB"><span>' + lab + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
     '<div class="pmdp"><input type="search" id="fltQ" placeholder="프로젝트 검색" value="' + esc(S.fltQ || '') + '"><div class="pmdl">' +
