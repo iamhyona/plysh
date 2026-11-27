@@ -7,7 +7,7 @@
   var W = window;
   if (W.plog) return;
   var API = 'https://script.google.com/macros/s/AKfycbzpvNlxuCa95ZxGvg8N4SiPqmsPzyYx_n9ikhmdRlIng7VzWzks_WS6DDyviPXsfoaO/exec';
-  var QK = 'd4:logq', LK = 'd4:logl', KINDS = ['검수', '다운로드', '인쇄', '복사', '캡처 의심'];
+  var QK = 'd4:logq', LK = 'd4:logl', KINDS = ['검수', '다운로드', '인쇄', '복사', '캡처 의심', '방문', '메뉴'];
   function lg(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function ls(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function rd() { try { var q = JSON.parse(lg(QK) || '[]'); return Array.isArray(q) ? q : []; } catch (e) { return []; } }
