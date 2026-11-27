@@ -2179,7 +2179,7 @@ html[data-nav] #cvSeg { display:none !important; }
 .ctn.n0 { font-weight:800; } .ctn.n1 { font-weight:700; } .ctn.n2 { font-weight:500; }
 .ctn:hover, .ctp:hover { background:var(--chip); } .ctn.on { background:var(--txt); color:#fff; } .ctn.on small { color:rgba(255,255,255,.7); }
 .ctp { display:flex; align-items:center; gap:6px; width:calc(100% - 30px); margin-left:30px; height:28px; border:0; background:none; border-radius:8px; padding:0 8px; font:inherit; font-size:13px; color:var(--sub); text-align:left; cursor:pointer; white-space:nowrap; overflow:hidden; }
-.ctp em { font-style:normal; font-size:11.5px; color:var(--mute); }
+.ctp.c0 { width:calc(100% - 30px); margin-left:30px !important; } .ctp em { font-style:normal; font-size:11.5px; color:var(--mute); }
 .ctc.hit { box-shadow:0 0 0 2px var(--acc); transition:box-shadow .2s; }
 .ctos { display:none; margin-bottom:12px; }
 .ctos select { width:100%; height:40px; border:0; border-radius:10px; background:#fff; padding:0 12px; font:inherit; font-size:14px; font-weight:600; color:var(--txt); }
@@ -2543,7 +2543,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm260';
+var APP_VER = '20261127hm261';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -6717,6 +6717,7 @@ function ctOrg() {
   });
   function firstI(o) { var m = 1e9; Object.keys(o).forEach(function (k) { o[k].forEach(function (r) { if (r._i < m) m = r._i; }); }); return m; }
 }
+function ctBn(b) { return String(b || '').replace(/^\s*\d+\s*[.)·_-]?\s*/, ''); }   // 본부 이름 앞 번호(01. 등) 빼고 보여 주기
 function ctCount(b) { return b.t.reduce(function (n, t) { return n + t.p.length; }, 0); }
 function ctTree() {
   var T = $('#ctT'), O = $('#ctOs'); if (!T || !S.ct) return;
@@ -6729,8 +6730,9 @@ function ctTree() {
     var open = !cur || cur.split('|')[0] === C.c;
     h += '<details class="ctd0"' + (open ? ' open' : '') + '><summary>' + CV + nd(C.c, C.c, C.b.reduce(function (n, b) { return n + ctCount(b); }, 0), 'n0') + '</summary>';
     C.b.forEach(function (B) {
+      if (!B.b) { h += B.t.map(function (Tm) { return Tm.p.map(function (r) { return '<button class="ctp c0" data-ci="' + r._i + '">' + esc(r.n) + (r.j ? '<em>' + esc(r.j) + '</em>' : '') + '</button>'; }).join(''); }).join(''); return; }
       var bk = C.c + '|' + B.b, bo = cur && (cur === bk || cur.indexOf(bk + '|') === 0);
-      h += '<details class="ctd1"' + (bo ? ' open' : '') + '><summary>' + CV + nd(bk, B.b || '본부 밖', ctCount(B), 'n1') + '</summary>';
+      h += '<details class="ctd1"' + (bo ? ' open' : '') + '><summary>' + CV + nd(bk, ctBn(B.b), ctCount(B), 'n1') + '</summary>';
       B.t.forEach(function (Tm) {
         var tk = bk + '|' + Tm.t, to = cur && (cur === tk || cur.indexOf(tk + '|') === 0);
         if (!Tm.t) { h += Tm.p.map(function (r) { return '<button class="ctp" data-ci="' + r._i + '">' + esc(r.n) + (r.j ? '<em>' + esc(r.j) + '</em>' : '') + '</button>'; }).join(''); return; }
@@ -6743,7 +6745,7 @@ function ctTree() {
   T.innerHTML = h;
   // 좁은 화면: 같은 조직도를 드롭다운으로
   var opt = '<option value="">조직도 · 전체 부서</option>';
-  org.forEach(function (C) { if (k && C.c !== k) return; opt += '<option value="' + esc(C.c) + '"' + (cur === C.c ? ' selected' : '') + '>' + esc(C.c) + '</option>'; C.b.forEach(function (B) { var bk = C.c + '|' + B.b; opt += '<option value="' + esc(bk) + '"' + (cur === bk ? ' selected' : '') + '>  ' + esc(B.b || '본부 밖') + ' (' + ctCount(B) + ')</option>'; B.t.forEach(function (Tm) { if (!Tm.t) return; var tk = bk + '|' + Tm.t; opt += '<option value="' + esc(tk) + '"' + (cur === tk ? ' selected' : '') + '>    ' + esc(Tm.t) + ' (' + Tm.p.length + ')</option>'; }); }); });
+  org.forEach(function (C) { if (k && C.c !== k) return; opt += '<option value="' + esc(C.c) + '"' + (cur === C.c ? ' selected' : '') + '>' + esc(C.c) + '</option>'; C.b.forEach(function (B) { if (!B.b) return; var bk = C.c + '|' + B.b; opt += '<option value="' + esc(bk) + '"' + (cur === bk ? ' selected' : '') + '>  ' + esc(ctBn(B.b)) + ' (' + ctCount(B) + ')</option>'; B.t.forEach(function (Tm) { if (!Tm.t) return; var tk = bk + '|' + Tm.t; opt += '<option value="' + esc(tk) + '"' + (cur === tk ? ' selected' : '') + '>    ' + esc(Tm.t) + ' (' + Tm.p.length + ')</option>'; }); }); });
   O.innerHTML = '<select id="ctOsel" aria-label="조직도">' + opt + '</select>';
   $('#ctOsel').onchange = function () { S.cto = this.value; ctTree(); ctList(); };
   $$('#ctT .ctn, #ctT .ctx').forEach(function (b) { b.onclick = function (ev) { ev.preventDefault(); ev.stopPropagation(); S.cto = S.cto === b.dataset.o ? '' : b.dataset.o; ctTree(); ctList(); }; });
@@ -6776,7 +6778,7 @@ function ctList() {
     var A = g.split('|'), R = G[g].slice().sort(function (a, b) { var x = ctTeamKey(a.t), y = ctTeamKey(b.t); return x < y ? -1 : x > y ? 1 : a._i - b._i; });
     if (A[0] !== lastCo) { h += (lastCo === null ? '' : '</div>') + '<div class="lgh">' + esc(A[0]) + '</div><div class="ctg">'; lastCo = A[0]; }
     h += R.map(function (r) {
-      var tel = r.m || r.l, org = r.b ? esc(r.b) + (r.t ? CV + esc(r.t) : '') : r.t ? esc(r.t) : '';
+      var tel = r.m || r.l, org = r.b ? esc(ctBn(r.b)) + (r.t ? CV + esc(r.t) : '') : r.t ? esc(r.t) : '';
       return '<div class="ctc" data-ci="' + r._i + '"><div class="cth"><div class="cn"><b>' + esc(r.n) + '</b>' + (r.j ? '<span>' + esc(r.j) + '</span>' : '') + '</div>' +
         (org ? '<div class="cto"><span>' + org.split(CV).join('</span>' + CV + '<span>') + '</span></div>' : '') + '</div>' +
         '<div class="ctf"><em>연락처</em>' + (tel ? '<button type="button" class="cta" data-cc="' + esc(tel) + '" data-cm="전화번호를 복사했어요" title="전화번호 복사">' + esc(tel) + '</button>' : '<span class="cta mute">없음</span>') + '</div>' +
