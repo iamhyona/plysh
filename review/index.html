@@ -220,6 +220,33 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   #sheet .s-err { color:var(--red); font-weight:800; } #sheet .s-warn { color:var(--org); font-weight:800; } #sheet .s-ok { color:#16a34a; font-weight:800; } #sheet .s-na { color:#8b95a1; }
   #sheet .thumbs { display:flex; flex-wrap:wrap; gap:6px; } #sheet .thumbs { margin-top:6px; } #sheet .thumbs figure { margin:0; width:31%; break-inside:avoid; } #sheet .thumbs img { width:100%; border:1px solid #d1d6db; } #sheet figcaption { font-size:10px; color:#4e5968; }
 }
+/* 2026-11-27 실장님: 자가 점검 리스트를 검수기 오른쪽(넓은 화면) · 아래(좁은 화면)에 — 자가점검리스트 메뉴와 같은 체크 상태를 함께 씀 */
+#ckp:empty { display:none; }
+#ckp .ckh { display:flex; align-items:center; gap:6px; margin-bottom:14px; }
+#ckp .ckh h3 { margin:0; flex:1; white-space:nowrap; min-width:0; }
+#ckp .ckh button { flex:none; border:0; background:var(--chip); color:var(--sub); border-radius:999px; height:30px; padding:0 12px; font-size:12.5px; font-weight:700; }
+#ckp .ckd { font-size:13px; color:var(--mute); line-height:1.5; margin:0 0 12px; }
+#ckp .ckt { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin:0 -18px 12px; padding:0 18px; }
+#ckp .ckt::-webkit-scrollbar { display:none; }
+#ckp .ckt button { flex:none; border:0; background:var(--chip); color:var(--sub); border-radius:999px; height:32px; padding:0 12px; font-size:13px; font-weight:700; white-space:nowrap; }
+#ckp .ckt button.on { background:var(--txt); color:#fff; }
+#ckp .ckt button small { font-size:11.5px; font-weight:600; opacity:.7; margin-left:4px; }
+#ckp .ckbar { height:6px; border-radius:3px; background:var(--chip); overflow:hidden; margin:0 0 6px; } #ckp .ckbar i { display:block; height:100%; background:var(--txt); border-radius:3px; }
+#ckp .ckn { display:flex; align-items:center; justify-content:space-between; min-height:24px; font-size:12.5px; color:var(--mute); font-weight:600; margin-bottom:6px; } #ckp .ckn button { border:0; background:none; color:var(--mute); font-size:12.5px; font-weight:700; padding:0; text-decoration:underline; text-underline-offset:2px; }
+#ckp .ckc { font-size:12.5px; font-weight:800; color:var(--mute); margin:14px 0 4px; }
+#ckp label { display:flex; align-items:flex-start; gap:10px; padding:8px 0; font-size:14px; line-height:1.45; cursor:pointer; border-bottom:1px solid #f2f4f6; }
+#ckp label:last-child { border-bottom:0; }
+#ckp label input { appearance:none; -webkit-appearance:none; flex:none; width:20px; height:20px; margin:0; border-radius:6px; box-shadow:inset 0 0 0 1.5px var(--faint); background:#fff; display:grid; place-items:center; cursor:pointer; }
+#ckp label input:checked { background:var(--txt); box-shadow:none; }
+#ckp label input:checked::after { content:''; width:10px; height:6px; border:2px solid #fff; border-top:0; border-right:0; transform:translateY(-1px) rotate(-45deg); }
+#ckp label.on span { color:var(--mute); text-decoration:line-through; }
+@media (min-width:900px) {
+  .wrap { display:grid; grid-template-columns:minmax(0,1fr) 320px; column-gap:16px; align-items:start; max-width:1440px; }
+  .wrap > * { grid-column:1; min-width:0; }
+  .wrap > h2:first-child { grid-column:1 / -1; } /* 제목은 두 칸 위로 → 오른쪽 상자 윗선 = 첫 카드 윗선 */
+  .wrap > #ckp { grid-column:2; grid-row:2 / span 40; position:sticky; top:14px; max-height:calc(100vh - 28px); overflow:auto; overscroll-behavior:contain; margin-bottom:0; }
+}
+@media print { #ckp { display:none !important; } }
 @media print { body.spking .wrap > *:not(#specRep), body.spking #sheet, body.spking .ov { display:none !important; } body.spking #specRep .spk { padding:0; border-radius:0; } }
 @media print { .ov, .noprint, .drop, details.set { display:none !important; } body { background:#fff; } .card { break-inside:avoid; border:1px solid var(--line); } }
 
@@ -332,6 +359,7 @@ details.ck > summary .bd { margin-left:auto; display:flex; gap:4px; }
   <div class="card noprint" id="hist" hidden></div>
   <div class="card" id="chk"></div>
   <div id="rep" hidden></div>
+  <aside class="card noprint" id="ckp" aria-label="자가 점검 리스트"></aside>
 </div>
 <div id="sheet"></div>
 
@@ -357,6 +385,43 @@ var LIBS = {
   tessCore: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',
   tessLang: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int'
 };
+</script>
+<script>
+/* 자가 점검 리스트 패널 (2026-11-27) — 내용은 자가점검리스트 메뉴(tools/design-checklist)와 같고, 체크도 같은 저장(wms_checks_v2)을 씀 */
+(function () {
+  var el = document.getElementById('ckp'); if (!el) return;
+  var SK = 'wms_structure_v2', CK = 'wms_checks_v2', S = null, C = {}, cur = '';
+  try { cur = localStorage.getItem('rv:cktab') || ''; } catch (e) {}
+  var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var names = function () { return (S.__tabOrder || Object.keys(S)).filter(function (k) { return k !== '__tabOrder' && S[k] && S[k].items; }); };
+  function load(cb) {
+    try { var x = localStorage.getItem(SK); if (x) { S = JSON.parse(x); return cb(); } } catch (e) {}
+    fetch('../tools/design-checklist/index.html', { cache: 'no-cache' }).then(function (r) { return r.text(); }).then(function (t) {
+      var m = t.match(/const DEFAULT_DATA = (\{[\s\S]*?\n\});/); if (!m) return;
+      S = (new Function('return ' + m[1]))(); cb();
+    }).catch(function () {});
+  }
+  function draw() {
+    try { C = JSON.parse(localStorage.getItem(CK) || '{}'); } catch (e) { C = {}; }
+    var N = names(); if (!N.length) return; if (N.indexOf(cur) < 0) cur = N[0];
+    var sh = S[cur], ck = C[cur] || {}, it = sh.items || [], done = it.filter(function (x) { return ck[x.id]; }).length;
+    var h = '<div class="ckh"><h3>자가 점검 리스트</h3>' + '<button type="button" id="ckGo">전체 보기</button></div>' +
+      '<div class="ckt">' +
+      N.map(function (n) { var c2 = C[n] || {}, t2 = S[n].items.length, d2 = S[n].items.filter(function (x) { return c2[x.id]; }).length; return '<button type="button" data-t="' + esc(n) + '"' + (n === cur ? ' class="on"' : '') + '>' + esc(n) + '<small>' + d2 + '/' + t2 + '</small></button>'; }).join('') + '</div>' +
+      (sh.desc ? '<p class="ckd">' + esc(sh.desc) + '</p>' : '') +
+      '<div class="ckbar"><i style="width:' + (it.length ? Math.round(done / it.length * 100) : 0) + '%"></i></div><div class="ckn"><span>' + done + ' / ' + it.length + ' 확인</span>' + (done ? '<button type="button" id="ckRs">체크 지우기</button>' : '') + '</div>';
+    var last = null;
+    it.forEach(function (x) { if (x.cat && x.cat !== last) { h += '<div class="ckc">' + esc(x.cat) + '</div>'; last = x.cat; } h += '<label' + (ck[x.id] ? ' class="on"' : '') + '><input type="checkbox" data-i="' + esc(x.id) + '"' + (ck[x.id] ? ' checked' : '') + '><span>' + esc(x.text) + '</span></label>'; });
+    var tb = el.querySelector('.ckt'), sl = tb ? tb.scrollLeft : 0;
+    el.innerHTML = h; var tb2 = el.querySelector('.ckt'); if (tb2) tb2.scrollLeft = sl;
+    el.querySelectorAll('.ckt button').forEach(function (b) { b.onclick = function () { cur = b.dataset.t; try { localStorage.setItem('rv:cktab', cur); } catch (e) {} draw(); }; });
+    el.querySelectorAll('input[data-i]').forEach(function (i) { i.onchange = function () { try { C = JSON.parse(localStorage.getItem(CK) || '{}'); } catch (e) { C = {}; } C[cur] = C[cur] || {}; C[cur][i.dataset.i] = i.checked; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (e) {} draw(); }; });
+    var rs = document.getElementById('ckRs'); if (rs) rs.onclick = function () { C[cur] = {}; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (e) {} draw(); };
+    document.getElementById('ckGo').onclick = function () { try { if (parent !== window && parent.navGo) return parent.navGo('checklist'); } catch (e) {} window.open('../tools/design-checklist/', '_blank'); };
+  }
+  load(draw);
+  window.addEventListener('storage', function (e) { if (S && (e.key === CK || e.key === SK)) { if (e.key === SK) { try { S = JSON.parse(e.newValue); } catch (x) {} } draw(); } });
+})();
 </script>
 <script src="korean-lunar-calendar.min.js"></script>
 <script src="text.js?v=20261123d6"></script>
