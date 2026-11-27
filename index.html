@@ -5728,7 +5728,7 @@ function ctList() {
       var tel = r.m || r.l, org = r.b ? esc(r.b) + (r.t ? CV + esc(r.t) : '') : r.t ? esc(r.t) : '';
       return '<div class="ctc"><div class="cth"><div class="cn"><b>' + esc(r.n) + '</b>' + (r.j ? '<span>' + esc(r.j) + '</span>' : '') + '</div>' +
         (org ? '<div class="cto"><span>' + org.split(CV).join('</span>' + CV + '<span>') + '</span></div>' : '') + '</div>' +
-        '<div class="ctf"><em>연락처</em>' + (tel ? '<a class="cta" href="tel:' + esc(tel.replace(/[^\d+]/g, '')) + '" data-ct="' + esc(tel) + '" title="번호 복사 · 휴대폰에서는 전화">' + esc(tel) + '</a>' : '<span class="cta mute">없음</span>') + '</div>' +
+        '<div class="ctf"><em>연락처</em>' + (tel ? '<button type="button" class="cta" data-cc="' + esc(tel) + '" data-cm="전화번호를 복사했어요" title="전화번호 복사">' + esc(tel) + '</button>' : '<span class="cta mute">없음</span>') + '</div>' +
         '<div class="ctf"><em>메일주소</em>' + (r.e ? '<button type="button" class="cta" data-cc="' + esc(r.e) + '" title="메일 주소 복사">' + esc(r.e) + '</button>' : '<span class="cta mute">없음</span>') + '</div></div>';
     }).join('');
   });
@@ -5737,9 +5737,8 @@ function ctList() {
   else h += '<div class="ctn">위하고 조직도 기준 · 고칠 내용은 오른쪽 위 시트 아이콘으로 연락망 시트를 열어 바로 고치면 돼요</div>';
   L.innerHTML = h;
   function cp(t, m) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast(m); }, function () { prompt('복사해서 쓰세요', t); }); }
-  $$('[data-cc]', L).forEach(function (b) { b.onclick = function () { cp(b.dataset.cc, '메일 주소를 복사했어요'); }; });
-  // PC(마우스)에서는 전화 대신 번호 복사, 휴대폰에서는 바로 전화
-  $$('[data-ct]', L).forEach(function (b) { b.onclick = function (e) { if (window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches) { e.preventDefault(); cp(b.dataset.ct, '전화번호를 복사했어요'); } }; });
+  // 2026-11-27 실장님: 연락처 · 메일주소 모두 누르면 복사 (휴대폰에서도 전화 걸기 대신 복사)
+  $$('[data-cc]', L).forEach(function (b) { b.onclick = function () { cp(b.dataset.cc, b.dataset.cm || '메일 주소를 복사했어요'); }; });
 }
 function kqHtml() { // 퀵 배차 맨 위: 카카오 T 퀵 주문 (2026-11-20 실장님: 연락처와 합침)
   return '<div class="kqr"><div class="kqt"><b>카카오 T 퀵으로 배차</b><span>카카오는 다른 사이트 안에서 주문·로그인을 열 수 없게 막아 두어서 새 탭(늘 같은 탭 하나)에서 열려요</span></div>' +
