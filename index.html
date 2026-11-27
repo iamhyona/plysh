@@ -2165,6 +2165,25 @@ html[data-nav] #cvSeg { display:none !important; }
 .ldb small { display:block; margin-top:14px; font-size:12px; color:var(--mute); }
 .ldsp { width:16px; height:16px; flex:none; border-radius:50%; border:2px solid #d5d9de; border-top-color:var(--acc); animation:ldspin .8s linear infinite; }
 @keyframes ldspin { to { transform:rotate(360deg); } }
+
+/* 사내연락망 조직도 (hm257): PC 오른쪽 트리(필터 패널), 좁으면 위쪽 드롭다운 */
+.ctw { display:grid; grid-template-columns:minmax(0,1fr) 248px; gap:16px; align-items:start; }
+.ctt { position:sticky; top:16px; max-height:calc(100vh - 32px); overflow:auto; background:#fff; border-radius:18px; padding:12px 10px 14px; }
+.ctth { display:flex; align-items:center; justify-content:space-between; height:32px; padding:0 6px 6px; font-size:13px; font-weight:800; }
+.ctth .ctx { height:28px; border:0; border-radius:8px; background:var(--chip); padding:0 10px; font:inherit; font-size:12px; font-weight:700; color:var(--sub); cursor:pointer; }
+.ctt details > summary { list-style:none; display:flex; align-items:center; gap:2px; cursor:pointer; } .ctt details > summary::-webkit-details-marker { display:none; }
+.ctt details > summary { padding:0 !important; margin:0 !important; min-height:32px; } .ctt summary > svg { align-self:center !important; margin:0 !important; position:static !important; width:14px; height:14px; flex:none; color:var(--faint); transition:transform .15s; } .ctt details[open] > summary > svg { transform:rotate(90deg); }
+.ctt .ctd1 { margin-left:14px; } .ctt .ctd2 { margin-left:14px; }
+.ctn, .ctp, .ctth .ctx { margin-top:0 !important; margin-bottom:0 !important; margin-right:0 !important; } .ctn { margin-left:0 !important; } .ctn { flex:1; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:6px; height:32px; border:0; background:none; border-radius:8px; padding:0 8px; font:inherit; font-size:13.5px; color:var(--txt); text-align:left; cursor:pointer; }
+.ctn span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .ctn small { font-size:11.5px; color:var(--mute); font-weight:600; }
+.ctn.n0 { font-weight:800; } .ctn.n1 { font-weight:700; } .ctn.n2 { font-weight:500; }
+.ctn:hover, .ctp:hover { background:var(--chip); } .ctn.on { background:var(--txt); color:#fff; } .ctn.on small { color:rgba(255,255,255,.7); }
+.ctp { display:flex; align-items:center; gap:6px; width:calc(100% - 30px); margin-left:30px; height:28px; border:0; background:none; border-radius:8px; padding:0 8px; font:inherit; font-size:13px; color:var(--sub); text-align:left; cursor:pointer; white-space:nowrap; overflow:hidden; }
+.ctp em { font-style:normal; font-size:11.5px; color:var(--mute); }
+.ctc.hit { box-shadow:0 0 0 2px var(--acc); transition:box-shadow .2s; }
+.ctos { display:none; margin-bottom:12px; }
+.ctos select { width:100%; height:40px; border:0; border-radius:10px; background:#fff; padding:0 12px; font:inherit; font-size:14px; font-weight:600; color:var(--txt); }
+@media (max-width:1099px) { .ctw { grid-template-columns:minmax(0,1fr); } .ctt { display:none; } .ctos { display:block; } }
 </style>
 </head>
 <body>
@@ -2478,7 +2497,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm256';
+var APP_VER = '20261127hm257';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -6562,11 +6581,54 @@ function renderCt() {
   if (k && ctCos().indexOf(k) < 0) k = '';
   var h = '<div class="srow"><label class="qkq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="ctQ" type="search" placeholder="이름 · 팀 · 메일 · 전화 검색" value="' + esc(S.ctq) + '" autocomplete="off"></label>';
   h += '<div class="tabs2" id="ctK"><button data-k="" class="' + (k ? '' : 'on') + '">전체</button>' + ctCos().map(function (x) { return '<button data-k="' + esc(x) + '" class="' + (k === x ? 'on' : '') + '">' + esc(x) + '</button>'; }).join('') + '</div></div>';
-  h += '<div id="ctL"></div>';
+  h += '<div class="ctw"><div class="ctm"><div class="ctos" id="ctOs"></div><div id="ctL"></div></div><aside class="ctt" id="ctT"></aside></div>';
   $('#main').innerHTML = h;
-  ctList();
+  ctTree(); ctList();
   $('#ctQ').oninput = function () { S.ctq = this.value; ctList(); };
-  $$('#ctK button').forEach(function (b) { b.onclick = function () { ls.set('d4:ctk', b.dataset.k); render(); }; });
+  $$('#ctK button').forEach(function (b) { b.onclick = function () { ls.set('d4:ctk', b.dataset.k); S.cto = ''; render(); }; });
+}
+// 2026-11-27 실장님: 사내연락망 오른쪽에 조직도 트리 (회사 > 본부 > 팀 > 사람). 누르면 목록이 그 부서로 걸러짐, 사람은 그 카드로 이동. 좁은 화면은 위쪽 드롭다운
+S.cto = '';
+function ctOrg() {
+  var cos = ctCos(), T = {};
+  (S.ct.rows || []).forEach(function (r, i) { r._i = i; var c = r.co || '', b = r.b || '', t = r.t || ''; T[c] = T[c] || {}; T[c][b] = T[c][b] || {}; (T[c][b][t] = T[c][b][t] || []).push(r); });
+  return cos.filter(function (c) { return T[c]; }).map(function (c) {
+    var bs = Object.keys(T[c]).sort(function (x, y) { var dx = x === '디자인 본부' ? 0 : x ? 2 : 1, dy = y === '디자인 본부' ? 0 : y ? 2 : 1; return dx !== dy ? dx - dy : firstI(T[c][x]) - firstI(T[c][y]); });
+    return { c: c, b: bs.map(function (b) { var ts = Object.keys(T[c][b]).sort(function (x, y) { var a = ctTeamKey(x), z = ctTeamKey(y); return a < z ? -1 : a > z ? 1 : 0; }); return { b: b, t: ts.map(function (t) { return { t: t, p: T[c][b][t] }; }) }; }) };
+  });
+  function firstI(o) { var m = 1e9; Object.keys(o).forEach(function (k) { o[k].forEach(function (r) { if (r._i < m) m = r._i; }); }); return m; }
+}
+function ctCount(b) { return b.t.reduce(function (n, t) { return n + t.p.length; }, 0); }
+function ctTree() {
+  var T = $('#ctT'), O = $('#ctOs'); if (!T || !S.ct) return;
+  var org = ctOrg(), cur = S.cto, CV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+  var k = ls.get('d4:ctk') || '';
+  var nd = function (key, label, n, cls) { return '<button class="ctn ' + cls + (cur === key ? ' on' : '') + '" data-o="' + esc(key) + '"><span>' + esc(label) + '</span>' + (n != null ? '<small>' + n + '</small>' : '') + '</button>'; };
+  var h = '<div class="ctth">조직도' + (cur ? '<button class="ctx" data-o="">전체 보기</button>' : '') + '</div>';
+  org.forEach(function (C) {
+    if (k && C.c !== k) return;
+    var open = !cur || cur.split('|')[0] === C.c;
+    h += '<details class="ctd0"' + (open ? ' open' : '') + '><summary>' + CV + nd(C.c, C.c, C.b.reduce(function (n, b) { return n + ctCount(b); }, 0), 'n0') + '</summary>';
+    C.b.forEach(function (B) {
+      var bk = C.c + '|' + B.b, bo = cur && (cur === bk || cur.indexOf(bk + '|') === 0);
+      h += '<details class="ctd1"' + (bo ? ' open' : '') + '><summary>' + CV + nd(bk, B.b || '본부 밖', ctCount(B), 'n1') + '</summary>';
+      B.t.forEach(function (Tm) {
+        var tk = bk + '|' + Tm.t, to = cur && (cur === tk || cur.indexOf(tk + '|') === 0);
+        if (!Tm.t) { h += Tm.p.map(function (r) { return '<button class="ctp" data-ci="' + r._i + '">' + esc(r.n) + (r.j ? '<em>' + esc(r.j) + '</em>' : '') + '</button>'; }).join(''); return; }
+        h += '<details class="ctd2"' + (to ? ' open' : '') + '><summary>' + CV + nd(tk, Tm.t, Tm.p.length, 'n2') + '</summary>' + Tm.p.map(function (r) { return '<button class="ctp" data-ci="' + r._i + '">' + esc(r.n) + (r.j ? '<em>' + esc(r.j) + '</em>' : '') + '</button>'; }).join('') + '</details>';
+      });
+      h += '</details>';
+    });
+    h += '</details>';
+  });
+  T.innerHTML = h;
+  // 좁은 화면: 같은 조직도를 드롭다운으로
+  var opt = '<option value="">조직도 · 전체 부서</option>';
+  org.forEach(function (C) { if (k && C.c !== k) return; opt += '<option value="' + esc(C.c) + '"' + (cur === C.c ? ' selected' : '') + '>' + esc(C.c) + '</option>'; C.b.forEach(function (B) { var bk = C.c + '|' + B.b; opt += '<option value="' + esc(bk) + '"' + (cur === bk ? ' selected' : '') + '>  ' + esc(B.b || '본부 밖') + ' (' + ctCount(B) + ')</option>'; B.t.forEach(function (Tm) { if (!Tm.t) return; var tk = bk + '|' + Tm.t; opt += '<option value="' + esc(tk) + '"' + (cur === tk ? ' selected' : '') + '>    ' + esc(Tm.t) + ' (' + Tm.p.length + ')</option>'; }); }); });
+  O.innerHTML = '<select id="ctOsel" aria-label="조직도">' + opt + '</select>';
+  $('#ctOsel').onchange = function () { S.cto = this.value; ctTree(); ctList(); };
+  $$('#ctT .ctn, #ctT .ctx').forEach(function (b) { b.onclick = function (ev) { ev.preventDefault(); ev.stopPropagation(); S.cto = S.cto === b.dataset.o ? '' : b.dataset.o; ctTree(); ctList(); }; });
+  $$('#ctT .ctp').forEach(function (b) { b.onclick = function () { var r = S.ct.rows[+b.dataset.ci]; S.cto = ''; S.ctq = ''; if ($('#ctQ')) $('#ctQ').value = ''; ctTree(); ctList(); var c = $('#ctL .ctc[data-ci="' + b.dataset.ci + '"]'); if (c) { c.scrollIntoView({ block: 'center', behavior: 'smooth' }); c.classList.add('hit'); setTimeout(function () { c.classList.remove('hit'); }, 1600); } }; });
 }
 // 본부 안 팀 순서: 본부 직속 → 1팀 · 2팀 … → 나머지 팀 (같은 팀 안은 위하고 직급순 그대로)
 function ctTeamKey(t) { if (!t) return '0'; var m = /^(\d+)팀$/.exec(t); return m ? '1' + ('00' + m[1]).slice(-3) : '2' + t; }
@@ -6575,6 +6637,7 @@ function ctList() {
   var k = ls.get('d4:ctk') || '', q = qkNorm(S.ctq), qd = String(S.ctq || '').replace(/\D/g, ''), cos = ctCos();
   var rows = (S.ct.rows || []).map(function (r, i) { r._i = i; return r; }).filter(function (r) {
     if (k && r.co !== k) return false;
+    if (S.cto) { var o = S.cto.split('|'); if (r.co !== o[0] || (o.length > 1 && (r.b || '') !== o[1]) || (o.length > 2 && (r.t || '') !== o[2])) return false; }
     if (!q) return true;
     if (qkNorm([r.n, r.j, r.co, r.b, r.t, r.e].join(' ')).indexOf(q) >= 0) return true;
     return qd.length >= 3 && (r.m + r.l).replace(/\D/g, '').indexOf(qd) >= 0;
@@ -6595,7 +6658,7 @@ function ctList() {
     if (A[0] !== lastCo) { h += (lastCo === null ? '' : '</div>') + '<div class="lgh">' + esc(A[0]) + '</div><div class="ctg">'; lastCo = A[0]; }
     h += R.map(function (r) {
       var tel = r.m || r.l, org = r.b ? esc(r.b) + (r.t ? CV + esc(r.t) : '') : r.t ? esc(r.t) : '';
-      return '<div class="ctc"><div class="cth"><div class="cn"><b>' + esc(r.n) + '</b>' + (r.j ? '<span>' + esc(r.j) + '</span>' : '') + '</div>' +
+      return '<div class="ctc" data-ci="' + r._i + '"><div class="cth"><div class="cn"><b>' + esc(r.n) + '</b>' + (r.j ? '<span>' + esc(r.j) + '</span>' : '') + '</div>' +
         (org ? '<div class="cto"><span>' + org.split(CV).join('</span>' + CV + '<span>') + '</span></div>' : '') + '</div>' +
         '<div class="ctf"><em>연락처</em>' + (tel ? '<button type="button" class="cta" data-cc="' + esc(tel) + '" data-cm="전화번호를 복사했어요" title="전화번호 복사">' + esc(tel) + '</button>' : '<span class="cta mute">없음</span>') + '</div>' +
         '<div class="ctf"><em>메일주소</em>' + (r.e ? '<button type="button" class="cta" data-cc="' + esc(r.e) + '" title="메일 주소 복사">' + esc(r.e) + '</button>' : '<span class="cta mute">없음</span>') + '</div></div>';
