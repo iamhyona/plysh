@@ -1356,7 +1356,11 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .hmc .wk .ev i { display:none; }
 #bgSv { position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px); z-index:400; background:#191f28; color:#fff; font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; white-space:nowrap; max-width:calc(100vw - 32px); }
 /* 출퇴근 단추 확인 문구는 잘리지 않게 줄바꿈 */
-.wck [data-pu].sure small { white-space:normal; line-height:1.25; text-align:center; font-size:11px; word-break:keep-all; }
+/* 2026-11-27 실장님: 출퇴근 단추 가로형 2×2 (아이콘·이름 왼쪽, 시각 오른쪽) · 찍힌 단추는 흐리지 않게 고정 */
+.wdg .wckb { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+.wdg .wckb button { height:52px !important; flex-direction:row !important; justify-content:flex-start !important; gap:8px !important; padding:0 14px !important; }
+.wdg .wckb button b { font-size:15px !important; } .wdg .wckb button small { margin-left:auto; font-size:13.5px !important; }
+.wdg .wckb button.done:disabled { opacity:1; } .wdg .wckb button.done:disabled small { color:var(--txt); font-weight:700; }
 #bgSv.on { opacity:1; transform:translate(-50%, 0); }
 #bgSv i { width:14px; height:14px; border-radius:50%; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; animation:bgspin .8s linear infinite; flex:none; }
 @keyframes bgspin { to { transform:rotate(360deg); } }
@@ -2094,7 +2098,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm220';
+var APP_VER = '20261127hm221';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3243,7 +3247,7 @@ function puCard() {
   return '<div class="wsc wck" style="--pc:' + dcol(me) + '"><h3>출퇴근<span class="wckh">' + (auto ? '<span class="wckme">' + esc(me) + '</span>' : '<button type="button" id="puWho">' + esc(me) + ' 바꾸기</button>') + '<button type="button" id="puEd">기록 고치기</button></span></h3>' +
     '<div class="wckn"><b id="puClk">' + wlHm(nm) + '</b><span class="' + k + '">' + line + '</span></div>' +
     '<div class="wckb">' + [['i', '출근'], ['x', '외근'], ['b', '복귀'], ['o', '퇴근']].map(function (b) {
-      return '<button type="button" data-pu="' + b[0] + '" class="' + (nx === b[0] ? 'nx ' : '') + (tm[b[0]] ? 'done' : '') + '"' + (dis[b[0]] ? ' disabled' : '') + '>' + puIc(b[0]) + '<b>' + b[1] + '</b><small>' + (tm[b[0]] ? tm[b[0]].replace(/^0(?=\d:)/, '') : '–') + '</small></button>';
+      return '<button type="button" data-pu="' + b[0] + '" class="' + (nx === b[0] ? 'nx ' : '') + (tm[b[0]] ? 'done' : '') + '"' + (dis[b[0]] || (tm[b[0]] && b[0] !== 'x') ? ' disabled' : '') + '>' + puIc(b[0]) + '<b>' + b[1] + '</b><small>' + (tm[b[0]] ? tm[b[0]].replace(/^0(?=\d:)/, '') : '–') + '</small></button>';
     }).join('') + '</div>' +
     '<div class="wckx" id="puEx" hidden><input id="puExT" maxlength="60" placeholder="외근 장소·내용 (안 적어도 돼요)" enterkeyhint="done"><button type="button" id="puExGo">외근 시작</button></div>' +
     bar + '</div>';
@@ -3270,8 +3274,8 @@ function bindPu() {
   $$('[data-pu]').forEach(function (b) { b.onclick = function () {
     var k = b.dataset.pu;
     if (k === 'x') { var ex = $('#puEx'); ex.hidden = !ex.hidden; if (!ex.hidden) $('#puExT').focus(); return; }
-    // 이미 찍힌 출근·퇴근은 한 번 더 눌러야 바꿈
-    if (b.classList.contains('done') && !b.classList.contains('sure')) { b.classList.add('sure'); b.querySelector('small').textContent = '다시 누르면 지금 시각'; clearTimeout(b.h); b.h = setTimeout(function () { render(); }, 3000); return; }
+    // 2026-11-27 실장님: 이미 찍힌 출근·복귀·퇴근은 다시 안 눌림 (고칠 땐 '기록 고치기')
+    if (b.classList.contains('done') && k !== 'x') return;
     puSave(k);
   }; });
   if ($('#puExGo')) { $('#puExGo').onclick = function () { puSave('x', $('#puExT').value.trim()); }; $('#puExT').onkeydown = function (ev) { if (ev.key === 'Enter') $('#puExGo').click(); }; }
