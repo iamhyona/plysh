@@ -1317,7 +1317,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wckn span { font-size:13.5px; font-weight:600; color:var(--sub); }
 .wckn span.on, .wckn span.ex { color:color-mix(in srgb, var(--pc) 80%, #191f28); }
 .wckb { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; align-items:start; }
-@media (min-width:1024px) { .wckb button { height:128px !important; gap:5px; } .wckb button svg { width:22px; height:22px; } .wckb button b { font-size:15px; } .wckb button small { font-size:12.5px; } }
+@media (min-width:1024px) { .wckb button { height:92px !important; gap:5px; } .wckb button svg { width:22px; height:22px; } .wckb button b { font-size:15px; } .wckb button small { font-size:12.5px; } }
 .wckb button { height:76px; border:0; border-radius:12px; background:var(--bg); color:var(--txt); font-family:inherit; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; padding:0 4px; min-width:0; }
 .wckb button svg { width:18px; height:18px; color:var(--sub); }
 .wckb button b { font-size:14px; font-weight:700; }
@@ -1382,6 +1382,33 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wmb .dl span { flex:1 1 0; text-align:center; font-size:12px; font-weight:600; color:var(--mute); }
 .wmb .dl span.td { color:var(--txt); font-weight:800; }
 @media (max-width:1023px) { .wsg.wdb { grid-template-columns:1fr; } }
+.wsg.wdc { grid-template-columns:minmax(0, 1fr) minmax(0, 1.45fr); }
+.wsg.wnt { align-items:stretch; } .wsg.wnt > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; } .wsg.wnt .nth { margin:-6px 0 4px; } .wsg.wnt .nth b { font-size:14px; font-weight:800; }
+.whc { display:flex; flex-direction:column; }
+.whc h3 .hct { font-size:15px; font-variant-numeric:tabular-nums; }
+.whc h3 .hca { display:flex; align-items:center; gap:4px; }
+.whc h3 .hca button { height:30px; min-width:30px; border-radius:999px; background:var(--bg); color:var(--sub); display:inline-flex; align-items:center; justify-content:center; padding:0 10px; }
+.whc h3 .hca button svg { width:14px; height:14px; } .whc h3 .hca button[aria-label] { padding:0; }
+.hmc { flex:1; display:flex; flex-direction:column; min-height:0; }
+.hmc .wd { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); text-align:center; font-size:11.5px; font-weight:600; color:var(--mute); padding-bottom:6px; }
+.hmc .wd .su { color:#f04452; } .hmc .wd .sa { color:#3182f6; }
+.hmc .gd { flex:1; display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); grid-auto-rows:minmax(84px, 1fr); border-top:1px solid var(--line); }
+.hmc .gd > button { border:0; border-bottom:1px solid var(--line); background:none; padding:5px 3px 4px; display:flex; flex-direction:column; gap:2px; align-items:stretch; text-align:left; min-width:0; cursor:pointer; font-family:inherit; overflow:hidden; }
+.hmc .gd > button:hover { background:var(--bg); }
+.hmc .dn { display:flex; align-items:center; gap:3px; min-width:0; margin-bottom:1px; }
+.hmc .dn b { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#333d4b; flex:none; font-variant-numeric:tabular-nums; }
+.hmc .dn small { font-size:9.5px; color:#f04452; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hmc .su .dn b { color:#f04452; } .hmc .sa .dn b { color:#3182f6; }
+.hmc .td .dn b { background:#191f28; color:#fff; font-weight:700; }
+.hmc .out { opacity:.35; } .hmc .pa .ev { opacity:.55; }
+.hmc .ev { display:flex; align-items:center; gap:3px; min-width:0; font-size:10.5px; line-height:1.35; color:#333d4b; border-radius:4px; padding:1px 3px; background:color-mix(in srgb, var(--c) 12%, #fff); }
+.hmc .ev i { width:3px; align-self:stretch; border-radius:2px; background:var(--c); flex:none; }
+.hmc .ev em { font-style:normal; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.hmc .ev.dl { color:#f04452; font-weight:700; }
+.hmc .evm { font-size:10px; color:var(--mute); padding-left:3px; }
+@media (max-width:1023px) { .wsg.wdc { grid-template-columns:1fr; } .wsg.wdc > .wcol { display:contents; } .wsg.wdc > .whc { order:1; } .wsg.wdc .wtn2 { order:2; } .wsg.wnt { grid-template-columns:1fr; } }
+@media (max-width:640px) { .hmc .gd { grid-auto-rows:minmax(58px, auto); } .hmc .gd > button { padding:4px 2px; align-items:center; } .hmc .dn { justify-content:center; } .hmc .dn small { display:none; } .hmc .ev { width:100%; height:4px; padding:0; background:var(--c); border-radius:2px; } .hmc .ev i, .hmc .ev em { display:none; } .hmc .evm { padding:0; font-size:9.5px; } }
+
 @media (max-width:640px) { .wmyg { grid-template-columns:1fr; } .wckb button { height:70px; } .wckn b { font-size:28px; } }
 
 @media (min-width:1024px) { .wcol .wsq { grid-template-columns:repeat(4, minmax(0, 1fr)) !important; } .wsg > .wsc.wclk { grid-template-columns:168px minmax(0, 1fr) !important; gap:28px !important; padding:20px 24px; } .wclk .aclk { width:168px; height:168px; } }
@@ -2996,12 +3023,30 @@ function renderStart() {
     wtCard() + '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
   var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['review', 'chk', '인쇄파일 검수기'], ['gcheck', 'chk', '작업지시서 검수기'], ['wo', 'doc', '작업지시서 양식'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
-  // 2026-11-27 대시보드: 출퇴근 단추 · 오늘 팀 → 내 이번 주 → 달력·공지·도구 → 마감·할 일·통계
-  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wdb">' + puCard() + teamNowCard() + '</div>' + myWeekCard() + '<div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick(); bindPu();
+  // 2026-11-27 대시보드: [출퇴근·오늘 팀 | 달력] → 내 이번 주 → 공지·도구 → 마감·할 일·통계 (시계 카드는 뺌: 출퇴근 카드에 시각)
+  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wdb wdc"><div class="wcol">' + puCard() + teamNowCard() + '</div>' + homeCal() + '</div>' + myWeekCard() + '<div class="wsg wdb wnt">' + ntHtml() + toolsCard + '</div>'); bindGo($('#main')); bindNt(); bindPu(); bindHomeCal();
   $$('#main [data-wgd]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); var a = b.dataset.wgd.split('|'); openWl(a[0], a[1]); }; });
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
+}
+/* 2026-11-27 실장님: 홈 달력을 한눈에 — 맨 위 오른쪽, 칸마다 제작일정 (PC는 글자, 모바일은 색 막대) */
+function homeCal() {
+  var b = S.hcb || TODAY.slice(0, 7), y = +b.slice(0, 4), m = +b.slice(5, 7), first = b + '-01', last = F(new Date(y, m, 0)), st = sunOf(first), en = addD(sunOf(last), 6), L = pvis(), cur = b === TODAY.slice(0, 7);
+  var h = '<div class="wsc whc"><h3><span class="hct">' + y + '.' + pad(m) + '</span><span class="hca">' + (cur ? '' : '<button type="button" id="hcT">이번 달</button>') + '<button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button><button type="button" data-ng="cal">달력 전체</button></span></h3>' +
+    '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd">';
+  for (var d = st; d <= en; d = addD(d, 1)) {
+    var l = onDay(d, L), w = P(d).getDay(), hl = hol(d), mx = 3;
+    h += '<button type="button" data-hcd="' + d + '" class="' + (d.slice(0, 7) !== b ? 'out ' : '') + (d === TODAY ? 'td ' : '') + (w === 0 || hl ? 'su ' : w === 6 ? 'sa ' : '') + (d < TODAY ? 'pa' : '') + '"><span class="dn"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</span>' +
+      l.slice(0, l.length > mx ? mx - 1 : mx).map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + '" style="--c:' + e.file.color + '"><i></i><em>' + esc(e.file.short) + ' ' + esc(e.t) + '</em></span>'; }).join('') +
+      (l.length > mx ? '<span class="evm">+' + (l.length - mx + 1) + '</span>' : '') + '</button>';
+  }
+  return h + '</div></div></div>';
+}
+function bindHomeCal() {
+  var mv = function (k) { var b = S.hcb || TODAY.slice(0, 7), y = +b.slice(0, 4), m = +b.slice(5, 7) + k; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; } S.hcb = y + '-' + pad(m); render(); };
+  if ($('#hcP')) { $('#hcP').onclick = function () { mv(-1); }; $('#hcN').onclick = function () { mv(1); }; }
+  if ($('#hcT')) $('#hcT').onclick = function () { S.hcb = ''; render(); };
 }
 /* 2026-11-27 실장님: 홈 = 대시보드 · 출근·외근·복귀·퇴근 단추를 누르면 지금 시각으로 근태(WORK LOG) 기록
    외근은 WORK LOG '외근 내용'에 '14:10–16:30 장소'로 남김 (서버 항목 그대로 씀) */
