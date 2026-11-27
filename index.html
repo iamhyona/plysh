@@ -2269,6 +2269,10 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 
 /* 2026-11-27 실장님: PC 상단 고정바 위아래 여백 같게 (아래 10px), 모든 메뉴에서 고정 */
 @media (min-width:1024px) { header { position:sticky !important; top:0 !important; padding-bottom:10px !important; z-index:30; } .pjdd { top:68px; } }
+
+/* 2026-11-27 실장님: 사이드바 PLYSH 칸 어디를 눌러도 홈 */
+#nsd .sbh { padding:0 !important; margin:-16px -12px 0; }
+#nsd .sbh button { flex:1; display:block; text-align:left; padding:20px 22px 14px !important; margin:0 !important; cursor:pointer; border-radius:0; }
 </style>
 </head>
 <body>
@@ -2582,7 +2586,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm270';
+var APP_VER = '20261127hm271';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
