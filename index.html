@@ -2543,7 +2543,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm261';
+var APP_VER = '20261127hm262';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -6390,7 +6390,10 @@ function renderMrep() {
   $$('[data-mrf]').forEach(function (b) { b.onclick = function () { openProj(b.dataset.mrf); }; });
 }
 var WLS = null;
+// 2026-11-27 실장님: 작성하기 = 로그인한 본인 화면 바로, 다른 사람 작성 내역은 안 보이게 (실장님 계정은 예외 — 모두 보고 고침)
+function wlBoss() { return hmMe() === '박현아'; }
 function openWl(d, p) {
+  var me = hmMe(); if (!p || (me && !wlBoss())) p = me || p || '';
   WLS = { d: d, p: p || '' };
   wlLoad(); unsure($('#wlDel'));
   var was = !!$('.bs.open'); closeBs(); setTimeout(function () { openBs('#wl'); }, was ? 230 : 0);
@@ -6406,7 +6409,9 @@ function wlLoad() {
   wlDraw();
 }
 function wlDraw() {
-  $('#wlP2').innerHTML = '<button data-n="" class="' + (WLS.p ? '' : 'on') + '">전체보기</button>' + team().map(function (n) { return '<button data-n="' + esc(n) + '" class="' + (WLS.p === n ? 'on' : '') + '">' + esc(n) + '</button>'; }).join('');
+  var me = hmMe(), boss = wlBoss();
+  $('#wlP2').style.display = $('#wlP2').previousElementSibling.style.display = me && !boss ? 'none' : '';
+  $('#wlP2').innerHTML = (boss ? '<button data-n="" class="' + (WLS.p ? '' : 'on') + '">전체보기</button>' : '') + team().map(function (n) { return '<button data-n="' + esc(n) + '" class="' + (WLS.p === n ? 'on' : '') + '">' + esc(n) + '</button>'; }).join('');
   $('#wlForm').style.display = WLS.p ? '' : 'none'; $('#wlForm0').style.display = WLS.p ? 'none' : '';
   if (WLS.p) $('#wlFT').innerHTML = '<b style="color:' + dcol(WLS.p) + '">' + esc(WLS.p) + '</b> 기록 쓰기';
   $$('#wlP2 button').forEach(function (b) { b.onclick = function () { WLS.p = b.dataset.n; WLS.d = $('#wlD').value || WLS.d; wlLoad(); }; });
@@ -6416,8 +6421,8 @@ function wlDraw() {
   $('#wlDn').value = String(+WLS.dn || 0); if ($('#wlDn').value === '') { $('#wlDn').insertAdjacentHTML('beforeend', '<option value="' + WLS.dn + '">' + WLS.dn + '분</option>'); $('#wlDn').value = String(WLS.dn); }
   $('#wl .wlex').style.display = WLS.k.ex ? '' : 'none';
   $('#wl .wltx').style.display = WLS.k.tx ? '' : 'none';
-  var T = team(), names = WLS.p ? [WLS.p] : T;
-  $('#wlDay').innerHTML = '<div class="fl" style="margin-top:14px">' + dw(WLS.d) + ' 기록</div>' + names.map(function (n) {
+  var T = team(), names = WLS.p ? [WLS.p] : boss ? T : [];
+  $('#wlDay').innerHTML = !names.length ? '' : '<div class="fl" style="margin-top:14px">' + dw(WLS.d) + ' 기록</div>' + names.map(function (n) {
     var x = wlRows(function (r) { return r.d === WLS.d && r.p === n; })[0];
     var line = x ? [x.i && x.o ? x.i + '–' + x.o : x.i || x.o, x.dn ? '저녁 ' + x.dn + '분' : ''].concat(wlTags(x)).filter(String).join(' · ') : '';
     return '<button class="wlo" data-wo="' + esc(n) + '"><b style="color:' + dcol(n) + '">' + esc(n) + '</b><span>' + (x ? esc(line || '-') : '<em style="font-style:normal;color:var(--faint)">기록 없음</em>') + (x && x.fd && x.m ? '<small class="wlrs">야근식사 · ' + esc(x.m) + '</small>' : '') + (x && x.tx && x.fare ? '<small class="wlrs">야근택시 · ' + won(x.fare) + '원</small>' : '') + (x && x.rs ? '<small class="wlrs">' + esc(x.rs) + '</small>' : '') + '</span></button>';
