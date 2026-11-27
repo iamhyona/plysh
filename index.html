@@ -1738,7 +1738,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 #nsd .si.tgh.on, #nsd .si.tgh.op { background:none; color:var(--txt); font-weight:600; } #nsd .ss:hover, #nsd .si:hover, #nsd .si.tgh:hover { background:var(--bg); } .s3[hidden] { display:none !important; } .stg[hidden] { display:none !important; } .stg .s3 { padding-left:14px; margin:0 0 4px; } .stg .si3 { font-weight:500; } .stg .si3.on { font-weight:700; color:var(--txt); }
 #nsd .si small { margin-left:auto; font-size:11px; color:var(--faint); }
 #nsd .sg { font-size:12px; font-weight:700; color:var(--faint); padding:8px 12px 3px 40px; letter-spacing:.03em; }
-#nsd .sx { padding-bottom:6px; } #nsd .sx[hidden] { display:none !important; } #nsd .ss .ssv { margin-left:auto; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; } #nsd .ss .ssv:hover { background:var(--line); } #nsd .ss .ssv .cv { margin:0; } #nsd .ss.op .ssv .cv { transform:rotate(-135deg); margin-top:4px; } 
+#nsd .tgh:not(.ss) > .cv { margin-right:12.5px; } /* 2026-11-27 실장님: 모든 꺾쇠를 대메뉴 꺾쇠와 같은 세로선에 */ #nsd .sx { padding-bottom:6px; } #nsd .sx[hidden] { display:none !important; } #nsd .ss .ssv { margin-left:auto; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; } #nsd .ss .ssv:hover { background:var(--line); } #nsd .ss .ssv .cv { margin:0; } #nsd .ss.op .ssv .cv { transform:rotate(-135deg); margin-top:4px; } 
 @media (max-width:1023px) {
   html[data-nav="w"] #nsub.has { display:flex; }
   html[data-nav="w"] #nhm { display:none !important; } /* 모바일: 전체 메뉴는 아래 탭바 "전체" 하나만 (2026-11-20 실장님) */
@@ -2367,7 +2367,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm245';
+var APP_VER = '20261127hm246';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3948,6 +3948,8 @@ function navSync() {
   if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
     sd.innerHTML = sideHtml(); bindGo(sd); tgBind(sd);
+    // 2026-11-27 실장님: 하위 메뉴가 있는 대메뉴는 글자를 눌러도 펴고 접힘 (꺾쇠만이 아니라 줄 전체)
+    $$('.ss.tgh', sd).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); e.preventDefault(); var k = (SPACES.filter(function (sp) { return sp.home === b.dataset.ng; })[0] || {}).k; if (!k) return; if (SOPEN[k]) SOPEN[k] = 0; else SOPEN[k] = 1; soSave(); var y = sd.scrollTop; navSync(); var s2 = $("#nsd"); if (s2) s2.scrollTop = y; }; });
     $$('[data-sst]', sd).forEach(function (c) { c.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); var b = c.parentNode, k = (SPACES.filter(function (sp) { return sp.home === b.dataset.ng; })[0] || {}).k; if (!k) return; if (SOPEN[k]) SOPEN[k] = 0; else SOPEN[k] = 1; soSave(); var y = sd.scrollTop; navSync(); var s2 = $("#nsd"); if (s2) s2.scrollTop = y; }, true); }); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
     var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
