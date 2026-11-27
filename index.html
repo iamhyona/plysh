@@ -1354,6 +1354,8 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+.pgt .pgn span, .pjbh span { font-weight:500; } .artb { font-weight:800; }
+.hmc .wk .ev em { font-weight:500; } .hmc .wk .ev em b { font-weight:800 !important; }
 /* 2026-11-27 실장님: 달력 글자가 다 빨갛게 보임 → 일정 글자는 검정, 데드라인·공식 일정은 굵게만 (색 구분은 앞 동그라미) · 다음 달 칸도 덜 흐리게 */
 .mcal .ev.dl, .hmc .ev.dl { color:var(--txt) !important; font-weight:800 !important; }
 .mcal .grid > button.out { opacity:.6; }
@@ -2056,7 +2058,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm216';
+var APP_VER = '20261127hm217';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2106,6 +2108,8 @@ function cached() { try { return JSON.parse(ls.get('d4:data') || 'null'); } catc
 function vis() { return S.D.events.filter(function (e) { return !S.off[e.f]; }); }
 // 2026-11-27 실장님: 달력엔 소속사 쪽 일정(구분 '소속사', 소속사 피드백)은 빼고 우리가 전달·공개·발매·발주하는 일정만. '피드백 반영'은 우리 작업이라 남김
 function agEv(e) { return e.k === '소속사' || (/피드백|컨펌/.test(e.t) && !/반영|전달|수정/.test(e.t)); }
+// 2026-11-27 실장님: 달력에서 아티스트명(프로젝트 이름 첫 단어)은 굵게
+function artB(n) { var a = String(n || '').split(/\s+/); return '<b class="artb">' + esc(a[0]) + '</b>' + (a.length > 1 ? ' ' + esc(a.slice(1).join(' ')) : ''); }
 function pvis() { return vis().filter(function (e) { return e.file.type === 'proj' && !agEv(e); }); }
 function pfs() { return S.D.files.filter(function (f) { return f.type === 'proj'; }); }
 function onDay(d, list) { return (list || vis()).filter(function (e) { return e.d === d; }); }
@@ -3873,7 +3877,7 @@ function pjListProj() {
     var E = S.D.events.filter(function (e) { return e.f === q.f.id && inL(e.d) && !agEv(e); }); if (!E.length) return '';
     var first = true;
     // 2026-11-27 실장님: 프로젝트 이름은 박스 안, 이름 앞 색 동그라미로 구분 (이름은 검정)
-    return '<div class="day list pjbx"><div class="pjbh"><i style="background:' + q.color + '"></i>' + esc(q.name) + '<small>' + E.length + '</small></div>' + E.map(function (e) {
+    return '<div class="day list pjbx"><div class="pjbh"><i style="background:' + q.color + '"></i><span>' + artB(q.name) + '</span><small>' + E.length + '</small></div>' + E.map(function (e) {
       var x = ''; if (first && e.d >= TODAY) { x = '<div class="pjnow">오늘 이후</div>'; first = false; }
       return x + ckItem(e, true, true);
     }).join('') + '</div>';
@@ -3892,7 +3896,7 @@ function pjGrid() {
   function P2(d) { return new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)); }
   return '<div class="pgw"><table class="pgt"><thead><tr><th class="pgn"></th>' + D.map(hd).join('') + '</tr></thead><tbody>' +
     P.map(function (q) {
-      return '<tr><th class="pgn"><i style="background:' + q.color + '"></i><span>' + esc(q.name) + '</span></th>' + D.map(function (d) {
+      return '<tr><th class="pgn"><i style="background:' + q.color + '"></i><span>' + artB(q.name) + '</span></th>' + D.map(function (d) {
         return '<td class="' + (d === TODAY ? 'td' : '') + '">' + E.filter(function (e) { return e.f === q.f.id && e.d === d; }).map(function (e) {
           return '<div class="pge' + (evDone(e) ? ' done' : '') + '" data-ekrow="' + esc(evKey(e)) + '" style="--pc:' + q.color + '"><button class="pgk" data-eck="' + esc(e.id) + '" aria-label="완료">' + CKSVG + '</button><button class="pgx" data-e="' + esc(e.id) + '">' + esc(e.t) + '</button></div>';
         }).join('') + '</td>';
