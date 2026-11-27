@@ -2574,7 +2574,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm263';
+var APP_VER = '20261127hm264';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3554,7 +3554,8 @@ var SPACES = [
   { k: 'ppm', t: '지류도우미', d: '용지 크기 · 사양서 · 검수 · 책등 · 종이연수 · 칼선 · 터잡기', home: 'space:ppm', ic: 'doc', g: [{ g: '지류도우미', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] }] },
   { k: 'mdm', t: 'MD도우미', d: '작업지시서 양식 · 검수 · 상품 정보 라벨', home: 'space:mdm', ic: 'aid', g: [{ g: 'MD도우미', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '작업지시서 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] }] },
   { k: 'dsm', t: '디자인도우미', d: '로고 · 폰트 찾기 · 단위 환산 · 팬톤', home: 'space:dsm', ic: 'pen', g: [{ g: '디자인도우미', i: [{ k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
-  { k: 'tool', t: '도구', d: '폴더 · 파일명 생성기', home: 'space:tool', ic: 'tool', g: [{ g: '도구', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
+  // 2026-11-27 실장님: 도구(공통) 없앰 → 폴더·파일명 생성기를 하위 없는 대메뉴로
+  { k: 'fnm', t: '폴더·파일명 생성기', d: '규칙에 맞는 폴더 · 파일 이름 만들기', home: 'filename', ic: 'tool', g: [] },
   // 2026-11-22 실장님: 명칭(상품별 부위 명칭)을 용어·견본에서 빼서 따로 대메뉴로, 하위 카테고리로 나눔
   { k: 'name', t: '명칭', d: '상품별 부위 명칭 · MD 공통 용어 · 책 구조 · 의류 · 모자 · 양말 · 가방 · 부자재 · 굿즈', home: 'space:name', ic: 'tag', g: [
     { g: '명칭', i: [{ k: 'ref:명칭 MD 공통 용어', t: 'MD 공통 용어', ct: '명칭 · MD 공통 용어', s: '생산 · 발주 · 계약 · 정산 (라이선스 · 로열티 · MG · OEM · 위탁 · 사입 · 감수) · 치수 · 단위 · 표시 · 인증 마크 (KOMCA · FSC · 바코드 · QR · SOY INK)' }, { k: 'ref:명칭 책 구조', t: '책 구조', ct: '명칭 · 책 구조', s: '하드커버 (양장) · 소프트커버 (무선 · PUR) 부위 그림 · 차이' }, { k: 'ref:명칭 의류', t: '의류', ct: '명칭 · 의류', s: '의류 공통 용어 (봉제 현장 말 · 원단 · 치수) · 티셔츠 · 링거티 · 카라티 · 맨투맨 · 후디 · 파자마 (긴팔 · 반팔) · 앞뒤 그림' }, { k: 'ref:명칭 모자·양말', t: '모자 · 양말', ct: '명칭 · 모자 · 양말', s: '볼캡 · 양말' }, { k: 'ref:명칭 가방', t: '가방', ct: '명칭 · 가방', s: '에코백 · 토트백 · 스트링백 · 파우치 · 백팩' }, { k: 'ref:명칭 부자재', t: '부자재', ct: '명칭 · 부자재', s: '부자재 공통 용어 · 지퍼 · 랜야드' }, { k: 'ref:명칭 굿즈·소품', t: '굿즈 · 소품', ct: '명칭 · 굿즈 · 소품', s: '아크릴 키링 · 아크릴 스탠드 · 인형 · 캔 뱃지 · 메탈 뱃지 · 우산 · 머그컵 · 쿠션 · 담요 · 반다나 · 와펜' }] }] },
@@ -3600,13 +3601,12 @@ function navGo(k) {
   if (k === 'ref:부위' || k === 'ref:명칭 공통') k = 'ref:명칭 MD 공통 용어'; // 2026-11-22 명칭 대메뉴로 분리
   if (k === 'ref:지류') k = 'ref:지류 소재'; // 2026-11-22 지류를 소재·인쇄·후가공·제본·포장으로 나눔
   if (k.indexOf('ref:') === 0) { NAV.refHome = 0; NAV.refPart = S.refP = k.slice(4); k = 'ref'; } // 용어사전 > 지류 · MD · 디자인
+  if (k === 'space:make' || k === 'space:tool' || k === 'tools') k = 'filename'; // 2026-11-27 도구 대메뉴 없앰 → 옛 주소는 폴더·파일명 생성기로
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
   if (k.indexOf('gd:') === 0) { S.gdf = k.slice(3); S.view = 'gdoc'; window.scrollTo(0, 0); return render(); }
   if (k.indexOf('gl:') === 0) { S.gl = +k.slice(3); S.view = 'glist'; window.scrollTo(0, 0); return render(); }
   if (k === 'guide') { S.spk = 'design'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
-  if (k === 'space:make') k = 'space:tool'; // 2026-11-22 도우미·도구 합침 → 옛 주소
   if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
-  if (k === 'tools') { S.spk = 'tool'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'cal' ? 'proj' : k === 'sched' ? 'proj' : (ls.get('d4:cv') || 'proj'); if (k === 'cal') { S.pjm = 'd'; ls.set('d4:pjm', 'd'); } ls.set('d4:cv', S.cv); k = 'month'; }
   menuReset(k);
   S.view = k; if (k !== 'refs') ls.set('d4:view', k); window.scrollTo(0, 0); render();
@@ -3986,7 +3986,7 @@ function renderSpace(k) {
   $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return (g.g === sp.t ? '' : '<h4>' + esc(g.g) + '</h4>') + '<div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') + '</div>';
   bindGo($('#main'));
 }
-function renderToolsHome() { renderSpace('tool'); }
+function renderToolsHome() { navGo('filename'); }
 // 안내 문서를 페이지 안에 바로 (팝업 대신)
 function renderGdoc() {
   var f = S.gdf || 'folder-file.html', doc = GUIDES.filter(function (g) { return g.f === f; })[0];
