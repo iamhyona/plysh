@@ -1309,6 +1309,80 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wsg.wtop > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
 .wsg.wtop .nth { margin:-6px 0 4px; } .wsg.wtop .nth b { font-size:14px; font-weight:800; color:var(--ink, #191f28); }
 @media (max-width:1023px) { .wsg.wtop { grid-template-columns:1fr; } }
+/* 2026-11-27 홈 대시보드: 출퇴근 단추 · 오늘 팀 · 내 이번 주 */
+.wsg.wdb { margin-bottom:12px; align-items:stretch; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
+.wck h3 button, .wtn2 h3 button, .wmy h3 button { border:0; background:none; color:var(--mute); font-size:12.5px; font-weight:600; padding:0; cursor:pointer; font-family:inherit; }
+.wckn { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:2px 0 14px; }
+.wckn b { font-size:32px; font-weight:800; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; color:var(--txt); line-height:1; }
+.wckn span { font-size:13.5px; font-weight:600; color:var(--sub); }
+.wckn span.on, .wckn span.ex { color:color-mix(in srgb, var(--pc) 80%, #191f28); }
+.wckb { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; align-items:start; }
+@media (min-width:1024px) { .wckb button { height:128px !important; gap:5px; } .wckb button svg { width:22px; height:22px; } .wckb button b { font-size:15px; } .wckb button small { font-size:12.5px; } }
+.wckb button { height:76px; border:0; border-radius:12px; background:var(--bg); color:var(--txt); font-family:inherit; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; padding:0 4px; min-width:0; }
+.wckb button svg { width:18px; height:18px; color:var(--sub); }
+.wckb button b { font-size:14px; font-weight:700; }
+.wckb button small { font-size:11.5px; font-weight:600; color:var(--mute); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.wckb button.done small { color:var(--txt); }
+.wckb button.nx { background:var(--pc); color:#fff; } .wckb button.nx svg, .wckb button.nx small { color:rgba(255,255,255,.85); }
+.wckb button.sure { box-shadow:inset 0 0 0 1.5px var(--pc); } .wckb button.sure small { color:color-mix(in srgb, var(--pc) 80%, #191f28); }
+.wckb button:disabled { opacity:.38; cursor:default; }
+.wckb button.busy { opacity:.6; }
+.wckx { display:flex; gap:8px; margin-top:10px; } .wckx[hidden] { display:none; }
+.wckx input { flex:1; min-width:0; height:44px; box-sizing:border-box; border:0; border-radius:10px; background:var(--bg); padding:0 12px; font-size:14px; color:var(--txt); }
+.wckx button { flex:none; height:44px; border:0; border-radius:10px; background:var(--pc); color:#fff; font-weight:700; font-size:14px; padding:0 16px; cursor:pointer; }
+.wck { display:flex; flex-direction:column; } .wckl { margin-top:auto; padding-top:16px; }
+.wckf { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; margin:8px 0 0; font-size:12.5px; font-weight:600; color:var(--sub); } .wckf span { font-weight:500; color:var(--mute); }
+.wckl .trk { position:relative; height:10px; border-radius:5px; background:#f2f4f6; overflow:hidden; }
+.wckl .trk i { position:absolute; top:0; bottom:0; }
+.wckl .trk i.band { background:#e5e8eb; } .wckl .trk i.wk { background:var(--pc); border-radius:5px; }
+.wckl .trk i.ex { background:repeating-linear-gradient(135deg, #191f28 0 2px, transparent 2px 5px); opacity:.35; }
+.wckl .trk em { position:absolute; top:0; bottom:0; width:2px; background:#191f28; border-radius:1px; }
+.wckl .tks { position:relative; height:16px; margin-top:4px; }
+.wckl .tks span { white-space:nowrap; position:absolute; transform:translateX(-50%); font-size:11px; color:var(--mute); font-variant-numeric:tabular-nums; }
+.wckq { margin:0 0 12px; font-size:13.5px; color:var(--sub); }
+.wckpk { display:flex; flex-wrap:wrap; gap:8px; }
+.wckpk button { height:40px; border:0; border-radius:999px; background:var(--bg); padding:0 16px; font-size:14px; font-weight:700; color:var(--txt); cursor:pointer; font-family:inherit; }
+.wckpk button.on { background:var(--pc); color:#fff; }
+.wtnc { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+.wtnc .col { background:var(--bg); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+.wtnc .ch { display:flex; align-items:center; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--sub); margin-bottom:2px; }
+.wtnc .ch em { font-style:normal; font-size:16px; font-weight:800; color:var(--txt); font-variant-numeric:tabular-nums; }
+.wtnc .col.no .ch em, .wtnc .col.off .ch em { color:var(--mute); }
+.wtnc .pp { display:flex; align-items:baseline; justify-content:space-between; gap:8px; background:#fff; border-radius:8px; padding:7px 10px; min-width:0; }
+.wtnc .pp b { font-size:13px; font-weight:700; color:color-mix(in srgb, var(--pc) 80%, #191f28); white-space:nowrap; }
+.wtnc .pp small { font-size:11.5px; color:var(--mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
+.wtnc .col.no .pp b, .wtnc .col.off .pp b { color:var(--sub); }
+.wtnc .n0 { font-size:12px; color:var(--faint); padding:4px 2px; }
+.wmy { margin-bottom:12px; }
+.wmyg { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:12px; align-items:stretch; }
+.wmk { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-auto-rows:1fr; gap:8px; }
+.wmk > div { background:var(--bg); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:4px; min-width:0; justify-content:center; }
+.wmk small { font-size:12px; font-weight:700; color:var(--sub); }
+.wmk b { font-size:20px; font-weight:800; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:var(--txt); }
+.wmk b i { font-style:normal; font-size:13px; color:var(--mute); font-weight:600; margin-left:1px; }
+.wmk b.x40, .wmk b.x52 { color:color-mix(in srgb, var(--pc) 75%, #191f28); }
+.wmk span { font-size:11.5px; color:var(--mute); }
+.wmk .bar { position:relative; display:block; height:6px; border-radius:3px; background:#e5e8eb; margin:2px 0; }
+.wmk .bar i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:#b0b8c1; } .wmk .bar i.x40 { background:color-mix(in srgb, var(--pc) 60%, #fff); } .wmk .bar i.x52 { background:var(--pc); }
+.wmk .bar em { position:absolute; top:-2px; bottom:-2px; width:1.5px; background:var(--faint); }
+.wmk .rg { flex-direction:row; align-items:center; justify-content:flex-start; gap:10px; } .wmk .rg > div { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.wmk .rg .wgrg { width:52px; height:52px; flex:none; }
+.wmb { background:var(--bg); border-radius:12px; padding:14px 14px 10px; display:flex; flex-direction:column; min-width:0; }
+.wmb .pl { position:relative; flex:1; min-height:150px; display:flex; gap:10px; align-items:flex-end; }
+.wmb .pl button { flex:1 1 0; min-width:0; height:100%; border:0; background:none; padding:0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; cursor:pointer; position:relative; z-index:1; font-family:inherit; }
+.wmb .pl button b { font-size:11.5px; font-weight:700; color:var(--sub); font-variant-numeric:tabular-nums; }
+.wmb .pl button i { display:block; width:100%; max-width:28px; border-radius:6px 6px 0 0; background:color-mix(in srgb, var(--pc) 55%, #fff); }
+.wmb .pl button i.hi { background:var(--pc); } .wmb .pl button i.df { background:#c9cdd2; }
+.wmb .pl button i.lv { background:repeating-linear-gradient(135deg, var(--pc) 0 3px, color-mix(in srgb, var(--pc) 55%, #fff) 3px 6px); }
+.wmb .pl button.td b { color:var(--txt); }
+.wmb .pl em { position:absolute; left:0; right:0; border-top:1.5px dashed #b0b8c1; z-index:0; }
+.wmb .pl em small { position:absolute; right:0; top:-16px; font-size:10.5px; color:var(--mute); font-style:normal; }
+.wmb .dl { display:flex; gap:10px; margin-top:6px; border-top:1px solid var(--line); padding-top:6px; }
+.wmb .dl span { flex:1 1 0; text-align:center; font-size:12px; font-weight:600; color:var(--mute); }
+.wmb .dl span.td { color:var(--txt); font-weight:800; }
+@media (max-width:1023px) { .wsg.wdb { grid-template-columns:1fr; } }
+@media (max-width:640px) { .wmyg { grid-template-columns:1fr; } .wckb button { height:70px; } .wckn b { font-size:28px; } }
+
 @media (min-width:1024px) { .wcol .wsq { grid-template-columns:repeat(4, minmax(0, 1fr)) !important; } .wsg > .wsc.wclk { grid-template-columns:168px minmax(0, 1fr) !important; gap:28px !important; padding:20px 24px; } .wclk .aclk { width:168px; height:168px; } }
 .wcol { display:flex; flex-direction:column; gap:12px; min-width:0; } @media (min-width:1024px) { .wsg.wtop { align-items:stretch; } .wsg.wtop > .wcol { align-self:stretch; } .wcol > .ntbox { flex:1 1 auto; } } /* 2026-11-20: 오른쪽 두 상자 합 = 시계·달력 높이 */ .wcol > .ntbox { margin:0 !important; padding:16px !important; border-radius:16px !important; }
 .wsg > .wsc.wclk, .wclk { display:grid; grid-template-columns:120px minmax(0, 1fr); gap:20px; align-items:center; }
@@ -2921,10 +2995,120 @@ function renderStart() {
     wtCard() + '<div class="wsc wfull"><h3>최근 프로젝트<button type="button" data-ng="pj">전체</button></h3><div class="wpc">' + R.map(function (r, i) { return '<button type="button" data-wr="' + i + '">' + esc(String(r.name).split(' ')[0]) + '<small>' + esc(String(r.name).split(' ').slice(1).join(' ')) + '</small></button>'; }).join('') + '</div></div>' +
     '</div>';
   var toolsCard = '<div class="wsc"><h3>자주 쓰는 도구</h3><div class="wsq">' + [['review', 'chk', '인쇄파일 검수기'], ['gcheck', 'chk', '작업지시서 검수기'], ['wo', 'doc', '작업지시서 양식'], ['qk', 'qk', '퀵 배차']].map(function (x) { return '<button type="button" data-ng="' + x[0] + '">' + navIc(x[1]) + x[2] + '</button>'; }).join('') + '</div></div>';
-  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick();
+  // 2026-11-27 대시보드: 출퇴근 단추 · 오늘 팀 → 내 이번 주 → 달력·공지·도구 → 마감·할 일·통계
+  $('#main').innerHTML = h.replace('</small></div>', '</small></div><div class="wsg wdb">' + puCard() + teamNowCard() + '</div>' + myWeekCard() + '<div class="wsg wtop w3">' + calCard(E) + '<div class="wcol">' + ntHtml() + toolsCard + '</div></div>'); bindGo($('#main')); bindNt(); clkTick(); bindPu();
+  $$('#main [data-wgd]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); var a = b.dataset.wgd.split('|'); openWl(a[0], a[1]); }; });
   $$('[data-hcd]').forEach(function (b) { b.onclick = function () { var d = b.dataset.hcd; S.y = +d.slice(0, 4); S.m = +d.slice(5, 7); navGo('cal'); setTimeout(function () { openDay(d, 1); }, 60); }; });
   $$('#main [data-wr]').forEach(function (b) { b.onclick = function () { wsOpen(R[+b.dataset.wr]); }; });
   $$('#main [data-wf]').forEach(function (b) { b.onclick = function () { var o = PL.filter(function (o) { return o.g && o.g.f.id === b.dataset.wf; })[0]; if (o) wsOpen(o); }; });
+}
+/* 2026-11-27 실장님: 홈 = 대시보드 · 출근·외근·복귀·퇴근 단추를 누르면 지금 시각으로 근태(WORK LOG) 기록
+   외근은 WORK LOG '외근 내용'에 '14:10–16:30 장소'로 남김 (서버 항목 그대로 씀) */
+var PU_IC = {
+  i: '<path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M10 21v-6h4v6"/>',
+  x: '<path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  b: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  o: '<path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/>'
+};
+function puIc(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + PU_IC[k] + '</svg>'; }
+function nowMin() { var n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
+function hmMe() { var n = wlMe() || ls.get('d4:hme') || ''; return team().indexOf(n) >= 0 ? n : ''; }
+// '14:10~ 파주' → 외근 중 · '14:10–16:30 파주' → 다녀옴
+function exParse(s) { s = String(s || '').trim(); var m = s.match(/^(\d{1,2}:\d\d)\s*[~–-]\s*(\d{1,2}:\d\d)?\s*(.*)$/); return m ? { a: m[1], b: m[2] || '', t: m[3] || '' } : { a: '', b: '', t: s }; }
+// 오늘 상태: on 근무 중 · ex 외근 중 · off 퇴근 · no 기록 전 (새벽 6시 전 = 어제 기록 기준)
+function wlNow(n) {
+  var nm = nowMin(), D = TODAY, r = wlRows(function (x) { return x.d === TODAY && x.p === n; })[0];
+  if (nm < 360 && !(r && r.i)) { var y = addD(TODAY, -1), ry = wlRows(function (x) { return x.d === y && x.p === n; })[0]; if (ry && ry.i) { r = ry; D = y; nm += 1440; } }
+  var e = r && r.ex ? exParse(r.exn) : null, oo = r && r.o ? wlMin(hmOut(r.i, r.o)) : null;
+  var k = r && oo != null && oo <= nm ? 'off' : e && e.a && !e.b ? 'ex' : r && r.i && wlMin(r.i) <= nm ? 'on' : 'no';
+  return { k: k, r: r, e: e, d: D, nm: nm };
+}
+function puCard() {
+  var me = hmMe(), T = team();
+  if (!me || S.puPick) return '<div class="wsc wck"><h3>출퇴근</h3><p class="wckq">누구의 근태를 기록할까요? 한 번만 고르면 이 기기에서 기억해요.</p><div class="wckpk">' + T.map(function (n) { return '<button type="button" data-pume="' + esc(n) + '" class="' + (n === me ? 'on' : '') + '" style="--pc:' + dcol(n) + '">' + esc(n) + '</button>'; }).join('') + '</div></div>';
+  var st = wlNow(me), r = st.r || {}, e = st.e, nm = nowMin(), k = st.k;
+  var since = function (t) { var a = wlMin(t); if (a == null) return ''; var m = Math.max(0, st.nm - a); return m < 1 ? '방금' : m < 60 ? m + '분째' : wlHk(m) + '째'; };
+  var line = k === 'on' ? '근무 중 · ' + since(r.i) : k === 'ex' ? '외근 중' + (e.t ? ' · ' + esc(e.t) : '') + ' · ' + since(e.a) : k === 'off' ? '퇴근 · 오늘 ' + wlHk((wlDay(st.d, me) || {}).m || 0) + ' 근무' : '아직 출근 기록이 없어요';
+  var nx = k === 'no' ? 'i' : k === 'ex' ? 'b' : k === 'on' ? 'o' : '';
+  var tm = { i: r.i || '', x: e && e.a ? e.a : '', b: e && e.b ? e.b : '', o: r.o ? hmOut(r.i, r.o) : '' };
+  var dis = { i: false, x: k === 'ex' || k === 'off', b: k !== 'ex', o: k === 'no' && !r.i };
+  // 오늘 9–18시 진행 막대 (출근~지금, 외근 구간은 빗금)
+  var A = 420, B = 1320, pc = function (v) { return ((Math.min(B, Math.max(A, v)) - A) / (B - A) * 100).toFixed(2); };
+  var i0 = wlMin(r.i), o0 = k === 'off' ? wlMin(tm.o) : st.nm, ea = e && e.a ? wlMin(e.a) : null, eb = e && e.b ? wlMin(e.b) : (k === 'ex' ? st.nm : null);
+  var bar = '<div class="wckl"><div class="trk"><i class="band" style="left:' + pc(540) + '%;width:' + (pc(1080) - pc(540)) + '%"></i>' +
+    (i0 != null ? '<i class="wk" style="left:' + pc(i0) + '%;width:' + Math.max(0.8, pc(o0) - pc(i0)) + '%"></i>' : '') +
+    (ea != null && eb != null ? '<i class="ex" style="left:' + pc(ea) + '%;width:' + Math.max(0.8, pc(eb) - pc(ea)) + '%"></i>' : '') +
+    (k !== 'off' && st.d === TODAY ? '<em style="left:' + pc(nm) + '%"></em>' : '') + '</div>' +
+    '<div class="tks">' + [9, 12, 15, 18, 21].map(function (t) { return '<span style="left:' + pc(t * 60) + '%">' + t + '시</span>'; }).join('') + '</div></div>'
+  var left = 1080 - st.nm, foot = k === 'off' ? '오늘 ' + (r.i || '').replace(/^0/, '') + '–' + tm.o.replace(/^0/, '') + ' 근무했어요' : k === 'no' ? '출근을 누르면 지금 시각으로 근무표에 적혀요' : left > 0 ? '18시까지 ' + wlHk(left) + ' 남음' : '18시 지나 ' + wlHk(-left) + ' 더 일하는 중';
+  bar += '<p class="wckf">' + foot + '<span>점심 12–13시 빼고 계산</span></p>';
+  return '<div class="wsc wck" style="--pc:' + dcol(me) + '"><h3>출퇴근<button type="button" id="puWho">' + esc(me) + ' 바꾸기</button></h3>' +
+    '<div class="wckn"><b id="puClk">' + wlHm(nm) + '</b><span class="' + k + '">' + line + '</span></div>' +
+    '<div class="wckb">' + [['i', '출근'], ['x', '외근'], ['b', '복귀'], ['o', '퇴근']].map(function (b) {
+      return '<button type="button" data-pu="' + b[0] + '" class="' + (nx === b[0] ? 'nx ' : '') + (tm[b[0]] ? 'done' : '') + '"' + (dis[b[0]] ? ' disabled' : '') + '>' + puIc(b[0]) + '<b>' + b[1] + '</b><small>' + (tm[b[0]] ? tm[b[0]].replace(/^0(?=\d:)/, '') : '–') + '</small></button>';
+    }).join('') + '</div>' +
+    '<div class="wckx" id="puEx" hidden><input id="puExT" maxlength="60" placeholder="외근 장소·내용 (안 적어도 돼요)" enterkeyhint="done"><button type="button" id="puExGo">외근 시작</button></div>' +
+    bar + '</div>';
+}
+function puSave(kind, place) {
+  var me = hmMe(); if (!me) return;
+  var st = wlNow(me), r = st.r || {}, t = wlHm(st.nm % 1440), e = st.e || { a: '', b: '', t: '' };
+  var o = { d: st.d, p: me, i: r.i || '', o: r.o || '', ot: false, fd: !!r.fd, dn: +r.dn || 0, rs: r.rs || '', ex: !!r.ex, exn: r.exn || '', tx: !!r.tx, fare: +r.fare || 0, m: r.m || '' };
+  if (kind !== 'o' && st.d !== TODAY) { o = { d: TODAY, p: me, i: '', o: '', ot: false, fd: false, dn: 0, rs: '', ex: false, exn: '', tx: false, fare: 0, m: '' }; r = {}; t = wlHm(nowMin()); }
+  t = hmN(t);
+  if (kind === 'i') o.i = t;
+  if (kind === 'o') { o.o = hmOut(o.i || '', st.d !== TODAY ? pad(Math.floor(st.nm / 60)) + ':' + pad(st.nm % 60) : t); if (!o.i) o.i = '09:00'; }
+  if (kind === 'x') { o.ex = true; o.exn = t + '~' + (place ? ' ' + place : ''); if (!o.i) o.i = t; }
+  if (kind === 'b') { o.ex = true; o.exn = (e.a || t) + '–' + t + (e.t ? ' ' + e.t : ''); }
+  $$('[data-pu]').forEach(function (b) { b.disabled = true; }); var bb = $('[data-pu="' + kind + '"]'); if (bb) bb.classList.add('busy');
+  call('appWlSet', S.pin, o).then(function (res) { S.D.wl = res.wl || S.D.wl; S.wt = {}; saveCache(); toast({ i: '출근', x: '외근', b: '복귀', o: '퇴근' }[kind] + ' ' + t.replace(/^0/, '') + ' 기록했어요'); render(); })
+    .catch(function (er) { toast(errMsg(er)); render(); });
+}
+function bindPu() {
+  $$('[data-pume]').forEach(function (b) { b.onclick = function () { ls.set('d4:hme', b.dataset.pume); S.puPick = false; render(); }; });
+  if ($('#puWho')) $('#puWho').onclick = function () { S.puPick = true; render(); };
+  $$('[data-pu]').forEach(function (b) { b.onclick = function () {
+    var k = b.dataset.pu;
+    if (k === 'x') { var ex = $('#puEx'); ex.hidden = !ex.hidden; if (!ex.hidden) $('#puExT').focus(); return; }
+    // 이미 찍힌 출근·퇴근은 한 번 더 눌러야 바꿈
+    if (b.classList.contains('done') && !b.classList.contains('sure')) { b.classList.add('sure'); b.querySelector('small').textContent = '한 번 더 누르면 지금으로'; clearTimeout(b.h); b.h = setTimeout(function () { render(); }, 3000); return; }
+    puSave(k);
+  }; });
+  if ($('#puExGo')) { $('#puExGo').onclick = function () { puSave('x', $('#puExT').value.trim()); }; $('#puExT').onkeydown = function (ev) { if (ev.key === 'Enter') $('#puExGo').click(); }; }
+  clearInterval(S.puT); S.puT = setInterval(function () { var c = document.getElementById('puClk'); if (!c) return clearInterval(S.puT); var t = wlHm(nowMin()); if (c.textContent !== t) { if (nowMin() % 5 === 0 && !document.activeElement.closest('.wck')) render(); else c.textContent = t; } }, 15000);
+}
+// 오늘 팀: 근무 중 · 외근 · 퇴근 · 기록 전
+function teamNowCard() {
+  var T = team(), G = { on: [], ex: [], off: [], no: [] };
+  T.forEach(function (n) { var s = wlNow(n); G[s.k].push([n, s]); });
+  var sub = function (n, s) { var r = s.r || {}; return s.k === 'on' ? r.i.replace(/^0/, '') + ' 출근' : s.k === 'ex' ? (s.e.t ? esc(s.e.t) : s.e.a + ' 외근') : s.k === 'off' ? hmOut(r.i, r.o) + ' 퇴근' : '기록 전'; };
+  return '<div class="wsc wtn2 wgo" data-ng="wl"><h3>오늘 팀<button type="button" data-ng="wl">근태</button></h3><div class="wtnc">' + [['on', '근무 중'], ['ex', '외근'], ['off', '퇴근'], ['no', '기록 전']].map(function (c) {
+    return '<div class="col ' + c[0] + '"><div class="ch">' + c[1] + '<em>' + G[c[0]].length + '</em></div>' + (G[c[0]].length ? G[c[0]].map(function (o) { return '<span class="pp" style="--pc:' + dcol(o[0]) + '"><b>' + esc(o[0]) + '</b><small>' + sub(o[0], o[1]) + '</small></span>'; }).join('') : '<span class="n0">없음</span>') + '</div>';
+  }).join('') + '</div></div>';
+}
+// 내 이번 주: 요약 2×2 + 옆에 요일별 근무시간 막대
+function myWeekCard() {
+  var me = hmMe(); if (!me) return '';
+  var ws = monOf(TODAY), sn = wlNow(me), D = [0, 1, 2, 3, 4].map(function (i) { var d = addD(ws, i), x = d <= TODAY ? wlDay(d, me) : null;
+    if (d === TODAY && sn.k !== 'off') { var a = sn.r && sn.d === TODAY ? wlMin(sn.r.i) : null, b = sn.nm; x = a != null && b > a ? { m: b - a - (a <= 720 && b >= 780 ? 60 : 0), i: a, o: b, live: 1 } : null; }
+    return { d: d, x: x }; });
+  var WT = wtLoad(TODAY.slice(0, 7), 'start'), wp = WT && (WT.people || []).filter(function (q) { return q.p === me; })[0];
+  var w = wp && !wp.none && !wp.err ? (wp.weeks || []).filter(function (w) { return w.s <= TODAY && TODAY <= w.e; })[0] : null;
+  var R = D.map(function (o) { return o.x; }).filter(function (x) { return x && !x.def && !x.live; }), tot = w ? +w.tot || 0 : D.reduce(function (s, o) { return s + (o.x ? o.x.m : 0); }, 0);
+  var avg = function (k) { return R.length ? R.reduce(function (s, x) { return s + x[k]; }, 0) / R.length : null; };
+  var W0 = D.filter(function (o) { return o.x && o.d < TODAY || (o.x && o.d === TODAY && wlNow(me).k === 'off'); }), ot = W0.filter(function (o) { return o.x.o <= 1110; }).length;
+  var c = tot > 3120 ? 'x52' : tot > 2400 ? 'x40' : '', r = 22, cc = 2 * Math.PI * r, pct = W0.length ? ot / W0.length * 100 : 0;
+  var ring = '<svg class="wgrg" viewBox="0 0 56 56"><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="#e5e8eb" stroke-width="5"/><circle cx="28" cy="28" r="' + r + '" fill="none" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (cc * pct / 100).toFixed(1) + ' ' + cc.toFixed(1) + '" transform="rotate(-90 28 28)"/></svg>';
+  var kpi = '<div class="wmk">' +
+    '<div><small>이번 주 근무</small><b class="' + c + '">' + wlHk(tot) + '</b><span class="bar"><i class="' + c + '" style="width:' + Math.min(100, tot / 3120 * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span><span>' + (w ? '근무표 기준 · 선 40시간' : '근태 기록 기준') + '</span></div>' +
+    '<div><small>평균 출근</small><b>' + (avg('i') != null ? wlHm(avg('i')) : '–') + '</b><span>' + R.length + '일 기록</span></div>' +
+    '<div><small>평균 퇴근</small><b>' + (avg('o') != null ? wlHm(avg('o')) : '–') + '</b><span>' + (R.length ? '가장 늦게 ' + wlHm(R.reduce(function (s, x) { return Math.max(s, x.o); }, 0)) : '기록 없음') + '</span></div>' +
+    '<div class="rg">' + ring + '<div><small>정시 퇴근</small><b>' + ot + '<i>/' + W0.length + '일</i></b><span>18시 30분 전</span></div></div></div>';
+  var bars = '<div class="wmb"><div class="pl">' + D.map(function (o) {
+    var x = o.x, h = x ? Math.min(100, x.m / 720 * 100) : 0;
+    return '<button type="button" class="' + (o.d === TODAY ? 'td' : '') + '" data-wgd="' + o.d + '|' + esc(me) + '"><b>' + (x ? wlHm(x.m) : '') + '</b><i class="' + (x && x.def ? 'df' : '') + (x && x.live ? ' lv' : '') + (x && x.m > 600 ? ' hi' : '') + '" style="height:' + h.toFixed(1) + '%"></i></button>';
+  }).join('') + '<em style="bottom:' + (480 / 720 * 100).toFixed(1) + '%"><small>8시간</small></em></div><div class="dl">' + D.map(function (o) { return '<span class="' + (o.d === TODAY ? 'td' : '') + '">' + W[P(o.d).getDay()] + '</span>'; }).join('') + '</div></div>';
+  return '<div class="wsc wfull wmy" style="--pc:' + dcol(me) + '"><h3>내 이번 주<button type="button" data-ng="wl">근태 그래프</button></h3><div class="wmyg">' + kpi + bars + '</div></div>';
 }
 // 2026-11-23 실장님: 홈에 근무시간 통계 (근무표 기준 이번 주) · 누르면 근태로
 function wtLoad(ymK, v) {
