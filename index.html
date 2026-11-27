@@ -2139,6 +2139,13 @@ html[data-nav] #cvSeg { display:none !important; }
 .whc .hch .hnv button[aria-label], #main .hm2.hdt .hnv button[aria-label] { width:28px !important; height:28px !important; min-height:28px !important; padding:0 !important; }
 @container whc (max-width:400px) { .whc .hch > .hcr > button.hcadd { width:var(--ui-h) !important; padding:0 !important; font-size:0 !important; gap:0 !important; } }
 .pmdf button[disabled] { opacity:.4; cursor:default; }
+
+.pmdn { display:flex; align-items:center; justify-content:space-between; width:100%; height:40px; margin:6px 0 2px; padding:0 10px; border:0; border-radius:10px; background:#f2f4f6; color:var(--sub); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; } .pmdn span { font-size:12px; font-weight:600; color:var(--mute); }
+
+/* 이번 주 근무시간 타일: 이름 · 시간 · 막대 · 보조 정보를 세로로 고르게 (hm252) */
+.wfull .wtp { justify-content:space-between; gap:10px; padding:16px; }
+.wfull .wtp .nm { font-size:13.5px; }
+.wfull .wtp .wts { font-size:12px; font-weight:600; color:var(--mute); line-height:1.3; } .wfull .wtp .wts small { font-size:inherit; opacity:.8; }
 </style>
 </head>
 <body>
@@ -2452,7 +2459,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm251';
+var APP_VER = '20261127hm252';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3782,7 +3789,9 @@ function wtCard() {
     var w = x && !x.none && !x.err ? (x.weeks || []).filter(function (w) { return w.s <= TODAY && TODAY <= w.e; })[0] : null;
     var t = w ? +w.tot || 0 : 0, c = w && (w.over > 0 || t > 52 * 60) ? 'x52' : w && (w.ot > 0 || t > 40 * 60) ? 'x40' : '';
     return '<div class="wtp" style="--pc:' + dcol(n) + '"><span class="nm">' + esc(n) + '</span><b class="' + c + '">' + (w ? hm(t) : '<small>기록 없음</small>') + '</b>' +
-      '<span class="bar"><i class="' + c + '" style="width:' + Math.min(100, t / (52 * 60) * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span></div>';
+      '<span class="bar"><i class="' + c + '" style="width:' + Math.min(100, t / (52 * 60) * 100).toFixed(1) + '%"></i><em style="left:' + (40 / 52 * 100).toFixed(1) + '%"></em></span>' +
+      // 2026-11-27 실장님: 위에 몰리지 않게 — 아래에 40시간 기준 보조 정보
+      '<span class="wts">' + (function (hm) { return (!w ? '이번 주 기록 없음' : t > 52 * 60 ? '52시간 넘김 +' + hm(t - 52 * 60) : t >= 40 * 60 ? '40시간 넘김 +' + hm(t - 40 * 60) : '40시간까지 ' + hm(40 * 60 - t)); })(function (n) { n = Math.round(+n || 0); var h = Math.floor(n / 60), m = n % 60; return (h ? h + '<small>시간</small>' : '') + (m ? (h ? ' ' : '') + m + '<small>분</small>' : '') || '0<small>분</small>'; }) + '</span></div>';
   }).join('') + '</div><p class="wtn">이번 주 · 근무표 기준 · 선은 40시간, 끝은 52시간</p>';
   return '<div class="wsc wfull wgo" data-ng="wl"><h3>이번 주 근무시간<button type="button" data-ng="wl">근태</button></h3>' + body + '</div>';
 }
@@ -4135,7 +4144,11 @@ function filterBar(home) {
   var q = (S.fltQ || '').trim().toLowerCase().replace(/\s+/g, '');
   return '<div class="pmd' + (S.fltO ? ' open' : '') + '" id="flt"><button type="button" class="pmdb" id="fltB"><span>' + lab + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
     '<div class="pmdp"><input type="search" id="fltQ" placeholder="프로젝트 검색" value="' + esc(S.fltQ || '') + '"><div class="pmdl">' +
-    fs.filter(function (f) { return !q || nm(f).toLowerCase().replace(/\s+/g, '').indexOf(q) > -1; }).map(function (f) { return '<label><input type="checkbox" data-f="' + f.id + '"' + (S.off[f.id] ? '' : ' checked') + '><span class="cb">' + CKSVG + '</span><i style="background:' + f.color + '"></i><span class="t">' + esc(nm(f)) + '</span></label>'; }).join('') +
+    (function () {   // 2026-11-27 실장님: 완료된 프로젝트는 기본으로 숨김 — 맨 아래 '완료된 프로젝트 N개'를 눌러야 펼쳐짐
+      var DF = pjDoneFiles(), lab2 = function (f) { return '<label><input type="checkbox" data-f="' + f.id + '"' + (S.off[f.id] ? '' : ' checked') + '><span class="cb">' + CKSVG + '</span><i style="background:' + f.color + '"></i><span class="t">' + esc(nm(f)) + '</span></label>'; };
+      var L = fs.filter(function (f) { return !q || nm(f).toLowerCase().replace(/\s+/g, '').indexOf(q) > -1; }), A = L.filter(function (f) { return !DF[f.id]; }), D = L.filter(function (f) { return DF[f.id]; });
+      return A.map(lab2).join('') + (D.length ? '<button type="button" class="pmdn" id="fltDn">완료된 프로젝트 ' + D.length + '개<span>' + (S.fltDn ? '접기' : '펼치기') + '</span></button>' + (S.fltDn ? D.map(lab2).join('') : '') : '');
+    })() +
     '</div><div class="pmdf"><button type="button" data-fa="all"' + (all ? ' disabled' : '') + '>전체 선택</button><button type="button" data-fa="none"' + (on.length ? '' : ' disabled') + '>전체 해제</button><button type="button" data-fa="close">닫기</button></div></div></div>';
 }
 function bindFilter() {
@@ -4145,6 +4158,7 @@ function bindFilter() {
   $('#flt .pmdp').onclick = function (e) { e.stopPropagation(); };
   $('#fltQ').oninput = function () { S.fltQ = this.value; rr(1); };
   $$('#flt input[type=checkbox]').forEach(function (c) { c.onchange = function () { var id = c.dataset.f; if (c.checked) delete S.off[id]; else S.off[id] = 1; if (pfs().every(function (f) { return S.off[f.id]; })) S.off = {}; rr(); }; });
+  if ($('#fltDn')) $('#fltDn').onclick = function (e) { e.stopPropagation(); S.fltDn = !S.fltDn; var l = $('#flt .pmdl'), y = l ? l.scrollTop : 0; rr(); var l2 = $('#flt .pmdl'); if (l2) l2.scrollTop = y; };
   $$('#flt [data-fa]').forEach(function (b) { b.onclick = function () { if (b.dataset.fa === 'all') { S.off = {}; rr(); } else if (b.dataset.fa === 'none') { S.off = {}; pfs().forEach(function (f) { S.off[f.id] = 1; }); rr(); } else { S.fltO = false; $('#flt').classList.remove('open'); } }; });
   if (!S.fltDoc) { S.fltDoc = 1; document.addEventListener('click', function () { if (S.fltO) { S.fltO = false; var f = $('#flt'); if (f) f.classList.remove('open'); } }); }
   $$('#flt button.x-old').forEach(function (b) {
@@ -5400,6 +5414,7 @@ var PJL = [];
 // 프로젝트 완료 (2026-11-20 실장님: 팀원 모두에게 보이게) = 일정완료 탭에 '프로젝트 완료 | 완료한 날 | 아티스트|제목|연도' 한 줄
 // (이름이 pjKey면 NAS 링크 찾는 pjKey(a, t)를 덮어써서 pjDK로)
 var PJD_N = '프로젝트 완료';
+function pjDoneFiles() { var DN = pjDone(), r = {}; try { pjMerged().forEach(function (o) { if (o.g && o.g.f && DN[pjDK(o)]) r[o.g.f.id] = 1; }); } catch (e) {} return r; }
 function pjDK(o) { return [o.artist || '', o.title || '', o.year || ''].join('|'); }
 function pjDone() {
   var d = {}; try { d = JSON.parse(ls.get('d4:pjdone') || '{}') || {}; } catch (e) {}
