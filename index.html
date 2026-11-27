@@ -2574,7 +2574,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm264';
+var APP_VER = '20261127hm265';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3530,6 +3530,7 @@ var NAV_IC = {
   todo: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11"/>',
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  won: '<rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M8 9l1.5 6 2.5-5 2.5 5L16 9M7.5 12h9"/>',
   truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
   cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
@@ -3549,7 +3550,7 @@ var SPACES = [
   { k: 'calm', t: '캘린더', d: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로', home: 'cal', ic: 'cal', g: [] },
   { k: 'tdm', t: '투두리스트', d: '팀 공지와 프로젝트별 할 일', home: 'todo', ic: 'todo', g: [] },
   { k: 'qkm', t: '퀵 배차', d: '카카오 T 퀵 주문 · 거래처 주소와 연락처', home: 'qk', ic: 'truck', g: [] },
-  { k: 'expm', t: '지출 결의서 작성', d: '지출결의서 작성 · 목록', home: 'exp', ic: 'doc', g: [] },
+  { k: 'expm', t: '지출 결의서 작성', d: '지출결의서 작성 · 목록', home: 'exp', ic: 'won', g: [] },   // 2026-11-27 실장님: 돈 아이콘
   // 2026-11-27 실장님: 도구의 지류 · MD · 디자인을 대메뉴로 (지류도우미 · MD도우미 · 디자인도우미), 공통은 도구에 그대로
   { k: 'ppm', t: '지류도우미', d: '용지 크기 · 사양서 · 검수 · 책등 · 종이연수 · 칼선 · 터잡기', home: 'space:ppm', ic: 'doc', g: [{ g: '지류도우미', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] }] },
   { k: 'mdm', t: 'MD도우미', d: '작업지시서 양식 · 검수 · 상품 정보 라벨', home: 'space:mdm', ic: 'aid', g: [{ g: 'MD도우미', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '작업지시서 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] }] },
