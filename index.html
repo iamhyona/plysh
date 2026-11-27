@@ -1356,6 +1356,9 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+/* 2026-11-27 실장님: 시간·분 단위는 전체 통일 — 숫자보다 작고 흐리게 (글자색은 그대로 두고 농도만) */
+.tu { font-style:normal; font-size:min(1em, max(.76em, 10.5px)); font-weight:600; opacity:.6; margin-left:1px; letter-spacing:0; }
+
 .rpi .tdgrip { user-select:none; -webkit-user-select:none; flex:none; align-self:center; width:28px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--faint); cursor:grab; touch-action:none; border-radius:8px; }
 .rpi .tdgrip svg { width:16px; height:16px; }
 /* 2026-11-27 실장님: 모바일에서 손가락으로 잡기 쉽게 손잡이 크게 · 꾹 눌러도 글자 선택·메뉴 안 뜨게 */
@@ -2280,7 +2283,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm234';
+var APP_VER = '20261127hm235';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -6809,6 +6812,35 @@ function openWlList(p, k, first, last) {
   $$('[data-wll]').forEach(function (b) { b.onclick = function () { openWl(b.dataset.wll, p); }; });
   var was = !!$('.bs.open'); closeBs(); setTimeout(function () { openBs('#wlL'); }, was ? 230 : 0);
 }
+
+// ───── 2026-11-27 실장님: 숫자 뒤 '시간'·'분'은 어디서든 작고 흐리게 (화면이 그려질 때마다 자동) ─────
+// 월간리포트(.mrg)는 따로 다듬는 중이라 건드리지 않음 · 입력칸·선택 목록·이미 꾸민 단위는 그대로
+var TU_RX = /(\d)(\s?)(시간|분)(?=$|[^가-힣]|째|씩|전|후|간|동안)/;
+var TU_SKIP = 'input,textarea,select,option,script,style,svg,.tu,t-w,.mrg,[contenteditable]';
+function tuWrap(root) {
+  if (!root || root.nodeType !== 1 || (root.closest && root.closest(TU_SKIP))) return;
+  var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), L = [], n;
+  while ((n = w.nextNode())) if (TU_RX.test(n.nodeValue) && !(n.parentNode.closest && n.parentNode.closest(TU_SKIP))) L.push(n);
+  L.forEach(function (t) {
+    var v = t.nodeValue, f = document.createElement('t-w'), m;   // 한 덩어리로 감싸야 flex 줄에서 칸이 갈라지지 않음
+    while ((m = v.match(TU_RX))) {
+      var at = m.index + m[1].length + m[2].length;
+      f.appendChild(document.createTextNode(v.slice(0, at)));
+      var u = document.createElement('t-u'); u.className = 'tu'; u.textContent = m[3]; f.appendChild(u);
+      v = v.slice(at + m[3].length);
+    }
+    f.appendChild(document.createTextNode(v)); t.parentNode.replaceChild(f, t);
+  });
+}
+(function () {
+  var Q = [], on = false;
+  function run() { on = false; var q = Q; Q = []; q.forEach(function (x) { if (x.isConnected) tuWrap(x.nodeType === 3 ? x.parentNode : x); }); }
+  new MutationObserver(function (M) {
+    M.forEach(function (m) { if (m.type === 'characterData') Q.push(m.target); else m.addedNodes.forEach(function (x) { if (x.nodeType === 1 || x.nodeType === 3) Q.push(x); }); });
+    if (Q.length && !on) { on = true; requestAnimationFrame(run); }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  tuWrap(document.body);
+})();
 </script>
 </body>
 </html>
