@@ -1361,6 +1361,9 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wckb button { height:52px !important; flex-direction:row !important; justify-content:flex-start !important; gap:8px !important; padding:0 14px !important; }
 .wdg .wckb button b { font-size:15px !important; } .wdg .wckb button small { margin-left:auto; font-size:13.5px !important; }
 .wdg .wckb button.done:disabled { opacity:1; } .wdg .wckb button.done:disabled small { color:var(--txt); font-weight:700; }
+.wdg .wckb button.nx, .wdg .wckb button.nx b, .wdg .wckb button.nx small, .wdg .wckb button.nx svg { color:#fff !important; }
+.wdg .wckb button.sure small { font-size:12.5px !important; font-weight:700; white-space:nowrap; }
+.wdg .wckb button.sure:not(.nx) small { color:color-mix(in srgb, var(--pc) 85%, #191f28) !important; }
 #bgSv.on { opacity:1; transform:translate(-50%, 0); }
 #bgSv i { width:14px; height:14px; border-radius:50%; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; animation:bgspin .8s linear infinite; flex:none; }
 @keyframes bgspin { to { transform:rotate(360deg); } }
@@ -2098,7 +2101,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm221';
+var APP_VER = '20261127hm222';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
