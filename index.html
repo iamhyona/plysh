@@ -2329,7 +2329,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm242';
+var APP_VER = '20261127hm243';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2401,7 +2401,7 @@ function specFix(o) {
   var t = n.replace(/^@/, '').replace(/\[[^\]]+\]/, '').replace(/의 사본$/, '').replace(/[_\s]*사양서(_\d+)?\s*$/, '').replace(/_/g, ' ').replace(/(\D)(20\d\d)/, '$1 $2').replace(/\s+/g, ' ').trim();
   return { id: o.id, name: n, artist: m ? m[1] : '', title: t || n, year: o.year, url: o.url, at: o.at };
 }
-function specList() { return (S.SL || []).map(specFix).filter(function (o) { return !SPEC_SKIP.test(o.name); }); }
+function specList() { return (Array.isArray(S.SL) ? S.SL : []).map(specFix).filter(function (o) { return !SPEC_SKIP.test(o.name); }); }
 function loadSpecs(force) {
   if (S.SL && !force && S.slAt && Date.now() - S.slAt < 300000) return Promise.resolve();
   return call('appSpecs', S.pin).then(function (L) { S.SL = L; S.slAt = Date.now(); ls.set('d4:sl', JSON.stringify(L)); });
@@ -2758,7 +2758,8 @@ function rtSync() {
 window.addEventListener('popstate', function () { var k = decodeURIComponent((location.hash || '').slice(1)); if (!k || k === rtKey() || !S.D) return; RT.pop = 1; try { navGo(k); } catch (e) {} RT.pop = 0; });
 function render() {
   if (!S.D) return;
-  if (!RT.done) { RT.done = 1; var hk = decodeURIComponent((location.hash || '').slice(1)); if (hk && hk !== rtKey()) { RT.wait = 1; setTimeout(function () { RT.wait = 0; RT.pop = 1; try { navGo(hk); } catch (e) {} RT.pop = 0; }, 0); } }
+  // 2026-11-27 실장님: 새로고침하면 다른 화면(근태 작성 등)이 잠깐 보였다 바뀜 → 주소의 화면을 처음부터 바로 그림
+  if (!RT.done) { RT.done = 1; var hk = decodeURIComponent((location.hash || '').slice(1)); if (hk && hk !== rtKey()) { RT.pop = 1; var ok = false; try { navGo(hk); ok = true; } catch (e) {} RT.pop = 0; if (ok) return; } }
   var keep = {}; $$('.tabs2[id]').forEach(function (t) { keep[t.id] = t.scrollLeft; });
   renderView(); rtSync();
   try { var mnu = window.plMenu && plMenu(); if (window.plog && S.tok && mnu) { var ssk = 'd4:mnu:' + mnu; if (!sessionStorage.getItem(ssk)) { sessionStorage.setItem(ssk, '1'); plog('메뉴', { menu: mnu }); } } } catch (e) {} // 2026-11-27 월간리포트 PLYSH 통계: 메뉴는 탭마다 처음 연 한 번만
@@ -3264,7 +3265,7 @@ function navGo(k) {
   if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'tools') { S.spk = 'tool'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'cal' ? 'proj' : k === 'sched' ? 'proj' : (ls.get('d4:cv') || 'proj'); if (k === 'cal') { S.pjm = 'd'; ls.set('d4:pjm', 'd'); } ls.set('d4:cv', S.cv); k = 'month'; }
-  S.view = k; if (k !== 'refs' && k !== 'start') ls.set('d4:view', k); window.scrollTo(0, 0); render();
+  S.view = k; if (k !== 'refs') ls.set('d4:view', k); window.scrollTo(0, 0); render();
 }
 function navClose() { document.documentElement.style.overflow = ''; ['#npl', '#nmg', '#nbd', '#nfm', '#nfb'].forEach(function (s) { var e = $(s); if (e) e.classList.remove('open'); }); NAV.hv = null; }
 function navEl(id, tag, where, html) { var e = document.getElementById(id); if (!e) { e = document.createElement(tag || 'div'); e.id = id; where(e); } if (html != null) e.innerHTML = html; return e; }
@@ -3804,14 +3805,18 @@ function glHtml(sp, cls) { var cur = navCur(); NAV.tgo = NAV.tgo || {}; return s
   var key = 'ref|' + g.g, has = g.i.some(function (x) { return x.k === cur; }), op = NAV.tgo[key] != null ? NAV.tgo[key] : has;
   return '<button type="button" class="' + cls + ' tgh' + (op ? ' op' : '') + '" data-tg="' + esc(key) + '">' + esc(g.g) + '<span class="cv"></span></button><div class="stg"' + (op ? '' : ' hidden') + '>' + g.i.map(function (x) { var on = x.k === cur && !inWs(); return '<button type="button" class="si3 tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + '<span class="cv"></span></button>'; }).join('') + '</div>'; }).join(''); }
 function tgBind(root) { $$('[data-tg]', root).forEach(function (b) { b.onclick = function () { var w = b.nextElementSibling, op = w.hasAttribute('hidden'); NAV.tgo = NAV.tgo || {}; NAV.tgo[b.dataset.tg] = op; if (op) w.removeAttribute('hidden'); else w.setAttribute('hidden', ''); b.classList.toggle('op', op); }; }); }
+// 2026-11-27 실장님: 대메뉴 펼침은 직접 닫을 때만 닫힘 — 펼친 목록을 기억(d4:sopen), 새로 들어간 대메뉴는 자동으로 펼침
+var SOPEN = (function () { try { return JSON.parse(ls.get('d4:sopen') || '{}') || {}; } catch (x) { return {}; } })();
+function soSave() { try { ls.set('d4:sopen', JSON.stringify(SOPEN)); } catch (x) {} }
 function sideHtml() {
   var cur = navCur(), sk = spOf();
+  if (NAV.lastSk !== sk) { NAV.lastSk = sk; if (!SOPEN[sk]) { SOPEN[sk] = 1; soSave(); } }
   return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
     SPACES.map(function (sp) {
       // 2026-11-23 실장님: 대메뉴 오른쪽에도 접고 펴는 꺾쇠
-      var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj', op = on && !NAV.ssShut, h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
-      if (!on) return h;
-      h += '<div class="sx"' + (op ? '' : ' hidden') + '>';
+      var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj', op = !!SOPEN[sp.k], h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
+      if (!sub || !op) return h;
+      h += '<div class="sx">';
       if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력'], ['todo', '할 일']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
@@ -3889,7 +3894,7 @@ function navSync() {
   if (NAV.s === 'w' || NAV.s === 'c') {
     var sd = navEl('nsd', 'aside', function (e) { document.body.appendChild(e); });
     sd.innerHTML = sideHtml(); bindGo(sd); tgBind(sd);
-    $$('[data-sst]', sd).forEach(function (c) { c.addEventListener('click', function (e) { var b = c.parentNode, x = b.nextElementSibling; if (!b.classList.contains('on') || !x || !x.classList.contains('sx')) { NAV.ssShut = false; return; } e.stopPropagation(); NAV.ssShut = !NAV.ssShut; x.hidden = NAV.ssShut; b.classList.toggle('op', !NAV.ssShut); }); }); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
+    $$('[data-sst]', sd).forEach(function (c) { c.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); var b = c.parentNode, k = (SPACES.filter(function (sp) { return sp.home === b.dataset.ng; })[0] || {}).k; if (!k) return; if (SOPEN[k]) SOPEN[k] = 0; else SOPEN[k] = 1; soSave(); var y = sd.scrollTop; navSync(); var s2 = $("#nsd"); if (s2) s2.scrollTop = y; }, true); }); $('.sfs', sd).onclick = function () { navPal(); }; SUB.sig = ''; setTimeout(subTick, 0);
     var T = [['home', 'home', '홈'], ['me', 'todo', '개인'], ['proj', 'proj', '프로젝트'], ['tool', 'tool', '도구'], ['all', 'menu', '전체']];
     var tb = navEl('ntb', 'nav', function (e) { document.body.appendChild(e); });
     tb.innerHTML = T.map(function (t) { return '<button type="button" data-nt="' + t[0] + '" class="' + (t[0] === sk ? 'on' : '') + '">' + navIc(t[1]) + t[2] + '</button>'; }).join('');
