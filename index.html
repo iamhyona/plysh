@@ -2307,7 +2307,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm236';
+var APP_VER = '20261127hm237';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3181,10 +3181,11 @@ function tl(k) { return TOOL_LIST.filter(function (x) { return x.k === k; })[0] 
 // 2026-11-20 실장님이 정한 메뉴 구성 (이름도 그대로)
 var SPACES = [
   { k: 'home', t: '홈', d: '이번 주 마감, 오늘 할 일, 최근 프로젝트, 자주 쓰는 도구', home: 'start', ic: 'home', g: [] },
-  { k: 'me', t: '개인', d: '할 일, 근태, 지출결의를 한곳에서', home: 'todo', ic: 'todo', g: [
-    { g: '개인', i: [{ k: 'todo', t: '할 일', s: '오늘 · 이번 주 할 일과 팀 공지' }, { k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
+  // 2026-11-27 실장님: '할 일'은 개인에서 빼서 프로젝트 아래로 (할 일은 프로젝트에 쓰자)
+  { k: 'me', t: '개인', d: '근태, 지출결의를 한곳에서', home: 'wl', ic: 'todo', g: [
+    { g: '개인', i: [{ k: 'wl', t: '근태 작성', s: '출퇴근 · 휴가 · 업무 기록' }, { k: 'exp', t: '지출결의', s: '지출결의서 작성 · 목록' }] }] },
   { k: 'proj', t: '프로젝트', d: '프로젝트를 열면 일정 · 할 일 · 사양서 · 검수 · 파일명이 한곳에', home: 'pj', ic: 'proj', g: [
-    { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로' }] }] },
+    { g: '프로젝트', i: [{ k: 'pj', t: '목록', s: '아티스트 · 연도로 찾기' }, { k: 'cal', t: '달력', s: '모든 프로젝트 일정을 가로형 · 세로형 · 리스트로' }, { k: 'todo', t: '할 일', s: '프로젝트별 오늘 · 이번 주 할 일과 팀 공지' }] }] },
   // 2026-11-27 실장님: 월간리포트 대메뉴 — 팀 활동 · 업무 · 근태를 한 달 단위 그래프로
   { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
   // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
@@ -3785,7 +3786,7 @@ function sideHtml() {
       if (!on) return h;
       h += '<div class="sx"' + (op ? '' : ' hidden') + '>';
       if (sp.k === 'proj') {
-        h += [['pj', '목록'], ['cal', '달력']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
+        h += [['pj', '목록'], ['cal', '달력'], ['todo', '할 일']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
