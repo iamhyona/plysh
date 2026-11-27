@@ -2230,6 +2230,37 @@ html.mving #main { touch-action:none; }
 #mvT span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #mvT button { flex:none; height:34px; padding:0 14px; border:0; border-radius:10px; background:#fff; color:#191f28; font:inherit; font-size:13px; font-weight:800; cursor:pointer; margin:0 !important; }
 @media (max-width:1023px) { #mvT { bottom:calc(78px + env(safe-area-inset-bottom)); } }
+
+/* 팝업 닫기 ✕ 통일 (hm263): 공통 아이콘 단추 36px, 팝업 안쪽 여백만큼 들여서 (모서리에 붙지 않게) */
+.bsh { height:auto !important; min-height:36px; padding:14px 14px 0 !important; margin:-22px -20px 6px !important; align-items:flex-start !important; }
+.bsh i { top:8px; }
+.bsx { width:36px !important; height:36px !important; min-height:36px; margin:0 !important; flex:none; }
+.bsx svg { width:16px !important; height:16px !important; }
+#nfm .nx { width:36px !important; height:36px !important; }
+@media (min-width:760px) { .bs .bsh { margin:-24px -24px 4px !important; padding:18px 18px 0 !important; } }
+
+/* 일정 추가: 프로젝트 드롭다운 (hm263) */
+.edfs { width:100%; height:48px; border:0; border-radius:12px; background:var(--chip); padding:0 14px; font:inherit; font-size:15px; font-weight:600; color:var(--txt); }
+.edfn { margin-top:10px; }
+
+/* 달력 '오늘 보기' = 진한 단추 (hm263), 누른 뒤 파란 포커스 테두리 없앰 (키보드 이동 때만 표시) */
+#main .hm2.hdt .hnv .tod.tdk, .whc .hch .hnv #hcT.tdk { background:var(--txt) !important; color:#fff !important; border:0 !important; height:28px; min-height:28px; padding:0 11px !important; border-radius:8px !important; font-size:12px !important; font-weight:700 !important; }
+button:focus:not(:focus-visible), a:focus:not(:focus-visible), [tabindex]:focus:not(:focus-visible) { outline:none !important; }
+button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
+
+/* 근태 막대: 40시간까지 본인 키컬러 연하게, 초과분은 진하게 (hm263) */
+.wgt i.wbase.cut { border-radius:5px 0 0 5px; }
+.wgt i.ov { border-radius:0 5px 5px 0; }
+.wgt em.e52 { background:#9aa0a8; opacity:1; }
+.wgr b.x52 { font-weight:900; } .wgr b.x52::after { content:' · 52↑'; font-size:11px; font-weight:700; }
+
+/* 캘린더 공통 머리 한 줄 (hm263) */
+#main .hm2.hdt .hrt > .pjtb.pjin { margin:0 auto 0 0; flex-wrap:nowrap; }
+#main .hm2.hm2h .hmt { display:none; }
+#main .hm2.hm2h .hnv { margin-left:0; }
+
+#main #mFold { width:auto !important; padding:0 12px !important; font-size:13px !important; font-weight:700; white-space:nowrap; }
+@media (max-width:1023px) { #main .hm2.hdt .hrt { flex-wrap:wrap; } #main .hm2.hdt .hrt > .pjtb.pjin { width:100%; flex-wrap:nowrap; margin:0; gap:6px; } #main .hm2.hdt .hrt:has(.pjin) > .hwr { display:none !important; } .pjtb.pjin .cvk button { padding:0 8px !important; } .pjtb.pjin .cvk svg { display:none; } .pjtb.pjin .pmd { min-width:0; } }
 </style>
 </head>
 <body>
@@ -2302,7 +2333,7 @@ html.mving #main { touch-action:none; }
 <!-- 일정 입력·수정 -->
 <div class="bs" id="ed">
   <h3 id="edT">일정 추가</h3>
-  <div class="fl" style="margin-top:0">일정표</div><div class="chips" id="edF"></div>
+  <div class="fl" style="margin-top:0">프로젝트</div><div id="edF"></div>
   <div class="frow" style="margin-top:14px"><div class="f"><label>날짜</label><input id="edD" type="date"></div></div>
   <div class="fl">구분</div><div class="chips" id="edK"></div>
   <div class="frow" style="margin-top:14px"><div class="f"><label>내용</label><input id="edX" placeholder="예) 로고 시안 1차" maxlength="80"></div></div>
@@ -2543,7 +2574,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm262';
+var APP_VER = '20261127hm263';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2843,7 +2874,7 @@ var IC_CALS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 function rgDw(id, v, ph) { return '<label class="rgdw' + (v ? '' : ' e') + '"><span>' + (v ? v.replace(/-/g, '.') + '(' + W[P(v).getDay()] + ')' : ph) + '</span>' + IC_CALS + '<input type="date" id="' + id + '" value="' + (v || '') + '" onclick="try{this.showPicker()}catch(e){}"></label>'; }
 function rgTitle(a, b) { var md = function (x) { return x.slice(5).replace('-', '.'); }; return a.slice(0, 4) === b.slice(0, 4) ? md(a) + '–' + md(b) : a.slice(2).replace(/-/g, '.') + '–' + b.slice(2).replace(/-/g, '.'); }
 var IC_MINUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>';
-function foldBtn() { return '<button id="mFold" class="fbtn" aria-label="' + (S.fold ? '주말 펼치기' : '주말 접기') + '">' + (S.fold ? IC_PLUS : IC_MINUS) + '</button>'; }
+function foldBtn() { return '<button id="mFold" class="fbtn">' + (S.fold ? '주말 펼치기' : '주말 접기') + '</button>'; }   // 2026-11-27: 빈 상자처럼 보여서 글자로
 function bindFold() { var b = $('#mFold'); if (b) b.onclick = function () { S.fold = !S.fold; ls.set('d4:fold', S.fold ? '1' : ''); var y0 = window.scrollY; render(); window.scrollTo(0, y0); }; }
 function chipVis(bar, smooth) {
   if (!bar) return; var c = bar.querySelector('button.on'); if (!c) return;
@@ -3053,7 +3084,7 @@ function hdTidy() {
     var nv = document.createElement('span'); nv.className = 'hnv';
     var rt = document.createElement('span'); rt.className = 'hrt';
     var arw = $('.arw', h);
-    if (arw) [].slice.call(arw.children).forEach(function (b) { var tx = (b.textContent || '').trim(); if ((b.tagName === 'BUTTON' && !tx && (/이전|다음/.test(b.getAttribute('aria-label') || '') || /(P|N|Pv|Nx)$/.test(b.id || ''))) || /^(오늘|이번 ?(달|주))$/.test(tx)) nv.appendChild(b); });
+    if (arw) [].slice.call(arw.children).forEach(function (b) { var tx = (b.textContent || '').trim(); if ((b.tagName === 'BUTTON' && !tx && (/이전|다음/.test(b.getAttribute('aria-label') || '') || /(P|N|Pv|Nx)$/.test(b.id || ''))) || /^(오늘( 보기)?|이번 ?(달|주))$/.test(tx)) nv.appendChild(b); });
     [].slice.call(h.children).forEach(function (c) { if (c !== t && c !== arw) rt.appendChild(c); });
     if (arw) { [].slice.call(arw.children).forEach(function (b) { rt.appendChild(b); }); arw.remove(); }
     $$('.tdshi', rt).forEach(function (a) { rt.appendChild(a); });   // 전환 단추 안에 끼어 있던 시트 아이콘은 밖으로
@@ -3064,6 +3095,8 @@ function hdTidy() {
       if (pw) { var w2 = pw.cloneNode(true); w2.removeAttribute('id'); w2.className = 'hwr'; w2.onclick = function () { var o = $('#pgW'); if (o) o.click(); }; rt.appendChild(w2); }
       document.documentElement.toggleAttribute('data-hdmv', !!(pa || pw));
     }
+    // 2026-11-27 실장님: 캘린더 머리 한 줄 = 날짜 · 화살표 · 오늘 보기 · 보기 전환 · 프로젝트 필터 · 일정 추가
+    var nx = h.nextElementSibling; if (i === 0 && nx && nx.classList.contains('pjtb')) { nx.classList.add('pjin'); rt.insertBefore(nx, rt.firstChild); }
     t.after(nv); nv.after(rt);
   });
 }
@@ -3517,12 +3550,11 @@ var SPACES = [
   { k: 'tdm', t: '투두리스트', d: '팀 공지와 프로젝트별 할 일', home: 'todo', ic: 'todo', g: [] },
   { k: 'qkm', t: '퀵 배차', d: '카카오 T 퀵 주문 · 거래처 주소와 연락처', home: 'qk', ic: 'truck', g: [] },
   { k: 'expm', t: '지출 결의서 작성', d: '지출결의서 작성 · 목록', home: 'exp', ic: 'doc', g: [] },
-  // 2026-11-22 실장님: 도우미 · 도구를 다시 '도구' 하나로 합치고 중메뉴를 용어사전처럼 분야별(지류 · MD · 디자인 · 공통)로 나눔 (11-22 오후 수정) (용어사전은 따로)
-  { k: 'tool', t: '도구', d: '지류 · MD · 디자인 · 공통', home: 'space:tool', ic: 'tool', g: [
-    { g: '지류', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] },
-    { g: 'MD', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '작업지시서 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] },
-    { g: '디자인', i: [{ k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }, // 2026-11-23 실장님: 로고 · 폰트 찾기 · 단위 환산 · 팬톤 순
-    { g: '공통', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
+  // 2026-11-27 실장님: 도구의 지류 · MD · 디자인을 대메뉴로 (지류도우미 · MD도우미 · 디자인도우미), 공통은 도구에 그대로
+  { k: 'ppm', t: '지류도우미', d: '용지 크기 · 사양서 · 검수 · 책등 · 종이연수 · 칼선 · 터잡기', home: 'space:ppm', ic: 'doc', g: [{ g: '지류도우미', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] }] },
+  { k: 'mdm', t: 'MD도우미', d: '작업지시서 양식 · 검수 · 상품 정보 라벨', home: 'space:mdm', ic: 'aid', g: [{ g: 'MD도우미', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '작업지시서 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] }] },
+  { k: 'dsm', t: '디자인도우미', d: '로고 · 폰트 찾기 · 단위 환산 · 팬톤', home: 'space:dsm', ic: 'pen', g: [{ g: '디자인도우미', i: [{ k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
+  { k: 'tool', t: '도구', d: '폴더 · 파일명 생성기', home: 'space:tool', ic: 'tool', g: [{ g: '도구', i: [{ k: 'filename', t: '폴더·파일명 생성기', tool: 1 }] }] },
   // 2026-11-22 실장님: 명칭(상품별 부위 명칭)을 용어·견본에서 빼서 따로 대메뉴로, 하위 카테고리로 나눔
   { k: 'name', t: '명칭', d: '상품별 부위 명칭 · MD 공통 용어 · 책 구조 · 의류 · 모자 · 양말 · 가방 · 부자재 · 굿즈', home: 'space:name', ic: 'tag', g: [
     { g: '명칭', i: [{ k: 'ref:명칭 MD 공통 용어', t: 'MD 공통 용어', ct: '명칭 · MD 공통 용어', s: '생산 · 발주 · 계약 · 정산 (라이선스 · 로열티 · MG · OEM · 위탁 · 사입 · 감수) · 치수 · 단위 · 표시 · 인증 마크 (KOMCA · FSC · 바코드 · QR · SOY INK)' }, { k: 'ref:명칭 책 구조', t: '책 구조', ct: '명칭 · 책 구조', s: '하드커버 (양장) · 소프트커버 (무선 · PUR) 부위 그림 · 차이' }, { k: 'ref:명칭 의류', t: '의류', ct: '명칭 · 의류', s: '의류 공통 용어 (봉제 현장 말 · 원단 · 치수) · 티셔츠 · 링거티 · 카라티 · 맨투맨 · 후디 · 파자마 (긴팔 · 반팔) · 앞뒤 그림' }, { k: 'ref:명칭 모자·양말', t: '모자 · 양말', ct: '명칭 · 모자 · 양말', s: '볼캡 · 양말' }, { k: 'ref:명칭 가방', t: '가방', ct: '명칭 · 가방', s: '에코백 · 토트백 · 스트링백 · 파우치 · 백팩' }, { k: 'ref:명칭 부자재', t: '부자재', ct: '명칭 · 부자재', s: '부자재 공통 용어 · 지퍼 · 랜야드' }, { k: 'ref:명칭 굿즈·소품', t: '굿즈 · 소품', ct: '명칭 · 굿즈 · 소품', s: '아크릴 키링 · 아크릴 스탠드 · 인형 · 캔 뱃지 · 메탈 뱃지 · 우산 · 머그컵 · 쿠션 · 담요 · 반다나 · 와펜' }] }] },
@@ -3554,10 +3586,11 @@ function navCur() { var v = S.view; if (v === 'space') return 'space:' + S.spk; 
   if (v === 'gdoc') { var k = 'gd:' + S.gdf, gi = -1; GUIDE_GROUPS.forEach(function (g, i) { if (g.i.some(function (d) { return d.f === S.gdf; })) gi = i; }); return (gi > 0 && S.gdf !== 'folder-file.html') ? 'gl:' + gi : k; } if (v === 'tk') return S.tk === 'ref' && S.refP ? 'ref:' + S.refP : S.tk === 'opp' ? 'pack' : S.tk; var t = TOOL_LIST.filter(function (x) { return x.v === v; })[0]; return t ? t.k : v; }
 function inWs() { if (!S.ws) return false; var c = navCur(); return S.view === 'ws' || (S.view === 'spec' && S.sp && S.sp === S.ws.sp) || !!WS_TOOLS[c]; }
 function spOf() {
-  if (inWs()) return 'proj';
-  var c = navCur(); if (c === 'spec') return 'proj';
+  // 2026-11-27: 'proj' 대메뉴가 'pjm'(프로젝트)으로 바뀜 — 프로젝트 상세(ws) · 사양서는 pjm, 못 찾으면 pjm
+  if (inWs()) return 'pjm';
+  var c = navCur(); if (c === 'spec') return 'pjm';
   for (var i = 0; i < SPACES.length; i++) if (SPACES[i].home === c || spItems(SPACES[i]).some(function (x) { return x.k === c; })) return SPACES[i].k;
-  return 'proj';
+  return 'pjm';
 }
 function navGo(k) {
   navClose(); S.ws = null;
@@ -3745,7 +3778,7 @@ function homeCal() {
       return { id: e.id, d: e.d, k: '', t: e.t.replace(p, '').replace(/^[\s·:,-]+/, '').trim() || e.t, f: 'p:' + p, file: { color: p === '팀' ? '#8b95a1' : dcol(p), short: p, name: p } }; });
     RK = {}; T.concat(['팀']).forEach(function (n, i) { RK['p:' + n] = pad(i); }); }
   // 2026-11-27 실장님: 머리 단추 정리 — 모든 단추 높이 34px·모서리 10px 통일, PC 한 줄(왼쪽 연월·화살표·보기·프로젝트 / 오른쪽 달력 전체·일정 추가), 모바일 두 줄
-  var h = '<div class="wsc whc"><div class="hch"><span class="hct">' + y + '.' + pad(m) + '</span><span class="hnv"><button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button>' + '<button type="button" id="hcT">오늘</button>' + '</span>' +
+  var h = '<div class="wsc whc"><div class="hch"><span class="hct">' + y + '.' + pad(m) + '</span><span class="hnv"><button type="button" id="hcP" aria-label="이전 달">' + IC_L + '</button><button type="button" id="hcN" aria-label="다음 달">' + IC_R + '</button>' + '<button type="button" class="tdk" id="hcT">오늘 보기</button>' + '</span>' +
     '<span class="hcg"><span class="aseg hcv" id="hcV"><button type="button" data-v="" class="' + (me ? '' : 'on') + '">프로젝트</button><button type="button" data-v="me" class="' + (me ? 'on' : '') + '">개인 일정</button></span></span>' +
     '<span class="hcr">' + filterBar(1) + '<button type="button" class="hcadd" id="hcAdd" aria-label="일정 추가">' + IC_PS + '일정 추가</button></span></div>' +
     '<div class="hmc"><div class="wd">' + W.map(function (w, i) { return '<span class="' + (i === 0 ? 'su' : i === 6 ? 'sa' : '') + '">' + w + '</span>'; }).join('') + '</div><div class="gd gl">';
@@ -4139,7 +4172,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' && sp.g.length > 1 ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
@@ -4170,19 +4203,19 @@ function sideHtml() {
       h += '<div class="sx">';
       if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력'], ['todo', '할 일']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
-      } else if (sp.k === 'tool') h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
+      } else if (sp.k === 'tool' && sp.g.length > 1) h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
       return h + '</div>';
     }).join('');
 }
 function subHtml() {
   var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur();
-  if (sk === 'proj' || !sp.g.length) return '';
+  if (!sp || sk === 'proj' || !sp.g.length) return '';
   return sp.g.map(function (g) { return (sp.g.length > 1 ? '<i>' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { return '<button type="button" data-ng="' + x.k + '" class="' + (x.k === cur ? 'on' : '') + '">' + esc(TOOL_SHORT[x.k] || x.t) + '</button>'; }).join(''); }).join('');
 }
 function crumbHtml() {
   // 2026-11-27 실장님: 홈 메뉴 없앰 — PC 홈은 맨 위 경로 자리에 날짜 · 날씨 · 세부 정보 (아래 날짜 줄은 숨김)
   if (S.view === 'start') { var d0 = new Date(); return '<div class="wday hcw">' + (d0.getMonth() + 1) + '월 ' + d0.getDate() + '일 ' + '일월화수목금토'.charAt(d0.getDay()) + '요일<small class="wwx">' + wxHtml() + '</small></div>'; }
-  var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur(), it = spItems(sp).filter(function (x) { return x.k === cur; })[0];
+  var sk = spOf(), sp = SPACES.filter(function (s) { return s.k === sk; })[0], cur = navCur(), it = spItems(sp || { g: [] }).filter(function (x) { return x.k === cur; })[0];
   var sep = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">' + NAV_IC.cv + '</svg>';
   if (inWs()) return sp.t + sep + '<b>' + esc(S.ws.name) + '</b>';
   if (S.view === 'space' || S.view === 'start') return '<b>' + esc(sp.t) + '</b>';
@@ -4442,7 +4475,7 @@ function bindFoldDay() { S.dop = S.dop || {}; $$('details.fday').forEach(functio
 function goTodayEl(sel) { var e = document.querySelector(sel); if (!e) return; var r = e.getBoundingClientRect(); window.scrollTo({ top: Math.max(0, window.scrollY + r.top - 140), behavior: 'smooth' }); }
 function calHead(y, m) {
   return '<div class="hm2"><label class="hmt" id="cT">' + y + '.' + pad(m) + '<input type="month" class="dpk" id="cTD" value="' + y + '-' + pad(m) + '"></label>' +
-    '<div class="arw">' + foldBtn() + '<button id="nP" aria-label="이전 달">' + IC_L + '</button><button id="nN" aria-label="다음 달">' + IC_R + '</button><button class="tod" id="nT">오늘</button></div></div>';
+    '<div class="arw">' + foldBtn() + '<button id="nP" aria-label="이전 달">' + IC_L + '</button><button id="nN" aria-label="다음 달">' + IC_R + '</button><button class="tod tdk" id="nT">오늘 보기</button></div></div>';
 }
 function modeSeg() { return '<div class="seg" id="mSeg"><button data-m="sched" class="' + (S.mm !== 'team' ? 'on' : '') + '">제작일정</button><button data-m="team" class="' + (S.mm === 'team' ? 'on' : '') + '">팀 업무</button></div>'; }
 function bindSeg() { $$('#mSeg button').forEach(function (b) { b.onclick = function () { S.mm = b.dataset.m; ls.set('d4:mm', S.mm); render(); }; }); if ($('#cTD')) $('#cTD').onchange = function () { var v = String(this.value || ''); if (/^\d{4}-\d\d/.test(v)) { S.y = +v.slice(0, 4); S.m = +v.slice(5, 7); render(); } }; }
@@ -4641,11 +4674,11 @@ function renderProject() {
   var top = lp === 'r'
     ? '<div class="hm2 hm2a"><label class="hmt">' + rgTitle(lrg[0], lrg[1]) + '</label>' + lseg + '</div><div class="rgrow">' + rgDw('lF', lrg[0], '시작일') + '<i>~</i>' + rgDw('lT', lrg[1], '종료일') + '</div>'
     : (function () { var cur = TODAY >= lrg[0] && TODAY <= lrg[1]; return '<div class="hm2 hm2a"><label class="hmt">' + perTitle(lp, lrg) + '<input type="date" class="dpk" id="lSegD" value="' + (S.ld || TODAY) + '"></label>' + lseg +
-      '<div class="arw"><button id="lP" aria-label="이전">' + IC_L + '</button><button id="lN" aria-label="다음">' + IC_R + '</button><button class="tod" id="nT">오늘</button></div></div>'; })();
+      '<div class="arw"><button id="lP" aria-label="이전">' + IC_L + '</button><button id="lN" aria-label="다음">' + IC_R + '</button><button class="tod tdk" id="nT">오늘 보기</button></div></div>'; })();
   // 2026-11-20 실장님: 프로젝트 칩 줄 → 보기(날짜별·프로젝트별·디자이너별) + 프로젝트 여러 개 고르는 드롭다운(검색), 달력과 같은 선택
   var MODES = [['d', '날짜별'], ['p', '프로젝트별']].concat(tm ? [['w', '디자이너별']] : []), md = S.pjm || ls.get('d4:pjm') || 'd'; if (!MODES.some(function (x) { return x[0] === md; })) md = 'd'; S.pjm = md;
   // 2026-11-27 실장님: 가로형은 달 단위로 자르지 말고 지난 일정부터 앞으로 잡힌 일정(1·2월…)까지 한 줄로, 열면 오늘 칸, 좌우 스크롤로 오가기
-  if (!tm && md === 'd') { S.lrg = [addD(TODAY, -183), '9999-12-31']; top = '<div class="hm2 hm2a"><label class="hmt">전체 일정<small class="hmts">지난 6개월부터 · 좌우로 넘겨 보기</small></label><div class="arw"><button class="tod" id="nT">오늘</button></div></div>'; }
+  if (!tm && md === 'd') { S.lrg = [addD(TODAY, -183), '9999-12-31']; top = '<div class="hm2 hm2h"><label class="hmt"></label><div class="arw"><button class="tod tdk" id="nT">오늘 보기</button></div></div>'; }   // 2026-11-27 실장님: '전체 일정 · 지난 6개월부터' 줄 없앰 — 오늘 보기는 보기 전환 · 필터와 한 줄
   var body = tm ? (md === 'p' ? pjTeamProj() : md === 'w' ? pjTeam(null) : pjTeamDate()) : (md === 'p' ? pjListProj() : pjGrid());
   var h = top + '<div class="seg" id="pSeg"><button data-m="sched" class="' + (tm ? '' : 'on') + '">제작일정</button><button data-m="team" class="' + (tm ? 'on' : '') + '">팀 업무</button></div>' +
     '<div class="pjtb">' + (tm ? '<div class="aseg" id="pjM">' + MODES.map(function (x) { return '<button data-m="' + x[0] + '" class="' + (x[0] === md ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' : cvKSeg()) + filterBar() + '</div>' +
@@ -4759,21 +4792,45 @@ function openEdit(id, d) {
   $('#edDel').classList.toggle('hide', !e); unsure($('#edDel'));
   var was = !!$('.bs.open'); drawEdit(); closeBs(); setTimeout(function () { openBs('#ed'); }, was ? 230 : 0);
 }
+// 2026-11-27 실장님: 프로젝트 칩 나열 → 드롭다운 (완료 프로젝트 숨김, 업무일지 하나), 맨 아래 '프로젝트 직접 생성하기' = 아티스트명 · 프로젝트명 입력
+function edFiles() {
+  var d = ($('#edD') && $('#edD').value) || TODAY, W = S.D.files.filter(function (f) { return f.type === 'work'; });
+  var w = W.filter(function (f) { return f.from && f.to && d >= f.from && d <= f.to; })[0] || W.filter(function (f) { return f.id === ED.f; })[0] || W[0];
+  var dn = pjDoneFiles();
+  var P = S.D.files.filter(function (f) { return f.type !== 'work' && (!dn[f.id] || f.id === ED.f); }).sort(function (a, b) { return a.name.localeCompare(b.name, 'ko'); });
+  return (w ? [w] : []).concat(P);
+}
 function drawEdit() {
-  $('#edF').innerHTML = S.D.files.map(function (f) { return '<button data-f="' + f.id + '" class="' + (ED.f === f.id ? 'on' : '') + '"><i style="background:' + f.color + '"></i>' + esc(f.type === 'work' ? '업무일지' : f.name) + '</button>'; }).join('') + '<button class="add" id="edNew">' + IC_PS + '새 프로젝트</button>';
-  var ks = kindsOf(ED.f); if (ks.indexOf(ED.k) < 0) ED.k = ks[0];
+  var L = edFiles(); if (ED.f !== '__new' && !L.some(function (f) { return f.id === ED.f; }) && L[0]) ED.f = L[0].id;
+  $('#edF').innerHTML = '<select id="edFs" class="edfs" aria-label="프로젝트">' + L.map(function (f) { return '<option value="' + f.id + '"' + (ED.f === f.id ? ' selected' : '') + '>' + esc(f.type === 'work' ? '업무일지 (개인 업무 · 휴가)' : f.name) + '</option>'; }).join('') +
+    '<option value="__new"' + (ED.f === '__new' ? ' selected' : '') + '>+ 프로젝트 직접 생성하기</option></select>' +
+    (ED.f === '__new' ? '<div class="frow edfn"><div class="f"><label>아티스트명</label><input id="edNa" maxlength="40" placeholder="예) 크래비티" value="' + esc(ED.na || '') + '"></div><div class="f"><label>프로젝트명</label><input id="edNt" maxlength="60" placeholder="예) 2027 시즌그리팅" value="' + esc(ED.nt || '') + '"></div></div>' : '');
+  $('#edFs').onchange = function () { ED.f = this.value; drawEdit(); if (ED.f === '__new') $('#edNa').focus(); };
+  if ($('#edNa')) { $('#edNa').oninput = function () { ED.na = this.value; drawEdit2(); }; $('#edNt').oninput = function () { ED.nt = this.value; drawEdit2(); }; }
+  drawEdit2();
+}
+function drawEdit2() {
+  var ks = ED.f === '__new' ? PROJ_K : kindsOf(ED.f); if (ks.indexOf(ED.k) < 0) ED.k = ks[0];
   $('#edK').innerHTML = ks.map(function (k) { return '<button data-k="' + k + '" class="' + (ED.k === k ? 'on' : '') + '"><i style="background:' + KIND[k] + '"></i>' + k + '</button>'; }).join('');
   var f = S.D.FM[ED.f];
-  $('#edI').textContent = f ? (f.type === 'work' ? '업무일지 시트의 그 날짜 칸에 써요. (업무는 비어 있는 줄에, 대휴·휴가는 7행에)' : f.name + ' 시트에 써요' + (f.from ? ' · ' + dot(f.from) + ' – ' + dot(f.to) + ' (기간 밖 날짜를 넣으면 일정표가 그만큼 늘어나요)' : '')) : '';
-  $$('#edF button[data-f]').forEach(function (b) { b.onclick = function () { ED.f = b.dataset.f; drawEdit(); }; });
-  $('#edNew').onclick = function () { openNew($('#edD').value); };
-  $$('#edK button').forEach(function (b) { b.onclick = function () { ED.k = b.dataset.k; drawEdit(); }; });
+  $('#edI').textContent = ED.f === '__new' ? '[' + (($('#edNa') && $('#edNa').value.trim()) || '아티스트') + ']' + (($('#edNt') && $('#edNt').value.trim()) || '프로젝트명') + ' 제작일정 시트를 새로 만들고 이 일정을 넣어요' : f ? (f.type === 'work' ? '업무일지 시트의 그 날짜 칸에 써요. (업무는 비어 있는 줄에, 대휴·휴가는 7행에)' : f.name + ' 시트에 써요' + (f.from ? ' · ' + dot(f.from) + ' – ' + dot(f.to) + ' (기간 밖 날짜를 넣으면 일정표가 그만큼 늘어나요)' : '')) : '';
+  $$('#edK button').forEach(function (b) { b.onclick = function () { ED.k = b.dataset.k; drawEdit2(); }; });
 }
 $('#edS').onclick = function () {
   var t = $('#edX').value.trim(), d = $('#edD').value;
   if (!d) return toast('날짜를 선택해 주세요');
   if (!t) return toast('내용을 적어 주세요');
-  var btn = $('#edS'); btn.classList.add('busy'); ED.lastF = ED.f;
+  var btn = $('#edS');
+  if (ED.f === '__new') {
+    var na = ($('#edNa').value || '').trim(), nt = ($('#edNt').value || '').trim();
+    if (!na) return toast('아티스트명을 적어 주세요'); if (!nt) return toast('프로젝트명을 적어 주세요');
+    btn.classList.add('busy');
+    return call('appNewProj', S.pin, { artist: na, title: nt, from: d < TODAY ? d : TODAY, to: addD(d, 62), staff: [] }).then(function (r) {
+      ED.lastF = r.id; return call('appAdd', S.pin, { f: r.id, d: d, k: ED.k, t: t });
+    }).then(function () { closeBs(); toast('새 프로젝트를 만들고 일정을 넣었어요'); ED.na = ED.nt = ''; return load(); })
+      .catch(function (er) { toast(errMsg(er)); }).then(function () { btn.classList.remove('busy'); });
+  }
+  btn.classList.add('busy'); ED.lastF = ED.f;
   var e = ED.e, kSlot = function (k) { return k === '리터칭' ? '디자인' : k; };
   var p = e ? call('appEdit', S.pin, { id: e.id, old: e.t, f: ED.f, d: d, k: ED.k, t: t, moved: e.f !== ED.f || e.d !== d || kSlot(e.k) !== kSlot(ED.k) })
     : call('appAdd', S.pin, { f: ED.f, d: d, k: ED.k, t: t });
@@ -6133,7 +6190,7 @@ function renderWl() {
     var MX = 72 * 60, pc = function (v) { return (Math.min(v, MX) / MX * 100).toFixed(1) + '%'; };
     return '<div class="wlwt wlgb"><div class="t">주별 근무시간 <small>근무표 기준 · 선 40 · 52시간</small></div>' + (x.weeks || []).map(function (w) {
       var t = +w.tot || 0, c = t > 52 * 60 ? 'x52' : t > 40 * 60 ? 'x40' : '';
-      return '<div class="wgr"><span class="wgd">' + md(w.s) + '</span><span class="wgt"><i style="width:' + pc(Math.min(t, 52 * 60)) + ';background:' + dcol(n) + '"></i>' + (t > 52 * 60 ? '<i class="ov" style="left:' + pc(52 * 60) + ';width:' + (parseFloat(pc(t)) - parseFloat(pc(52 * 60))).toFixed(1) + '%"></i>' : '') + '<em style="left:' + pc(40 * 60) + '"></em><em class="e52" style="left:' + pc(52 * 60) + '"></em></span><b class="' + c + '">' + (t ? hmK(t) : '–') + '</b></div>';
+      return '<div class="wgr"><span class="wgd">' + md(w.s) + '</span><span class="wgt"><i class="wbase' + (t > 40 * 60 ? ' cut' : '') + '" style="width:' + pc(Math.min(t, 40 * 60)) + ';background:color-mix(in srgb, ' + dcol(n) + ' 38%, #fff)"></i>' + (t > 40 * 60 ? '<i class="ov" style="left:' + pc(40 * 60) + ';width:' + (parseFloat(pc(t)) - parseFloat(pc(40 * 60))).toFixed(1) + '%;background:' + dcol(n) + '"></i>' : '') + '<em style="left:' + pc(40 * 60) + '"></em><em class="e52" style="left:' + pc(52 * 60) + '"></em></span><b class="' + c + '"' + (c ? ' style="color:' + dcol(n) + '"' : '') + '>' + (t ? hmK(t) : '–') + '</b></div>';
     }).join('') + '</div>';
   };
   var apBtn = function (n) {
