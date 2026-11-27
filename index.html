@@ -1327,10 +1327,10 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .hmc .wk { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); border-bottom:1px solid var(--line); min-height:84px; }
 .hmc .wk > * { min-width:0; cursor:pointer; }
 .hmc .wk > .dh { border:0; background:none; padding:5px 3px 2px; display:flex; align-items:center; gap:3px; font-family:inherit; text-align:left; }
-.hmc .wk > .dh b { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#333d4b; flex:none; font-variant-numeric:tabular-nums; }
+.hmc .wk > .dh > b { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#333d4b; flex:none; font-variant-numeric:tabular-nums; }
 .hmc .wk > .dh small { font-size:9.5px; color:#f04452; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.hmc .wk > .su b { color:#f04452; } .hmc .wk > .sa b { color:#3182f6; }
-.hmc .wk > .td b { background:#191f28; color:#fff; font-weight:700; }
+.hmc .wk > .su > b { color:#f04452; } .hmc .wk > .sa > b { color:#3182f6; }
+.hmc .wk > .td > b { background:#191f28; color:#fff; font-weight:700; }
 .hmc .wk > .lc { padding:1px 3px; display:flex; flex-direction:column; gap:2px; }
 .hmc .wk > .lf { min-height:6px; }
 .hmc .wk > .out { opacity:.35; }
@@ -1339,6 +1339,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button { flex-direction:row; align-items:center; gap:8px; padding:12px; white-space:nowrap; min-width:0; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
+.hmc .wk .ev em b { font-weight:700; } .hmc .wk .ev.cont { margin-left:-4px; border-radius:0 4px 4px 0; min-height:17px; } .hmc .wk .lc { padding-right:0; }
 /* 2026-11-27 실장님: 근무시간 막대는 40시간 아래여도 디자이너별 색 (52시간 넘으면 진하게) */
 .wtp .bar i, .wmk .bar i { background:color-mix(in srgb, var(--pc) 70%, #fff) !important; } .wtp .bar i.x52, .wmk .bar i.x52 { background:color-mix(in srgb, var(--pc) 80%, #191f28) !important; }
 @media (max-width:640px) { .hmc .wk { min-height:56px; } .hmc .wk > .dh { justify-content:center; } .hmc .wk > .dh small { display:none; } }
@@ -2030,7 +2031,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm212';
+var APP_VER = '20261127hm213';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3098,10 +3099,18 @@ function homeCal() {
     WE.forEach(function (e) { if (lanes.indexOf(e.f) < 0) lanes.push(e.f); });
     lanes.sort(function (p, q) { return (RK[p] || '') < (RK[q] || '') ? -1 : 1; });
     h += '<div class="wk" style="--n:' + lanes.length + '">' + days.map(function (d) { var hl = hol(d); return '<button type="button" class="dh ' + cls(d) + '" data-hcd="' + d + '"><b>' + P(d).getDate() + '</b>' + (hl ? '<small>' + esc(hl) + '</small>' : '') + '</button>'; }).join('');
+    // 2026-11-27 실장님: 같은 일정이 날마다 반복돼 중복처럼 보임 → 같은 날 같은 제목은 하나만, 전날과 이어지는 같은 제목은 글자 없이 색 띠로 이어 붙임
     lanes.forEach(function (fid) {
+      var prev = [], named = false;
       h += days.map(function (d) {
-        var l = WE.filter(function (e) { return e.f === fid && e.d === d; });
-        return '<div class="lc ' + cls(d) + '" data-hcd="' + d + '">' + l.map(function (e) { return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + '" style="--c:' + e.file.color + '" title="' + esc(e.file.name + ' · ' + e.t) + '"><i></i><em>' + esc(e.file.short) + ' ' + esc(e.t) + '</em></span>'; }).join('') + '</div>';
+        var l = [], seen = {};
+        WE.forEach(function (e) { if (e.f === fid && e.d === d && !seen[e.t]) { seen[e.t] = 1; l.push(e); } });
+        var cont = l.filter(function (e) { return prev.indexOf(e.t) >= 0; }).sort(function (a, b) { return prev.indexOf(a.t) - prev.indexOf(b.t); }), nw = l.filter(function (e) { return prev.indexOf(e.t) < 0; });
+        l = cont.concat(nw); prev = l.map(function (e) { return e.t; });
+        return '<div class="lc ' + cls(d) + '" data-hcd="' + d + '">' + l.map(function (e) {
+          var c = cont.indexOf(e) >= 0, nm = !c;
+          return '<span class="ev' + (e.k === '데드라인' || e.k === '공식' ? ' dl' : '') + (c ? ' cont' : '') + '" style="--c:' + e.file.color + '" title="' + esc(e.file.name + ' · ' + e.t) + '"><i></i><em>' + (c ? '' : (nm ? '<b>' + esc(e.file.short) + '</b> ' : '') + esc(e.t)) + '</em></span>';
+        }).join('') + '</div>';
       }).join('');
     });
     h += days.map(function (d) { return '<div class="lf ' + cls(d) + '" data-hcd="' + d + '"></div>'; }).join('') + '</div>';
