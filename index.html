@@ -1357,7 +1357,9 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wdg .wdl .wsq button .nvi { flex:none; }
 .hmc .wk .ev i { display:none; }
 .rpi .tdgrip { user-select:none; -webkit-user-select:none; flex:none; align-self:center; width:28px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--faint); cursor:grab; touch-action:none; border-radius:8px; }
-.rpi .tdgrip svg { width:16px; height:16px; } .rpi .tdgrip:hover { color:var(--sub); background:var(--chip); }
+.rpi .tdgrip svg { width:16px; height:16px; }
+/* 2026-11-27 실장님: 모바일에서 손가락으로 잡기 쉽게 손잡이 크게 · 꾹 눌러도 글자 선택·메뉴 안 뜨게 */
+.rpi .tdgrip { -webkit-touch-callout:none; } @media (max-width:1023px) { .rpi .tdgrip { width:40px; height:40px; margin:-5px -6px -5px 0; color:var(--mute); } .rpi .tdgrip svg { width:18px; height:18px; } } .rpi .tdgrip:hover { color:var(--sub); background:var(--chip); }
 .rpi.drag { position:relative; z-index:5; background:var(--card); box-shadow:0 6px 20px rgba(0,0,0,.14); border-radius:10px; } .rpi.drag .tdgrip { cursor:grabbing; color:var(--sub); }
 
 .whc .hcv { display:inline-flex; width:auto; max-width:max-content; margin:0 0 8px; } .whc .hcv button { height:30px; padding:0 12px; font-size:12.5px; }
@@ -2125,7 +2127,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm230';
+var APP_VER = '20261127hm232';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
