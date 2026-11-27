@@ -2579,7 +2579,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm267';
+var APP_VER = '20261127hm268';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3535,7 +3535,8 @@ var NAV_IC = {
   todo: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11"/>',
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  won: '<rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M8 9l1.5 6 2.5-5 2.5 5L16 9M7.5 12h9"/>',
+  won: '<circle cx="12" cy="12" r="9"/><path d="M8.2 8.8l1.3 6.4 2.5-5 2.5 5 1.3-6.4M7.6 12h8.8"/>',   // 2026-11-27 실장님: 지폐 → 동전
+  monitor: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
   truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
   cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
@@ -3575,7 +3576,7 @@ var SPACES = [
     { g: '작업 기초 지침', i: [{ k: 'gd:folder-file.html', t: '폴더·파일 작성법' }, { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }, { k: 'checklist', t: '자가점검리스트', tool: 1 }] }] },
   // 2026-11-27 실장님: 퀵 배차 · 사내연락망은 안내에서 빼서 따로 대메뉴 (하위 없이 바로 열림)
   // 2026-11-27 실장님: 안내 → 전산실(사무실 · 전산) + 행정실(행정 업무), 이름 실장님 그대로
-  { k: 'itm', t: '전산실', d: '사무실 출입 · 와이파이 · 나스 · 복합기 · 위하고 · 메일', home: 'space:itm', ic: 'office', g: [
+  { k: 'itm', t: '전산실', d: '사무실 출입 · 와이파이 · 나스 · 복합기 · 위하고 · 메일', home: 'space:itm', ic: 'monitor', g: [
     { g: '전산실', i: [{ k: 'gd:g.html?id=office&s=1', t: '사무실 출입', s: '사무실 출입 방법' }, { k: 'gd:g.html?id=office&s=3', t: '와이파이', s: '사무실 와이파이' }, { k: 'gd:g.html?id=office&s=2', t: '나스(NAS)', s: '맥에서 연결 · 사무실 밖에서 접속 · 공유 링크' }, { k: 'gd:g.html?id=office&s=4', t: '복합기', s: '프린터 연결 · 스캔 받기' }, { k: 'gd:g.html?id=system&s=1', t: '위하고', s: '접속 정보 · 로그인 순서' }, { k: 'gd:g.html?id=system&s=2', t: '메일플러그', s: '웹에서 사용 · 맥 Mail 앱 연결' }, { k: 'gd:g.html?id=system&s=3', t: '메일 서명', s: '팀 서명 양식 · 웹메일 · 맥 Mail 앱' }] }] },
   { k: 'admin', t: '행정실', d: '퀵 · 지출결의서 · 법인택시 · 법인카드 · 명함 · 초과근무', home: 'space:admin', ic: 'doc', g: [
     { g: '행정실', i: [{ k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 신청 및 제작', s: '신청 정보 · 제작 순서 · 데이터' }, { k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }] }] },
