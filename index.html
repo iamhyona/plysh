@@ -2189,6 +2189,7 @@ html[data-nav] #cvSeg { display:none !important; }
 #ncr .wday.hcw { margin:0; font-size:18px; color:var(--txt); display:flex; align-items:center; gap:0; min-width:0; overflow:hidden; white-space:nowrap; }
 #ncr .wday.hcw small { font-size:13px; margin-left:10px !important; }
 @media (min-width:1024px) { html[data-nav="w"] #main .wday:not(.hcw) { display:none; } }
+#mwd { display:none; } @media (max-width:1023px) { html[data-nav="w"] #mwd:not([hidden]) { display:block; } }
 /* 2026-11-27 창 너비 검수: 좁은 PC에서는 맨 위 날씨 줄의 체감·습도 등 세부를 감추고 한 줄 유지 */
 @media (max-width:1439px) { #ncr .wday.hcw .wxs { display:none; } }
 #ncr .wday.hcw > * { flex:none; } #ncr .wday.hcw small { white-space:nowrap; }
@@ -2657,7 +2658,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm274';
+var APP_VER = '20261127hm275';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3145,13 +3146,21 @@ function rtSync() {
   try { history[RT.pop || !location.hash ? 'replaceState' : 'pushState'](null, '', location.pathname + location.search + h); } catch (e) {}
 }
 window.addEventListener('popstate', function () { var k = decodeURIComponent((location.hash || '').slice(1)); if (!k || k === rtKey() || !S.D) return; RT.pop = 1; try { navGo(k); } catch (e) {} RT.pop = 0; });
+// 2026-11-27 실장님: 모바일도 모든 메뉴 맨 위(제목 위)에 홈과 같은 오늘 날짜 · 날씨
+function mwdSync() {
+  var m = $('#main'); if (!m || !m.parentNode) return;
+  var e = document.getElementById('mwd'), at = document.getElementById('npg') || m; if (!e) { e = document.createElement('div'); e.id = 'mwd'; } if (e.nextElementSibling !== at) at.parentNode.insertBefore(e, at);
+  var cs = getComputedStyle(at); e.style.paddingLeft = cs.paddingLeft; e.style.paddingRight = cs.paddingRight; e.style.marginLeft = cs.marginLeft; e.style.marginRight = cs.marginRight; e.style.maxWidth = cs.maxWidth;
+  var on = S.view !== 'start'; e.hidden = !on; if (!on) return;
+  var d = new Date(); e.innerHTML = '<div class="wday">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + '일월화수목금토'.charAt(d.getDay()) + '요일<small class="wwx">' + wxHtml() + '</small></div>';
+}
 function render() {
   if (!S.D) return;
   // 2026-11-27 실장님: 새로고침하면 다른 화면(근태 작성 등)이 잠깐 보였다 바뀜 → 주소의 화면을 처음부터 바로 그림
   if (!RT.done) { RT.done = 1; var hk = decodeURIComponent((location.hash || '').slice(1)); if (hk && hk !== rtKey()) { RT.pop = 1; var ok = false; try { navGo(hk); ok = true; } catch (e) {} RT.pop = 0; if (ok) return; } }
   var keep = {}; $$('.tabs2[id]').forEach(function (t) { keep[t.id] = t.scrollLeft; });
   var mm0 = $('#main'); if (mm0) mm0.classList.remove('ctdOn');   // 2026-11-27: 캘린더+할 일 2열 틀이 다른 메뉴에 남아 화면이 깨지던 문제
-  renderView(); rtSync();
+  renderView(); rtSync(); mwdSync();
   try { var mnu = window.plMenu && plMenu(); if (window.plog && S.tok && mnu) { var ssk = 'd4:mnu:' + mnu; if (!sessionStorage.getItem(ssk)) { sessionStorage.setItem(ssk, '1'); plog('메뉴', { menu: mnu }); } } } catch (e) {} // 2026-11-27 월간리포트 PLYSH 통계: 메뉴는 탭마다 처음 연 한 번만
   $$('.tabs2[id]').forEach(function (t) { if (t.id in keep) t.scrollLeft = keep[t.id]; chipVis(t); });
   // 날짜 글자를 누르면 날짜 고르기 창이 바로 열림 (2026.10.06)
