@@ -1352,6 +1352,7 @@ html[data-nav="t"] #nsub.has { display:flex; }
 .wtnc .pp b { font-size:13px; font-weight:700; color:color-mix(in srgb, var(--pc) 80%, #191f28); white-space:nowrap; }
 .wtnc .pp small { font-size:11.5px; color:var(--mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
 .wtnc .col.no .pp b, .wtnc .col.off .pp b { color:var(--sub); }
+.wtnc .ch span { display:inline-flex; align-items:center; gap:6px; } .wtnc .ch i { width:7px; height:7px; border-radius:50%; background:#b0b8c1; } .wtnc .col.on .ch i { background:#f04452; } .wtnc .col.ex .ch i { background:#4e5968; } .wtnc .col.off .pp { opacity:.55; }
 .wtnc .n0 { font-size:12px; color:var(--faint); padding:4px 2px; }
 .wmy { margin-bottom:12px; }
 .wmyg { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:12px; align-items:stretch; }
@@ -3083,7 +3084,7 @@ function teamNowCard() {
   T.forEach(function (n) { var s = wlNow(n); G[s.k].push([n, s]); });
   var sub = function (n, s) { var r = s.r || {}; return s.k === 'on' ? r.i.replace(/^0/, '') + ' 출근' : s.k === 'ex' ? (s.e.t ? esc(s.e.t) : s.e.a + ' 외근') : s.k === 'off' ? hmOut(r.i, r.o) + ' 퇴근' : '기록 전'; };
   return '<div class="wsc wtn2 wgo" data-ng="wl"><h3>오늘 팀<button type="button" data-ng="wl">근태</button></h3><div class="wtnc">' + [['on', '근무 중'], ['ex', '외근'], ['off', '퇴근'], ['no', '기록 전']].map(function (c) {
-    return '<div class="col ' + c[0] + '"><div class="ch">' + c[1] + '<em>' + G[c[0]].length + '</em></div>' + (G[c[0]].length ? G[c[0]].map(function (o) { return '<span class="pp" style="--pc:' + dcol(o[0]) + '"><b>' + esc(o[0]) + '</b><small>' + sub(o[0], o[1]) + '</small></span>'; }).join('') : '<span class="n0">없음</span>') + '</div>';
+    return '<div class="col ' + c[0] + '"><div class="ch"><span><i></i>' + c[1] + '</span><em>' + G[c[0]].length + '</em></div>' + (G[c[0]].length ? G[c[0]].map(function (o) { return '<span class="pp" style="--pc:' + dcol(o[0]) + '"><b>' + esc(o[0]) + '</b><small>' + sub(o[0], o[1]) + '</small></span>'; }).join('') : '<span class="n0">없음</span>') + '</div>';
   }).join('') + '</div></div>';
 }
 // 내 이번 주: 요약 2×2 + 옆에 요일별 근무시간 막대
