@@ -2046,7 +2046,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261127hm213';
+var APP_VER = '20261127hm214';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -2089,7 +2089,9 @@ function load() {
 }
 function cached() { try { return JSON.parse(ls.get('d4:data') || 'null'); } catch (e) { return null; } }
 function vis() { return S.D.events.filter(function (e) { return !S.off[e.f]; }); }
-function pvis() { return vis().filter(function (e) { return e.file.type === 'proj'; }); }
+// 2026-11-27 실장님: 달력엔 소속사 쪽 일정(구분 '소속사', 소속사 피드백)은 빼고 우리가 전달·공개·발매·발주하는 일정만. '피드백 반영'은 우리 작업이라 남김
+function agEv(e) { return e.k === '소속사' || (/피드백|컨펌/.test(e.t) && !/반영|전달|수정/.test(e.t)); }
+function pvis() { return vis().filter(function (e) { return e.file.type === 'proj' && !agEv(e); }); }
 function pfs() { return S.D.files.filter(function (f) { return f.type === 'proj'; }); }
 function onDay(d, list) { return (list || vis()).filter(function (e) { return e.d === d; }); }
 function hol(d) { return (S.D.hol || {})[d] || ''; }
@@ -3075,7 +3077,7 @@ var CLK_T = 0;
 function clkTick() { clearTimeout(CLK_T); var hH = document.getElementById('chH'); if (!hH) return; var n = new Date(), hh = n.getHours(), ac = document.getElementById('aClk'); if (ac) ac.classList.toggle('night', hh >= 18 || hh < 6); var sec = n.getSeconds(), mi = n.getMinutes() + sec / 60, hr = n.getHours() % 12 + mi / 60; hH.setAttribute('transform', 'rotate(' + hr * 30 + ' 50 50)'); document.getElementById('chM').setAttribute('transform', 'rotate(' + mi * 6 + ' 50 50)'); document.getElementById('chS').setAttribute('transform', 'rotate(' + sec * 6 + ' 50 50)'); CLK_T = setTimeout(clkTick, 1000 - n.getMilliseconds()); }
 function renderStart() {
   var d = P(TODAY), wk = '일월화수목금토'.charAt(d.getDay()), end = addD(TODAY, 7);
-  var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && e.d >= TODAY && e.d <= end; }).slice(0, 10);
+  var E = S.D.events.filter(function (e) { return e.file.type === 'proj' && !agEv(e) && e.d >= TODAY && e.d <= end; }).slice(0, 10);
   var Td = tdRows(function (x) { return x.k === '데일리' && x.d === TODAY; }).sort(tdSort).slice(0, 7);
   var PL = pjMerged(), R = NAV.rec.slice(0, 8), RN = R.map(function (r) { return r.name; }); PL.map(wsFrom).forEach(function (r) { if (R.length < 8 && RN.indexOf(r.name) < 0) { R.push(r); RN.push(r.name); } });
   // 2026-11-27 실장님: 정렬 — 홈 전체를 3등분 격자 하나로 (줄마다 열 경계가 위아래로 맞게)
@@ -3850,7 +3852,7 @@ function pjList(p) { return pjListAll(p); }
 // 전체(프로젝트별): 프로젝트마다 묶어서 날짜순
 function pjListProj() {
   var g = projList().filter(function (q) { return q.f && !S.off[q.f.id]; }).map(function (q) {
-    var E = S.D.events.filter(function (e) { return e.f === q.f.id && inL(e.d); }); if (!E.length) return '';
+    var E = S.D.events.filter(function (e) { return e.f === q.f.id && inL(e.d) && !agEv(e); }); if (!E.length) return '';
     var first = true;
     return '<div class="mh" style="color:' + q.color + '">' + esc(q.name) + '</div><div class="day list">' + E.map(function (e) {
       var x = ''; if (first && e.d >= TODAY) { x = '<div class="pjnow">오늘 이후</div>'; first = false; }
@@ -3863,7 +3865,7 @@ function pjListProj() {
 function pjGrid() {
   var P = projList().filter(function (q) { return q.f && !S.off[q.f.id]; }), ids = {};
   P.forEach(function (q) { ids[q.f.id] = 1; });
-  var E = S.D.events.filter(function (e) { return ids[e.f] && inL(e.d); });
+  var E = S.D.events.filter(function (e) { return ids[e.f] && inL(e.d) && !agEv(e); });
   P = P.filter(function (q) { return E.some(function (e) { return e.f === q.f.id; }); });
   if (!P.length) return '<div class="day"><div class="empty2">일정이 없어요</div></div>';
   var D = []; E.forEach(function (e) { if (D.indexOf(e.d) < 0) D.push(e.d); }); D.sort();
@@ -3881,7 +3883,7 @@ function pjGrid() {
 // LIST 기간 안인지
 function inL(d) { var g = S.lrg; return !g || (d >= g[0] && d <= g[1]); }
 function pjListAll(p) {
-  var L = (p ? (p.f ? S.D.events.filter(function (e) { return e.f === p.f.id; }) : []) : S.D.events.filter(function (e) { return e.file.type === 'proj' && !S.off[e.f]; })).filter(function (e) { return inL(e.d); });
+  var L = (p ? (p.f ? S.D.events.filter(function (e) { return e.f === p.f.id; }) : []) : S.D.events.filter(function (e) { return e.file.type === 'proj' && !S.off[e.f] && !agEv(e); })).filter(function (e) { return inL(e.d); });
   var h = '', cur = '', cd = '', first = true;
   L.forEach(function (e) {
     var mm = e.d.slice(0, 7);
@@ -4021,6 +4023,8 @@ function openDay(d, po) {
   var l = onDay(d, po ? pvis() : null), hl = hol(d);
   $('#dyT').innerHTML = mdw(d) + (hl ? '<em class="hwd">' + esc(hl) + '</em>' : '');
   var rr = repOf(function (r) { return r.d === d; });
+  // 2026-11-27 실장님: 팀원 할 일(업무보고)은 달력에 안 보이게
+  if (po) rr = [];
   $('#dyB').innerHTML = (l.length ? l.map(function (e) { return itemHtml(e); }).join('') : '<div class="empty2">일정이 없어요</div>') +
     (rr.length ? '<div class="tmv dyr">' + repBlock(rr) + '</div>' : '');
   bindItems($('#dyB')); bindRep($('#dyB')); $('#dyAdd').onclick = function () { closeBs(); setTimeout(function () { openEdit(null, d); }, 230); };
