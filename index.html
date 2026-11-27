@@ -1055,8 +1055,12 @@ details.fday:not([open]) > summary { margin-bottom:0; }
 .wgtd { font-style:normal; font-size:12px; font-weight:700; color:var(--mute); } .wgtd.up { color:#191f28; } .wgtd.dn { color:#3182f6; }
 .wgkr { flex-direction:row !important; align-items:center; gap:14px !important; }
 .wgkr > div { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.wgkr, .wgk.wgk2 > .wgkr { flex-wrap:wrap; justify-content:space-between; align-content:center; }
+.wgkr > div { order:-1; flex:1 1 110px; }
 .wgrg { width:88px; height:88px; flex:none; }
 @media (min-width:1024px) { .wgrg { width:100px; height:100px; } }
+.wgkr > div > small, .wgkr > div > b { white-space:nowrap; }
+.wgkr .wgsk { width:100%; max-width:150px; } .wgkr .wgsk i { flex:1 1 0; min-width:3px; max-width:12px; }
 .wgk b i { font-style:normal; font-size:14px; color:var(--mute); font-weight:600; }
 .wgsk { display:flex; gap:3px; margin-top:6px; } .wgsk i { width:12px; height:6px; border-radius:3px; background:#e5e8eb; display:block; } .wgsk i.on { background:var(--pc); }
 .wgal { display:flex; gap:12px; align-items:flex-start; background:#fff; border-radius:16px; padding:14px 16px; }
