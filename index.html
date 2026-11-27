@@ -4909,10 +4909,10 @@ function wlGraph(y, m, wp, T, WT) {
     var OT = ST.map(function (x) { return ontime(x.D); }), otn = OT.reduce(function (s, o) { return s + o.n; }, 0), otf = OT.reduce(function (s, o) { return s + o.of; }, 0);
     h += alert(T);
     h += '<div class="wgk">' +
-      '<div><small>팀 이번 달 근무</small><b>' + wlHk(tot) + '</b>' + (trend(tot, ptot, wlHk) || '<span>' + T.length + '명 합계</span>') + dots(dsum, 0, T.length * 660, '#4e5968') + '</div>' +
-      '<div><small>팀 평균 출근</small><b>' + (avgOf('ai') != null ? wlHm(avgOf('ai')) : '9:00') + '</b><span>선이 높을수록 늦게 출근</span>' + dots(dAvg('i'), 420, 720, '#4e5968') + '</div>' +
-      '<div><small>팀 평균 퇴근</small><b>' + (avgOf('ao') != null ? wlHm(avgOf('ao')) : '18:00') + '</b><span>선이 높을수록 늦게 퇴근</span>' + dots(dAvg('o'), 1020, 1560, '#4e5968') + '</div>' +
-      '<div class="wgkr">' + ring(otf ? otn / otf * 100 : 0, '#4e5968') + '<div><small>정시 퇴근</small><b>' + otn + '<i>/' + otf + '일</i></b><span>18시 30분 전 퇴근</span></div></div></div>';
+      '<div><small>팀 이번 달 근무</small><b>' + wlHk(tot) + '</b>' + (trend(tot, ptot, wlHk) || '<span>' + T.length + '명 합계</span>') + dots(dsum, 0, T.length * 660, '#f04452') + '</div>' +
+      '<div><small>팀 평균 출근</small><b>' + (avgOf('ai') != null ? wlHm(avgOf('ai')) : '9:00') + '</b><span>선이 높을수록 늦게 출근</span>' + dots(dAvg('i'), 420, 720, '#f04452') + '</div>' +
+      '<div><small>팀 평균 퇴근</small><b>' + (avgOf('ao') != null ? wlHm(avgOf('ao')) : '18:00') + '</b><span>선이 높을수록 늦게 퇴근</span>' + dots(dAvg('o'), 1020, 1560, '#f04452') + '</div>' +
+      '<div class="wgkr">' + ring(otf ? otn / otf * 100 : 0, '#f04452') + '<div><small>정시 퇴근</small><b>' + otn + '<i>/' + otf + '일</i></b><span>18시 30분 전 퇴근</span></div></div></div>';
     if (TODAY.slice(0, 7) === first.slice(0, 7) && P(TODAY).getDay() % 6) {
       var col = { on: [], off: [], no: [] };
       T.forEach(function (n) { var r = wlRows(function (x) { return x.d === TODAY && x.p === n; })[0]; if (r && r.o) col.off.push([n, r]); else if (r && r.i) col.on.push([n, r]); else col.no.push([n, r]); });
