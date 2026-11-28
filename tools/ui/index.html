@@ -64,6 +64,11 @@ main{max-width:1040px;margin:0 auto;padding:0 16px 80px}
 .ph p{margin:6px 0 0;font-size:14px;color:var(--t3);line-height:1.5}
 @media(min-width:1024px){.ph{padding-top:10px;padding-bottom:24px}}
 html.emb .ph{display:none}
+/* 2026-11-29 실장님: PLYSH · 공부방 안에서는 다른 도구와 같은 줄(왼쪽 끝 = 페이지 제목)에 맞추고, 분류 칩은 모바일만 (PC는 왼쪽 메뉴) */
+html.emb header{padding:0 0 12px}
+html.emb .hd,html.emb #chips,html.emb main{max-width:none}
+html.emb main{padding:0 0 80px}
+@media(min-width:900px){html.emb #chips{display:none}}
 html.emb header .logo{display:none}
 section{margin-top:28px}
 section:first-of-type{margin-top:0}
@@ -1098,7 +1103,16 @@ $('#fbtn').onclick=()=>$('#fp').classList.add('show');
 $('#fp').onclick=e=>{if(e.target.id==='fp'||e.target.closest('[data-fclose]')){$('#fp').classList.remove('show');return}const b=e.target.closest('[data-f]');if(b){F[b.dataset.f]^=1;$('.sw',b).classList.toggle('on',!!F[b.dataset.f]);$('#fbtn').classList.toggle('on',F.demo||F.mine);render()}};
 /* 메뉴 · 찾기 */
 document.addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b&&!b.closest('.stage'))go(b.dataset.c)});
-function go(id){if(!CATS.find(c=>c.id===id))id=CATS[0].id;CUR=id;Q='';$('#q').value='';$('#srch').classList.remove('has');if(location.hash!=='#'+id)try{history.replaceState(null,'','#'+id)}catch(e){}render();window.scrollTo(0,0)}
+function go(id){if(!CATS.find(c=>c.id===id))id=CATS[0].id;CUR=id;Q='';$('#q').value='';$('#srch').classList.remove('has');if(location.hash!=='#'+id)try{history.replaceState(null,'','#'+id)}catch(e){}render();window.scrollTo(0,0);lastSec=-1;secPing()}
+/* 왼쪽 메뉴 소메뉴 = 지금 분류의 묶음(고르기 · 날짜·시간 …). 누르면 그 묶음으로 이동, 스크롤하면 지금 묶음이 진하게 */
+const secs=()=>$$('main section');
+function secTop(e){try{if(window.frameElement)return window.frameElement.getBoundingClientRect().top+e.getBoundingClientRect().top}catch(x){}return e.getBoundingClientRect().top}
+function secCur(){const L=secs();let k=0;L.forEach((e,i)=>{if(secTop(e)<=140)k=i});return k}
+window.uiSubs=()=>{const k=secCur();return secs().map((e,i)=>{const h=$('h2',e);return{t:h.firstChild.textContent.trim(),n:h.querySelector('small')?h.querySelector('small').textContent:'',on:i===k}})};
+window.uiSub=i=>{const e=secs()[i];if(!e)return;try{const fr=window.frameElement;if(fr){const y=parent.scrollY+fr.getBoundingClientRect().top+e.getBoundingClientRect().top-90;parent.scrollTo({top:y,behavior:'smooth'});return}}catch(x){}window.scrollTo({top:window.scrollY+e.getBoundingClientRect().top-90,behavior:'smooth'})};
+let lastSec=-1;const secPing=()=>{const k=secCur();if(k!==lastSec){lastSec=k;try{parent.subTick&&parent.subTick()}catch(x){}}};
+try{if(window.parent!==window)parent.addEventListener('scroll',()=>requestAnimationFrame(secPing),{passive:true})}catch(x){}
+window.addEventListener('scroll',()=>requestAnimationFrame(secPing),{passive:true});
 window.uiGo=go;window.plyshGo=go;window.uiCats=CATS.map(c=>({id:c.id,t:c.t,d:c.d,n:c.subs.reduce((n,s)=>n+s.items.length,0)}));
 let qt;$('#q').oninput=e=>{clearTimeout(qt);qt=setTimeout(()=>{Q=e.target.value.trim().toLowerCase();$('#srch').classList.toggle('has',!!Q);render()},150)};
 $('#qx').onclick=()=>{$('#q').value='';Q='';$('#srch').classList.remove('has');render()};
