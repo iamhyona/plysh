@@ -2667,7 +2667,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261128hm285';
+var APP_VER = '20261128hm286';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3692,7 +3692,7 @@ if (STUDY) {
   // 2026-11-28 실장님: 디자인 실무 하위를 도우미로 나눔 — PLYSH · 공부방 둘 다 SPACES의 gx 묶음(gxHtml)으로 처리
   var STK = ['ppm', 'mdm', 'dsm', 'cdm', 'fnm', 'name', 'gloss'];
   SPACES = SPACES.filter(function (s) { return STK.indexOf(s.k) >= 0; });
-} else SPACES.forEach(function (s) { if (s.k === 'name' || s.k === 'gloss') s.boss = 1; });
+} else SPACES.forEach(function (s) { if (s.k === 'name' || s.k === 'gloss') s.hid = 1; }); // 2026-11-29 실장님: PLYSH 메뉴에서 명칭 · 용어·견본 없앰 (공부방에만). 화면 · 파일은 그대로
 function studyOk(k) { // 공부방에서 회사 업무 화면(근태 · 프로젝트 · 캘린더 · 할 일 · 퀵 · 지출 · 연락망 · 리포트 · 전산실 · 행정실)은 열지 않음
   if (!STUDY) return true; k = String(k || '');
   if (/^(start|home|pj|cal|sched|month|todo|wl|spec|qk|ct|exp|mrep|sheets|ws)$/.test(k)) return false;
