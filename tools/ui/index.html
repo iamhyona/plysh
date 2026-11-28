@@ -994,7 +994,9 @@ function render(){
   document.title=(Q?'찾기':CATS.find(x=>x.id===CUR).t)+' · UI 용어사전';
 }
 function addRp(st){if($('.rp',st))return;const b=document.createElement('button');b.className='rp';b.type='button';b.title='다시 재생';b.innerHTML=ic('replay');b.onclick=e=>{e.stopPropagation();run(st)};st.appendChild(b)}
-function run(st){const [k,a]=st.dataset.demo.split(':');const f=D[k];if(!f)return;clearInterval(st._i);clearTimeout(st._t);cancelAnimationFrame(st._r);st.onclick=null;st.onpointerdown=st.onpointermove=st.onpointerleave=null;st.removeAttribute('style');try{f(st,a)}catch(e){console.error(k,e)}if(f.replay)addRp(st)}
+/* 펼친 목록·메뉴가 무대 밖으로 잘리지 않게: 열리면 무대 높이를 늘리고 닫히면 되돌림 (2026-11-28 실장님) */
+function fitStage(st){const open=$$('.menu:not(.hide)',st);if(!open.length){if(st._mh){st._mh='';st.style.minHeight=st.style.paddingTop=st.style.alignItems=''}return}const r=st.getBoundingClientRect();let over=0;open.forEach(m=>{over=Math.max(over,m.getBoundingClientRect().bottom+16-r.bottom)});if(over<=0)return;if(!st._mh){const top=[...st.children].filter(x=>x.tagName!=='STYLE'&&!x.classList.contains('rp')&&!x.classList.contains('say'))[0];if(top){st.style.paddingTop=Math.round(top.getBoundingClientRect().top-r.top)+'px';st.style.alignItems='flex-start'}}st._mh=Math.ceil(st.offsetHeight+over)+'px';st.style.minHeight=st._mh}
+function run(st){const [k,a]=st.dataset.demo.split(':');const f=D[k];if(!f)return;clearInterval(st._i);clearTimeout(st._t);cancelAnimationFrame(st._r);st.onclick=null;st.onpointerdown=st.onpointermove=st.onpointerleave=null;st.removeAttribute('style');try{f(st,a)}catch(e){console.error(k,e)}if(f.replay)addRp(st);st._mh='';if(!st._mo){st._mo=new MutationObserver(ms=>{if(ms.some(m=>m.target!==st))requestAnimationFrame(()=>fitStage(st))});st._mo.observe(st,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})}}
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!e.target._on){e.target._on=1;run(e.target)}}),{rootMargin:'120px'});
 /* 팝업 */
 window.openPop=h=>{$('#ovb').innerHTML=h;$('#ovl').classList.add('show')};
