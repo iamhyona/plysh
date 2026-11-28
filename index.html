@@ -2665,7 +2665,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261128hm283';
+var APP_VER = '20261128hm284';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3678,9 +3678,9 @@ var SPACES = [
   // 2026-11-27 실장님: 안내 → 전산실(사무실 · 전산) + 행정실(행정 업무), 이름 실장님 그대로
   { k: 'itm', t: '전산실', d: '사무실 출입 · 와이파이 · 나스 · 복합기 · 위하고 · 메일', home: 'space:itm', ic: 'monitor', g: [
     { g: '전산실', i: [{ k: 'gd:g.html?id=office&s=1', t: '사무실 출입', s: '사무실 출입 방법' }, { k: 'gd:g.html?id=office&s=3', t: '와이파이', s: '사무실 와이파이' }, { k: 'gd:g.html?id=office&s=2', t: '나스(NAS)', s: '맥에서 연결 · 사무실 밖에서 접속 · 공유 링크' }, { k: 'gd:g.html?id=office&s=4', t: '복합기', s: '프린터 연결 · 스캔 받기' }, { k: 'gd:g.html?id=system&s=1', t: '위하고', s: '접속 정보 · 로그인 순서' }, { k: 'gd:g.html?id=system&s=2', t: '메일플러그', s: '웹에서 사용 · 맥 Mail 앱 연결' }, { k: 'gd:g.html?id=system&s=3', t: '메일 서명', s: '팀 서명 양식 · 웹메일 · 맥 Mail 앱' }] }] },
-  { k: 'admin', t: '행정실', d: '퀵 · 지출결의서 · 법인택시 · 법인카드 · 명함 · 초과근무', home: 'space:admin', ic: 'stamp', g: [
-    { g: '행정실', i: [{ k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 신청 및 제작', s: '신청 정보 · 제작 순서 · 데이터' }, { k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }] }] },
-  { k: 'ctm', t: '사내연락망', d: '사운드웨이브 · 사운드컨텐츠 직원 메일과 휴대전화', home: 'ct', ic: 'qk', g: [] },
+  { k: 'admin', t: '행정실', d: '사내연락망 · 퀵 · 지출결의서 · 법인택시 · 법인카드 · 명함 · 초과근무', home: 'space:admin', ic: 'stamp', g: [
+    { g: '행정실', i: [{ k: 'ct', t: '사내연락망', s: '사운드웨이브 · 사운드컨텐츠 직원 메일과 휴대전화' }, { k: 'gd:g.html?id=adm_quick', t: '퀵 이용법', s: '접수 준비 · 보내는 순서' }, { k: 'gd:g.html?id=adm_expense', t: '지출결의서 작성법', s: '구글 시트 양식 · 작성 순서' }, { k: 'gd:g.html?id=adm_taxi', t: '법인택시 사용법', s: '야근 귀가 · 업무 이동 · 사용목적' }, { k: 'gd:g.html?id=adm_corpcard', t: '법인카드 사용법', s: '사용 전 확인 · 결재 순서 · 적요' }, { k: 'gd:g.html?id=adm_namecard', t: '명함 신청 및 제작', s: '신청 정보 · 제작 순서 · 데이터' }, { k: 'gd:g.html?id=adm_overtime', t: '초과근무 기준', s: '17:30 전 결재 · 18시 이후 · 식사 차감 · 수당 · 주 62시간' }] }] },
+  // 2026-11-28 실장님: 사내연락망은 행정실 안으로 (맨 위)
   // 2026-11-27 실장님: 월간리포트는 맨 밑
   { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
 ];
