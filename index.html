@@ -2661,7 +2661,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261128hm282';
+var APP_VER = '20261128hm283';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -3651,9 +3651,9 @@ var SPACES = [
   { k: 'qkm', t: '퀵 배차', d: '카카오 T 퀵 주문 · 거래처 주소와 연락처', home: 'qk', ic: 'truck', g: [] },
   { k: 'expm', t: '지출 결의서 작성', d: '지출결의서 작성 · 목록', home: 'exp', ic: 'won', g: [] },   // 2026-11-27 실장님: 돈 아이콘
   // 2026-11-27 실장님: 도구의 지류 · MD · 디자인을 대메뉴로 (지류도우미 · MD도우미 · 디자인도우미), 공통은 도구에 그대로
-  { k: 'ppm', t: '지류도우미', d: '용지 크기 · 사양서 · 검수 · 책등 · 종이연수 · 칼선 · 터잡기', home: 'space:ppm', ic: 'doc', g: [{ g: '지류도우미', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] }] },
-  { k: 'mdm', t: 'MD도우미', d: '작업지시서 양식 · 검수 · 상품 정보 라벨', home: 'space:mdm', ic: 'aid', g: [{ g: 'MD도우미', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '작업지시서 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] }] },
-  { k: 'dsm', t: '디자인도우미', d: '로고 · 폰트 찾기 · 단위 환산 · 팬톤', home: 'space:dsm', ic: 'pen', g: [{ g: '디자인도우미', i: [{ k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
+  { k: 'ppm', t: '지류도우미', d: '용지 크기 · 사양서 · 검수 · 책등 · 종이연수 · 칼선 · 터잡기 · 인쇄 디자인 실무', home: 'space:ppm', ic: 'doc', gx: [{ t: '인쇄 디자인 실무', gi: 2, c: '인쇄 데이터' }], g: [{ g: '지류도우미', i: [{ k: 'paper', t: '용지 크기', tool: 1 }, { k: 'doc', t: '사양서 작성', tool: 1 }, { k: 'review', t: '인쇄파일 검수기', s: '인쇄 파일 · 사양서', tool: 1 }, { k: 'spine', t: '책등 계산기', tool: 1 }, { k: 'cut', t: '종이연수·칼선', tool: 1 }, { k: 'impose', t: '터잡기', tool: 1 }] }] },
+  { k: 'mdm', t: 'MD도우미', d: '작업지시서 양식 · 검수 · 상품 정보 라벨 · MD 디자인 실무', home: 'space:mdm', ic: 'aid', gx: [{ t: 'MD 디자인 실무', gi: 2, c: '상품별 디자인' }], g: [{ g: 'MD도우미', i: [{ k: 'wo', t: '작업지시서 양식', s: '품목별 AI · PDF 양식', tool: 1 }, { k: 'gcheck', t: '작업지시서 검수기', s: '굿즈 작업지시서 검수', tool: 1 }, { k: 'formly', t: '상품 정보 라벨 생성기', s: '후면 표시사항 · 부착 라벨', tool: 1 }, { k: 'mark', t: '분리배출 · 표시 마크', s: '재질 · 국가로 넣을 마크 계산', tool: 1 }, { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 케이스 · 봉투 · 박스 · 지관통 · 틴케이스 · 지퍼백 규격 · 구매 링크', tool: 1 }] }] },
+  { k: 'dsm', t: '디자인도우미', d: '로고 · 폰트 찾기 · 단위 환산 · 팬톤 · 프로그램 기본 셋팅 · 코드 · 마크 · 촬영 · 사진', home: 'space:dsm', ic: 'pen', gx: [{ t: '프로그램 기본 셋팅', gi: 1 }, { t: '코드 · 마크', gi: 2, c: '코드 · 마크' }, { t: '촬영 · 사진', gi: 2, c: '촬영 · 사진' }], g: [{ g: '디자인도우미', i: [{ k: 'logo', t: '로고', tool: 1 }, { k: 'fonts', t: '폰트 찾기', tool: 1 }, { k: 'unit', t: '단위 환산', tool: 1 }, { k: 'pt', t: '팬톤', tool: 1 }] }] },
   // 2026-11-27 실장님: 도구(공통) 없앰 → 폴더·파일명 생성기를 하위 없는 대메뉴로
   { k: 'fnm', t: '폴더·파일명 생성기', d: '규칙에 맞는 폴더 · 파일 이름 만들기', home: 'filename', ic: 'tool', g: [] },
   // 2026-11-22 실장님: 명칭(상품별 부위 명칭)을 용어·견본에서 빼서 따로 대메뉴로, 하위 카테고리로 나눔
@@ -3666,8 +3666,9 @@ var SPACES = [
     { g: '음반', i: [{ k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · LP · 바이닐 · 포장 · 마감 · 실물 포맷 · 엔터 · 팬 굿즈' }] },
     { g: '디자인', i: [{ k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
   // 2026-11-28 실장님: 작업 기초 지침 대메뉴 없앰 → 프로그램 기본 셋팅 · 디자인 실무를 대메뉴로 (문서 목록이 바로 아래 펼쳐짐)
-  { k: 'glp', t: '프로그램 기본 셋팅', d: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지', home: 'gl:1', ic: 'set', flat: 1, g: [] },
-  { k: 'gld', t: '디자인 실무', d: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진', home: 'gl:2', ic: 'shape', flat: 1, g: [] },
+  // 2026-11-28 실장님(2차): 두 대메뉴도 없애고 문서를 지류 · MD · 디자인도우미 아래로 나눔 (gx). 주소 호환용으로 숨겨 둠
+  { k: 'glp', hid: 1, t: '프로그램 기본 셋팅', d: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지', home: 'gl:1', ic: 'set', flat: 1, g: [] },
+  { k: 'gld', hid: 1, t: '디자인 실무', d: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진', home: 'gl:2', ic: 'shape', flat: 1, g: [] },
   { k: 'design', hid: 1, t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드', home: 'space:design', ic: 'shape', g: [
     { g: '작업 기초 지침', i: [{ k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }] }] },  // 2026-11-28 실장님: 자가점검리스트는 인쇄파일 검수기 오른쪽 상자로 옮겨서 메뉴에서 뺌
   // 2026-11-27 실장님: 퀵 배차 · 사내연락망은 안내에서 빼서 따로 대메뉴 (하위 없이 바로 열림)
@@ -3694,6 +3695,7 @@ function spOf() {
   // 2026-11-27: 'proj' 대메뉴가 'pjm'(프로젝트)으로 바뀜 — 프로젝트 상세(ws) · 사양서는 pjm, 못 찾으면 pjm
   if (inWs()) return 'pjm';
   var c = navCur(); if (c === 'spec') return 'pjm';
+  if (S.view === 'gdoc') { var ow = gxOwner(S.gdf); if (ow) return ow; }
   for (var i = 0; i < SPACES.length; i++) if (SPACES[i].home === c || spItems(SPACES[i]).some(function (x) { return x.k === c; })) return SPACES[i].k;
   return 'pjm';
 }
@@ -4087,14 +4089,16 @@ function wtCard() {
 /* ── 도구 · 자료 공간 첫 화면 ── */
 function renderSpace(k) {
   var sp = SPACES.filter(function (s) { return s.k === k; })[0];
-  $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return (g.g === sp.t ? '' : '<h4>' + esc(g.g) + '</h4>') + '<div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') + '</div>';
+  $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return (g.g === sp.t ? '' : '<h4>' + esc(g.g) + '</h4>') + '<div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') +
+    (sp.gx || []).map(function (sec) { var by = [], m = {}; gxDocs(sec).forEach(function (d) { var c2 = d.c2 || ''; if (!m[c2]) { m[c2] = []; by.push(c2); } m[c2].push(d); });
+      return '<h4 class="glc">' + esc(sec.t) + '</h4>' + by.map(function (c2) { return (c2 ? '<h5 class="glc2">' + esc(c2) + '</h5>' : '') + '<div class="tkl">' + m[c2].map(function (d) { return '<button class="tkc" type="button" data-ng="gd:' + esc(d.f) + '"><b>' + esc(d.t) + '</b><span>' + esc((d.s || []).slice(0, 4).map(function (x) { return x[0]; }).join(' · ')) + '</span></button>'; }).join('') + '</div>'; }).join(''); }).join('') + '</div>';
   bindGo($('#main'));
 }
 function renderToolsHome() { navGo('filename'); }
 // 안내 문서를 페이지 안에 바로 (팝업 대신)
 function renderGdoc() {
   var f = S.gdf || 'folder-file.html', doc = GUIDES.filter(function (g) { return g.f === f; })[0];
-  var back = S.view === 'gdoc' && navCur().indexOf('gl:') === 0 ? '<button type="button" class="gdbk" data-ng="' + navCur() + '">' + navIc('back') + '목록으로</button>' : '';
+  var gow = gxOwner(f), back = S.view === 'gdoc' && (gow || navCur().indexOf('gl:') === 0) ? '<button type="button" class="gdbk" data-ng="' + (gow ? 'space:' + gow : navCur()) + '">' + navIc('back') + '목록으로</button>' : '';
   S.gdLede = '';
   $('#main').innerHTML = back + '<div class="gdl" id="gdL"><div class="gdin"><iframe id="gdIn" title="' + esc(doc ? doc.t : '안내') + '"></iframe></div><nav class="gdtoc" id="gdToc" aria-label="목차"></nav></div>';
   bindGo($('#main'));
@@ -4277,7 +4281,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length || sp.flat ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.flat ? flHtml(sp) : sp.k === 'tool' && sp.g.length > 1 ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length || sp.flat ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.flat ? flHtml(sp) : sp.k === 'tool' && sp.g.length > 1 ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + gxHtml(sp) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); flBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
@@ -4314,6 +4318,26 @@ function flHtml(sp) {
   if (d2) h += '</div>'; if (d1) h += '</div>';
   return '<div class="s3 sfl">' + h + '</div>';
 }
+function gxDocs(sec) { var G = GUIDE_GROUPS[sec.gi]; return G ? G.i.filter(function (d) { return d.f !== 'folder-file.html' && (!sec.c || d.c === sec.c); }) : []; }
+function gxOwner(f) { if (!f) return ''; var o = ''; SPACES.forEach(function (sp) { if (!o && sp.gx && sp.gx.some(function (sec) { return gxDocs(sec).some(function (d) { return d.f === f; }); })) o = sp.k; }); return o; }
+// 도우미 대메뉴 안 '디자인 실무' 묶음: 묶음(접고 펴기) > [소분류] > 문서
+function gxHtml(sp) {
+  if (!sp.gx) return '';
+  var curF = S.view === 'gdoc' ? (S.gdf || '') : '', fo = NAV.flo || (NAV.flo = {}), h = '';
+  sp.gx.forEach(function (sec) {
+    var docs = gxDocs(sec), k = sp.k + '|' + sec.t, op = fo[k] != null ? fo[k] : docs.some(function (d) { return d.f === curF; }), c2 = null, d2 = 0;
+    h += '<button type="button" class="pt' + (op ? ' op' : '') + '" data-flt="' + esc(k) + '">' + esc(sec.t) + '<i class="cv"></i></button><div class="flg"' + (op ? '' : ' hidden') + '>';
+    docs.forEach(function (dd) {
+      if ((dd.c2 || null) !== c2) { if (d2) { h += '</div>'; d2 = 0; } c2 = dd.c2 || null;
+        if (c2) { var k2 = k + '|' + c2, cc = c2, op2 = fo[k2] != null ? fo[k2] : docs.some(function (z) { return z.c2 === cc && z.f === curF; }); h += '<button type="button" class="s4 pt2' + (op2 ? ' op' : '') + '" data-flt="' + esc(k2) + '">' + esc(c2) + '<i class="cv"></i></button><div class="flg"' + (op2 ? '' : ' hidden') + '>'; d2 = 1; } }
+      var on = dd.f === curF && !inWs();
+      h += '<button type="button" class="' + (dd.c2 ? 's5' : 's4') + (on ? ' on' : '') + '" data-ng="gd:' + esc(dd.f) + '">' + esc(dd.t) + '</button>';
+    });
+    if (d2) h += '</div>';
+    h += '</div>';
+  });
+  return '<div class="s3 sfl gx">' + h + '</div>';
+}
 function flBind(root) { $$('[data-flt]', root).forEach(function (b) { b.onclick = function (ev) { if (ev) ev.stopPropagation(); var w = b.nextElementSibling, op = w.hasAttribute('hidden'); (NAV.flo || (NAV.flo = {}))[b.dataset.flt] = op; if (op) w.removeAttribute('hidden'); else w.setAttribute('hidden', ''); b.classList.toggle('op', op); }; }); }
 function sideHtml() {
   var cur = navCur(), sk = spOf();
@@ -4328,6 +4352,7 @@ function sideHtml() {
       else if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력'], ['todo', '할 일']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else if (sp.k === 'tool' && sp.g.length > 1) h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
+      h += gxHtml(sp);
       return h + '</div>';
     }).join('');
 }
