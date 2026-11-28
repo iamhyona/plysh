@@ -4886,7 +4886,7 @@ function renderProject() {
     '<div class="pjs1">' + body + '</div>';
   $('#main').innerHTML = h; bindItems(); bindRep(); bindEvCk(); bindFilter();
   // 2026-11-27 실장님: 가로형은 오늘 칸부터 보이게 (예전엔 다른 .pgw 단추를 잡아서 안 움직였음)
-  var gw = $('#main .pjs1 .pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
+  var gw = $('#main .pjs1 .pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, gw.scrollLeft + th.getBoundingClientRect().left - gw.getBoundingClientRect().left - nm.offsetWidth); }
   // 2026-11-29 실장님: 모바일 가로형은 프로젝트 두 줄만 보이고 그 안에서 스크롤 (날짜 줄은 위에 고정)
   if (gw && window.innerWidth < 1024) { var gr = gw.querySelectorAll('tbody tr'), gh = gw.querySelector('thead'); if (gr.length > 2 && gh) { var pj = gw.parentNode; pj.style.maxHeight = 'none'; pj.style.overflow = 'visible'; gw.style.height = 'auto'; gw.style.maxHeight = (gh.offsetHeight + gr[0].offsetHeight + gr[1].offsetHeight + 16) + 'px'; gw.style.overflowY = 'auto'; gw.style.overscrollBehavior = 'contain'; } }
   $$('#lSeg button').forEach(function (b) { b.onclick = function () { S.lp = b.dataset.p; ls.set('d4:lp', S.lp); render(); }; });
@@ -4895,7 +4895,7 @@ function renderProject() {
   if ($('#lP')) { $('#lP').onclick = function () { S.ld = dMove(lp, S.ld || TODAY, -1); render(); }; $('#lN').onclick = function () { S.ld = dMove(lp, S.ld || TODAY, 1); render(); }; }
   if ($('#nT')) $('#nT').onclick = function () {
     var g = $('#main .pjs1 .pgw');
-    if (g) { var t = [].filter.call(g.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], n = g.querySelector('.pgn'); if (t && n) g.scrollLeft = Math.max(0, t.offsetLeft - n.offsetWidth); goTodayEl('#main .pjs1'); return; }
+    if (g) { var t = [].filter.call(g.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], n = g.querySelector('.pgn'); if (t && n) g.scrollLeft = Math.max(0, g.scrollLeft + t.getBoundingClientRect().left - g.getBoundingClientRect().left - n.offsetWidth); goTodayEl('#main .pjs1'); return; }
     S.ld = TODAY; render(); goTodayEl('#main .pjnow');
   };
   $$('#pSeg button').forEach(function (b) { b.onclick = function () { S.pm = b.dataset.m; ls.set('d4:pm', S.pm); render(); }; });
