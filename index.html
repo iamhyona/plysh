@@ -1765,7 +1765,7 @@ html.s3pc .gdl.has .gdtoc { display:none !important; } html.s3pc .gdl.has { grid
 #nsd .sbh button { border:0; background:none; padding:0; font-size:18px; font-weight:800; letter-spacing:.06em; color:var(--txt); }
 #nsd .sfs { display:flex; align-items:center; gap:8px; width:100%; height:38px; border:0; background:var(--bg); border-radius:10px; padding:0 11px; color:var(--mute); font-size:13.5px; margin-bottom:12px; }
 #nsd .sfs svg { width:15px; height:15px; } #nsd .sfs kbd { margin-left:auto; font-family:inherit; font-size:11px; background:#fff; border-radius:6px; padding:1px 6px; }
-#nsd .si.sflat { display:none !important; } .flg[hidden] { display:none !important; }
+.flg[hidden] { display:none !important; }
 #nsd .ss { display:flex; align-items:center; gap:10px; width:100%; min-height:42px; border:0; background:none; text-align:left; padding:0 12px; border-radius:12px; font-size:16px; font-weight:700; color:var(--sub); margin-top:2px; }
 .gdin { background:#fff; border-radius:16px; overflow:hidden; min-width:0; } .gdin iframe { display:block; width:100%; min-height:70vh; border:0; }
 .gdl { display:grid; grid-template-columns:minmax(0, 1fr); gap:12px; align-items:start; }
@@ -3665,12 +3665,7 @@ var SPACES = [
     { g: 'MD', i: [{ k: 'ref:MD', t: '소재', ct: 'MD 소재', s: '봉제 · 아크릴 · 금속 · 유리 · 도자기 · 플라스틱 · 실리콘 · 카드 소재 · 기법 · 용어' }, { k: 'ref:부자재', t: '부자재', ct: 'MD 부자재', s: '연결 고리 · 키링 · 체인 · 끈 · 지퍼 · 단추·스냅 · 여밈 · 라벨 · 인형 부속 · 장식 · 비즈 · 주얼리' }, { k: 'ref:포장', t: '포장', ct: 'MD 포장', s: '봉투 · 슬라이드 지퍼백 · 전투후은 · 걸이 · 속지 · 박스 · 택 · 마감 · 분리배출 표시 · 품목별 포장' }] },
     { g: '음반', i: [{ k: 'ref:음반', t: '음반', s: 'CD 디스크 · CD 패키지 · 인레이 · 부클릿 · LP · 바이닐 · 포장 · 마감 · 실물 포맷 · 엔터 · 팬 굿즈' }] },
     { g: '디자인', i: [{ k: 'ref:디자인', t: '디자인', s: '타이포그래피 · 서체 양식 · 레이아웃 · 색 · 착시 · 사진 · 사조 · 단위 · 파일' }] }] },
-  // 2026-11-28 실장님: 작업 기초 지침 대메뉴 없앰 → 프로그램 기본 셋팅 · 디자인 실무를 대메뉴로 (문서 목록이 바로 아래 펼쳐짐)
-  // 2026-11-28 실장님(2차): 두 대메뉴도 없애고 문서를 지류 · MD · 디자인도우미 아래로 나눔 (gx). 주소 호환용으로 숨겨 둠
-  { k: 'glp', hid: 1, t: '프로그램 기본 셋팅', d: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지', home: 'gl:1', ic: 'set', flat: 1, g: [] },
-  { k: 'gld', hid: 1, t: '디자인 실무', d: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진', home: 'gl:2', ic: 'shape', flat: 1, g: [] },
-  { k: 'design', hid: 1, t: '작업 기초 지침', d: '폴더 · 파일 규칙, 프로그램 셋팅, 실무 가이드', home: 'space:design', ic: 'shape', g: [
-    { g: '작업 기초 지침', i: [{ k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' }, { k: 'gl:2', t: '디자인 실무', s: '인쇄 데이터 · 상품별 디자인 · 코드 · 마크 · 촬영 · 사진' }] }] },  // 2026-11-28 실장님: 자가점검리스트는 인쇄파일 검수기 오른쪽 상자로 옮겨서 메뉴에서 뺌
+  // 2026-11-28 실장님: 작업 기초 지침 · 프로그램 기본 셋팅 · 디자인 실무 대메뉴 삭제 → 문서는 지류 · MD · 디자인도우미 안 gx 묶음. 예전 주소 gl:1 · gl:2 는 navGo에서 도우미로 보냄
   // 2026-11-27 실장님: 퀵 배차 · 사내연락망은 안내에서 빼서 따로 대메뉴 (하위 없이 바로 열림)
   // 2026-11-27 실장님: 안내 → 전산실(사무실 · 전산) + 행정실(행정 업무), 이름 실장님 그대로
   { k: 'itm', t: '전산실', d: '사무실 출입 · 와이파이 · 나스 · 복합기 · 위하고 · 메일', home: 'space:itm', ic: 'monitor', g: [
@@ -3710,8 +3705,9 @@ function navGo(k) {
   if (k === 'space:make' || k === 'space:tool' || k === 'tools' || k === 'gd:folder-file.html') k = 'filename'; // 2026-11-27 폴더·파일 작성법은 생성기 아래로 // 2026-11-27 도구 대메뉴 없앰 → 옛 주소는 폴더·파일명 생성기로
   if (TOOL_LIST.some(function (x) { return x.k === k; })) return openTool(k);
   if (k.indexOf('gd:') === 0) { S.gdf = k.slice(3); S.view = 'gdoc'; window.scrollTo(0, 0); return render(); }
+  if (k === 'gl:1') k = 'space:dsm'; else if (k === 'gl:2') k = 'space:ppm'; // 2026-11-28 대메뉴 삭제 → 도우미로
   if (k.indexOf('gl:') === 0) { S.gl = +k.slice(3); S.view = 'glist'; window.scrollTo(0, 0); return render(); }
-  if (k === 'guide') { S.spk = 'design'; S.view = 'space'; window.scrollTo(0, 0); return render(); }
+  if (k === 'guide' || k === 'space:design') k = 'space:dsm'; // 작업 기초 지침 대메뉴 삭제(2026-11-28)
   if (k.indexOf('space:') === 0) { S.spk = k.slice(6); S.view = 'space'; window.scrollTo(0, 0); return render(); }
   if (k === 'cal' || k === 'sched' || k === 'month') { S.cv = k === 'cal' ? 'proj' : k === 'sched' ? 'proj' : (ls.get('d4:cv') || 'proj'); if (k === 'cal') { S.pjm = 'd'; ls.set('d4:pjm', 'd'); } ls.set('d4:cv', S.cv); k = 'month'; }
   menuReset(k);
@@ -4088,7 +4084,7 @@ function wtCard() {
 }
 /* ── 도구 · 자료 공간 첫 화면 ── */
 function renderSpace(k) {
-  var sp = SPACES.filter(function (s) { return s.k === k; })[0];
+  var sp = SPACES.filter(function (s) { return s.k === k; })[0]; if (!sp) return navGo('start');
   $('#main').innerHTML = '<div class="spg">' + sp.g.map(function (g) { return (g.g === sp.t ? '' : '<h4>' + esc(g.g) + '</h4>') + '<div class="tkl">' + g.i.map(function (x) { return '<button class="tkc" type="button" data-ng="' + x.k + '"><b>' + esc(x.t) + '</b><span>' + esc(x.s || '') + '</span></button>'; }).join('') + '</div>'; }).join('') +
     (sp.gx || []).map(function (sec) { var by = [], m = {}; gxDocs(sec).forEach(function (d) { var c2 = d.c2 || ''; if (!m[c2]) { m[c2] = []; by.push(c2); } m[c2].push(d); });
       return '<h4 class="glc">' + esc(sec.t) + '</h4>' + by.map(function (c2) { return (c2 ? '<h5 class="glc2">' + esc(c2) + '</h5>' : '') + '<div class="tkl">' + m[c2].map(function (d) { return '<button class="tkc" type="button" data-ng="gd:' + esc(d.f) + '"><b>' + esc(d.t) + '</b><span>' + esc((d.s || []).slice(0, 4).map(function (x) { return x[0]; }).join(' · ')) + '</span></button>'; }).join('') + '</div>'; }).join(''); }).join('') + '</div>';
@@ -4179,7 +4175,7 @@ function subItems() {
   try {
     var nc = navCur();
     if (S.view === 'tk' && (S.tk === 'pack' || S.tk === 'opp')) { var pc0 = packCur(); PACK_SUB.forEach(function (p) { L.push({ t: p[1], on: p[0] === pc0, go: function () { if (p[0] === 'opp') return navGo('opp'); var f = subFrame('pack'); if (S.tk === 'pack' && f && f.contentWindow.plyshPackKind) { f.contentWindow.plyshPackKind(p[0]); SUB.sig = ''; } else window.plyshOpenTool('pack', p[0]); } }); }); return L; }
-    if ((S.view === 'glist' || S.view === 'gdoc') && nc.indexOf('gl:') === 0 && SPACES.some(function (s) { return s.flat && s.home === nc; })) { return L; // 대메뉴에 늘 그려 둠 (flHtml)
+    if ((S.view === 'glist' || S.view === 'gdoc') && nc.indexOf('gl:') === 0) { return L; // 도우미 대메뉴 안에 늘 그려 둠 (gxHtml)
     } else if ((S.view === 'glist' || S.view === 'gdoc') && nc.indexOf('gl:') === 0 && GUIDE_GROUPS[+nc.slice(3)]) {
       // 프로그램 기본 셋팅 · 디자인 실무: 문서 이름이 소메뉴, 누르면 그 문서가 열리고 목차가 그 아래 펼쳐짐 (2026-11-20 실장님)
       var curF = S.view === 'gdoc' ? (S.gdf || '') : '';
@@ -4281,7 +4277,7 @@ setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
   f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
-    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length || sp.flat ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.flat ? flHtml(sp) : sp.k === 'tool' && sp.g.length > 1 ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + gxHtml(sp) + '</div>'; }).join('') + '</div>';
+    '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.k === 'tool' && sp.g.length > 1 ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + gxHtml(sp) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); flBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
   if (!f._sw) { f._sw = 1; var x0 = null; f.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true }); f.addEventListener('touchend', function (e) { if (x0 != null && e.changedTouches[0].clientX - x0 > 70) navClose(); x0 = null; }, { passive: true }); }
@@ -4301,23 +4297,7 @@ function tgBind(root) { $$('[data-tg]', root).forEach(function (b) { b.onclick =
 // 2026-11-27 실장님: 대메뉴 펼침은 직접 닫을 때만 닫힘 — 펼친 목록을 기억(d4:sopen), 새로 들어간 대메뉴는 자동으로 펼침
 var SOPEN = (function () { try { return JSON.parse(ls.get('d4:sopen') || '{}') || {}; } catch (x) { return {}; } })();
 function soSave() { try { ls.set('d4:sopen', JSON.stringify(SOPEN)); } catch (x) {} }
-// 2026-11-28 실장님: 프로그램 기본 셋팅 · 디자인 실무 대메뉴를 펼치면 (지금 화면과 상관없이) 문서 목록이 늘 보이게 — 사이드바 · 모바일 전체 메뉴 같은 모양
-function flHtml(sp) {
-  var G = GUIDE_GROUPS[+String(sp.home).slice(3)]; if (!G) return '';
-  var curF = S.view === 'gdoc' ? (S.gdf || '') : '', fo = NAV.flo || (NAV.flo = {}), h = '', c = null, c2 = null, d1 = 0, d2 = 0;
-  function has(fn) { return G.i.some(function (z) { return fn(z) && z.f === curF; }); }
-  G.i.forEach(function (dd) {
-    if (dd.f === 'folder-file.html') return;
-    if ((dd.c || null) !== c) { if (d2) { h += '</div>'; d2 = 0; } if (d1) { h += '</div>'; d1 = 0; } c = dd.c || null; c2 = null;
-      if (c) { var k = sp.k + '|' + c, op = fo[k] != null ? fo[k] : has(function (z) { return z.c === c; }); h += '<button type="button" class="pt' + (op ? ' op' : '') + '" data-flt="' + esc(k) + '">' + esc(c) + '<i class="cv"></i></button><div class="flg"' + (op ? '' : ' hidden') + '>'; d1 = 1; } }
-    if ((dd.c2 || null) !== c2) { if (d2) { h += '</div>'; d2 = 0; } c2 = dd.c2 || null;
-      if (c2) { var k2 = sp.k + '|' + c + '|' + c2, op2 = fo[k2] != null ? fo[k2] : has(function (z) { return z.c === c && z.c2 === c2; }); h += '<button type="button" class="s4 pt2' + (op2 ? ' op' : '') + '" data-flt="' + esc(k2) + '">' + esc(c2) + '<i class="cv"></i></button><div class="flg"' + (op2 ? '' : ' hidden') + '>'; d2 = 1; } }
-    var on = dd.f === curF && !inWs();
-    h += '<button type="button" class="' + (dd.c2 ? 's5' : dd.c ? 's4' : '') + (on ? ' on' : '') + '" data-ng="gd:' + esc(dd.f) + '">' + esc(dd.t) + '</button>';
-  });
-  if (d2) h += '</div>'; if (d1) h += '</div>';
-  return '<div class="s3 sfl">' + h + '</div>';
-}
+// 2026-11-28 실장님: 디자인 실무 문서를 도우미 대메뉴 안에 늘 그림 (지금 화면과 상관없이) — 사이드바 · 모바일 전체 메뉴 같은 모양
 function gxDocs(sec) { var G = GUIDE_GROUPS[sec.gi]; return G ? G.i.filter(function (d) { return d.f !== 'folder-file.html' && (!sec.c || d.c === sec.c); }) : []; }
 function gxOwner(f) { if (!f) return ''; var o = ''; SPACES.forEach(function (sp) { if (!o && sp.gx && sp.gx.some(function (sec) { return gxDocs(sec).some(function (d) { return d.f === f; }); })) o = sp.k; }); return o; }
 // 도우미 대메뉴 안 '디자인 실무' 묶음: 묶음(접고 펴기) > [소분류] > 문서
@@ -4345,11 +4325,10 @@ function sideHtml() {
   return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
     spVis().map(function (sp) {
       // 2026-11-23 실장님: 대메뉴 오른쪽에도 접고 펴는 꺾쇠
-      var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj' || sp.flat, op = !!SOPEN[sp.k], h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
+      var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj', op = !!SOPEN[sp.k], h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
       if (!sub || !op) return h;
       h += '<div class="sx">';
-      if (sp.flat) h += flHtml(sp);   // 문서 목록(분류 > 문서)을 늘 그림
-      else if (sp.k === 'proj') {
+      if (sp.k === 'proj') {
         h += [['pj', '목록'], ['cal', '달력'], ['todo', '할 일']].map(function (x) { return '<button type="button" class="si' + (cur === x[0] && !inWs() ? ' on' : '') + '" data-ng="' + x[0] + '">' + x[1] + '</button>'; }).join('');
       } else if (sp.k === 'tool' && sp.g.length > 1) h += tgHtml(sp, 'si'); else if (sp.k === 'gloss') h += glHtml(sp, 'si'); else sp.g.forEach(function (g) { if (sp.g.length > 1) h += '<div class="sg">' + esc(g.g) + '</div>'; h += g.i.map(function (x) { var on = x.k === cur && !inWs(), hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="si' + (hs ? ' tgh' + (on && !(window.SUB || {}).shut ? ' op' : '') : '') + (on ? ' on' : '') + '" data-ng="' + x.k + '">' + esc(x.t) + (hs ? '<span class="cv"></span>' : '') + '</button>'; }).join(''); });
       h += gxHtml(sp);
@@ -4386,7 +4365,7 @@ function pgInfo() {
   if (v === 'space') return { t: sp.t, d: sp.d };
   if (v === 'gdoc') { var doc = GUIDES.filter(function (g) { return g.f === S.gdf; })[0], gi = doc ? null : spItems(sp).filter(function (x) { return x.k === cur; })[0]; return { t: doc ? doc.t : gi ? gi.t : '안내', d: S.gdLede || '' }; }
   var it = spItems(sp).filter(function (x) { return x.k === cur; })[0];
-  if (v === 'glist') return { t: it ? it.t : sp.flat ? sp.t : '', d: it ? it.s : sp.flat ? sp.d : '' };
+  if (v === 'glist') return { t: it ? it.t : '', d: it ? it.s : '' };
   return { t: it ? it.ct || it.t : cur === 'spec' ? '사양서' : sp.t, d: PG_DESC[cur] || (it && it.s ? it.s.replace(/^[A-Z][A-Z .]*[A-Z]\s+/, '') : '') };
 }
 window.plMenu = function () { try { var i = pgInfo(); return i ? i.t : (S.view === 'start' ? '홈' : ''); } catch (e) { return ''; } }; // 사용 기록(plog.js)의 메뉴 이름
