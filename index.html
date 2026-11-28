@@ -2610,10 +2610,13 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 
 <script src="plog.js?v=2"></script>
 <script>
+// 2026-11-28 실장님: 공부방(study) = PLYSH와 같은 틀. study/ 가 이 파일을 불러와 window.STUDY=1 로 염 → 공부 메뉴만 보이고, 보던 화면 저장 키는 따로
+var STUDY = !!window.STUDY, APPN = STUDY ? '공부방' : 'PLYSH';
 var $ = function (s, r) { return (r || document).querySelector(s); };
 var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
-var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-  set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+var LSK = function (k) { return STUDY && /^d4:(view|tk|lgtab)$/.test(k) ? 'st:' + k.slice(3) : k; };
+var ls = { get: function (k) { try { return localStorage.getItem(LSK(k)); } catch (e) { return null; } },
+  set: function (k, v) { try { localStorage.setItem(LSK(k), v); } catch (e) {} } };
 // 2026-10-23: 지출결의 목록의 '시트 열기' 아이콘 (전역으로 둬서 어디서든 사용 — 없으면 올리기 후 목록 그리다 오류)
 var SHIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>';
 var W = ['일', '월', '화', '수', '목', '금', '토'];
@@ -2646,6 +2649,7 @@ S.cv = ls.get('d4:cv') || 'proj'; // 2026-11-23 실장님: 달력 기본 = 가�
 if (S.view === 'designer' || S.view === 'team' || S.view === 'project') { S.view = 'month'; S.cv = 'proj'; }
 if (S.view === 'home' || S.view === 'tl' || S.view === 'spec') S.view = 'pj';
 if (['pj', 'month', 'todo', 'wl', 'spec', 'qk', 'ct', 'exp', 'mrep'].indexOf(S.view) < 0) S.view = 'start';
+if (STUDY) { if (ls.get('d4:view') === 'tk' && S.tk) S.view = 'tk'; else { S.view = 'space'; S.spk = 'ppm'; } }
 
 S.pj = ls.get('d4:pj'); S.mm = ls.get('d4:mm') || 'sched'; S.pm = ls.get('d4:pm') || 'sched'; S.dp = ls.get('d4:dp') || 'd'; S.dn = ls.get('d4:dn') || ''; S.dd = TODAY; S.pf = ls.get('d4:pf') || ''; S.fold = !!ls.get('d4:fold'); S.lp = ls.get('d4:lp') || 'a'; S.ld = TODAY; S.tl = ls.get('d4:tl') || 'date';
 var API = 'https://script.google.com/macros/s/AKfycbzpvNlxuCa95ZxGvg8N4SiPqmsPzyYx_n9ikhmdRlIng7VzWzks_WS6DDyviPXsfoaO/exec';
@@ -3300,6 +3304,9 @@ var TOOLS = [
     { k: 'opp', t: 'OPP 봉투 찾기', s: '제품 크기로 봉투 추천 · 국내 판매 규격 · 구매 링크', f: 'tools/opp/' },
     { k: 'pack', t: '포장재 찾기', s: 'OPP 봉투 · 블리스터 · 투명 케이스 · 안전봉투 · 택배봉투 · 무지 박스 · 지관통 · 틴케이스 · PVC 슬라이드 지퍼백 기성 규격 · 추천 · 구매 링크', f: 'tools/pack/' }] }
 ];
+// 2026-11-28 실장님: 공부방 코딩도우미 = UI·UX 용어사전 (tools/ui, 분류마다 메뉴 하나)
+var UI_CATS = [['input', '입력·선택', '토글 · 체크박스 · 셀렉트 · 입력칸 · 날짜'], ['button', '버튼·아이콘', '버튼 종류 · 버튼 상태 · 메뉴 아이콘 별명'], ['layout', '화면 구조', '뼈대 · 화면 배치 · 목록 보기 · 간격'], ['layer', '레이어·알림', '모달 · 시트 · 토스트 · 배지 · 권한'], ['feedback', '피드백·진행', '로딩 · 진행 표시 · 완료 · 빈 화면'], ['motion', '모션', '등장 · 텍스트 · 속도 곡선 · 화면 전환 · 스크롤'], ['gesture', '제스처', '탭 · 길게 누르기 · 스와이프 · 드래그'], ['data', '데이터·그래프', '차트 · KPI 카드 · 참고범위 막대'], ['screens', '기능별 화면', '검색 · 로그인 · 쇼핑 · 평점 · 지도 · AI'], ['style', '스타일·원칙', '디자인 스타일 · 모던 요소 · 심리 · 리서치'], ['pairs', '헷갈리는 짝', '닮았는데 이름이 다른 것']];
+if (STUDY) TOOLS.push({ g: '코딩도우미', i: UI_CATS.map(function (c) { return { k: 'ui-' + c[0], t: c[1], s: c[2], f: 'tools/ui/', pv: c[0] }; }) });
 var TOOL_OLD = { proof: 'doc', label: 'formly', calc: 'cut', die: 'cut' }; // 예전 저장값 → 새 메뉴
 var TOOL_LIST = []; TOOLS.forEach(function (gr) { gr.i.forEach(function (x) { TOOL_LIST.push(x); }); });
 var TOOL_SHORT = { wo: '작업지시서 양식', doc: '지류 사양서', formly: '상품 정보 라벨', filename: '파일명', spine: '책등', cut: '종이연수·칼선', impose: '터잡기', unit: '단위 환산', opp: 'OPP 봉투 찾기', pack: '포장재 찾기', mark: '분리배출 마크', review: 'PREFLIGHT', gcheck: '작업지시서 검수기', checklist: '체크리스트', items: '지류 품목', pt: '팬톤', ref: '용어사전', logo: '로고', fonts: '폰트' };
@@ -3632,6 +3639,7 @@ var NAV_IC = {
   monitor: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
   truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
   cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+  code: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
   cv: '<path d="M9 6l6 6-6 6"/>', back: '<path d="M15 6l-6 6 6 6"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
   sheet: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/>', ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'
@@ -3640,7 +3648,7 @@ function navIc(k) { return '<svg class="nvi" viewBox="0 0 24 24" fill="none" str
 function tl(k) { return TOOL_LIST.filter(function (x) { return x.k === k; })[0] || {}; }
 // 네 공간: 메뉴 하나 = { k(뷰나 도구 키), t, s(설명) }
 // 2026-11-20 실장님이 정한 메뉴 구성 (이름도 그대로)
-function spVis() { return SPACES.filter(function (s) { return !s.hid; }); }
+function spVis() { return SPACES.filter(function (s) { return !s.hid && !(s.boss && !(function () { try { return wlBoss(); } catch (e) { return false; } })()); }); } // 2026-11-28 실장님: 명칭 · 용어·견본은 PLYSH에선 실장님만
 var SPACES = [
   { k: 'home', hid: 1, t: '홈', d: '이번 주 마감, 오늘 할 일, 최근 프로젝트, 자주 쓰는 도구', home: 'start', ic: 'home', g: [] },
   // 2026-11-27 실장님: 홈 메뉴 없앰(PLYSH 로고 = 홈), 자주 쓰는 6개를 하위 없는 대메뉴로 맨 위에 (이름 실장님 그대로)
@@ -3680,6 +3688,19 @@ var SPACES = [
   // 2026-11-27 실장님: 월간리포트는 맨 밑
   { k: 'report', t: '월간리포트', d: '팀 활동 · 업무 · 근태를 한 달 단위 그래프로', home: 'mrep', ic: 'chart', g: [] },
 ];
+// 2026-11-28 실장님: 공부방은 공부·참고 메뉴만 (지류 · MD · 디자인 · 코딩도우미, 폴더·파일명 생성기, 명칭, 용어·견본, 프로그램 기본 셋팅, 디자인 실무)
+if (STUDY) {
+  SPACES.splice(SPACES.map(function (s) { return s.k; }).indexOf('fnm'), 0, { k: 'cdm', t: '코딩도우미', d: 'UI · UX 용어를 움직여 보며 익히기 · AI에게 정확한 이름으로 시키기', home: 'space:cdm', ic: 'code', g: [{ g: '코딩도우미', i: UI_CATS.map(function (c) { return { k: 'ui-' + c[0], t: c[1], tool: 1 }; }) }] });
+  var STK = ['ppm', 'mdm', 'dsm', 'cdm', 'fnm', 'name', 'gloss', 'glp', 'gld'];
+  SPACES = SPACES.filter(function (s) { return STK.indexOf(s.k) >= 0; });
+} else SPACES.forEach(function (s) { if (s.k === 'name' || s.k === 'gloss') s.boss = 1; });
+function studyOk(k) { // 공부방에서 회사 업무 화면(근태 · 프로젝트 · 캘린더 · 할 일 · 퀵 · 지출 · 연락망 · 리포트 · 전산실 · 행정실)은 열지 않음
+  if (!STUDY) return true; k = String(k || '');
+  if (/^(start|home|pj|cal|sched|month|todo|wl|spec|qk|ct|exp|mrep|sheets|ws)$/.test(k)) return false;
+  if (/^space:(itm|admin|home|wlm|pjm|calm|tdm|qkm|expm|ctm|report)$/.test(k)) return false;
+  if (/^gd:g\.html\?id=(office|system|adm_)/.test(k)) return false;
+  return true;
+}
 // 2026-11-27 실장님: 안내는 '안내 · 행정 업무' 구분 없이 한 목록
 SPACES.forEach(function (sp) { if (sp.k === 'admin' && sp.g.length > 1) sp.g = [{ g: sp.t, i: [].concat.apply([], sp.g.map(function (g) { return g.i; })) }]; });
 // 2026-11-20: 메뉴 이름은 SPACES(실장님 확정)가 유일한 기준. 칩 · 카드 · 찾기 · 자주 쓰는 도구 모두 이 이름
@@ -3698,6 +3719,7 @@ function spOf() {
   return 'pjm';
 }
 function navGo(k) {
+  if (!studyOk(k)) k = 'space:' + SPACES[0].k;
   navClose(); S.ws = null;
   if (TOOL_OLD[k]) k = TOOL_OLD[k]; // 예전 메뉴 키 (전개도 생성기 → 종이연수·칼선)
   if (k === 'ref') { NAV.refHome = 1; NAV.refPart = ''; S.refP = ''; } // 용어사전 메뉴를 누르면 늘 첫 화면(분류 카드)
@@ -4276,7 +4298,7 @@ function subTick() {
 setInterval(subTick, 500);
 function fullMenu() {
   var f = navEl('nfm', 'div', function (e) { document.body.appendChild(e); }), cur = navCur();
-  f.innerHTML = '<div class="top"><b>PLYSH</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
+  f.innerHTML = '<div class="top"><b>' + APPN + '</b><button type="button" class="fq">' + navIc('search') + '프로젝트 · 도구 · 연락처 찾기</button><button type="button" class="nx" aria-label="닫기" style="width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">' + navIc('x') + '</button></div>' +
     '<div class="cols">' + spVis().map(function (sp) { return '<div class="col' + (sp.g.length || sp.flat ? '' : ' c1') + '"><b data-ng="' + sp.home + '">' + esc(sp.t) + '</b>' + (sp.flat ? flHtml(sp) : sp.k === 'tool' && sp.g.length > 1 ? tgHtml(sp, 'lk') : sp.k === 'gloss' ? glHtml(sp, 'lk') : sp.g.map(function (g) { return (sp.g.length > 1 ? '<i class="fsg">' + esc(g.g) + '</i>' : '') + g.i.map(function (x) { var hs = /^(ref:|gl:)/.test(x.k) && !/^ref:명칭 (MD 공통 용어|책 구조)$/.test(x.k); return '<button type="button" class="lk' + (hs ? ' tgh' + (x.k === cur ? ' op' : '') : '') + (x.k === cur ? ' on' : '') + '" data-ng="' + x.k + '">' + (hs ? '<span class="cv" style="order:2"></span>' : '') + esc(x.t) + '</button>'; }).join(''); }).join('')) + '</div>'; }).join('') + '</div>';
   bindGo(f); tgBind(f); flBind(f); $('.nx', f).onclick = navClose; $('.fq', f).onclick = function () { navClose(); navPal(); };
   var bd = navEl('nfb', 'div', function (e) { document.body.appendChild(e); e.onclick = navClose; });
@@ -4318,7 +4340,7 @@ function flBind(root) { $$('[data-flt]', root).forEach(function (b) { b.onclick 
 function sideHtml() {
   var cur = navCur(), sk = spOf();
   if (NAV.lastSk !== sk) { NAV.lastSk = sk; if (!SOPEN[sk]) { SOPEN[sk] = 1; soSave(); } }
-  return '<div class="sbh"><button type="button" data-ng="start">PLYSH</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
+  return '<div class="sbh"><button type="button" data-ng="start">' + APPN + '</button></div><button type="button" class="sfs">' + navIc('search') + '찾기<kbd>⌘K</kbd></button>' +
     spVis().map(function (sp) {
       // 2026-11-23 실장님: 대메뉴 오른쪽에도 접고 펴는 꺾쇠
       var on = sp.k === sk, sub = sp.g.length || sp.k === 'proj' || sp.flat, op = !!SOPEN[sp.k], h = '<button type="button" class="ss' + (on ? ' on' : '') + (sp.g.length ? ' ex' : '') + (sub ? ' tgh' + (op ? ' op' : '') : '') + '" data-ng="' + sp.home + '">' + navIc(sp.ic) + esc(sp.t) + (sub ? '<span class="ssv" data-sst="1"><i class="cv"></i></span>' : '') + '</button>';
@@ -6226,7 +6248,7 @@ function wlMeInit() {
   if (!e || e === S.wlMeE || !window.crypto || !crypto.subtle || !window.TextEncoder) return; S.wlMeE = e;
   crypto.subtle.digest('SHA-256', new TextEncoder().encode(e)).then(function (b) {
     var h = Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('').slice(0, 12);
-    S.wlMe = WL_ME[h] || ''; S.wlMeDone = 1; if ((S.view === 'wl' || S.view === 'start') && S.wlMe) { try { render(); } catch (x) {} } if ($('#wlShG')) wlShSync();
+    S.wlMe = WL_ME[h] || ''; S.wlMeDone = 1; try { navSync(); } catch (x) {} if ((S.view === 'wl' || S.view === 'start') && S.wlMe) { try { render(); } catch (x) {} } if ($('#wlShG')) wlShSync();
   }).catch(function () {});
 }
 function wlShSync() { var u = wlShUrl(wlMe()), a = $('#wlShG'); if (!a) return; a.style.display = u ? '' : 'none'; if (u) a.href = u; }
