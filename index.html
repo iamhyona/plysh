@@ -3691,7 +3691,17 @@ var SPACES = [
 // 2026-11-28 실장님: 공부방은 공부·참고 메뉴만 (지류 · MD · 디자인 · 코딩도우미, 폴더·파일명 생성기, 명칭, 용어·견본, 프로그램 기본 셋팅, 디자인 실무)
 if (STUDY) {
   SPACES.splice(SPACES.map(function (s) { return s.k; }).indexOf('fnm'), 0, { k: 'cdm', t: '코딩도우미', d: 'UI · UX 용어를 움직여 보며 익히기 · AI에게 정확한 이름으로 시키기', home: 'space:cdm', ic: 'code', g: [{ g: '코딩도우미', i: UI_CATS.map(function (c) { return { k: 'ui-' + c[0], t: c[1], tool: 1 }; }) }] });
-  var STK = ['ppm', 'mdm', 'dsm', 'cdm', 'fnm', 'name', 'gloss', 'glp', 'gld'];
+  // 2026-11-28 실장님: 디자인 실무 하위를 도우미로 나눔 — 인쇄 데이터 → 지류도우미 '인쇄 디자인 실무', 상품별 디자인 → MD도우미 'MD 디자인 실무',
+  // 코드 · 마크 · 촬영 · 사진 · 프로그램 기본 셋팅 → 디자인도우미. 디자인 실무 · 프로그램 기본 셋팅 대메뉴는 공부방에서 없앰
+  var gdSplit = function (c, t) { GUIDE_GROUPS.push({ g: t, i: GUIDE_GROUPS[2].i.filter(function (d) { return d.c === c; }).map(function (d) { var o = {}; for (var x in d) o[x] = d[x]; o.c = ''; return o; }) }); return 'gl:' + (GUIDE_GROUPS.length - 1); };
+  var spAdd = function (k, it) { SPACES.filter(function (s) { return s.k === k; })[0].g[0].i.push(it); };
+  spAdd('ppm', { k: gdSplit('인쇄 데이터', '인쇄 디자인 실무'), t: '인쇄 디자인 실무', s: '인쇄 데이터 기본 · 녹아웃 · 오버프린트 · 트랩 · 인쇄 감리' });
+  spAdd('mdm', { k: gdSplit('상품별 디자인', 'MD 디자인 실무'), t: 'MD 디자인 실무', s: '포토카드 · 라벨 · 카드 · 아크릴 · 금속 · 봉제 · 가죽 · 음반' });
+  spAdd('dsm', { k: 'gl:1', t: '프로그램 기본 셋팅', s: '일러스트 · 포토샵 · 인디자인 · 아크로뱃 · 브릿지' });
+  spAdd('dsm', { k: gdSplit('코드 · 마크', '코드 · 마크'), t: '코드 · 마크', s: '바코드 · QR · FSC · 분리배출 · 표시사항 · 인증 마크' });
+  spAdd('dsm', { k: gdSplit('촬영 · 사진', '촬영 · 사진'), t: '촬영 · 사진', s: '시즌그리팅 팩샷 · 사진 촬영 · 데이터 관리' });
+  SPACES.forEach(function (s) { if (s.k === 'ppm') s.d += ' · 인쇄 디자인 실무'; if (s.k === 'mdm') s.d += ' · MD 디자인 실무'; if (s.k === 'dsm') s.d += ' · 프로그램 기본 셋팅 · 코드 · 마크 · 촬영 · 사진'; });
+  var STK = ['ppm', 'mdm', 'dsm', 'cdm', 'fnm', 'name', 'gloss'];
   SPACES = SPACES.filter(function (s) { return STK.indexOf(s.k) >= 0; });
 } else SPACES.forEach(function (s) { if (s.k === 'name' || s.k === 'gloss') s.boss = 1; });
 function studyOk(k) { // 공부방에서 회사 업무 화면(근태 · 프로젝트 · 캘린더 · 할 일 · 퀵 · 지출 · 연락망 · 리포트 · 전산실 · 행정실)은 열지 않음
