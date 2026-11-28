@@ -2286,6 +2286,8 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 .ctdst { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:800; margin-bottom:8px; } .ctdst small { font-size:12px; font-weight:600; color:var(--mute); }
 .ctda { margin:0 0 0 auto !important; height:30px; padding:0 11px 0 8px !important; border:0; border-radius:8px; background:var(--txt); color:#fff; font:inherit; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:3px; cursor:pointer; }
 .ctda svg { width:14px; height:14px; }
+.ctdw { margin-left:auto; height:30px; max-width:120px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--txt); font:inherit; font-size:12px; font-weight:600; padding:0 24px 0 9px; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 7px center; background-size:12px; }
+.ctdw + .ctda { margin-left:6px !important; }
 .ctdev { display:grid; gap:4px; }
 .ctd0 { font-size:13px; color:var(--mute); padding:6px 0; }
 .ctd0b { display:block; width:100%; text-align:left; border:1px dashed var(--line); border-radius:10px; background:none; padding:9px 12px; margin:0 !important; font:inherit; font-size:13px; color:var(--mute); cursor:pointer; }
@@ -2665,7 +2667,7 @@ function call(fn) {
   function run(n) { return once().catch(function (e) { if (e.retry && n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return run(n - 1); }); throw e; }); }
   return run(tries).then(function (o) { if (!o.ok) throw new Error(o.error || '오류가 났어요'); return o.data; });
 }
-var APP_VER = '20261128hm284';
+var APP_VER = '20261128hm285';
 function checkUpdate() {
   fetch('index.html?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
     var m = t.match(/var APP_VER = '(\w+)'/);
@@ -5507,11 +5509,15 @@ function ctdHtml() {
   var TT = me && T.indexOf(me) >= 0 ? [me].concat(T.filter(function (n) { return n !== me; })) : T;
   var h = '<div class="ctdh"><button type="button" class="ctdn" id="ctdP" aria-label="전날">' + IC_L + '</button><b>' + (+d.slice(5, 7)) + '.' + (+d.slice(8, 10)) + ' <em class="hwd">' + W[P(d).getDay()] + '</em>' + (d === TODAY ? '<em class="ctdt">오늘</em>' : '') + (hl ? '<em class="hwd">' + esc(hl) + '</em>' : '') + '</b><button type="button" class="ctdn" id="ctdN" aria-label="다음 날">' + IC_R + '</button>' +
     (d !== TODAY ? '<button type="button" class="ctdtd" id="ctdT">오늘</button>' : '') + '</div>';
-  h += '<div class="ctds"><div class="ctdst">일정<small>' + ev.length + '</small><button type="button" class="ctda" id="ctdE">' + IC_PS + '일정</button></div>' + (ev.length ? '<div class="ctdev">' + ev.map(function (e) { return itemHtml(e); }).join('') + '</div>' : '<div class="ctd0">일정이 없어요</div>') + '</div>';
-  h += '<div class="ctds"><div class="ctdst">할 일<small>' + R.filter(function (x) { return x.c; }).length + ' / ' + R.length + '</small>' + (me ? '<button type="button" class="ctda" data-tdq="' + esc(me) + '|' + d + '">' + IC_PS + '할 일</button>' : '') + '</div>';
+  // 2026-11-29 실장님: 캘린더 옆 패널은 투두리스트(할 일)만 — 일정 섹션 뺌
+  // 2026-11-29 실장님: 할 일 보기 = 전체 보기 / 사람 한 명 (드롭다운, 이 기기에 기억)
+  var who = ''; try { who = ls.get('d4:ctdwho') || ''; } catch (x) {} if (who && TT.indexOf(who) < 0) who = '';
+  if (who) { TT = [who]; R = R.filter(function (x) { return x.p === who; }); }
+  var wsel = '<select class="ctdw" id="ctdW" aria-label="할 일 보기"><option value="">전체 보기</option>' + T.map(function (n) { return '<option value="' + esc(n) + '"' + (n === who ? ' selected' : '') + '>' + esc(n) + (n === me ? ' (나)' : '') + '</option>'; }).join('') + '</select>';
+  h += '<div class="ctds"><div class="ctdst">할 일<small>' + R.filter(function (x) { return x.c; }).length + ' / ' + R.length + '</small>' + wsel + (me ? '<button type="button" class="ctda" data-tdq="' + esc(me) + '|' + d + '">' + IC_PS + '할 일</button>' : '') + '</div>';
   var any = false;
   TT.forEach(function (n) {
-    var L = R.filter(function (x) { return x.p === n; }); if (!L.length && n !== me) return; any = true;
+    var L = R.filter(function (x) { return x.p === n; }); if (!L.length && n !== me && n !== who) return; any = true;
     h += '<div class="ctdp"><div class="ctdpn"><i style="background:' + dcol(n) + '"></i>' + esc(n) + (n === me ? '<small>나</small>' : '') + (L.length ? (function () { var all = L.every(function (x) { return x.c; }); return '<button type="button" class="tdallck' + (all ? ' on' : '') + '" data-tdall="' + esc(L.map(function (x) { return x.id; }).join('\n')) + '">' + CKSVG + (all ? '전체 풀기' : '전체 완료') + '</button>'; })() : '') + '<button type="button" class="ctdq" data-tdq="' + esc(n) + '|' + d + '" aria-label="' + esc(n) + ' 할 일 추가">' + IC_PS + '</button></div>' +
       (L.length ? '<div class="tdl">' + tdGroup(L) + '</div>' : '<button type="button" class="ctd0 ctd0b" data-tdq="' + esc(n) + '|' + d + '">+ 이 날 할 일 쓰기</button>') + '</div>';
   });
@@ -5527,7 +5533,8 @@ function ctdPaint() {
   var go = function (d) { S.ctd = d; ctdSel(); ctdPaint(); ctdWeek(); };
   $('#ctdP').onclick = function () { go(addD(S.ctd || TODAY, -1)); }; $('#ctdN').onclick = function () { go(addD(S.ctd || TODAY, 1)); };
   if ($('#ctdT')) $('#ctdT').onclick = function () { go(TODAY); };
-  $('#ctdE').onclick = function () { openEdit(null, S.ctd || TODAY); };
+  if ($('#ctdW')) $('#ctdW').onchange = function () { try { ls.set('d4:ctdwho', this.value); } catch (x) {} ctdPaint(); };
+  if ($('#ctdE')) $('#ctdE').onclick = function () { openEdit(null, S.ctd || TODAY); };
 }
 function ctdSel() { var d = S.ctd || TODAY; $$('#main .ctdon').forEach(function (x) { x.classList.remove('ctdon'); }); $$('#main .mcal .grid > button[data-d="' + d + '"], #main [data-gd="' + d + '"]').forEach(function (x) { x.classList.add('ctdon'); }); }
 function ctdMount() {
