@@ -2365,6 +2365,11 @@ button:focus, button:focus-visible, a:focus-visible { outline:none !important; }
 #nsd .sx button small { margin-left:auto; font-size:11.5px; font-weight:600; color:var(--faint); }
 #nsd .sx button small + .cv { margin-left:10px !important; }
 #nfm .s3 button:before, #nfm .stg button:before { display:none !important; }
+
+/* 2026-11-29 실장님: 모바일 가로형 날짜 줄 고정 (두 줄만 보이는 상자 안에서 스크롤할 때) */
+@media (max-width:1023px) { .pgt thead th { position:sticky; top:0; z-index:3; background:var(--card); } .pgt thead th.pgn { z-index:4; } }
+/* 2026-11-29 실장님: 모바일 날짜 · 날씨는 한 줄로 작게 (제목보다 눈에 덜 띄게), 체감 · 습도 등 세부는 감춤 */
+@media (max-width:600px) { #mwd .wday, .wday { flex-direction:row !important; align-items:center !important; flex-wrap:nowrap; font-size:16px; font-weight:700; margin:2px 0 10px; white-space:nowrap; min-width:0; overflow:hidden; } .wday small.wwx { display:inline-flex; align-items:center; gap:4px; margin-left:10px !important; font-size:13px; } .wday .wwx svg { width:16px; height:16px; } .wday .wwx .wxs { display:none !important; } }
 /* 2026-11-29 실장님: 모바일 전체 메뉴도 같은 하이어라키 — 구역 이름(작은 회색) > 메뉴 > 소메뉴 > 항목, 단계는 들여쓰기 · 글자 크기만, 배경 · 막대 없음, 꺾쇠는 모두 오른쪽 끝 한 줄 */
 #nfm .s3, #nfm .stg, #nfm .flg { padding-left:0 !important; margin:0 !important; }
 #nfm .col button:before { display:none !important; }
@@ -4882,6 +4887,8 @@ function renderProject() {
   $('#main').innerHTML = h; bindItems(); bindRep(); bindEvCk(); bindFilter();
   // 2026-11-27 실장님: 가로형은 오늘 칸부터 보이게 (예전엔 다른 .pgw 단추를 잡아서 안 움직였음)
   var gw = $('#main .pjs1 .pgw'); if (gw) { var th = [].filter.call(gw.querySelectorAll('[data-gd]'), function (x) { return x.dataset.gd >= TODAY; })[0], nm = gw.querySelector('.pgn'); if (th && nm) gw.scrollLeft = Math.max(0, th.offsetLeft - nm.offsetWidth); }
+  // 2026-11-29 실장님: 모바일 가로형은 프로젝트 두 줄만 보이고 그 안에서 스크롤 (날짜 줄은 위에 고정)
+  if (gw && window.innerWidth < 1024) { var gr = gw.querySelectorAll('tbody tr'), gh = gw.querySelector('thead'); if (gr.length > 2 && gh) { var pj = gw.parentNode; pj.style.maxHeight = 'none'; pj.style.overflow = 'visible'; gw.style.height = 'auto'; gw.style.maxHeight = (gh.offsetHeight + gr[0].offsetHeight + gr[1].offsetHeight + 16) + 'px'; gw.style.overflowY = 'auto'; gw.style.overscrollBehavior = 'contain'; } }
   $$('#lSeg button').forEach(function (b) { b.onclick = function () { S.lp = b.dataset.p; ls.set('d4:lp', S.lp); render(); }; });
   if ($('#lSegD')) $('#lSegD').onchange = function () { if (this.value) { S.ld = this.value; render(); } };
   if ($('#lF')) { $('#lF').onchange = function () { if (this.value) { S.lf = this.value; ls.set('d4:lf', S.lf); render(); } }; $('#lT').onchange = function () { if (this.value) { S.lt = this.value; ls.set('d4:lt', S.lt); render(); } }; }
